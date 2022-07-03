@@ -274,6 +274,7 @@ template("k32w0_sdk") {
         "PDM_EXT_FLASH=1",
         "gEepromType_d=gEepromDevice_MX25R8035F_c",
         "gPdmNbSegments=63",
+        "gRadioUsePdm_d=1",
       ]
 
       if (chip_with_OM15082 != 0) {
@@ -470,11 +471,11 @@ template("k32w0_sdk") {
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
         sources += [
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm/board.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm/board_utility.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm/clock_config.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm/hardware_init.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/lped/bm/pin_mux.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/clock_config.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/hardware_init.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
         ]
       } else {
         sources += [
