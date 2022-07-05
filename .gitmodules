@@ -70,7 +70,8 @@
 	platforms = k32w0
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
-	url = https://github.com/openthread/ot-nxp.git
+	url = https://github.com/NXPmicro/ot-nxp.git
+	branch = update/SDK_2.6.6
 	platforms = k32w0
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
