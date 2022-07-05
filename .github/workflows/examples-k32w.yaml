@@ -83,7 +83,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w061+release light \
-                    out/artifacts/k32w-light-release-no-ota/chip-k32w061-light-example \
+                    out/artifacts/k32w-light-release-no-ota/chip-k32w0x-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5
