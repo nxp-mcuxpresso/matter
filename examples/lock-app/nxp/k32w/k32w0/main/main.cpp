@@ -77,6 +77,8 @@ static sDualModeAppStates dualModeStates;
 #define THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE 4000
 #endif
 
+extern "C" void sched_enable();
+
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
@@ -131,6 +133,11 @@ extern "C" void main_task(void const * argument)
         K32W_LOG("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
+
+    /* Enable the MAC scheduler after BLEManagerImpl::_Init() and V2MMAC_Enable().
+     * This is needed to register properly the active protocols.
+     */
+    sched_enable();
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     dualModeStates.threadWarmBootInitTime = THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE;
