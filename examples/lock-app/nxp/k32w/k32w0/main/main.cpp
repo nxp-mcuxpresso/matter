@@ -271,7 +271,9 @@ static void dm_switch_preSleepCallBack(void)
 
     if (dualModeStates.threadInitialized)
     {
+        /* stop the internal MAC Scheduler timer */
         stopM2();
+        /* disable the MAC scheduler */
         sched_disable();
         otPlatRadioDisable(NULL);
         dualModeStates.threadInitialized = FALSE;
@@ -289,8 +291,8 @@ static void dm_switch_preSleepCallBack(void)
 
 extern "C" void vDynStopAll(void)
 {
-	vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_OFF);
-	vDynRequestState(E_DYN_MASTER, E_DYN_STATE_OFF);
+    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_OFF);
+    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_OFF);
 }
 
 void dm_switch_init15_4AfterWakeUp(void)
