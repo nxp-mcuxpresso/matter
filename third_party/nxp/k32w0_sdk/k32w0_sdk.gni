@@ -188,7 +188,7 @@ template("k32w0_sdk") {
     ]
 
     libs = [
-      "${k32w0_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller_peripheral.a",
+      "${k32w0_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller_peripheral_commissioning.a",
       "${k32w0_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_matter_cm4_noFP.a",
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
@@ -469,15 +469,6 @@ template("k32w0_sdk") {
     ]
 
     if (chip_with_DK6) {
-      if (chip_with_low_power != 0) {
-        sources += [
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/clock_config.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/hardware_init.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
-        ]
-      } else {
         sources += [
           "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
           "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
@@ -495,7 +486,6 @@ template("k32w0_sdk") {
             "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
           ]
         }
-      }
     }
 
     if (chip_with_low_power != 0) {
