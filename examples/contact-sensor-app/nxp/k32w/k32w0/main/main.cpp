@@ -36,6 +36,8 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
+#define ENABLE_LOW_POWER_LOGS 0
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "Keyboard.h"
 #include "PWR_Configuration.h"
@@ -44,17 +46,55 @@ using namespace ::chip::Logging;
 #include "app_dual_mode_low_power.h"
 #include "app_dual_mode_switch.h"
 #include "radio.h"
+#include "OtaSupport.h"
 #endif
+
+#include "MacSched.h"
+
+#ifdef K32WMCM_APP_BUILD
+#define string string_shadow
+#include "MMAC.h"
+#include "mac_sap.h"
+#include "AppApi.h"
+#undef string
+#endif
+
 
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
+
+#define NORMAL_PWR_LIMIT        10    /* dBm */
+
+#ifdef K32WMCM_APP_BUILD
+/* Must be called before zps_eAplAfInit() */
+void APP_SetHighTxPowerMode();
+
+/* Must be called after zps_eAplAfInit() */
+void APP_SetMaxTxPower();
+
+#undef HIGH_TX_PWR_LIMIT
+#define HIGH_TX_PWR_LIMIT 15    /* dBm */
+/* High Tx power */
+void APP_SetHighTxPowerMode()
+{
+    if (CHIP_IS_HITXPOWER_CAPABLE())
+        vMMAC_SetTxPowerMode(TRUE);
+}
+
+void APP_SetMaxTxPower()
+{
+    if (CHIP_IS_HITXPOWER_CAPABLE())
+        eAppApiPlmeSet(PHY_PIB_ATTR_TX_POWER, HIGH_TX_PWR_LIMIT);
+}
+#endif
 
 /* low power requirements */
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 extern "C" void vMMAC_IntHandlerBbc();
 extern "C" void vMMAC_IntHandlerPhy();
 extern "C" void BOARD_SetClockForPowerMode(void);
+extern "C" void stopM2();
 
 static void dm_switch_wakeupCallBack(void);
 static void dm_switch_preSleepCallBack(void);
@@ -96,7 +136,9 @@ extern "C" void main_task(void const * argument)
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_Init();
 
-    PWR_vAddRamRetention((uint32_t) &ucHeap[0], sizeof(ucHeap));
+    /* Internal - MATTER-303: keep in retention the entire RAM1 for the moment */
+    PWR_vAddRamRetention((uint32_t)0x4020000, 0x10000);
+
     PWR_RegisterLowPowerExitCallback(dm_switch_wakeupCallBack);
     PWR_RegisterLowPowerEnterCallback(dm_switch_preSleepCallBack);
 
@@ -119,6 +161,10 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
+    
+#ifdef K32WMCM_APP_BUILD
+    APP_SetHighTxPowerMode();
+#endif
 
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
@@ -148,6 +194,13 @@ extern "C" void main_task(void const * argument)
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     dualModeStates.threadWarmBootInitTime = THREAD_WARM_BOOT_INIT_DURATION_DEFAULT_VALUE;
     dualModeStates.threadInitialized      = TRUE;
+#endif
+
+#ifdef K32WMCM_APP_BUILD
+    APP_SetMaxTxPower();
+    otPlatRadioSetTransmitPower(ThreadStackMgrImpl().OTInstance(), HIGH_TX_PWR_LIMIT);
+#else
+    otPlatRadioSetTransmitPower(ThreadStackMgrImpl().OTInstance(), NORMAL_PWR_LIMIT);
 #endif
 
     err = PlatformMgr().StartEventLoopTask();
@@ -208,6 +261,10 @@ extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, app
     event.Handler = handler;
     event.param   = param;
 
+#if ENABLE_LOW_POWER_LOGS
+    K32W_LOG("App_PostCallbackMessage %d", (uint32_t)param);
+#endif
+
     GetAppTask().PostEvent(&event);
 
     return gBleSuccess_c;
@@ -217,6 +274,11 @@ static void dm_switch_wakeupCallBack(void)
 {
     BOARD_SetClockForWakeup();
 
+#if ENABLE_LOW_POWER_LOGS
+    K32W_LOG("dm_switch_wakeupCallBack");
+    K32W_LOG("Warm up time actual value: %d", dualModeStates.threadWarmBootInitTime);
+#endif
+
     RNG_Init();
     SecLib_Init();
 
@@ -225,25 +287,38 @@ static void dm_switch_wakeupCallBack(void)
     PWR_WakeupReason_t wakeReason = PWR_GetWakeupReason();
     if (wakeReason.Bits.FromBLE_LLTimer == 1)
     {
-        SWITCH_DBG_LOG("woken up from LL");
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("woken up from LL");
+#endif
     }
     else if (wakeReason.Bits.FromKeyBoard == 1)
     {
-        SWITCH_DBG_LOG("woken up from FromKeyBoard");
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("woken up from FromKeyBoard");
+#endif
     }
     else if (wakeReason.Bits.FromTMR == 1)
     {
-        SWITCH_DBG_LOG("woken up from TMR");
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("woken up from TMR");
+#endif
     }
     dm_lp_wakeup();
 }
 
+
 static void dm_switch_preSleepCallBack(void)
 {
-    SWITCH_DBG_LOG("sleeping");
+#if ENABLE_LOW_POWER_LOGS
+    K32W_LOG("dm_switch_preSleepCallBack");
+#endif
 
     if (dualModeStates.threadInitialized)
     {
+        /* stop the internal MAC Scheduler timer */
+        stopM2();
+        /* disable the MAC scheduler */
+        sched_disable();
         otPlatRadioDisable(NULL);
         dualModeStates.threadInitialized = FALSE;
     }
@@ -256,6 +331,12 @@ static void dm_switch_preSleepCallBack(void)
     BOARD_DeInitAdc();
     /* DeInit the necessary clocks */
     BOARD_SetClockForPowerMode();
+}
+
+extern "C" void vDynStopAll(void)
+{
+    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_OFF);
+    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_OFF);
 }
 
 void dm_switch_init15_4AfterWakeUp(void)
@@ -278,8 +359,13 @@ void dm_switch_init15_4AfterWakeUp(void)
     {
         tick2                                 = PWR_Get32kTimestamp();
         dualModeStates.threadWarmBootInitTime = ((tick2 - tick1) * 15625u) >> 9;
+
         /* Add a margin of 1 ms */
         dualModeStates.threadWarmBootInitTime += 1000;
+
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("Calibration: %d", dualModeStates.threadWarmBootInitTime);
+#endif
     }
 }
 
@@ -294,6 +380,8 @@ static void ThreadExitSleep()
         /* Radio must be re-enabled after waking up from sleep.
          * The module is completely disabled in power down mode */
         otPlatRadioEnable(NULL);
+        sched_enable();
+
         dualModeStates.threadInitialized = TRUE;
 
         /* wake up the Thread stack and check if any processing needs to be done */
