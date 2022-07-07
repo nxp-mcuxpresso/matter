@@ -186,12 +186,14 @@ CHIP_ERROR AppTask::Init()
 
 void LockOpenThreadTask(void)
 {
+    PWR_DisallowDeviceToSleep();
     chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
 }
 
 void UnlockOpenThreadTask(void)
 {
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+    PWR_AllowDeviceToSleep();
 }
 
 void AppTask::InitServer(intptr_t arg)
@@ -745,6 +747,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         aEvent->Handler(aEvent->param);
     }
+    else
 #endif
 
     if (aEvent->Handler)
