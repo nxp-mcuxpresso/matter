@@ -57,6 +57,7 @@ private:
     static void HandleKeyboard(void);
     static void JoinHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void LockActionEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);

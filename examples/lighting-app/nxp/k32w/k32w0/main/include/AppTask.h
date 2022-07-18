@@ -66,6 +66,7 @@ private:
     static void HandleKeyboard(void);
     static void OTAHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void LightActionEventHandler(AppEvent * aEvent);
     static void OTAResumeEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);

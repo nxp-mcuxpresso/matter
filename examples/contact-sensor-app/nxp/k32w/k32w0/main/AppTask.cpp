@@ -559,7 +559,11 @@ void AppTask::BleHandler(void * aGenericEvent)
         K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
         return;
     }
+    PlatformMgr().ScheduleWork(AppTask::BleStartAdvertising, 0);
+}
 
+void AppTask::BleStartAdvertising(intptr_t arg)
+{
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);

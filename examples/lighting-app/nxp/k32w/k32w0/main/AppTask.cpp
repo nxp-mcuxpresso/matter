@@ -538,7 +538,11 @@ void AppTask::BleHandler(AppEvent * aEvent)
         K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
         return;
     }
+    PlatformMgr().ScheduleWork(AppTask::BleStartAdvertising, 0);
+}
 
+void AppTask::BleStartAdvertising(intptr_t arg)
+{
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
@@ -547,7 +551,6 @@ void AppTask::BleHandler(AppEvent * aEvent)
     else
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");

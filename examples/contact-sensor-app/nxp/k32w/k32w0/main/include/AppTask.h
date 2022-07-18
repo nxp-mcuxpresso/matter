@@ -68,6 +68,7 @@ private:
     static void HandleKeyboard(void);
     static void OTAHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
+    static void BleStartAdvertising(intptr_t arg);
     static void ContactActionEventHandler(void * aGenericEvent);
     static void OTAResumeEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
