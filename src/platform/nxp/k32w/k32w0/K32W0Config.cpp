@@ -384,6 +384,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     PDM_teStatus pdmStatus;
 
     MutexLock(pdmMutexHandle, osaWaitForever_c);
+    FactoryResetConfigInternal(kMinConfigKey_ChipCounter,kMaxConfigKey_ChipCounter);
     FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
     FactoryResetConfigInternal(kMinConfigKey_KVSKey, kMaxConfigKey_KVSKey);
     FactoryResetConfigInternal(kMinConfigKey_KVSValue, kMaxConfigKey_KVSValue);
