@@ -25,6 +25,7 @@
 #include "LightingManager.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <app/clusters/identify-server/identify-server.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -48,6 +49,10 @@ public:
 
     void UpdateClusterState(void);
     void UpdateDeviceState(void);
+
+    // Identify cluster callbacks.
+    static void OnIdentifyStart(Identify* identify);
+    static void OnIdentifyStop(Identify* identify);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -94,6 +99,7 @@ private:
         kFunction_SoftwareUpdate = 0,
         kFunction_FactoryReset,
         kFunctionTurnOnTurnOff,
+        kFunction_Identify,
 
         kFunction_Invalid
     } Function;
