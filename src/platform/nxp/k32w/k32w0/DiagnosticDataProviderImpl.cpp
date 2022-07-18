@@ -35,6 +35,10 @@ extern "C" void xPortResetHeapMinimumEverFreeHeapSize( void );
 
 #include <openthread/platform/entropy.h>
 
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -204,6 +208,23 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    *netifpp = ifp;
+    return CHIP_NO_ERROR; 
 }
 
 } // namespace DeviceLayer

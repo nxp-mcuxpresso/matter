@@ -51,6 +51,7 @@ public:
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
 };
 
 /**
