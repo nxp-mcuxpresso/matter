@@ -84,6 +84,14 @@ using namespace chip;
 
 AppTask AppTask::sAppTask;
 
+static Identify gIdentify = {
+    chip::EndpointId{1},
+    AppTask::OnIdentifyStart,
+    AppTask::OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED
+};
+
+/* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor gRequestorCore;
 static DefaultOTARequestorStorage gRequestorStorage;
@@ -268,7 +276,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             PlatformMgr().UnlockChipStack();
         }
 
-        // Update the status LED if factory reset has not been initiated.
+        // Update the status LED if factory reset or identify process have not been initiated.
         //
         // If system has "full connectivity", keep the LED On constantly.
         //
@@ -282,7 +290,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
 
 #if !cPWR_UsePowerDownMode
-        if (sAppTask.mFunction != Function::kFactoryReset)
+        if (sAppTask.mFunction != Function::kFactoryReset &&
+            sAppTask.mFunction != Function::kIdentify)
         {
             if (sIsThreadProvisioned)
             {
@@ -695,6 +704,31 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     }
 
     sAppTask.mFunction = Function::kNoneSelected;
+}
+
+void AppTask::OnIdentifyStart(Identify* identify)
+{
+    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    {
+        if (Function::kNoneSelected != sAppTask.mFunction)
+        {
+            K32W_LOG("Another function is scheduled. Could not initiate Identify process!");
+            return;
+        }
+        K32W_LOG("Identify process has started. Status LED should blink every 0.5 seconds.");
+        sAppTask.mFunction = Function::kIdentify;
+        sStatusLED.Set(false);
+        sStatusLED.Blink(500);
+    }
+}
+
+void AppTask::OnIdentifyStop(Identify* identify)
+{
+    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    {
+        K32W_LOG("Identify process has stopped.");
+        sAppTask.mFunction = Function::kNoneSelected;
+    }
 }
 
 void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)

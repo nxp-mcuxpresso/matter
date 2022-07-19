@@ -25,6 +25,7 @@
 #include "ContactSensorManager.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <app/clusters/identify-server/identify-server.h>
 
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -51,6 +52,9 @@ public:
 
     bool IsSyncClusterToButtonAction();
     void SetSyncClusterToButtonAction(bool value);
+    // Identify cluster callbacks.
+    static void OnIdentifyStart(Identify* identify);
+    static void OnIdentifyStop(Identify* identify);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -96,6 +100,7 @@ private:
         kSoftwareUpdate = 0,
         kFactoryReset,
         kContact,
+        kIdentify,
         kInvalid
     };
 
