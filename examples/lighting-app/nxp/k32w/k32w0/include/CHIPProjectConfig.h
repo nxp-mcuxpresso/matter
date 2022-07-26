@@ -126,7 +126,7 @@
  *    provision the device with its unique operational credentials and manage
  *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
+#define CHIP_CONFIG_MAX_FABRICS 5 // 5 is the minimum number of supported fabrics
 
 /**
  * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
