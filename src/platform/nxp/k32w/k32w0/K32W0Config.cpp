@@ -240,7 +240,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
 
-     /* first delete all occurences of "key" */
+    /* first delete all occurences of "key" */
     ramStorageDelete(ramDescr, key, -1);
 
     /* resize RAM Buffer if needed */
@@ -254,6 +254,39 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
     /* schedule flash writing */
     pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
                                               ramDescr->ramBufferLen + kRamDescHeaderSize);
+    SuccessOrExit(err = MapPdmStatus(pdmStatus));
+
+exit:
+    MutexUnlock(pdmMutexHandle);
+    return err;
+}
+
+CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, uint32_t val)
+{
+    CHIP_ERROR err;
+    PDM_teStatus pdmStatus;
+    rsError      ramStatus = RS_ERROR_NONE;
+
+    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
+    MutexLock(pdmMutexHandle, osaWaitForever_c);
+
+    /* first delete all occurences of "key" */
+    ramStorageDelete(ramDescr, key, -1);
+
+    /* resize RAM Buffer if needed */
+    ramStatus = ramStorageResize(&ramDescr, key, (uint8_t *) &val, sizeof(uint32_t));
+    SuccessOrExit(err = MapRamStorageStatus(ramStatus));
+
+    /* add to RAM buffer */
+    ramStatus = ramStorageSet(ramDescr, key, (uint8_t *)&val, sizeof(uint32_t));
+    SuccessOrExit(err = MapRamStorageStatus(ramStatus));
+
+    // Interrupts are disabled to ensure there is no context switch during the actual
+    // writing, thus avoiding race conditions.
+    OSA_InterruptDisable();
+    pdmStatus = PDM_eSaveRecordData(kNvmIdChipConfigData, ramDescr,
+                                    ramDescr->ramBufferLen + kRamDescHeaderSize);
+    OSA_InterruptEnable();
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:

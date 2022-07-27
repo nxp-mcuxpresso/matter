@@ -126,6 +126,7 @@ public:
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValueSync(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
+    static CHIP_ERROR WriteConfigValueSync(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);

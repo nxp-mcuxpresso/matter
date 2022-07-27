@@ -125,7 +125,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareVersion(uint32_t softwareVer)
 {
-    return WriteConfigValue(K32WConfig::kConfigKey_SoftwareVersion, softwareVer);
+    // Bypass the ConfigurationManager wrapper for writing and use
+    // synchronized write from K32WConfig to ensure that the software
+    // version is correctly updated, especially when a new update is
+    // applied, which resets the device before the PDM write on idle
+    // actually happens.
+    return K32WConfig::WriteConfigValueSync(K32WConfig::kConfigKey_SoftwareVersion, softwareVer);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
