@@ -1,0 +1,16 @@
+--- a/sha256_alt.h
++++ b/sha256_alt.h
+@@ -39,11 +39,12 @@ extern "C" {
+ #define mbedtls_sha256_context ltc_hash_ctx_t
+ 
+ #elif defined(MBEDTLS_FREESCALE_LPC_SHA256)
++#include "SecLib.h"
+ 
+ /**
+  * \brief          SHA-256 context structure
+  */
+-#define mbedtls_sha256_context sha_ctx_t
++#define mbedtls_sha256_context sha256Context_t
+ 
+ #elif defined(MBEDTLS_FREESCALE_CAAM_SHA256)
+ 

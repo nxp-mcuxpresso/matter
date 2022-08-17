@@ -1,0 +1,507 @@
+--- a/SecLib.c
++++ b/SecLib.c
+@@ -86,6 +86,9 @@
+ #include "PWR_Interface.h"
+ #endif
+ 
++#if (MBEDTLS_NXP_USE_SECLIB)
++#include "seclib_config.h"
++#endif
+ 
+ /*! *********************************************************************************
+ *************************************************************************************
+@@ -114,11 +117,20 @@
+ 
+ /* Need to lockout access to the AES HW accelerator in multitask environments */ 
+ #if USE_RTOS && (LTC_HW_ACC || MMCAU_HW_ACC || JN_AES_HW_ACC || FSL_FEATURE_SOC_AES_HW) && gSecLibUseMutex_c
+-    #define SECLIB_MUTEX_LOCK()   OSA_MutexLock(mSecLibMutexId, osaWaitForever_c)
+-    #define SECLIB_MUTEX_UNLOCK() OSA_MutexUnlock(mSecLibMutexId)
++    #define SECLIB_AES_MUTEX_LOCK()   OSA_MutexLock(mSecLibAesMutexId, osaWaitForever_c)
++    #define SECLIB_AES_MUTEX_UNLOCK() OSA_MutexUnlock(mSecLibAesMutexId)
+ #else
+-    #define SECLIB_MUTEX_LOCK()
+-    #define SECLIB_MUTEX_UNLOCK()
++    #define SECLIB_AES_MUTEX_LOCK()
++    #define SECLIB_AES_MUTEX_UNLOCK()
++#endif /* USE_RTOS */
++
++/* Need to lockout access to the SHA HW accelerator in multitask environments */ 
++#if USE_RTOS && JN_SHA_HW_ACC && gSecLibUseMutex_c
++    #define SECLIB_SHA_MUTEX_LOCK(wait_time) OSA_MutexLock(mSecLibShaMutexId, wait_time)
++    #define SECLIB_SHA_MUTEX_UNLOCK()        OSA_MutexUnlock(mSecLibShaMutexId)
++#else
++    #define SECLIB_SHA_MUTEX_LOCK(...)
++    #define SECLIB_SHA_MUTEX_UNLOCK()
+ #endif /* USE_RTOS */
+ 
+ #if (JN_AES_HW_ACC)
+@@ -163,16 +175,18 @@ mmcauAesContext_t mmcauAesCtx;
+ 
+ #if USE_RTOS && (JN_AES_HW_ACC || LTC_HW_ACC || MMCAU_HW_ACC || FSL_FEATURE_SOC_AES_HW)
+ /*! Mutex used to protect the AES Context when an RTOS is used. */
+-osaMutexId_t mSecLibMutexId = NULL;
++osaMutexId_t mSecLibAesMutexId = NULL;
++#endif /* USE_RTOS */
++
++#if USE_RTOS && (JN_SHA_HW_ACC)
++/*! Mutex used to protect the SHA Context when an RTOS is used. */
++osaMutexId_t mSecLibShaMutexId = NULL;
+ #endif /* USE_RTOS */
+ 
+ #if JN_SHA_HW_ACC
+ typedef struct sha1Context_tag{
+     uint32_t sha_working_area[SHA_CTX_SIZE];
+ }sha1Context_t;
+-typedef struct sha256Context_tag{
+-    uint32_t sha_working_area[SHA_CTX_SIZE];
+-}sha256Context_t;
+ #else
+ typedef struct sha1Context_tag{
+     uint32_t hash[SHA1_HASH_SIZE/sizeof(uint32_t)];
+@@ -180,16 +194,8 @@ typedef struct sha1Context_tag{
+     uint32_t totalBytes;
+     uint8_t  bytes;
+ }sha1Context_t;
+-typedef struct sha256Context_tag{
+-    uint32_t hash[SHA256_HASH_SIZE/sizeof(uint32_t)];
+-    uint8_t  buffer[SHA256_BLOCK_SIZE];
+-    uint32_t totalBytes;
+-    uint8_t  bytes;
+-}sha256Context_t;
+ #endif
+ 
+-
+-
+ typedef struct HMAC_SHA256_context_tag{
+     sha256Context_t shaCtx;
+     uint8_t pad[SHA256_BLOCK_SIZE];
+@@ -314,8 +320,8 @@ void Ecdh_JacobiCompleteMult
+ ********************************************************************************** */
+ #if !(JN_SHA_HW_ACC)
+ static void SHA1_hash_n(const uint8_t* pData, uint32_t nBlk, uint32_t* pHash);
+-static void SHA256_hash_n(const uint8_t* pData, uint32_t nBlk, uint32_t* pHash);
+ #endif
++static void SHA256_hash_n(const uint8_t* pData, uint32_t nBlk, uint32_t* pHash);
+ static void AES_128_CMAC_Generate_Subkey(const uint8_t *key, uint8_t *K1, uint8_t *K2);
+ static void SecLib_LeftShiftOneBit(uint8_t *input, uint8_t *output);
+ static void SecLib_Padding(const uint8_t *lastb, uint8_t *pad, uint32_t length);
+@@ -363,10 +369,25 @@ void SecLib_Init(void)
+     /*! Initialize the MMCAU AES Context Buffer Mutex here. */
+     /* Do not allocate heap memory again after getting out of low power
+        and reinitializing SecLib if RAM retention is on*/
+-    if (mSecLibMutexId == NULL)
++    if (mSecLibAesMutexId == NULL)
++    {
++        mSecLibAesMutexId = OSA_MutexCreate();
++        if (mSecLibAesMutexId == NULL)
++        {
++            panic( ID_PANIC(0,0), (uint32_t)SecLib_Init, 0, 0 );
++            return;
++        }
++    }
++#endif
++
++#if USE_RTOS && (JN_SHA_HW_ACC)
++    /*! Initialize the MMCAU SHA Context Buffer Mutex here. */
++    /* Do not allocate heap memory again after getting out of low power
++       and reinitializing SecLib if RAM retention is on*/
++    if (mSecLibShaMutexId == NULL)
+     {
+-        mSecLibMutexId = OSA_MutexCreate();
+-        if (mSecLibMutexId == NULL)
++        mSecLibShaMutexId = OSA_MutexCreate();
++        if (mSecLibShaMutexId == NULL)
+         {
+             panic( ID_PANIC(0,0), (uint32_t)SecLib_Init, 0, 0 );
+             return;
+@@ -402,14 +423,14 @@ bool_t  SecLib_AES_Is_HW_Accelerator_disabled(void)
+ static void hw_aes_encrypt(const uint8_t *pInput, const size_t inputLen, const uint8_t *pKey, uint8_t * pOutput)
+ {
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     /* If key is already set in may be omitted and parameter is left NULL */
+     if (pKey != NULL)
+     {
+         AES_SetKey(AES0, pKey, 128/8);
+     }
+     AES_EncryptEcb(AES0, pInput, pOutput, inputLen);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ }
+ 
+@@ -417,14 +438,14 @@ static void hw_aes_encrypt(const uint8_t *pInput, const size_t inputLen, const u
+ static void hw_aes_decrypt(const uint8_t *pInput, const size_t inputLen, const uint8_t *pKey, uint8_t * pOutput)
+ {
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     /* If key is already set in may be omitted and parameter is left NULL */
+     if (pKey != NULL)
+     {
+         AES_SetKey(AES0, pKey, 128/8);
+     }
+     AES_DecryptEcb(AES0, pInput, pOutput, inputLen);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ }
+ 
+@@ -482,7 +503,7 @@ void AES_128_Encrypt(const uint8_t* pInput,
+ 
+ #if !JN_AES_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+ #endif
+ 
+ #if MMCAU_HW_ACC
+@@ -553,7 +574,7 @@ void AES_128_Encrypt(const uint8_t* pInput,
+ #endif
+ 
+  #if !JN_AES_HW_ACC    
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ #endif
+ }
+@@ -579,7 +600,7 @@ void AES_128_Decrypt(const uint8_t* pInput,
+ {
+ #if !JN_AES_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+ #endif
+ 
+ #if MMCAU_HW_ACC
+@@ -649,7 +670,7 @@ void AES_128_Decrypt(const uint8_t* pInput,
+     sw_Aes128(pInput, pKey, 0, pOutput);
+ #endif
+ #if !JN_AES_HW_ACC
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ #endif
+ }
+@@ -832,10 +853,10 @@ static void hw_aes_cbc_encrypt(const uint8_t* pInput,
+                               uint8_t* pOutput)
+ {
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     AES_SetKey(AES0, pKey, 128/8);
+     AES_EncryptCbc(AES0, pInput, pOutput, inputLen, pInitVector);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ }
+ 
+@@ -886,9 +907,9 @@ void AES_128_CBC_Encrypt(const uint8_t* pInput,
+ {
+ #if LTC_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     LTC_AES_EncryptCbc(LTC0, pInput, pOutput, inputLen, pInitVector, pKey, AES_BLOCK_SIZE);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ 
+ #elif JN_AES_HW_ACC
+@@ -946,9 +967,9 @@ uint32_t AES_128_CBC_Encrypt_And_Pad(uint8_t* pInput,
+     /* CBC-Encrypt */
+ #if LTC_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     LTC_AES_EncryptCbc(LTC0, pInput, pOutput, newLen, pInitVector, pKey, AES_BLOCK_SIZE);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ #elif JN_AES_HW_ACC
+     k32w0_aes_cbc_encrypt(pInput, newLen, pInitVector, pKey, pOutput);
+@@ -1000,10 +1021,10 @@ static void hw_aes_cbc_decrypt(const uint8_t* pInput,
+                         uint8_t* pOutput)
+ {
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     AES_SetKey(AES0, pKey, 128/8);
+     AES_DecryptCbc(AES0, pInput, pOutput, inputLen, pInitVector);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ }
+ 
+@@ -1058,9 +1079,9 @@ uint32_t AES_128_CBC_Decrypt_And_Depad(const uint8_t* pInput,
+     }
+ #if LTC_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     LTC_AES_DecryptCbc(LTC0, pInput, pOutput, inputLen, pInitVector, pKey, AES_BLOCK_SIZE, kLTC_DecryptKey);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ 
+ #elif JN_AES_HW_ACC
+@@ -1112,10 +1133,10 @@ static void hw_aes_ctr_crypt(const uint8_t* pInput,
+                      uint8_t* pOutput)
+ {
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     AES_SetKey(AES0, pKey, 128/8);
+     AES_CryptCtr(AES0, pInput, pOutput, inputLen, pCounter, NULL, NULL);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ }
+ 
+@@ -1178,9 +1199,9 @@ void AES_128_CTR(const uint8_t* pInput,
+ 
+ #elif LTC_HW_ACC
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+     LTC_AES_EncryptCtr(LTC0, pInput, pOutput, inputLen, pCounter, pKey, AES_BLOCK_SIZE, NULL, NULL);
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ 
+ #elif JN_AES_HW_ACC
+@@ -1671,7 +1692,7 @@ uint8_t AES_128_CCM(uint8_t* pInput,
+     uint8_t status;
+ 
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_AES_MUTEX_LOCK();
+ 
+ #if LTC_HW_ACC
+     if( flags & gSecLib_CCM_Decrypt_c )
+@@ -1687,7 +1708,7 @@ uint8_t AES_128_CCM(uint8_t* pInput,
+         status = sw_AES128_CCM(pInput, inputLen, pAuthData, authDataLen, pNonce, nonceSize, pKey, pOutput, pCbcMac, macSize, flags);
+ #endif
+ 
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_AES_MUTEX_UNLOCK();
+     SecLib_AllowToSleep();
+ 
+     return status;
+@@ -1949,7 +1970,7 @@ void SHA1_Init (void* pContext)
+     /* lock SHA HW resource and */
+     /* prevent device to go to low power until SHA processing finished */
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    SECLIB_SHA_MUTEX_LOCK(osaWaitForever_c);
+     SHA_ClkInit(SHA0);
+     SHA_Init(SHA0, pContext, kSHA_Sha1);
+ #else
+@@ -2038,7 +2059,7 @@ void SHA1_HashFinish (void* pContext, uint8_t*  pOutput)
+     SHA_ClkDeinit(SHA0);
+     /* Unlock SHA HW resource and allow device to go to low power */
+     SecLib_AllowToSleep();
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_SHA_MUTEX_UNLOCK();
+ #else
+     uint32_t i;
+     uint32_t temp;
+@@ -2136,6 +2157,10 @@ void SHA256_CloneCtx (void* pDestCtx, void* pSourceCtx)
+    FLib_MemCpy(pDestCtx, pSourceCtx, sizeof(sha256Context_t));
+ }
+ 
++#ifdef SECLIB_SHA256_USE_SWITCH
++/*! Pointer to the context which currently uses hardware SHA.*/
++static void* sHwContext = NULL;
++#endif
+ 
+ /*! *********************************************************************************
+ * \brief  This function initializes the SHA256 context data
+@@ -2147,15 +2172,34 @@ void SHA256_CloneCtx (void* pDestCtx, void* pSourceCtx)
+ void SHA256_Init (void* pContext)
+ {
+ #if JN_SHA_HW_ACC
++#ifdef SECLIB_SHA256_USE_SWITCH
+     /* lock SHA HW resource and */
+     /* prevent device to go to low power until SHA processing finished */
+     SecLib_DisallowToSleep();
+-    SECLIB_MUTEX_LOCK();
++    if (osaStatus_Success == SECLIB_SHA_MUTEX_LOCK(SECLIB_SHA256_MUTEX_TIMEOUT) && sHwContext == NULL)
++    {
++        sHwContext = pContext;
++        SHA_ClkInit(SHA0);
++        SHA_Init(SHA0, pContext, kSHA_Sha256);
++    }
++    else
++    {
++        sw_sha256_init_wrap(pContext);
++    }
++#else
++    SECLIB_SHA_MUTEX_LOCK(osaWaitForever_c);
++    SecLib_DisallowToSleep();
+     SHA_ClkInit(SHA0);
+     SHA_Init(SHA0, pContext, kSHA_Sha256);
+-#else  
++#endif
++#else
++    sw_sha256_init_wrap(pContext);
++#endif
++}
++
++void sw_sha256_init_wrap(void* pContext)
++{
+     sha256Context_t* context = (sha256Context_t*)pContext;
+-    
+     context->bytes = 0;
+     context->totalBytes = 0;
+ #if FSL_FEATURE_SOC_MMCAU_COUNT
+@@ -2163,10 +2207,8 @@ void SHA256_Init (void* pContext)
+ #else
+     sw_sha256_initialize_output(context->hash);
+ #endif
+-#endif
+ }
+ 
+-
+ /*! *********************************************************************************
+ * \brief  This function performs SHA256 on multiple bytes and updates the context data
+ *
+@@ -2179,8 +2221,25 @@ void SHA256_Init (void* pContext)
+ void SHA256_HashUpdate(void* pContext, const uint8_t* pData, uint32_t numBytes)
+ {
+ #if JN_SHA_HW_ACC
++#ifdef SECLIB_SHA256_USE_SWITCH
++    if (sHwContext == pContext)
++    {
++        SHA_Update(SHA0, pContext, pData, numBytes);
++    }
++    else
++    {
++        sw_sha256_update_wrap(pContext, pData, numBytes);
++    }
++#else
+     SHA_Update(SHA0, pContext, pData, numBytes);
++#endif
+ #else
++    sw_sha256_update_wrap(pContext, pData, numBytes);
++#endif
++}
++
++void sw_sha256_update_wrap(void* pContext, const uint8_t* pData, uint32_t numBytes)
++{
+     uint16_t blocks;
+     sha256Context_t* context = (sha256Context_t*)pContext;
+ 
+@@ -2218,10 +2277,8 @@ void SHA256_HashUpdate(void* pContext, const uint8_t* pData, uint32_t numBytes)
+             FLib_MemCpy(context->buffer, pData, numBytes);
+         }
+     }
+-#endif
+ }
+ 
+-
+ /*! *********************************************************************************
+ * \brief  This function finalizes the SHA256 hash computaion and clears the context data.
+ *         The final hash value is stored at the provided output location.
+@@ -2231,19 +2288,41 @@ void SHA256_HashUpdate(void* pContext, const uint8_t* pData, uint32_t numBytes)
+ * \param [out]      pOutput     Pointer to the output location
+ *
+ ********************************************************************************** */
+-void SHA256_HashFinish (void* pContext, uint8_t* pOutput)
++void SHA256_HashFinish(void* pContext, uint8_t* pOutput)
+ {
+ #if JN_SHA_HW_ACC
++#ifdef SECLIB_SHA256_USE_SWITCH
++    if (sHwContext == pContext)
++    {
++        sHwContext = NULL;
++        SHA_Finish(SHA0, pContext, pOutput, NULL);
++        SHA_ClkDeinit(SHA0);
++        /* Unlock SHA HW resource and allow device to go to low power */
++        SecLib_AllowToSleep();
++        SECLIB_SHA_MUTEX_UNLOCK();
++    }
++    else
++    {
++        sw_sha256_finish_wrap(pContext, pOutput);   
++    }
++#else
+     SHA_Finish(SHA0, pContext, pOutput, NULL);
+     SHA_ClkDeinit(SHA0);
+     /* Unlock SHA HW resource and allow device to go to low power */
+     SecLib_AllowToSleep();
+-    SECLIB_MUTEX_UNLOCK();
++    SECLIB_SHA_MUTEX_UNLOCK();
++#endif
+ #else
++    sw_sha256_finish_wrap(pContext, pOutput);
++#endif
++}
++
++void sw_sha256_finish_wrap(void* pContext, uint8_t* pOutput)
++{
+     uint32_t i;
+     uint32_t temp;
+-    sha256Context_t* context = (sha256Context_t*)pContext;
+     uint32_t numBytes;
++    sha256Context_t* context = (sha256Context_t*)pContext;
+ 
+     /* update remaining bytes */
+     numBytes = context->bytes;
+@@ -2272,10 +2351,8 @@ void SHA256_HashFinish (void* pContext, uint8_t* pOutput)
+     
+     /* Copy the generated hash to the indicated output location */
+     FLib_MemCpy(pOutput, (uint8_t*)(context->hash), SHA256_HASH_SIZE);
+-#endif
+ }
+ 
+-
+ /*! *********************************************************************************
+ * \brief  This function performs all SHA256 steps on multiple bytes: initialize, 
+ *         update and finish.
+@@ -3168,6 +3245,7 @@ static void SHA1_hash_n(const uint8_t* pData, uint32_t nBlk, uint32_t* pHash)
+         SecLib_AllowToSleep();
+     }
+ }
++#endif
+ 
+ /*! *********************************************************************************
+ * \brief  This function performs SHA256 on multiple blocks
+@@ -3190,7 +3268,6 @@ static void SHA256_hash_n(const uint8_t* pData, uint32_t nBlk, uint32_t* pHash)
+         SecLib_AllowToSleep();
+     }
+ }
+-#endif
+ 
+ /****************************************************************************
+  *
+
+--- a/SecLib.h
++++ b/SecLib.h
+@@ -60,6 +60,13 @@
+ #ifndef SHA256_BLOCK_SIZE
+ #define SHA256_BLOCK_SIZE  64 /* [bytes] */
+ #endif
++ 
++typedef struct sha256Context_tag{
++    uint32_t hash[SHA256_HASH_SIZE/sizeof(uint32_t)];
++    uint8_t  buffer[SHA256_BLOCK_SIZE];
++    uint32_t totalBytes;
++    uint8_t  bytes;
++}sha256Context_t;
+ 
+ #define gHmacIpad_c               0x36
+ #define gHmacOpad_c               0x5C
+@@ -662,6 +669,11 @@ void SHA256_Hash (const uint8_t*  pData,
+                   const uint32_t  numBytes,
+                   uint8_t*  pOutput);
+ 
++/* SHA256 wrappers over SW emulated functions*/
++void sw_sha256_init_wrap(void* pContext);
++void sw_sha256_update_wrap(void* pContext, const uint8_t* pData, uint32_t numBytes);
++void sw_sha256_finish_wrap(void* pContext, uint8_t* pOutput);
++
+ /*! *********************************************************************************
+ * \brief  This function allocates a memory buffer for a HMAC SHA256 context structure
+ *

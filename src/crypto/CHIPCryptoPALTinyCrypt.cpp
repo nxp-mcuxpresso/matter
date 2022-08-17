@@ -58,6 +58,10 @@
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if (SECLIB_MODE_ALT)
+#include "SecLib_alt.h"
+#endif
+
 #include <string.h>
 
 namespace chip {
@@ -262,15 +266,16 @@ Hash_SHA256_stream::~Hash_SHA256_stream(void)
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
-
+#if defined(SECLIB_MODE_ALT)
+    sw_sha256_init_wrap(context);
+#else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_starts(context, 0);
 #else
     const int result = mbedtls_sha256_starts_ret(context, 0);
 #endif
-
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
-
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -278,14 +283,16 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
+#if defined(SECLIB_MODE_ALT)
+    sw_sha256_update_wrap(context, Uint8::to_const_uchar(data.data()), data.size());
+#else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_update(context, Uint8::to_const_uchar(data.data()), data.size());
 #else
     const int result = mbedtls_sha256_update_ret(context, Uint8::to_const_uchar(data.data()), data.size());
 #endif
-
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
-
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -313,13 +320,16 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
+#if defined(SECLIB_MODE_ALT)
+    sw_sha256_finish_wrap(context, Uint8::to_uchar(out_buffer.data()));
+#else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_finish(context, Uint8::to_uchar(out_buffer.data()));
 #else
     const int result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer.data()));
 #endif
-
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+#endif
     out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
 
     return CHIP_NO_ERROR;
@@ -437,6 +447,20 @@ static EntropyContext * get_entropy_context()
     return &gsEntropyContext;
 }
 
+static int strong_entropy_func(void *data, unsigned char *output, size_t len)
+{
+    int result = -1;
+#if defined(MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES)
+    size_t olen = 0;
+    EntropyContext * const ctxt = get_entropy_context();
+    mbedtls_entropy_f_source_ptr trng_get_random = ctxt->mEntropy.source[0].f_source;
+    result = trng_get_random(NULL, Uint8::to_uchar(output), len, &olen);
+#else
+    result = mbedtls_entropy_func(data, output, len);
+#endif
+    return result;
+}
+
 static mbedtls_ctr_drbg_context * get_drbg_context()
 {
     EntropyContext * const context = get_entropy_context();
@@ -445,7 +469,7 @@ static mbedtls_ctr_drbg_context * get_drbg_context()
 
     if (!context->mDRBGSeeded)
     {
-        const int status = mbedtls_ctr_drbg_seed(drbgCtxt, mbedtls_entropy_func, &context->mEntropy, nullptr, 0);
+        const int status = mbedtls_ctr_drbg_seed(drbgCtxt, strong_entropy_func, &context->mEntropy, nullptr, 0);
         if (status != 0)
         {
             _log_mbedTLS_error(status);

@@ -67,8 +67,6 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     char * argv[1]    = { 0 };
     argv[0]           = &initString[0];
 
-    SHA_ClkInit(SHA_INSTANCE);
-
     if (MEM_Init() != MEM_SUCCESS_c)
     {
         err = CHIP_ERROR_NO_MEMORY;

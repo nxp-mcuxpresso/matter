@@ -149,6 +149,7 @@ template("k32w0_sdk") {
 
     _sdk_include_dirs += [
       "${chip_root}/src/platform/nxp/k32w/k32w0",
+      "${chip_root}/src/platform/nxp/k32w/k32w0/crypto",
       "${k32w0_sdk_root}/CMSIS/Include",
       "${k32w0_sdk_root}/components/serial_manager",
       "${k32w0_sdk_root}/components/uart",
@@ -258,6 +259,7 @@ template("k32w0_sdk") {
       "HEAP_SIZE=gTotalHeapSize_c",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
+      "SECLIB_MODE_ALT=1",
     ]
 
     if (chip_mdns == "platform") {
@@ -461,6 +463,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/framework/RNG/Source/RNG.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/SecLib_matter.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/SerialManager.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/SerialManager/Source/UART_Serial_Adapter.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",

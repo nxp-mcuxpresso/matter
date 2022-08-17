@@ -69,6 +69,7 @@ source_set("libopenthread-k32w0") {
     "${openthread_nxp_root}/src/k32w0/platform/radio.c",
     "${openthread_nxp_root}/src/k32w0/platform/system.c",
     "${openthread_nxp_root}/src/k32w0/platform/uart.c",
+    "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/crypto.cpp",
   ]
 
   if (chip_with_ot_cli == 1) {
@@ -78,6 +79,7 @@ source_set("libopenthread-k32w0") {
   public_deps = [
     ":openthread_core_config_k32w0",
     "${k32w0_sdk_build_root}:k32w0_sdk",
+    "${k32w0_sdk_build_root}:mbedtls",
     "${openthread_root}/src/core:libopenthread_core_headers",
     "../../..:libopenthread-platform",
     "../../..:libopenthread-platform-utils",
