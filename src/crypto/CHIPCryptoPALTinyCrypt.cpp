@@ -267,7 +267,7 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 #if defined(SECLIB_MODE_ALT)
-    sw_sha256_init_wrap(context);
+    seclib_sw_sha256_init(context);
 #else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_starts(context, 0);
@@ -284,7 +284,7 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if defined(SECLIB_MODE_ALT)
-    sw_sha256_update_wrap(context, Uint8::to_const_uchar(data.data()), data.size());
+    seclib_sw_sha256_update(context, Uint8::to_const_uchar(data.data()), data.size());
 #else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_update(context, Uint8::to_const_uchar(data.data()), data.size());
@@ -321,7 +321,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if defined(SECLIB_MODE_ALT)
-    sw_sha256_finish_wrap(context, Uint8::to_uchar(out_buffer.data()));
+    seclib_sw_sha256_finish(context, Uint8::to_uchar(out_buffer.data()));
 #else
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
     const int result = mbedtls_sha256_finish(context, Uint8::to_uchar(out_buffer.data()));

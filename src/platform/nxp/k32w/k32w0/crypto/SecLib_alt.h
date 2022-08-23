@@ -26,8 +26,7 @@
 /* Arbitrary value in milliseconds. If hardware SHA256 is currently in use,
  * subsequent SHA256_Init calls from other tasks will wait for SECLIB_SHA256_MUTEX_TIMEOUT
  * in order to lock the hardware SHA256 mutex. If a task fails to lock the mutex in this 
- * interval, it will use SW SHA256 instead. Set it to 0 for polling.
- */
+ * interval, it will use SW SHA256 instead. Set it to 0 for polling. */
 #define SECLIB_SHA256_MUTEX_TIMEOUT 0
 
 #ifndef SHA256_HASH_SIZE
@@ -46,9 +45,9 @@ typedef struct sha256Context_tag{
     uint8_t  bytes;
 }sha256Context_t;
 
-/* SHA256 wrappers over SW emulated functions. */
-void sw_sha256_init_wrap(void* pContext);
-void sw_sha256_update_wrap(void* pContext, const uint8_t* pData, uint32_t numBytes);
-void sw_sha256_finish_wrap(void* pContext, uint8_t* pOutput);
+/* Software SHA256 API. */
+void seclib_sw_sha256_init(void* pContext);
+void seclib_sw_sha256_update(void* pContext, const uint8_t* pData, uint32_t numBytes);
+void seclib_sw_sha256_finish(void* pContext, uint8_t* pOutput);
 
 #endif
