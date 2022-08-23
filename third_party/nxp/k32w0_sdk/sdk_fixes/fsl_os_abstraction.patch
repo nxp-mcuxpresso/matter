@@ -1,0 +1,111 @@
+--- a/Interface/fsl_os_abstraction.h
++++ b/Interface/fsl_os_abstraction.h
+@@ -625,6 +625,14 @@ void OSA_InstallIntHandler(uint32_t IRQNumber, void (*handler)(void));
+  */
+ void OSA_TimeInit(void);
+ 
++/*!
++ * @brief Checks if current context is inside an ISR.
++ *
++ * @retval TRUE  Current context is inside an ISR.
++ * @retval FALSE Current context is not inside an ISR.
++ */
++bool_t OSA_InIsrContext(void);
++
+ #ifdef  __cplusplus
+ }
+ #endif
+
+--- a/Source/fsl_os_abstraction_bm.c
++++ b/Source/fsl_os_abstraction_bm.c
+@@ -1355,6 +1355,17 @@ void OSA_InstallIntHandler(uint32_t IRQNumber, void (*handler)(void))
+ #endif
+ }
+ 
++/*FUNCTION**********************************************************************
++ *
++ * Function Name : OSA_InIsrContext
++ * Description   : self explanatory.
++ *
++ *END**************************************************************************/
++bool_t OSA_InIsrContext(void)
++{
++    return __get_IPSR();
++}
++
+ /*! *********************************************************************************
+ *************************************************************************************
+ * Private functions
+
+--- a/Source/fsl_os_abstraction_free_rtos.c
++++ b/Source/fsl_os_abstraction_free_rtos.c
+@@ -344,6 +344,12 @@ osaStatus_t OSA_SemaphoreWait(osaSemaphoreId_t semId, uint32_t millisec)
+ {
+ #if osNumberOfSemaphores
+   uint32_t timeoutTicks;
++
++  if (xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED)
++  {
++      return osaStatus_Success;
++  }
++
+   if(semId == NULL)
+   {
+     return osaStatus_Error;
+@@ -388,6 +394,12 @@ osaStatus_t OSA_SemaphorePost(osaSemaphoreId_t semId)
+ {
+ #if osNumberOfSemaphores
+   osaStatus_t status = osaStatus_Error;
++
++  if (xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED)
++  {
++      return osaStatus_Success;
++  }
++
+   if(semId)
+   {
+     semaphore_t sem = (semaphore_t)semId;
+@@ -461,6 +473,12 @@ osaStatus_t OSA_MutexLock(osaMutexId_t mutexId, uint32_t millisec)
+ #if osNumberOfMutexes    
+     uint32_t timeoutTicks;
+     mutex_t mutex = (mutex_t)mutexId;
++
++    if (xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED)
++    {
++        return osaStatus_Success;
++    }
++
+     if(mutexId == NULL)
+     {
+      return osaStatus_Error;
+@@ -506,6 +524,12 @@ osaStatus_t OSA_MutexUnlock(osaMutexId_t mutexId)
+ {
+ #if osNumberOfMutexes  
+   mutex_t mutex = (mutex_t)mutexId;
++
++  if (xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED)
++  {
++      return osaStatus_Success;
++  }
++
+   if(mutexId == NULL)
+   {
+     return osaStatus_Error;
+@@ -1078,6 +1102,17 @@ void OSA_TimeInit(void)
+ 
+ }
+ 
++/*FUNCTION**********************************************************************
++ *
++ * Function Name : OSA_InIsrContext
++ * Description   : self explanatory.
++ *
++ *END**************************************************************************/
++bool_t OSA_InIsrContext(void)
++{
++    return __get_IPSR();
++}
++
+ /*! *********************************************************************************
+ *************************************************************************************
+ * Private functions
