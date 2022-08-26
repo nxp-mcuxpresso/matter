@@ -497,6 +497,8 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
+        actor = AppEvent::kEventType_Button;
+
         if (LightingMgr().IsTurnedOff())
         {
             action = LightingManager::TURNON_ACTION;
@@ -911,6 +913,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* set the device state */
     sLightLED.Set(onoffAttrValue);
+    LightingMgr().SetState(onoffAttrValue);
 }
 
 extern "C" void OTAIdleActivities(void)
