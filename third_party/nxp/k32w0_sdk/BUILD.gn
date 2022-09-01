@@ -84,8 +84,8 @@ config("mbedtls_k32w0_config") {
 
 mbedtls_target("mbedtls") {
   sources = [
-    "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
-    "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/ksdk_mbedtls.c",
+    "${k32w0_sdk_root}/middleware/mbedtls/port/matter/aes_alt.c",
+    "${k32w0_sdk_root}/middleware/mbedtls/port/matter/ksdk_mbedtls.c",
   ]
 
   if (chip_crypto == "tinycrypt") {
