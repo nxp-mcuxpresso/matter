@@ -1,0 +1,18 @@
+--- a/board.c
++++ b/board.c
+@@ -1014,6 +1014,7 @@ void BOARD_SetFaultBehaviour(void)
+ 
+ }
+ 
++#if 0
+ __attribute__((section(".after_vectors")))  void BusFault_Handler(void)
+ {
+     /* Retrieve the stack pointer */
+@@ -1048,6 +1049,7 @@ __attribute__((section(".after_vectors")))  void BusFault_Handler(void)
+     );
+ 
+ }
++#endif
+ 
+ uint32_t BOARD_GetSpiClock(uint32_t instance)
+ {

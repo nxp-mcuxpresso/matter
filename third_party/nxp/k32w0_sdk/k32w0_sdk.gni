@@ -165,6 +165,8 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/host/config",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/host/interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/Common",
+      "${k32w0_sdk_root}/middleware/wireless/framework/DebugExceptionHandlers_jn518x/inc",
+      "${k32w0_sdk_root}/middleware/wireless/framework/DebugFifo/Include",
       "${k32w0_sdk_root}/middleware/wireless/framework/Flash/External/Interface",
       "${k32w0_sdk_root}/middleware/wireless/framework/Flash/Internal",
       "${k32w0_sdk_root}/middleware/wireless/framework/FunctionLib",
@@ -258,6 +260,7 @@ template("k32w0_sdk") {
       "HEAP_SIZE=gTotalHeapSize_c",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
+      "DEBUG_ENABLE"
     ]
 
     if (chip_mdns == "platform") {
@@ -431,6 +434,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/devices/${device}/drivers/fsl_spifi.c",
       "${k32w0_sdk_root}/devices/${device}/drivers/fsl_usart.c",
       "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wtimer.c",
+      "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wwdt.c",
       "${k32w0_sdk_root}/devices/${device}/mcuxpresso/startup_${device_lowercase}.c",
       "${k32w0_sdk_root}/devices/${device}/system_${device}.c",
       "${k32w0_sdk_root}/devices/${device}/utilities/debug_console/fsl_debug_console.c",
@@ -440,6 +444,9 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/host/config/ble_globals.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Common/MicroInt_arm_sdk2.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/DebugExceptionHandlers_jn518x/src/Exceptions_NVIC.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/DebugExceptionHandlers_jn518x/src/MicroExceptions_arm.c",
+      "${k32w0_sdk_root}/middleware/wireless/framework/DebugFifo/Source/Debug.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Flash/External/Source/Eeprom_MX25R8035F.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/Flash/Internal/Flash_Adapter.c",
       "${k32w0_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
