@@ -27,8 +27,8 @@ using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
 
-constexpr uint16_t kOptionDacProviderFilePath     = 0xFF01;
-constexpr uint16_t kOptionMinCommissioningTimeout = 0xFF02;
+constexpr uint16_t kOptionDacProviderFilePath     = 0xE001;
+constexpr uint16_t kOptionMinCommissioningTimeout = 0xE002;
 
 static chip::Credentials::Examples::TestHarnessDACProvider mDacProvider;
 
