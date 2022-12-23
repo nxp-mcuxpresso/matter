@@ -21,6 +21,11 @@
 #include <platform/logging/LogV.h>
 
 #include <editline.h>
+#if CHIP_WITH_WEBUI
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+#endif
 
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
@@ -349,6 +354,63 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_WITH_WEBUI
+void WritebackFifo(const char* ret)
+{
+
+    std::ofstream fifo("/tmp/webui_ack_fifo", std::ios::app);
+    fifo << ret << std::endl;
+    fifo.flush();
+    //
+}
+
+std::string GetFifo()
+{
+    std::ifstream fifo("/tmp/webui_fifo");
+    std::string line;
+    if (std::getline(fifo, line))
+    {
+        std::cout << line << std::endl;
+        ChipLogError(NotSpecified, "thread read fifo %s", line.c_str());
+    }
+    if (fifo.eof())
+    {
+        fifo.clear();
+    }
+    fifo.close();
+    return line;
+}
+#endif
+
+#if CHIP_WITH_WEBUI
+CHIP_ERROR InteractiveStartCommand::RunCommand()
+{
+    read_history(kInteractiveModeHistoryFilePath);
+
+    // Logs needs to be redirected in order to refresh the screen appropriately when something
+    // is dumped to stdout while the user is typing a command.
+    chip::Logging::SetLogRedirectCallback(LoggingCallback);
+
+    char * command = nullptr;
+    int status;
+    std::string cmd;
+    while (true)
+    {
+        cmd = GetFifo();
+        command = (char*)cmd.c_str();
+        if (command != nullptr && !ParseCommand(command, &status))
+        {
+            break;
+        }
+        CHIP_ERROR err = GetCommandExitStatus();
+        ChipLogError(NotSpecified, "sendrolon exitstatus = %s", err.AsString());
+        WritebackFifo(err == CHIP_NO_ERROR? "0":"1");
+    }
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+#else
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(GetHistoryFilePath().c_str());
@@ -377,6 +439,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
+#endif
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
@@ -390,8 +453,15 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
     }
 
     ClearLine();
-
+    #if CHIP_WITH_WEBUI
+    if (mHandler->RunInteractive(command, GetStorageDirectory())) {
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+    } else {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
+    #else
     *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    #endif
 
     return true;
 }

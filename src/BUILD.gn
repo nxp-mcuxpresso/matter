@@ -21,6 +21,7 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
+import("${chip_root}/src/lib/web.gni")
 
 declare_args() {
   # Build monolithic test library.
@@ -50,6 +51,12 @@ config("includes") {
 
   # Make __FILE__ and related macros relative to chip_root
   cflags = [ "-fmacro-prefix-map=${build_relative_chip_root}/=" ]
+
+  if (chip_with_web == 1) {
+    defines += [ "CHIP_WITH_WEBUI=1" ]
+  } else {
+    defines += [ "CHIP_WITH_WEBUI=0" ]
+  }
 }
 
 if (chip_build_tests) {
