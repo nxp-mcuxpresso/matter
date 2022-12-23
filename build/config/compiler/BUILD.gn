@@ -500,7 +500,6 @@ declare_args() {
   # Enable or disable Runtime Type Information (RTTI).
   # Defaults true on darwin because Darwin.framework uses it.
   enable_rtti = current_os == "mac" || current_os == "ios"
-
   # Enable or disable support for C++ exceptions.
   enable_exceptions = false
 }
