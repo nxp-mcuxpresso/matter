@@ -364,6 +364,38 @@ const ClusterStateCache::EventData * ClusterStateCache::GetEventData(EventNumber
     return &(*eventData);
 }
 
+#if CHIP_WITH_WEBUI
+void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus, NodeId peerId)
+{
+    //
+    // Since the cache itself is a ReadClient::Callback, it may be incorrectly passed in directly when registering with the
+    // ReadClient. This should be avoided, since that bypasses the built-in buffered reader adapter callback that is needed for
+    // lists to work correctly.
+    //
+    // Instead, the right callback should be retrieved using GetBufferedCallback().
+    //
+    // To catch such errors, we validate that the provided concrete path never indicates a raw list item operation (which the
+    // buffered reader will handle and convert for us).
+    //
+    //
+    VerifyOrDie(!aPath.IsListItemOperation());
+
+    // Copy the reader for forwarding
+    TLV::TLVReader dataSnapshot;
+    if (apData)
+    {
+        dataSnapshot.Init(*apData);
+    }
+
+    UpdateCache(aPath, apData, aStatus);
+
+    //
+    // Forward the call through.
+    //
+    ChipLogError(chipTool, " clusterstatecache onattributedata");
+    mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus, peerId);
+}
+#else
 void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     //
@@ -393,6 +425,7 @@ void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath,
     //
     mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
+#endif
 
 CHIP_ERROR ClusterStateCache::GetVersion(const ConcreteClusterPath & aPath, Optional<DataVersion> & aVersion) const
 {

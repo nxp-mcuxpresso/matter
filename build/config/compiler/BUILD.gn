@@ -487,6 +487,7 @@ config("coverage_default") {
 declare_args() {
   # Enable Runtime Type Information (RTTI)
   enable_rtti = current_os == "mac" || current_os == "ios"
+  enable_exceptions = false
 }
 
 config("no_rtti") {
@@ -514,7 +515,11 @@ config("exceptions") {
 }
 
 config("exceptions_default") {
-  configs = [ ":no_exceptions" ]
+  if (enable_exceptions) {
+    configs = [ ":exceptions" ]
+  } else {
+    configs = [ ":no_exceptions" ]
+  }
 }
 
 config("unwind_tables") {
