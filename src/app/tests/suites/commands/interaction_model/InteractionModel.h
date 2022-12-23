@@ -25,6 +25,9 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
+#if CHIP_WITH_WEBUI
+#include <lib/core/NodeId.h>
+#endif
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 
@@ -686,8 +689,13 @@ public:
     void Shutdown();
 
     /////////// ReadClient Callback Interface /////////
+    #if CHIP_WITH_WEBUI
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
+                         const chip::app::StatusIB & status, uint64_t peerId) override;
+    #else
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override;
+    #endif
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
