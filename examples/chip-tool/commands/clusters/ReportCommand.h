@@ -23,14 +23,122 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
+#if CHIP_WITH_WEBUI
+using namespace chip::app::Clusters;
+
+struct ChipReport
+{
+    int nodeid;
+    int endpoint;
+    int cluster;
+    std::string attr;
+    std::string value;
+};
+
+class ReportBuffers
+{
+public:
+    static void AddReport(const ChipReport & report) { m_queue.push(report); }
+
+    static ChipReport DequeueReport()
+    {
+        auto report = m_queue.front();
+        m_queue.pop();
+        return report;
+    }
+
+    static void ResetQueue()
+    {
+        while (!m_queue.empty())
+        {
+            m_queue.pop();
+        }
+    }
+
+    static bool IsQueueEmpty() { return m_queue.empty(); }
+
+private:
+    static std::queue<ChipReport> m_queue;
+};
+
+std::queue<ChipReport> ReportBuffers::m_queue;
+#endif
+
 class ReportCommand : public InteractionModelReports, public ModelCommand, public chip::app::ReadClient::Callback
 {
+#if CHIP_WITH_WEBUI
+private:
+    struct ChipReport GenerateReport(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data, NodeId nodeid)
+    {
+        struct ChipReport report;
+        report.endpoint = path.mEndpointId;
+        report.nodeid   = nodeid;
+        report.cluster  = path.mClusterId;
+        switch (path.mClusterId)
+        {
+            case OnOff::Id: {
+                switch (path.mAttributeId)
+                {
+                    case OnOff::Attributes::OnOff::Id:
+                    {
+                        bool val;
+                        chip::app::DataModel::Decode(*data, val);
+                        report.attr  = "On-Off";
+                        report.value = val ? "TRUE" : "FALSE";
+                        ChipLogError(chipTool, "generate one report value=%s", report.value.c_str());
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        return report;
+    }
+#endif
 public:
     ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig, /* supportsMultipleEndpoints = */ true)
     {}
+    #if CHIP_WITH_WEBUI
+    NodeId mPeerNodeId;
+    void SetPeerNodeId(NodeId nodeId) override
+    {
+        this->mPeerNodeId = nodeId;
+        ChipLogError(chipTool, "setpeernodeid %llu", nodeId);
+    }
+    #endif
 
     /////////// ReadClient Callback Interface /////////
+    #if CHIP_WITH_WEBUI
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
+                         const chip::app::StatusIB & status, NodeId peerId) override
+    {
+        ChipLogError(chipTool, "onAttributeData getnodeid %llu", peerId);
+        CHIP_ERROR error = status.ToChipError();
+        if (CHIP_NO_ERROR != error)
+        {
+            ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
+            mError = error;
+            return;
+        }
+
+        if (data == nullptr)
+        {
+            ChipLogError(chipTool, "Response Failure: No Data");
+            mError = CHIP_ERROR_INTERNAL;
+            return;
+        }
+
+        error = DataModelLogger::LogAttribute(path, data);
+        if (CHIP_NO_ERROR != error)
+        {
+            ChipLogError(chipTool, "Response Failure: Can not decode Data");
+            mError = error;
+            return;
+        }
+        ReportBuffers::AddReport(GenerateReport(path, data, peerId));
+    }
+    #else
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override
     {
@@ -61,6 +169,7 @@ public:
             return;
         }
     }
+    #endif
 
     void OnEventData(const chip::app::EventHeader & eventHeader, chip::TLV::TLVReader * data,
                      const chip::app::StatusIB * status) override

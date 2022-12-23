@@ -136,10 +136,17 @@ void InteractionModel::Shutdown()
 }
 
 /////////// ReadClient Callback Interface /////////
+#if CHIP_WITH_WEBUI
+void InteractionModel::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status, NodeId peerId)
+{
+    OnResponse(status, data);
+}
+#else
 void InteractionModel::OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * data, const StatusIB & status)
 {
     OnResponse(status, data);
 }
+#endif
 
 void InteractionModel::OnEventData(const EventHeader & eventHeader, TLV::TLVReader * data, const StatusIB * status)
 {
