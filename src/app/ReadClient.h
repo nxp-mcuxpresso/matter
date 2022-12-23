@@ -143,7 +143,12 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
+        #if CHIP_WITH_WEBUI
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus, NodeId peerId = 0)
+        {}
+        #else
         virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
+        #endif
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -284,6 +289,12 @@ public:
          * things like min/max intervals based on the session parameters).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        #if CHIP_WITH_WEBUI
+        virtual void SetPeerNodeId(NodeId nodeId) { return; }
+
+        virtual NodeId GetPeerNodeId() { return 0; }
+        #endif
     };
 
     enum class InteractionType : uint8_t

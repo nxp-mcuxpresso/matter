@@ -106,6 +106,11 @@ if [ "$3" = "debug" ]; then
 fi
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
+chip_with_web=${NXP_CHIPTOOL_WITH_WEB:-0}
+additional_gn_args=""
+if [ "$chip_with_web" = 1 ]; then
+    additional_gn_args+=" enable_rtti=true enable_exceptions=true chip_with_web=$chip_with_web"
+fi
 gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
@@ -115,6 +120,7 @@ custom_toolchain=\"\${build_root}/toolchain/custom\"
 target_cc=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cc\"
 target_cxx=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cxx\"
 target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cross_compile-ar\"
-$(if [ "$release_build" = "true" ]; then echo "is_debug=false"; else echo "optimize_debug=true"; fi)"
+$(if [ "$release_build" = "true" ]; then echo "is_debug=false"; else echo "optimize_debug=true"; fi)
+$additional_gn_args"
 
 ninja -C "$2"
