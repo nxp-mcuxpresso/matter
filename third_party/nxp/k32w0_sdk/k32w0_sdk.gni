@@ -272,6 +272,8 @@ template("k32w0_sdk") {
       "gOtaVerifyWrite_d=0",
       "gExternalFlashIsCiphered_d=1",
       "PDM_USE_DYNAMIC_MEMORY=1",
+      "PDM_SAVE_IDLE=1",
+      "PDM_ENCRYPTION=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
