@@ -160,7 +160,7 @@ template("k32w1_sdk") {
     }
 
     libs = [
-      "${k32w1_sdk_root}/middleware/wireless/bluetooth/host/lib/lib_ble_host_cm33_gcc.a",
+      "${k32w1_sdk_root}/middleware/wireless/bluetooth/host/lib/lib_ble_host_peripheral_cm33_gcc.a",
       "${k32w1_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m33.a",
     ]
 
