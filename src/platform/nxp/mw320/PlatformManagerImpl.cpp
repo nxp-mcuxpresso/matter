@@ -46,7 +46,19 @@ sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    *olen = len;
+    static uint8_t rnd_offset=0;
+    uint8_t *prand=NULL;
+
+    PRINTF("app_entropy_source: len: %lu \r\n", len);
+    prand = get_uninit_mem_hash_buff(rnd_offset);
+    if (prand != NULL) {
+        memcpy(output, prand, len);
+        *olen = len;
+    } else {
+        *olen = 0;
+    }
+
+    rnd_offset += len/8;
     return 0;
 }
 

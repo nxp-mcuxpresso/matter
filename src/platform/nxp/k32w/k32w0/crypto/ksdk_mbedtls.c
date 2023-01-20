@@ -1104,37 +1104,6 @@ exit:
  * Authenticated encryption or decryption
  */
 #if defined(MBEDTLS_FREESCALE_LTC_AES)
-static int ccm_auth_crypt(mbedtls_ccm_context * ctx, int mode, size_t length, const unsigned char * iv, size_t iv_len,
-                          const unsigned char * add, size_t add_len, const unsigned char * input, unsigned char * output,
-                          unsigned char * tag, size_t tag_len)
-{
-    status_t status;
-    const uint8_t * key;
-    uint8_t keySize;
-    mbedtls_aes_context * aes_ctx;
-
-    aes_ctx = (mbedtls_aes_context *) ctx->cipher_ctx.cipher_ctx;
-    key     = (uint8_t *) aes_ctx->rk;
-    keySize = aes_ctx->nr;
-    if (mode == CCM_ENCRYPT)
-    {
-        status = LTC_AES_EncryptTagCcm(LTC_INSTANCE, input, output, length, iv, iv_len, add, add_len, key, keySize, tag, tag_len);
-    }
-    else
-    {
-        status = LTC_AES_DecryptTagCcm(LTC_INSTANCE, input, output, length, iv, iv_len, add, add_len, key, keySize, tag, tag_len);
-    }
-
-    if (status == kStatus_InvalidArgument)
-    {
-        return MBEDTLS_ERR_CCM_BAD_INPUT;
-    }
-    else if (status != kStatus_Success)
-    {
-        return MBEDTLS_ERR_CCM_AUTH_FAILED;
-    }
-
-    return (0);
 }
 #elif defined(MBEDTLS_FREESCALE_CAAM_AES)
 static int ccm_auth_crypt(mbedtls_ccm_context * ctx, int mode, size_t length, const unsigned char * iv, size_t iv_len,

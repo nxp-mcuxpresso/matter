@@ -1,0 +1,269 @@
+# Copyright (c) 2020 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/lwip/lwip.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/bt_ble/bt_ble.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
+
+import("//build_overrides/openthread.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+rt_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+mbedtls_root = "${rt_sdk_root}/middleware/mbedtls"
+
+rt_sdk("nxp_sdk") {
+  defines = []
+
+  cflags = []
+  public_deps = []
+  public_configs = []
+  sources = []
+  include_dirs = []
+
+  #Adding common board files
+  include_dirs += ["${rt_platform_dir}/board/"]
+  sources += ["${rt_platform_dir}/board/pin_mux.c"]
+  sources += ["${rt_platform_dir}/board/hardware_init.c"]
+  sources += ["${rt_platform_dir}/board/clock_config.c"]
+  sources += ["${rt_platform_dir}/board/board.c"]
+  sources += ["${rt_platform_dir}/board/peripherals.c"]
+
+  #Adding pre-include files
+  cflags += ["-include" + rebase_path("${chip_root}/examples/platform/nxp/common/app/transceiver/app_matter_config.h", root_build_dir)]
+
+  if (iw416_transceiver) {
+    defines += [ "WIFI_IW416_BOARD_AW_AM510_USD", "SDIO_ENABLED" ]
+    public_deps += [":nxp_transceiver"]
+  }
+
+  if (w8801_transceiver)
+  {
+    defines += [ "WIFI_88W8801_BOARD_MURATA_2DS_USD", "SDIO_ENABLED" ]
+    public_deps += [":nxp_transceiver"]
+  }
+
+  if (iwx12_transceiver) 
+  {
+    defines += [ "WIFI_IW61x_BOARD_RD_USD", "SDIO_ENABLED" ]
+    public_deps += [":nxp_transceiver"]
+
+    #TODO , Add source below in wifi as well once handled in framework platform
+    if (chip_enable_openthread) {
+      sources += [
+          "${rt_sdk_root}/middleware/wireless/framework/platform/rt/iw612/fwk_platform_coex.c",
+      ]
+    }
+  }
+
+  if (k32w0_transceiver) {
+    defines += ["K32W061_TRANSCEIVER"]
+    sources += ["${rt_sdk_root}/middleware/wireless/framework/platform/rt/k32w0/fwk_platform_coex.c"]
+  }
+
+  # Add a dep to SDK driver files
+  public_deps += ["${rt_platform}:rt_sdk_drivers"]
+
+  #SDK needs a include path to freeRTOSConfig.h
+  public_configs += ["${rt_platform_dir}:chip_app_project_config"]
+
+  if (chip_enable_openthread) {
+    #Some chip files need openthread core includes
+    public_deps +=  ["${openthread_root}/src/core:libopenthread_core_headers"]
+  }
+
+  if (chip_enable_ble) {
+    public_deps += [":nxp_bt_ble"]
+  }
+
+  if (chip_enable_wifi) {
+    public_deps += [":nxp_wifi"]
+  }
+}
+
+config("mbedtls_ksdk_config") {
+  include_dirs = [ "${mbedtls_root}/port/ksdk" ]
+  defines = [ "MBEDTLS_PORT_INCLUDE=<ksdk_mbedtls.h>" ]
+  if (chip_enable_openthread) {
+    defines += [ "MBEDTLS_CONFIG_FILE=<ot-nxp-mbedtls-config.h>" ]
+  }
+  else {
+    defines += [ "MBEDTLS_CONFIG_FILE=<matter_mbedtls_config.h>" ]
+  }
+}
+
+config("mbedtls_els_pkc_config") {
+    include_dirs = [ 
+      "${mbedtls_root}/port/els",
+      "${mbedtls_root}/port/pkc",
+    ]
+    defines = [ "MBEDTLS_PORT_INCLUDE=<els_pkc_mbedtls.h>" ]
+
+    if (chip_enable_openthread) {
+      defines += [ "MBEDTLS_CONFIG_FILE=<rw610-mbedtls-config.h>" ]
+    }
+    else {
+      defines += [ "MBEDTLS_CONFIG_FILE=<els_pkc_mbedtls_config.h>" ]
+    }
+}
+
+mbedtls_target("nxp_els_pkc_mbedtls") {
+  sources = []
+  public_deps = [":nxp_sdk"]
+  public_configs = [":mbedtls_els_pkc_config"]
+  sources += [
+      # els port
+      "${mbedtls_root}/port/els/aes_alt.c",
+      "${mbedtls_root}/port/els/cbc_mac_alt.c",
+      "${mbedtls_root}/port/els/cmac_alt.c",
+      "${mbedtls_root}/port/els/ctr_drbg_alt.c",
+      "${mbedtls_root}/port/els/els_mbedtls.c",
+      "${mbedtls_root}/port/els/entropy_poll_alt.c",
+      "${mbedtls_root}/port/els/gcm_alt.c",
+      "${mbedtls_root}/port/els/sha256_alt.c",
+      "${mbedtls_root}/port/els/sha512_alt.c",
+      # pkc port
+      "${mbedtls_root}/port/pkc/ecc_alt.c",
+      "${mbedtls_root}/port/pkc/ecdh_alt.c",
+      "${mbedtls_root}/port/pkc/ecdsa_alt.c",
+      "${mbedtls_root}/port/pkc/els_pkc_mbedtls.c",
+      "${mbedtls_root}/port/pkc/rsa_alt.c",
+    ]
+}
+
+mbedtls_target("nxp_ksdk_mbedtls") {
+  sources = []
+  public_deps = [":nxp_sdk"]
+  public_configs = [":mbedtls_ksdk_config"]
+  sources += [
+      "${mbedtls_root}/port/ksdk/aes_alt.c",
+      "${mbedtls_root}/port/ksdk/des_alt.c",
+      "${mbedtls_root}/port/ksdk/ecp_alt.c",
+      "${mbedtls_root}/port/ksdk/ecp_alt_ksdk.c",
+      "${mbedtls_root}/port/ksdk/ecp_curves_alt.c",
+      "${mbedtls_root}/port/ksdk/ksdk_mbedtls.c",
+    ]
+  
+  # Allow a platform to use a software implementation of ksdk_mbedtls.c if provided
+  if (defined(ksdk_mbedtls_sw_impl))
+  {
+    sources -= ["${mbedtls_root}/port/ksdk/ksdk_mbedtls.c"]
+    sources += [ "${ksdk_mbedtls_sw_impl}" ]
+  }
+}
+
+config("lwip_rt_config") {
+  include_dirs = [
+    "${rt_sdk_root}/middleware/lwip/src/include",
+    "${rt_sdk_root}/middleware/lwip/port",
+    "lwip/common",
+  ]
+  if (chip_enable_ethernet) {
+    include_dirs += ["lwip/ethernet"]
+  } else if (chip_enable_openthread && chip_enable_wifi) {
+    include_dirs += ["lwip/wifi_openthread"]
+  } else if (chip_enable_openthread) {
+    include_dirs += ["lwip/openthread"]
+  } else if (chip_enable_wifi) {
+    include_dirs += ["lwip/wifi"]
+  }
+}
+
+lwip_target("nxp_lwip")
+{
+  public = []
+  sources = [
+    #lwip port file
+    "${rt_sdk_root}/middleware/lwip/port/sys_arch.c",
+  ]
+  if (chip_enable_ethernet) {
+    sources += [
+        "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif.c",
+        "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif_kinetis.c",
+    ]
+  }
+  public_configs = [":lwip_rt_config"]
+
+  public_deps = [":nxp_sdk"]
+  rt_sdk_root = rt_sdk_root
+}
+
+bt_ble_target("nxp_bt_ble")
+{
+  public_configs = [
+    ":nxp_sdk_config",
+    "${rt_platform}:rt_sdk_drivers_config",
+    # needs include path to freeRTOSConfig.h
+    "${rt_platform_dir}:chip_app_project_config"
+  ]
+  if (chip_enable_wifi) {
+    public_configs += [
+      ":nxp_wifi_config",
+      ":nxp_transceiver_config",
+    ]
+  }
+  else if(iwx12_transceiver)
+  {
+    public_configs += [
+      # As iwx12 could support 15.4 without Wi-fi and 
+      # because the bt_ble stack requires some include files 
+      # from the nxp_transceiver config, a config dependency needs to be added.
+      ":nxp_transceiver_config",
+    ]
+  }
+  rt_sdk_root = rt_sdk_root
+}
+
+rt_transceiver("nxp_transceiver")
+{
+  public_configs = [
+    ":nxp_sdk_config",
+    "${rt_platform}:rt_sdk_drivers_config",
+    # needs include path to freeRTOSConfig.h
+    "${rt_platform_dir}:chip_app_project_config"
+  ]
+  if (chip_enable_ble) {
+    public_configs += [
+      ":nxp_bt_ble_config",
+    ]
+  }
+  if (chip_enable_wifi) {
+    public_configs += [
+      ":nxp_wifi_config",
+    ]
+  }
+}
+
+rt_wifi("nxp_wifi")
+{
+  public_configs = [
+    ":nxp_sdk_config",
+    "${rt_platform}:rt_sdk_drivers_config",
+    ":nxp_transceiver_config",
+    # needs include path to freeRTOSConfig.h
+    "${rt_platform_dir}:chip_app_project_config",
+    ":lwip_rt_config",
+  ]
+  if (chip_enable_ble) {
+    public_configs += [
+      ":nxp_bt_ble_config",
+    ]
+  }
+}

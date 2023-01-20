@@ -37,6 +37,11 @@
 #include <openthread/dns_client.h>
 #endif
 
+#if IHD_SRP_SERVER
+#include <openthread/srp_server.h>
+#endif
+
+
 #include <app/AttributeAccessInterface.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -263,8 +268,22 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    static void OnJoinerComplete(otError aError, void * aContext);
-    void OnJoinerComplete(otError aError);
+#if IHD_SRP_SERVER
+    struct SrpServer {
+        static constexpr uint8_t kMaxServicesNumber      = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
+        static constexpr const char * kDefaultDomainName = "default.service.arpa";
+        static constexpr uint8_t kDefaultDomainNameSize  = 20;
+        static constexpr uint8_t kMaxDomainNameSize      = 32;
+    };
+
+    SrpServer mSrpServer;
+
+    static void _SrpServerHandler(otSrpServerServiceUpdateId aId, const otSrpServerHost * aHost, uint32_t aTimeout, void * aContext);
+    void _SrpServerHandler(otSrpServerServiceUpdateId aId, const otSrpServerHost * aHost, uint32_t aTimeout);
+#endif // IHD_SRP_SERVER
+
+	static void OnJoinerComplete(otError aError, void * aContext);
+	void OnJoinerComplete(otError aError);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType);

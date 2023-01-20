@@ -30,7 +30,8 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "cc32xx" ||
-           lwip_platform == "efr32" || lwip_platform == "k32w0" ||
+           lwip_platform == "efr32" || lwip_platform == "nxp" ||
+           lwip_platform == "k32w0" || lwip_platform == "k32w1" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
            lwip_platform == "bl602" || lwip_platform == "mw320" ||
@@ -52,9 +53,12 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/efr32_sdk.gni")
 } else if (lwip_platform == "qpg") {
   import("//build_overrides/qpg_sdk.gni")
-  import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (lwip_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
+} else if (lwip_platform == "k32w1") {
+  import("//build_overrides/k32w1_sdk.gni")
+} else if (lwip_platform == "p6") {
+  import("//build_overrides/p6.gni")
 } else if (lwip_platform == "psoc6") {
   import("//build_overrides/psoc6.gni")
 } else if (lwip_platform == "cyw30739") {
@@ -63,6 +67,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
 } else if (lwip_platform == "bl702") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (lwip_platform == "nxp") {
+  import("//build_overrides/nxp_sdk.gni")
 } else if (lwip_platform == "mw320") {
   import("//build_overrides/mw320_sdk.gni")
 } else if (lwip_platform == "mt793x") {
@@ -148,6 +154,10 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("all") {
     deps = [ ":lwip" ]
   }
+} else if (lwip_platform == "nxp") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig", "${nxp_sdk_build_root}:nxp_lwip" ]
+  }
 } else {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
@@ -192,6 +202,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+    } else if (lwip_platform == "k32w1") {
+      public_deps += [ "${k32w1_sdk_build_root}:k32w1_sdk" ]
     } else if (lwip_platform == "cyw30739") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
     } else if (lwip_platform == "bl602") {

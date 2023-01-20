@@ -31,6 +31,16 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#include "fsl_gpio.h"
+#include "fsl_iocon.h"
+#include "gpio_pins.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -50,7 +60,7 @@ typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
-#define NORMAL_PWR_LIMIT 10 /* dBm */
+#define NORMAL_PWR_LIMIT        10    /* dBm */
 
 #ifdef K32WMCM_APP_BUILD
 /* Must be called before zps_eAplAfInit() */
@@ -60,7 +70,7 @@ void APP_SetHighTxPowerMode();
 void APP_SetMaxTxPower();
 
 #undef HIGH_TX_PWR_LIMIT
-#define HIGH_TX_PWR_LIMIT 15 /* dBm */
+#define HIGH_TX_PWR_LIMIT 15    /* dBm */
 /* High Tx power */
 void APP_SetHighTxPowerMode()
 {
@@ -114,9 +124,15 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-
+    
 #ifdef K32WMCM_APP_BUILD
     APP_SetHighTxPowerMode();
+#endif
+
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
 #endif
 
     err = PlatformMgr().InitChipStack();
@@ -199,3 +215,29 @@ extern "C" void otSysEventSignalPending(void)
         portYIELD_FROM_ISR(yieldRequired);
     }
 }
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+extern "C" void vOptimizeConsumption(void)
+{
+    /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */
+    uint32_t u32SkipIO = (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN);
+
+    /* Pins are set to GPIO mode (IOCON FUNC0), pulldown and analog mode */
+    uint32_t u32PIOvalue = (IOCON_FUNC0 | IOCON_MODE_PULLDOWN | IOCON_ANALOG_EN);
+
+    const gpio_pin_config_t pin_config = { .pinDirection = kGPIO_DigitalInput, .outputLogic = 1U };
+
+    if (u32PIOvalue != 0)
+    {
+        for (int i = 0; i < 22; i++)
+        {
+            if (((u32SkipIO >> i) & 0x1) != 1)
+            {
+                /* configure GPIOs to Input mode */
+                GPIO_PinInit(GPIO, 0, i, &pin_config);
+                IOCON_PinMuxSet(IOCON, 0, i, u32PIOvalue);
+            }
+        }
+    }
+}
+#endif

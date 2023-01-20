@@ -133,9 +133,19 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
 
     while (true)
     {
+#ifdef RT_MATTER_SUPPORT
+/* 
+* TMP workaround to fix mbdetls concurrent access to crypto hardware
+* Would be removed once the mbedtls port layer would be reworked to support concurrent access
+*/
+        PlatformMgr().LockChipStack();
+#endif
         self->Impl()->LockThreadStack();
         self->Impl()->ProcessThreadActivity();
         self->Impl()->UnlockThreadStack();
+#ifdef RT_MATTER_SUPPORT
+        PlatformMgr().UnlockChipStack();
+#endif
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }

@@ -1,0 +1,30 @@
+diff --git a/wlcmgr/wlan.c b/wlcmgr/wlan.c
+index 9f58c1c..6492c2a 100644
+--- a/wlcmgr/wlan.c
++++ b/wlcmgr/wlan.c
+@@ -1335,13 +1335,13 @@ static void do_connect_failed(enum wlan_event_reason reason)
+ 
+     wlcm_d("connecting to \"%s\" failed", wlan.networks[wlan.cur_network_idx].name);
+ 
+-    CONNECTION_EVENT(reason, NULL);
+-    wlan.sta_state = CM_STA_IDLE;
+-
+     if (wlan.sta_state == CM_STA_SCANNING_USER)
+     {
+         wlan.sta_return_to = CM_STA_IDLE;
+     }
++
++    wlan.sta_state = CM_STA_IDLE;
++    CONNECTION_EVENT(reason, NULL);
+ }
+ 
+ static void report_scan_results(void)
+@@ -2813,6 +2813,8 @@ static void wlcm_request_reconnect(enum cm_sta_state *next, struct wlan_network
+ 
+         wlcm_d("Disconnecting ... ");
+         (void)wlan_disconnect();
++
++        CONNECTION_EVENT(WLAN_REASON_CONNECT_FAILED, NULL);
+     }
+ }
+ 

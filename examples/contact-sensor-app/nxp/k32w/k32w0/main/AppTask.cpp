@@ -72,7 +72,6 @@ static LEDWidget sContactSensorLED;
 
 static bool sIsThreadProvisioned        = false;
 static bool sHaveBLEConnections         = false;
-static bool sIsDnssdPlatformInitialized = false;
 
 static uint32_t eventMask = 0;
 
@@ -86,8 +85,12 @@ using namespace chip;
 
 AppTask AppTask::sAppTask;
 
-static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+static Identify gIdentify = {
+    chip::EndpointId{1},
+    AppTask::OnIdentifyStart,
+    AppTask::OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED
+};
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -133,12 +136,10 @@ CHIP_ERROR AppTask::Init()
 // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
-    ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-    SetDeviceInstanceInfoProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-#endif
-    SetDeviceAttestationCredentialsProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&K32W0FactoryDataProvider::GetDefaultInstance());
+    ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
+	SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+	SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+	SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -147,7 +148,7 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    AppTask::PrintOnboardingInfo();
 #endif
 
     /* HW init leds */
@@ -162,7 +163,7 @@ CHIP_ERROR AppTask::Init()
 #endif
     UpdateDeviceState();
 
-    /* intialize the Keyboard and button press callback */
+    /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
 
     // Create FreeRTOS sw timer for Function Selection.
@@ -189,23 +190,11 @@ CHIP_ERROR AppTask::Init()
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
+    uint32_t currentVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
-    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
+    K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (gImageProcessor.IsFirstImageRun())
-    {
-        // If DNS-SD initialization was captured by MatterEventHandler, then
-        // OTA initialization will be started as soon as possible. Otherwise,
-        // a periodic timer is started until the DNS-SD initialization event
-        // is received. Configurable delay: CHIP_DEVICE_CONFIG_INIT_OTA_DELAY
-        AppTask::OnScheduleInitOTA(nullptr, nullptr);
-    }
-    else
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-#endif
     return err;
 }
 
@@ -237,6 +226,21 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+}
+
+void AppTask::PrintOnboardingInfo()
+{
+    chip::PayloadContents payload;
+    CHIP_ERROR err = GetPayloadContents(
+        payload,
+        chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)
+    );
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    payload.commissioningFlow = chip::CommissioningFlow::kUserActionRequired;
+    PrintOnboardingCodes(payload);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -566,32 +570,6 @@ void AppTask::StartOTAQuery(intptr_t arg)
 {
     GetRequestorInstance()->TriggerImmediateQuery();
 }
-
-void AppTask::PostOTAResume()
-{
-    AppEvent event;
-    event.Type    = AppEvent::kOTAResume;
-    event.Handler = OTAResumeEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState)
-{
-    if (sIsDnssdPlatformInitialized)
-    {
-        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
-    }
-    else
-    {
-        CHIP_ERROR error = chip::DeviceLayer::SystemLayer().StartTimer(
-            chip::System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_INIT_OTA_DELAY), AppTask::OnScheduleInitOTA, nullptr);
-
-        if (error != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Failed to schedule OTA initialization timer.");
-        }
-    }
-}
 #endif
 
 void AppTask::BleHandler(void * aGenericEvent)
@@ -614,9 +592,9 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-#if !cPWR_UsePowerDownMode
+    #if !cPWR_UsePowerDownMode
         sStatusLED.Set(false);
-#endif
+    #endif
         K32W_LOG("Stopped BLE Advertising!");
     }
     else
@@ -625,9 +603,9 @@ void AppTask::BleStartAdvertising(intptr_t arg)
 
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
-#if !cPWR_UsePowerDownMode
+        #if !cPWR_UsePowerDownMode
             sStatusLED.Set(true);
-#endif
+        #endif
             K32W_LOG("Started BLE Advertising!");
         }
         else
@@ -652,15 +630,10 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (event->Type == DeviceEventType::kOtaStateChanged && event->OtaStateChanged.newState == kOtaSpaceAvailable)
-    {
-        sAppTask.PostOTAResume();
-    }
-
     if (event->Type == DeviceEventType::kDnssdPlatformInitialized)
     {
         K32W_LOG("Dnssd platform initialized.");
-        sIsDnssdPlatformInitialized = true;
+        PlatformMgr().ScheduleWork(AppTask::InitOTA, 0);
     }
 #endif
 
@@ -750,7 +723,7 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     sAppTask.mFunction = Function::kNoneSelected;
 }
 
-void AppTask::OnIdentifyStart(Identify * identify)
+void AppTask::OnIdentifyStart(Identify* identify)
 {
     if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
     {
@@ -768,7 +741,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
     }
 }
 
-void AppTask::OnIdentifyStop(Identify * identify)
+void AppTask::OnIdentifyStop(Identify* identify)
 {
     if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
     {
@@ -784,20 +757,6 @@ void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
     event.ContactEvent.Action = static_cast<uint8_t>(aAction);
     event.Handler             = ContactActionEventHandler;
     PostEvent(&event);
-}
-
-void AppTask::OTAResumeEventHandler(void * aGenericEvent)
-{
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-    if (aEvent->Type == AppEvent::kOTAResume)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        if (gDownloader.GetState() == OTADownloader::State::kInProgress)
-        {
-            gImageProcessor.TriggerNewRequestForData();
-        }
-#endif
-    }
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)
@@ -834,7 +793,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
 #endif
 
-        if (aEvent->Handler)
+    if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
@@ -881,7 +840,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 #endif
 }
 
-extern "C" void OTAIdleActivities(void)
+extern "C" void OTAIdleActivities( void )
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();

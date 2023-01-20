@@ -20,6 +20,7 @@
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/nxp/mw320/ConnectivityUtils.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -28,7 +29,9 @@
 
 extern "C" {
 #include "wlan.h"
+#include "network_flash_storage.h"
 }
+#include "AppTask.h"
 
 using chip::FormatCHIPError;
 using chip::Shell::Engine;
@@ -241,15 +244,33 @@ static CHIP_ERROR wlan_abort_handler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR wlan_conn_handler(int argc, char ** argv)
+{
+    VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
+    PRINTF("[%s], [%s] \r\n", argv[0], argv[1]);
+    //::connect_wifi_network(argv[0], argv[1]);
+    chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(argv[0], argv[1]);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR factory_rst_handler(int argc, char **argv)
+{
+    ::erase_all_params();
+    return CHIP_NO_ERROR;
+}
+
+
 static void RegisterMetaCommands(void)
 {
     static shell_command_t sCmds[] = {
         { &ShutdownHandler, "shutdown", "Exit the shell application" },
         { &VersionHandler, "version", "Output the software version" },
         { &SetPinCodeHandler, "pincode", "Set the pin code" },
-        { &SetDefAPHandler, "set_defap", "Set default AP SSID/PWD" },
+        { &SetDefAPHandler, "set-defap", "Set default AP SSID/PWD" },
         { &wlan_state_handler, "wlan-stat", "Check the wifi status" },
         { &wlan_abort_handler, "wlan-abort", "Abort the scan/reconnect" },
+	{ &wlan_conn_handler, "wlan-connect", "Connect to AP" },
+	{ &factory_rst_handler, "factory-reset", "Do factory reset"},
     };
 
     std::atexit(AtExitShell);
