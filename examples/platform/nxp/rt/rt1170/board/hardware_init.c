@@ -46,7 +46,6 @@ void BOARD_InitHardware(void)
 
         BOARD_InitBootClocks();
         BOARD_InitDebugConsole();
-        SCB_DisableDCache();
 
         isInitialize = true;
     }
