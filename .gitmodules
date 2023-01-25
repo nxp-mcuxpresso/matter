@@ -284,4 +284,6 @@
         url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
         branch = master
         platforms = bouffalolab
-
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
