@@ -20,6 +20,8 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
 
+import("${chip_root}/src/lib/trusty.gni")
+
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
       current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
@@ -57,6 +59,12 @@ buildconfig_header("crypto_buildconfig") {
     defines += [ "CHIP_CRYPTO_HSM=0" ]
     defines += [ "CHIP_CRYPTO_HSM_NXP=0" ]
   }
+
+  if (chip_with_trusty_os == 1) {
+    defines += [ "CHIP_CRYPTO_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_CRYPTO_TRUSTY_OS=0" ]
+  }
 }
 
 source_set("public_headers") {
@@ -72,6 +80,10 @@ source_set("public_headers") {
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]
+
+  if (chip_with_trusty_os == 1) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
