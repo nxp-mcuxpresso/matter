@@ -297,3 +297,6 @@
 	path = third_party/infineon/trustm/optiga-trust-m
 	url = https://github.com/Infineon/optiga-trust-m
 	platforms = infineon
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
