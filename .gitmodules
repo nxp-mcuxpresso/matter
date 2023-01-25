@@ -324,3 +324,6 @@
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
 	branch = v1.17.0
 	platforms = stm32
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
