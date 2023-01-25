@@ -293,3 +293,6 @@
 	path = third_party/imgui/repo
 	url = https://github.com/ocornut/imgui
 	platforms = linux
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
