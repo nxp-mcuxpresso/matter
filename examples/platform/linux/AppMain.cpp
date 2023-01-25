@@ -77,6 +77,11 @@
 #include "AppMain.h"
 #include "CommissionableInit.h"
 
+#if CHIP_ATTESTATION_TRUSTY_OS
+#include "DeviceAttestationCreds.h"
+using namespace chip::Credentials::Trusty;
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -374,7 +379,11 @@ void ChipLinuxAppMainLoop()
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
+#if CHIP_ATTESTATION_TRUSTY_OS
+    SetDeviceAttestationCredentialsProvider(&TrustyDACProvider::GetTrustyDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

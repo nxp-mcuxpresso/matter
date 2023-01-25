@@ -17,6 +17,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/lib/trusty.gni")
 
 config("app-main-config") {
   include_dirs = [ "." ]
@@ -53,7 +54,20 @@ source_set("app-main") {
     "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
+  if (chip_with_trusty_os == 1) {
+    sources += [
+      "DeviceAttestationCreds.cpp",
+      "DeviceAttestationCreds.h",
+    ]
+  }
+
   defines = []
+
+  if (chip_with_trusty_os == 1) {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_ATTESTATION_TRUSTY_OS=0" ]
+  }
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
@@ -70,7 +84,12 @@ source_set("app-main") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/shell:shell_core",
+    "${chip_root}/third_party/libtrustymatter",
   ]
+
+  if (chip_with_trusty_os == 1) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
 
   if (chip_enable_transport_trace) {
     public_deps +=
