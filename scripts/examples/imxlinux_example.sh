@@ -111,7 +111,7 @@ additional_gn_args=""
 if [ "$chip_with_web" = 1 ]; then
     additional_gn_args+=" enable_rtti=true enable_exceptions=true chip_with_web=$chip_with_web"
 fi
-gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\" chip_with_trusty_os=0
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
 sysroot=\"$sdk_target_sysroot\"
