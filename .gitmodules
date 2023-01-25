@@ -345,3 +345,6 @@
 	path = third_party/re2/src
 	url = https://github.com/google/re2.git
 	platforms = linux,darwin
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
