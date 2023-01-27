@@ -531,7 +531,7 @@ void FactoryDataProvider::FactoryDataProviderRunTests(void)
     assert( 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Verify round trip signature
-    err = dac_public_key.ECDSA_validate_hash_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
+    err = dac_public_key.ECDSA_validate_msg_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
     assert( err == CHIP_NO_ERROR);
 #endif
 }
