@@ -100,6 +100,12 @@ public:
     static constexpr Key kConfigKey_CountryCode        = config_key(kFileId_ChipConfig, 0x0C);
     static constexpr Key kConfigKey_Breadcrumb         = config_key(kFileId_ChipConfig, 0x0D);
 
+    // CHIP Counter Keys
+    static constexpr Key kCounterKey_RebootCount           = config_key(kFileId_ChipCounter, 0x00);
+    static constexpr Key kCounterKey_UpTime                = config_key(kFileId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_TotalOperationalHours = config_key(kFileId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_BootReason            = config_key(kFileId_ChipCounter, 0x03);
+
     static constexpr Key kConfigKey_GroupKey   = config_key(kFileId_ChipConfig, 0x0E);
     static constexpr Key kConfigKey_GroupKey0  = config_key(kFileId_ChipConfig, 0x0F);
     static constexpr Key kConfigKey_GroupKey1  = config_key(kFileId_ChipConfig, 0x10);

@@ -56,11 +56,14 @@ public:
     static void SaveSettings(void);
     void StopBLEConnectivity(void);
     CHIP_ERROR ServiceInit(void);
+    
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
+    void _Shutdown();
 
     CHIP_ERROR WiFiInterfaceInit(void);
     CHIP_ERROR EthernetInterfaceInit();
@@ -70,6 +73,8 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     bool resetInIdle = false;
     static PlatformManagerImpl sInstance;

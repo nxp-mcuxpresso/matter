@@ -29,6 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include "NXPConfig.h"
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/DiagnosticDataProvider.h>
 
 #include "fsl_device_registers.h"
 
@@ -56,11 +57,39 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount = 0;
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
     SuccessOrExit(err);
+
+    if (NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
+    if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
+    {
+        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
+    }
 
     // TODO: Initialize the global GroupKeyStore object here
 
@@ -247,6 +276,36 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     /* Schedule a reset in the next idle call */
     PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
