@@ -387,6 +387,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = System::Clock::InitClock_RealTime();
     SuccessOrExit(err);
 
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
 exit:
     return err;
 }
@@ -461,6 +463,31 @@ void PlatformManagerImpl::StopBLEConnectivity(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otPlatRadioSendSetPropVendorUint8Cmd(OT_NXP_SPINEL_PROP_VENDOR_BLE_STATE, 0);
 #endif /* #if CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+}
+
+void PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer
