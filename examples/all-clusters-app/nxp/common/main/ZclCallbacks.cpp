@@ -102,5 +102,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    GetAppTask().UpdateClusterState();
+    /**
+     * Do not update cluster state here. 
+     * StartUp state should be handled by the cluster. 
+     */
 }
