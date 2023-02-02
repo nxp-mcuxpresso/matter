@@ -80,6 +80,9 @@ public:
         kHardwareVersionId,
         kHardwareVersionStrId,
         kUniqueId,
+        kPartNumber,
+        kProductURL,
+        kProductLabel,
         kMaxId
     };
 
