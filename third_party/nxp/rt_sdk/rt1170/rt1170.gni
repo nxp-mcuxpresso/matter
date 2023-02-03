@@ -135,14 +135,6 @@ template("rt1170_sdk_drivers") {
     defines += [
         "CPU_${deviceBoardName}DVMAA",
         "CPU_${deviceBoardName}DVMAA_cm7",
-        #"BOARD_${evkname}", #Used only in /examples/platform/nxp/rt/rt1170/app/transceiver/sdmmc_config.c
-        #Framework defines to support hdlc over UART and a reset pin
-        "SPINEL_UART_INSTANCE=7",
-        "SPINEL_ENABLE_RX_RTS=1",
-        "SPINEL_ENABLE_TX_RTS=1",
-        #Framework flags for the reset pin
-        "RESET_PIN_PORT=3",
-        "RESET_PIN_NUM=9",
         #Crypto flags
         "CRYPTO_USE_DRIVER_CAAM",
         "CACHE_MODE_WRITE_THROUGH=1",
@@ -160,6 +152,13 @@ template("rt1170_sdk_drivers") {
         # This flag must be defined here in order for the controller to only be initialized once for all (ble, ot, wifi)  
         "CONTROLLER_INIT_ESCAPE=1",
       ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
+        ]
     }
 
     if (chip_enable_matter_cli)

@@ -66,7 +66,7 @@ OCRAM1_START                 = 0x20240000;
 OCRAM2_START                 = 0x202C0000;
 __NCACHE_REGION_START        = OCRAM2_START;
 __NCACHE_REGION_SIZE         = 0x2000;
-HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x800;
+HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x800;
 RPMSG_SHMEM_SIZE = DEFINED(__use_shmem__) ? 0x2000 : 0;
 VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000400 : 0;
@@ -133,9 +133,9 @@ SECTIONS
     . = ALIGN(4);
     *(EXCLUDE_FILE(
         /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.obj
-        *mflash_drv.c.obj
-        *fsl_flexspi.c.obj
+        *fsl_adapter_flexspi_nor_flash.c.o*
+        *mflash_drv.c.o*
+        *fsl_flexspi.c.o*
     ) .text)                 /* .text sections (code) */
     *(.rodata)               /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)              /* .rodata* sections (constants, strings, etc.) */
@@ -301,9 +301,9 @@ SECTIONS
     *(m_usb_dma_init_data)
     /* Explicit placement of flash and frequently executed functions in RAM */
     *fsl_adapter_flexspi_nor_flash.c.o
-    *mflash_drv.c.o
-    *fsl_flexspi.c.o
-    *lfs_mflash.c.o
+    *mflash_drv.c.o*
+    *fsl_flexspi.c.o*
+    *lfs_mflash.c.o*
     *(.data)                 /* .data sections */
     *(.data*)                /* .data* sections */
     *(.wlan_data .wlan_data.*)
@@ -341,6 +341,7 @@ SECTIONS
   __DATA_END = __ram_function_flash_start + (__ram_function_end__ - __ram_function_start__);
 
   text_end = ORIGIN(m_text) + LENGTH(m_text);
+  flash_usage = __DATA_END - FLASH_START;
   ASSERT(__DATA_END <= text_end, "region m_text overflowed with text and data")
 
   /* Uninitialized data section */
@@ -359,7 +360,7 @@ SECTIONS
     __END_BSS = .;
   } > m_data
 
-  .heap :
+  .heap (NOLOAD):
   {
     . = ALIGN(8);
     __end__ = .;
