@@ -36,52 +36,39 @@ user@ubuntu: git submodule update --init
 
 ### Build instructions
 
--   Build the Openthread configuration with BLE commissioning. Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB. Also argument is_debug=true optimize_debug=false could be used to build the application in debug mode. For this configuration a K32W061 image supporting HCI and spinel on a single UART should be used. To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the option chip_with_factory_data=1 should be added (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md). To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
+### Build the Openthread configuration with BLE commissioning.
+
+Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB. Also argument is_debug=true optimize_debug=false could be used to build the application in debug mode. For this configuration a K32W061 image supporting HCI and spinel on a single UART should be used.
+
+To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the option chip_with_factory_data=1 should be added (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+
+ To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true hci_spinel_single_uart=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Openthread configuration (without BLE, matter-cli enabled to join an existing thread network, **not the standard way, only for test purpose**) - argument is_debug=true optimize_debug=false could be used to build the application in debug mode. Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB.
+### Build the Openthread configuration (without BLE)
+In this configuration the matter-cli must be enabled to join an existing thread network, **not the standard way, only for test purpose**) - argument is_debug=true optimize_debug=false could be used to build the application in debug mode. Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true chip_inet_config_enable_ipv4=false chip_enable_matter_cli=true chip_config_network_layer_ble=false" out/debug 
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" chip_inet_config_enable_ipv4=false chip_enable_matter_cli=true chip_config_network_layer_ble=false" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
 Note : 
-- To build the application with OTW enabled that would allow to flash the K32W0 transceiver image at boot, argument "enable_otw_k32w0=true" must be added to the *gn gen* command from above.
-- To build the application with OTA Requestor functionality enabled, argument "chip_enable_ota_requestor=true" must be added to the *gn gen* command from above. 
+- If the K32W061 transceiver is selected, by default if the gn option k32w0_transceiver_bin_path is not set, the binary file located in "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" will be used. If the K32W061 transceiver binary is saved at another location an absolute path of its location should be given in the k32w0_transceiver_bin_path gn option (as shown above in the examples).
 
 The resulting output file can be found in out/debug/chip-rt1060-all-cluster-example
 
 ## Flash Binaries
 
-### Flashing a K32W061 transceiver image
+### K32W061 transceiver image
 
-A dedicated k32w0 transceiver binary is delivered. The binary can be flashed using OTW and therefore the argument "enable_otw_k32w0=true" must be added to the *gn gen* command from above. This binary supports OT and BLE. It allows to support spinel and hci on a single UART. 
+A dedicated k32w0 transceiver binary should be built. This binary must support OT+BLE and must support spinel and hci on a single UART. To build this binary the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme] should be followed.
 
-In a next release, the application code to rebuild the K32W0 transceiver image would be delivered in ot_nxp. In this case the binary called “ot-rcp-ble-hci-bb-k32w061.bin” would be the result of a build in ot-nxp for the target "ot_rcp_ble_hci_bb_single_uart". To have more information to build such a configuration the following [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme]. Then the generated binary will need to be converted into a header file using the **xxd** command as below:
-
-```
-user@ubuntu:~/<location of the binary>/$ xxd -i rcp_name.bin > rcp_name.bin.h
-```
-
-Then the **ot-rcp-fw-placeholder.bin.h** file will need to be replaced with the generated header file from above in the following directory:
-
-```
-~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060/otw_uploader/include/
-```
-
-And, as a last step, the include of the **ot-rcp-fw-placeholder.bin.h** in **ISPInterface.cpp** will need to be changed to the newly added header file and the following line edited acordingly with the new name of the char string storing the firmware, which is located in the newly generated header file.
-
-```
-isp.eBL_ProgramFirmware((uint8_t *)ot_rcp_fw_placeholder_bin, sizeof(ot_rcp_fw_placeholder_bin));
-                                                 |
-                                                 V
-isp.eBL_ProgramFirmware((uint8_t *)rcp_name_bin, sizeof(rcp_name_bin));
-```
+The Over The Wire (OTW) protocol (over UART) would be used to download the k32w0 transceiver image from the RT1060 to the its internal flash.
 
 [ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0-branch-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md
 
@@ -147,9 +134,9 @@ sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset init new"; sudo doc
 3. On the matter CLI enter the below commands:
 
 ```
-otcli networkkey 00112233445566778899aabbccddeeff
-otcli panid 0x1234
-otcli commit active
+otcli dataset networkkey 00112233445566778899aabbccddeeff
+otcli dataset panid 0x1234
+otcli dataset commit active
 otcli ifconfig up
 otcli thread start
 ```

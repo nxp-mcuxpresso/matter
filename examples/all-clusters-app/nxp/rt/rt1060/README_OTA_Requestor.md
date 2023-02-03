@@ -1,9 +1,12 @@
-# OTA requestor feature
+# OTA requestor feature - WARNING NOT SUPPORTED
 
 ### Overview
 The OTA Requestor functionality enables the device to communicate with an OTA Provider in order to query, download and apply a software update.
 
 This section explains how to perform an OTA Software Update on the RT1060 with the All-Clusters application.
+
+### Build
+To build the application with OTA Requestor functionality enabled, argument "chip_enable_ota_requestor=true" must be added to the *gn gen* command.
 
 ### General OTA Process for the RT1060
 

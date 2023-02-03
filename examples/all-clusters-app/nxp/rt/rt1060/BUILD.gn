@@ -138,23 +138,6 @@ rt_executable("all_cluster_app") {
     ]
   }
 
-  if (enable_otw_k32w0)
-  {
-    defines += [
-      "MAIN_TASK_SIZE = ((configSTACK_DEPTH_TYPE)8192 / sizeof(portSTACK_TYPE))"
-    ]
-
-   include_dirs += [
-      "otw_uploader/include",
-    ]
-
-    sources += [
-      "otw_uploader/source/ISPInterface.cpp",
-      "otw_uploader/include/ISPInterface.h",
-      "otw_uploader/include/ot-rcp-fw-placeholder.bin.h",
-    ]
-  }
-
   if (enable_ota_provider)
   {
     defines += [

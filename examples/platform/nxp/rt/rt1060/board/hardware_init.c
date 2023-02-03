@@ -11,8 +11,8 @@
 #include "fsl_gpio.h"
 #include "fsl_iomuxc.h"
 #include "fsl_lpuart_edma.h"
-#include "pin_mux.h"
 #include "peripherals.h"
+#include "pin_mux.h"
 
 #if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
     (defined(WIFI_IW416_BOARD_AW_AM510_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
@@ -57,7 +57,7 @@ void BOARD_InitHardware(void)
 #if (defined(WIFI_IW416_BOARD_MURATA_1XK_USD) || defined(WIFI_88W8987_BOARD_MURATA_1ZM_USD))
         BOARD_InitMurataModulePins();
 #endif
-#if ENABLE_OTW_K32W0
+#ifdef BOARD_OTW_K32W0_PIN_INIT
         BOARD_InitOTWPins();
 #endif
         BOARD_InitBootClocks();

@@ -129,7 +129,7 @@ OTA_STORAGE_START_ADDRESS    = mcuboot_header_start + slot_max_sectors * FLASH_S
 OTA_STORAGE_SIZE             = FLASH_SECTOR_SIZE * OTA_STORAGE_MAX_SECTORS;
 OTA_STORAGE_END_ADDRESS      = OTA_STORAGE_START_ADDRESS + OTA_STORAGE_SIZE - 1;
 
-HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x0800;
+HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0800;
 VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000400 : 0;
 
@@ -450,7 +450,7 @@ SECTIONS
     __END_BSS = .;
   } > m_data2
 
-  .heap :
+  .heap (NOLOAD) :
   {
     . = ALIGN(8);
     __end__ = .;

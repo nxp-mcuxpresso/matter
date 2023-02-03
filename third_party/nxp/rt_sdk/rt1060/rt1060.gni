@@ -53,6 +53,7 @@ FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName
 template("rt1060_sdk_drivers") {
   config("${target_name}_config") {
     include_dirs = []
+    defines = []
 
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -104,20 +105,10 @@ template("rt1060_sdk_drivers") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
-    else {
-        defines = []
-    }
 
     defines += [
         "CPU_${deviceBoardName}DVL6A",
         "CPU_${deviceBoardName}DVL6A_cm7",
-        #Framework defines to support hdlc over UART on UART3 and a reset pin
-        "SPINEL_UART_INSTANCE=3",
-        "SPINEL_ENABLE_RX_RTS=1",
-        "SPINEL_ENABLE_TX_RTS=1",
-        #Framework flags for the reset pin
-        "RESET_PIN_PORT=6",
-        "RESET_PIN_NUM=2",
     ]
 
     if (chip_enable_ble) {
@@ -228,8 +219,8 @@ template("rt1060_sdk_drivers") {
 
     if (chip_enable_openthread) {
       sources += [
-          "${rt_sdk_root}/middleware/wireless/framework/platform/rt/fwk_platform_ot.c",
-          "${rt_sdk_root}/middleware/wireless/framework/platform/rt/fwk_platform_hdlc.c",
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
         ]
     }
 
