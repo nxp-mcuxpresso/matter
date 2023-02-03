@@ -33,6 +33,7 @@ declare_args() {
   # transceivers
   iw416_transceiver = false
   k32w0_transceiver = false
+  k32w0_transceiver_bin_path = rebase_path("${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h")
   w8801_transceiver = false
   iwx12_transceiver = false
 }
@@ -346,13 +347,6 @@ template("rt_sdk") {
 
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
-    }
-
-    if (enable_otw_k32w0 == true)
-    {
-        defines += [
-          "ENABLE_OTW_K32W0=1",
-        ]
     }
 
     if (rt_nvm_component == "nvm_fwk")
