@@ -87,10 +87,6 @@ rt_executable("all_cluster_app") {
       "${chip_root}/src/lib/shell:shell",
       "${chip_root}/examples/shell/shell_common:shell_common",
     ]
-    if (chip_enable_openthread)
-    {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI" ]
-    }
   }
 
   if (chip_enable_ota_requestor) {
