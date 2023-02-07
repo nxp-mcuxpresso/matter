@@ -274,6 +274,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+    /* Emit ShutDown event before reboot */
+    chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
     /* Schedule a reset in the next idle call */
     PlatformMgrImpl().ScheduleResetInIdle();
 }

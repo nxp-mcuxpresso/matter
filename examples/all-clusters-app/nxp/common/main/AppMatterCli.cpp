@@ -21,6 +21,7 @@
 #include <cstring>
 #include <platform/CHIPDeviceLayer.h>
 #include "AppTask.h"
+#include <app/server/Server.h>
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -73,6 +74,12 @@ CHIP_ERROR cliFactoryReset(int argc, char * argv[])
 
 CHIP_ERROR cliReset(int argc, char * argv[])
 {
+    /* 
+       Shutdown device before reboot,
+       this emits the ShutDown event, handles the server shutting down,
+       and stores in flash the total-operational-hours value.
+    */
+    chip::DeviceLayer::PlatformMgr().Shutdown();
     chip::DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
     return CHIP_NO_ERROR;
 }
