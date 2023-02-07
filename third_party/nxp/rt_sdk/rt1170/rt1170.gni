@@ -82,6 +82,7 @@ else {
 template("rt1170_sdk_drivers") {
   config("${target_name}_config") {
     include_dirs = []
+    defines = []
     
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -128,9 +129,6 @@ template("rt1170_sdk_drivers") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
-    else {
-        defines = []
-    }
 
     defines += [
         "CPU_${deviceBoardName}DVMAA",
@@ -152,13 +150,6 @@ template("rt1170_sdk_drivers") {
         # This flag must be defined here in order for the controller to only be initialized once for all (ble, ot, wifi)  
         "CONTROLLER_INIT_ESCAPE=1",
       ]
-    }
-
-    if (chip_enable_openthread) {
-      sources += [
-          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",
-          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
-        ]
     }
 
     if (chip_enable_matter_cli)
@@ -186,9 +177,6 @@ template("rt1170_sdk_drivers") {
     if (!defined(sources)) {
       sources = []
     }
-
-
-
 
     sources += [
         "${DRIVER_LPUART_FILES_PATH}/fsl_lpuart.c",
@@ -258,6 +246,13 @@ template("rt1170_sdk_drivers") {
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11k.c",
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11v.c",
       ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",
+          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
+        ]
     }
 
     if (!defined(public_configs)) {

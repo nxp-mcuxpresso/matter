@@ -25,6 +25,7 @@ rt1170_sdk_drivers("rt_sdk_drivers") {
     include_dirs = []
     public_configs = []
     sources = []
+    defines = []
 
     public_configs += [ 
         "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_sdk_config",
@@ -62,8 +63,8 @@ rt1170_sdk_drivers("rt_sdk_drivers") {
     else if (iwx12_transceiver)
     {
       defines += [
-        -DPLATFORM_RESET_PIN_PORT=3
-        -DPLATFORM_RESET_PIN_NUM=9
+         "PLATFORM_RESET_PIN_PORT=3",
+         "DPLATFORM_RESET_PIN_NUM=9",
       ]
     }
 
