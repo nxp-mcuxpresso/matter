@@ -503,6 +503,10 @@ void PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
+    /* Handle the server shutting down & emit the ShutDown event*/
+    PlatformMgr().HandleServerShuttingDown();
+    PlatformMgr().StopEventLoopTask();
+    /* Shutdown all layers */
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
