@@ -39,6 +39,8 @@
 #include "openthread-system.h"
 #include "ot_platform_common.h"
 
+extern "C" CHIP_ERROR AppMatterCli_RegisterCommands(void);
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -49,6 +51,12 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    /* Make sure to initialize the Matter CLI which will include the ot-cli first.
+    * In fact it is mandatory to enable first the ot-cli before initializing the Matter openthread layer
+    * which would modify some contexts of the openthread instance. 
+    */
+    AppMatterCli_RegisterCommands();
 
     // Initialize the OpenThread platform layer
     otPlatAlarmInit();

@@ -27,11 +27,12 @@
 #include <ChipShellCollection.h>
 #include "task.h"
 
-#define MATTER_CLI_TASK_SIZE 2048
+#define MATTER_CLI_TASK_SIZE ((configSTACK_DEPTH_TYPE)2048 / sizeof(portSTACK_TYPE))
 #define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
 
 using namespace chip::Shell;
 TaskHandle_t AppMatterCliTaskHandle;
+static bool isShellInitialized = false;
 #else
 #define MATTER_CLI_LOG(...)
 #endif /* ENABLE_CHIP_SHELL */
@@ -80,44 +81,49 @@ CHIP_ERROR cliReset(int argc, char * argv[])
 CHIP_ERROR AppMatterCli_RegisterCommands(void)
 {
 #ifdef ENABLE_CHIP_SHELL
-    int error = Engine::Root().Init();
-    if (error != 0)
+    if (!isShellInitialized)
     {
-        ChipLogError(Shell, "Streamer initialization failed: %d", error);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    /* Register common shell commands */
-    cmd_misc_init();
-    cmd_otcli_init();
-#if CHIP_SHELL_ENABLE_CMD_SERVER
-    cmd_app_server_init();
-#endif /* CHIP_SHELL_ENABLE_CMD_SERVER */
-
-    /* Register application commands */
-    static const shell_command_t kCommands[] = {
+        int error = Engine::Root().Init();
+        if (error != 0)
         {
-            .cmd_func = commissioningManager,
-            .cmd_name = "mattercommissioning",
-            .cmd_help = "Open/close the commissioning window. Usage : mattercommissioning [on|off]",
-        },
-        {
-            .cmd_func = cliFactoryReset,
-            .cmd_name = "matterfactoryreset", 
-            .cmd_help = "Perform a factory reset on the device",
-        },
-        {
-            .cmd_func = cliReset,
-            .cmd_name = "matterreset",
-            .cmd_help = "Reset the device",
-        },
-    };
+            ChipLogError(Shell, "Streamer initialization failed: %d", error);
+            return CHIP_ERROR_INTERNAL;
+        }
 
-    Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
+        /* Register common shell commands */
+        cmd_misc_init();
+        cmd_otcli_init();
+    #if CHIP_SHELL_ENABLE_CMD_SERVER
+        cmd_app_server_init();
+    #endif /* CHIP_SHELL_ENABLE_CMD_SERVER */
 
-    if (xTaskCreate(&AppMatterCliTask, "AppMatterCli_task", MATTER_CLI_TASK_SIZE, NULL, 1, &AppMatterCliTaskHandle) != pdPASS)
-    {
-        ChipLogError(Shell, "Failed to start Matter CLI task");
+        /* Register application commands */
+        static const shell_command_t kCommands[] = {
+            {
+                .cmd_func = commissioningManager,
+                .cmd_name = "mattercommissioning",
+                .cmd_help = "Open/close the commissioning window. Usage : mattercommissioning [on|off]",
+            },
+            {
+                .cmd_func = cliFactoryReset,
+                .cmd_name = "matterfactoryreset",
+                .cmd_help = "Perform a factory reset on the device",
+            },
+            {
+                .cmd_func = cliReset,
+                .cmd_name = "matterreset",
+                .cmd_help = "Reset the device",
+            },
+        };
+
+        Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
+
+        if (xTaskCreate(&AppMatterCliTask, "AppMatterCli_task", MATTER_CLI_TASK_SIZE, NULL, 1, &AppMatterCliTaskHandle) != pdPASS)
+        {
+            ChipLogError(Shell, "Failed to start Matter CLI task");
+             return CHIP_ERROR_INTERNAL;
+        }
+        isShellInitialized = true;
     }
 #endif /* ENABLE_CHIP_SHELL */
     
