@@ -178,20 +178,159 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     }
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 {
+    struct wlan_network current_network;
+    int ret = wlan_get_current_network(&current_network);
+    uint8_t bssid[6];
+    if (ret == WM_SUCCESS)
+    {
+        memcpy(bssid, current_network.bssid, 6);
+        BssId = ByteSpan(bssid, 6);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+{
+    struct wlan_network current_network;
+    int ret = wlan_get_current_network(&current_network);
+    
+    if (ret != WM_SUCCESS)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    switch (current_network.security.type)
+    {
+        case WLAN_SECURITY_WEP_OPEN:
+        case WLAN_SECURITY_WEP_SHARED:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+            break;
+        case WLAN_SECURITY_WPA:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+            break;
+        case WLAN_SECURITY_WPA2:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+            break;
+        case WLAN_SECURITY_WPA3_SAE:
+            securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+            break;
+        case WLAN_SECURITY_NONE:
+        default:
+            securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
+#if defined(CONFIG_11AX)
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX;
+#elif defined(CONFIG_11AC)
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
+#elif defined(CONFIG_11N)
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+#endif
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
+    channelNumber  = wlan_get_current_channel();
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    short w_rssi;
+    int err = wlan_get_current_rssi(&w_rssi);
+    if (err != 0)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    rssi = static_cast<int8_t>(w_rssi);
+    return CHIP_NO_ERROR;
+}
+
+#if DGWIFI_RESET_COUNTS_SUPPORTED
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+#ifdef CONFIG_WIFI_GET_LOG
+    wifi_pkt_stats_t stats;
+    int ret = wifi_get_log(&stats, MLAN_BSS_TYPE_STA);
+    if (ret == WM_SUCCESS)
+    {
+        beaconLostCount = stats.bcn_miss_cnt;
+        return CHIP_NO_ERROR;
+    }
+#endif /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+#ifdef CONFIG_WIFI_GET_LOG
+    wifi_pkt_stats_t stats;
+    int ret = wifi_get_log(&stats, MLAN_BSS_TYPE_STA);
+    if (ret == WM_SUCCESS)
+    {
+        beaconRxCount = stats.bcn_rcv_cnt;
+        return CHIP_NO_ERROR;
+    }
+#endif /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+#ifdef CONFIG_WIFI_GET_LOG
+    wifi_pkt_stats_t stats;
+    int ret = wifi_get_log(&stats, MLAN_BSS_TYPE_STA);
+    if (ret == WM_SUCCESS)
+    {
+        packetMulticastRxCount = stats.mcast_rx_frame;
+        return CHIP_NO_ERROR;
+        
+    }
+#endif /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+#ifdef CONFIG_WIFI_GET_LOG
+    wifi_pkt_stats_t stats;
+    int ret = wifi_get_log(&stats, MLAN_BSS_TYPE_STA);
+    if (ret == WM_SUCCESS)
+    {
+        packetMulticastTxCount = stats.mcast_tx_frame;
+        return CHIP_NO_ERROR;
+    }
+#endif /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+#ifdef CONFIG_WIFI_GET_LOG
+    wifi_pkt_stats_t stats;
+    int ret = wifi_get_log(&stats, MLAN_BSS_TYPE_STA);
+    if (ret == WM_SUCCESS)
+    {
+        packetUnicastTxCount = stats.tx_frame;
+        return CHIP_NO_ERROR;
+    }
+#endif /* CONFIG_WIFI_GET_LOG */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+#endif /* DGWIFI_RESET_COUNTS_SUPPORTED */
+
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
