@@ -92,10 +92,8 @@ static_library("k32w0") {
 
     if (chip_enable_ota_default_processors == 1) {
       sources += [
-        "OTAApplicationProcessor.cpp",
-        "OTAApplicationProcessor.h",
-        "OTABootloaderProcessor.cpp",
-        "OTABootloaderProcessor.h",
+        "OTAFirmwareProcessor.cpp",
+        "OTAFirmwareProcessor.h",
         "OTAHooks.cpp",
       ]
 
@@ -107,7 +105,6 @@ static_library("k32w0") {
       }
     }
   }
-
 
   deps = []
 
