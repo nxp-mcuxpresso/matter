@@ -16,7 +16,7 @@ Transceiver part:
 
 Board settings are described [here][ot_cli_rt1060_readme].
 
-[ot_cli_rt1060_readme]:https://bitbucket.sw.nxp.com/projects/CONNINT/repos/ot-nxp/browse/src/imx_rt/rt1060/README.md#Board-settings-for-MIMXRT1060-EVKB
+[ot_cli_rt1060_readme]:https://github.com/NXP/ot-nxp/blob/v1.0-branch-nxp/src/imx_rt/rt1060/README.md#board-settings-for-mimxrt1060-evkb
 
 <a name="building"></a>
 
@@ -83,7 +83,7 @@ isp.eBL_ProgramFirmware((uint8_t *)ot_rcp_fw_placeholder_bin, sizeof(ot_rcp_fw_p
 isp.eBL_ProgramFirmware((uint8_t *)rcp_name_bin, sizeof(rcp_name_bin));
 ```
 
-[ot_rcp_ble_hci_bb_k32w0_readme]:https://bitbucket.sw.nxp.com/projects/CONNINT/repos/ot-nxp/browse/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md
+[ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0-branch-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md
 
 ### Flashing and debugging the RT1060
 
