@@ -27,6 +27,9 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rt1060")
 
 declare_args() {
+  # This defines the device type as a "thermostat" by default,
+  # use "all-clusters" in order to build the all-clusters-app
+  nxp_device_type = "thermostat"
   tcp_download = false
   enable_ota_provider = false
   wifi_connect = true
@@ -36,6 +39,15 @@ declare_args() {
 }
 
 rt1060_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+
+if (nxp_device_type == "thermostat")
+{
+  app_common_folder = "${nxp_device_type}/${nxp_device_type}-common"
+}
+else 
+{
+  app_common_folder = "${nxp_device_type}-app/${nxp_device_type}-common"
+}
 
 rt_executable("all_cluster_app") {
   output_name = "chip-rt1060-all-cluster-example"
@@ -48,13 +60,10 @@ rt_executable("all_cluster_app") {
     "../../common/main/include",
     "../../common/main",
 
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/${app_common_folder}/include",
   ]
 
   sources = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "src/AppMatterButton.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/CHIPDeviceManager.cpp",
@@ -74,10 +83,20 @@ rt_executable("all_cluster_app") {
     "${nxp_sdk_build_root}:nxp_sdk",
     "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/lib",
     "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
   ]
+
+  if (nxp_device_type == "all-clusters")
+  {
+    defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+    sources += [
+      "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/binding-handler.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+    ]
+  }
 
   if (chip_enable_matter_cli)
   {
