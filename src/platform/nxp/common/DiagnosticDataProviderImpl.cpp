@@ -46,21 +46,6 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-   return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
