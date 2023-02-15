@@ -142,9 +142,11 @@ void AppTask::InitServer(intptr_t arg)
 #endif
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
 
+#ifdef DEVICE_TYPE_ALL_CLUSTERS
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
+#endif /* DEVICE_TYPE_ALL_CLUSTERS */
 
 #if ENABLE_OTA_PROVIDER
     InitOTAServer();
