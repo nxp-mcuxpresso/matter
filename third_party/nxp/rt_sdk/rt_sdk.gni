@@ -29,7 +29,6 @@ declare_args() {
   # RT platform
   rt_platform = ""
   sdk_fsl_assert_support = true
-  is_sdk_2_13 = false
   # transceivers
   iw416_transceiver = false
   k32w0_transceiver = false
@@ -53,19 +52,7 @@ if (!defined(rt_fwk_platform)) {
 
 assert(rt_sdk_root != "", "rt_sdk_root must be specified")
 
-# when the rt_platform is a rt1170 or rw610 switch to sdk 2.13 by default
-if (!is_sdk_2_13 && (rt_platform == "rt1170" || rt_platform == "rw610"))
-{
-  is_sdk_2_13 = true
-}
-
-if(is_sdk_2_13)
-{
-  rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos-kernel"
-}
-else{
-  rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos_kernel"
-}
+rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos-kernel"
 
 template("rt_transceiver") {
   config("${target_name}_config") {
@@ -386,9 +373,6 @@ template("rt_sdk") {
       defines += [
         "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
       ]
-      defines -=[
-        "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING"
-      ]
     }
 
     if (chip_enable_pairing_autostart == 1) {
@@ -439,10 +423,6 @@ template("rt_sdk") {
       {
           defines += ["CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=0"]
       }
-    }
-    if (is_sdk_2_13)
-    {
-      defines +=["USE_SDK_2_13"]
     }
 
     # Now add our "system-header" include dirs

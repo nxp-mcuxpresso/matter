@@ -152,6 +152,7 @@ template("bt_ble_target") {
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/porting.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/work_queue.c",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
   #ethermind files
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/sco_audio_pl.c",
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/write_task_pl.c",
@@ -178,11 +179,6 @@ template("bt_ble_target") {
   # Adding rand32 file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/random/rand32.cpp",
     ]
-
-    if (is_sdk_2_13) {
-      sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
-      ]
-    }
 
     if (!defined(configs)) {
       configs = []

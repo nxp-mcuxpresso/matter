@@ -79,8 +79,7 @@ rt_sdk("nxp_sdk") {
     #Framework OTW defines to locate transceiver binary header
     defines += ["K32W0_RCP_BINARY_H_FILE=\"${k32w0_transceiver_bin_path}\""]
     #SDK defines for OTW
-    defines += ["HAL_UART_DMA_ENABLE=1",
-                "LPUART_RING_BUFFER_SIZE=768"]
+    defines += ["HAL_UART_DMA_ENABLE=1"]
     include_dirs += ["${rt_sdk_root}/middleware/wireless/framework/OTW/Interface"]
     sources += ["${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/k32w0/fwk_platform_coex.c",
                 "${rt_sdk_root}/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c"]

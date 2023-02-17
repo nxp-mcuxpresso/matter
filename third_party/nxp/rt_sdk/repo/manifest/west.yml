@@ -11,11 +11,12 @@ manifest:
     remote: nxpmicro
   projects:
   - name: mcux-sdk
-    revision: fca7db8476bd9c3dbf6805494b440f359aa2be37
+    revision: df3766a7a8289510a6e30ac2f6d1760131a38e8f
     path: core
     import:
       name-allowlist:
         - FreeRTOS-Kernel
+        - CMSIS_5
         - mcux-sdk-middleware-sdmmc
         - fatfs
         - mcux-sdk-middleware-edgefast-bluetooth
@@ -24,14 +25,6 @@ manifest:
         - wifi_nxp
         - lwip
         - littlefs
-  - name: lwip
-    url: https://github.com/NXPmicro/lwip
-    revision: 0d5415fb2bf6f6676fadbff0db3fc33e8f703efe
-    path: middleware/lwip
-  - name: mcux-sdk-middleware-edgefast-bluetooth
-    url: https://github.com/NXPmicro/mcux-sdk-middleware-edgefast-bluetooth
-    revision: 41ee50155049d52579b9acc1a19880c78ec07f73
-    path: middleware/edgefast_bluetooth
   - name: framework
     url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
     revision: master

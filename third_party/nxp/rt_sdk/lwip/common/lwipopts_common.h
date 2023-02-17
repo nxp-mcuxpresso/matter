@@ -448,11 +448,6 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define mem_clib_malloc pvPortMalloc
 #define mem_clib_free vPortFree
 
-#ifndef  USE_SDK_2_13
-/* This function comes from NXP porting layer for mbedTLS: */
-void *pvPortCalloc(size_t num, size_t size);
-#endif
-
 #define mem_clib_calloc pvPortCalloc
 
 
