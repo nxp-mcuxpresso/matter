@@ -39,8 +39,8 @@
 
 /* Default NXP Platform general configuration overrides are used */ 
 
-/* For now on RT1170, due to the current file system implementation only one fabric is supported */
-#define CHIP_CONFIG_MAX_FABRICS 1
+/* For now on RT1170, due to the current file system implementation only 5 fabrics are supported */
+#define CHIP_CONFIG_MAX_FABRICS 5
 
 // ==================== Security Configuration Overrides ====================
 
