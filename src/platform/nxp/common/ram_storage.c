@@ -295,15 +295,24 @@ int ramStorageReadFromFlash(const char * file_name, uint8_t * buffer, uint32_t b
     return res;
 }
 
+/* Buffer size must be superior to the max ram buffer size CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE */
+static uint8_t bufferIdleWriteToFlash[4 * 5000];
+
 int ramStorageSavetoFlash(const char * file_name, uint8_t * buffer, uint32_t buf_length)
 {
     int res;
 
+    assert(sizeof(bufferIdleWriteToFlash) >= buf_length);
+
+    /**
+     * Copy buffer to minimise the task lock duration
+     * TODO : Improve ram buffer management to minimize ram buffer usage
+     */
     (void) OSA_MutexLock((osa_mutex_handle_t) mRamStorageMutexId, osaWaitForever_c);
-
-    res = FS_WriteBufferToFile(file_name, buffer, buf_length);
-
+    memcpy(bufferIdleWriteToFlash, buffer, buf_length);
     (void) OSA_MutexUnlock((osa_mutex_handle_t) mRamStorageMutexId);
+
+    res = FS_WriteBufferToFile(file_name, bufferIdleWriteToFlash, buf_length);
 
     return res;
 }
