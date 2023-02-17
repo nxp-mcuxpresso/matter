@@ -1,4 +1,4 @@
-# OTA provider feature for Matter over Openthread
+# OTA provider feature for Matter over Openthread - WARNING NOT SUPPORTED
 
 ### OTA Provider Feature
 

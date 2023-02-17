@@ -47,7 +47,7 @@ COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
 UTILITIES_FILES_PATH = "${rt_sdk_root}/core/utilities"
 UTILITIES_DEVICE_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName}/utilities"
 DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
-STR_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console/str"
+STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
 FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName}/xip"
 
 template("rt1060_sdk_drivers") {
@@ -95,7 +95,7 @@ template("rt1060_sdk_drivers") {
         # mdio
         "${rt_sdk_root}/core/components/phy/mdio/enet",
         # freertos
-        "${rt_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM4F",
+        "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
         # Framework
         "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
     ]
@@ -168,7 +168,6 @@ template("rt1060_sdk_drivers") {
         "${DRIVER_DEVICE_FILES_PATH}/fsl_clock.c",
         "${COMPONENT_CRC_FILES_PATH}/fsl_adapter_software_crc.c",
         "${COMPONENT_RNG_FILES_PATH}/fsl_adapter_trng.c",
-        "${COMPONENT_SILICON_ID_FILES_PATH}/fsl_silicon_id.c",
         "${COMPONENT_UART_FILES_PATH}/fsl_adapter_lpuart.c",
         "${COMPONENT_TIMER_FILES_PATH}/fsl_adapter_pit.c",
         "${COMPONENT_GPIO_FILES_PATH}/fsl_adapter_igpio.c",
@@ -188,10 +187,10 @@ template("rt1060_sdk_drivers") {
         "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c",
         # freertos files
         # freertos
-        "${rt_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM4F/port.c",
-        "${rt_sdk_root}/rtos/freertos/freertos_kernel/portable/MemMang/heap_4.c",
+        "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
+        "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
         # mdio
-        "${rt_core_sdk_root}/components/phy/mdio/enet/fsl_enet_mdio.c",
+        #"${rt_core_sdk_root}/components/phy/mdio/enet/fsl_enet_mdio.c",
         # framework files
         "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
@@ -206,9 +205,17 @@ template("rt1060_sdk_drivers") {
     if (chip_enable_ble) {
       sources += [
         "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_uart.c",
-        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_wifi_nxp.c",
-        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller.c",
       ]
+      # TODO transceiver initialization should be moved in the framework
+      if (k32w0_transceiver)
+      {
+        # In case of k32w0 transceiver BLE serial link will be managed and initiliaze by the shared link with openthread
+        sources += ["${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller.c"]
+      }
+      else
+      {
+        sources += ["${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_wifi_nxp.c"]
+      }
     }
 
     if (chip_enable_wifi) {

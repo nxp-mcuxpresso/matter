@@ -17,7 +17,7 @@
 #if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
     (defined(WIFI_IW416_BOARD_AW_AM510_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
     (defined(WIFI_IW416_BOARD_AW_AM457_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
-#include "controller.h"
+#include "controller_hci_uart.h"
 #endif
 
 /*${header:end}*/

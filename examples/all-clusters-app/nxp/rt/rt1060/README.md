@@ -54,8 +54,7 @@ board by default. It is also possible to use the older EVK-MIMXRT1060 board, bui
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [NXP MCUXpresso SDK 2.12.0](https://github.com/NXPmicro/mcux-sdk/tree/MCUX_2.12.0_UPDATE)
-    and associated middleware from GitHub using the west tool.
+-   Download the NXP MCUXpresso git SDK 2.13.0 and associated middleware from GitHub using the west tool.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
@@ -63,17 +62,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/repo
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west init -l manifest --mf west.yml
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west update
 ```
-
--   Apply the patches to the downloaded SDK.
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ cd ../sdk_fixes
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/sdk_fixes$ ./patch_rt_sdk.sh
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/sdk_fixes$ cd ../../../../examples/all-clusters-app/nxp/rt/rt1060/
-```
-
--   In case you want to update the already downloaded SDK and/or reapply the SDK patches (which should be done when the `manifest/west.yml` file or the patches have changed),
-    use the `west forall` command instead of the `west init` to reset the west workspace before running the `west update` command and applying patches again.
+- In case there are local modification to the already installed git NXP SDK. Use the west forall command instead of the west init to reset the west workspace before running the west update command. Warning: all local changes will be lost after running this command.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a

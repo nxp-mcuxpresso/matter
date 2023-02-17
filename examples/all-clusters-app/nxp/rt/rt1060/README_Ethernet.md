@@ -1,4 +1,4 @@
-# RT1060 All-cluster Application for Matter over Ethernet
+# RT1060 All-cluster Application for Matter over Ethernet - WARNING NOT SUPPORTED
 
 <a name="building"></a>
 
