@@ -88,9 +88,12 @@
 #define LWIP_MDNS_RESPONDER 1
 #endif
 
-/* The maximum number of services per netif */
+/**
+ * The maximum number of services per netif
+ * recommended to be two times greater than number of matter fabrics supported
+*/
 #ifndef MDNS_MAX_SERVICES
-#define MDNS_MAX_SERVICES 5
+#define MDNS_MAX_SERVICES 10
 #endif
 
 /* Search over multicast DNS module */
