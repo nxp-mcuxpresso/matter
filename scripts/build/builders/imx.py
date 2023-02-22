@@ -24,6 +24,10 @@ class IMXApp(Enum):
     CHIP_TOOL = auto()
     LIGHT = auto()
     THERMOSTAT = auto()
+    CHIP_TOOL_TRUSTY = auto()
+    LIGHT_TRUSTY = auto()
+    NXP_THERMOSTAT = auto()
+    NXP_THERMOSTAT_TRUSTY = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     OTA_PROVIDER = auto()
@@ -41,6 +45,14 @@ class IMXApp(Enum):
             return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        if self == IMXApp.CHIP_TOOL_TRUSTY:
+            return 'chip-tool'
+        if self == IMXApp.LIGHT_TRUSTY:
+            return 'lighting-app/linux'
+        if self == IMXApp.NXP_THERMOSTAT:
+            return 'nxp-thermostat/linux'
+        if self == IMXApp.NXP_THERMOSTAT_TRUSTY:
+            return 'nxp-thermostat/linux'
 
     def OutputNames(self):
         if self == IMXApp.CHIP_TOOL:
@@ -61,6 +73,18 @@ class IMXApp(Enum):
         if self == IMXApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
+        if self == IMXApp.CHIP_TOOL_TRUSTY:
+            yield 'chip-tool-trusty'
+            yield 'chip-tool-trusty.map'
+        if self == IMXApp.NXP_THERMOSTAT:
+            yield 'nxp-thermostat-app'
+            yield 'nxp-thermostat-app.map'
+        if self == IMXApp.NXP_THERMOSTAT_TRUSTY:
+            yield 'nxp-thermostat-app-trusty'
+            yield 'nxp-thermostat-app-trusty.map'
+        if self == IMXApp.LIGHT_TRUSTY:
+            yield 'chip-lighting-app-trusty'
+            yield 'chip-lighting-app-trusty.map'
 
 
 class IMXBuilder(GnBuilder):
@@ -80,6 +104,10 @@ class IMXBuilder(GnBuilder):
         try:
             entries = os.listdir(self.SysRootPath('IMX_SDK_ROOT'))
         except FileNotFoundError:
+            if self.app == IMXApp.NXP_THERMOSTAT_TRUSTY or self.app == IMXApp.CHIP_TOOL_TRUSTY or self.app == IMXApp.LIGHT_TRUSTY:
+                trusty = 1
+            else:
+                trusty = 0
             if self.SysRootPath('IMX_SDK_ROOT') == 'IMX_SDK_ROOT':
                 # CI test, use default value
                 target_cpu = 'arm64'
@@ -88,6 +116,7 @@ class IMXBuilder(GnBuilder):
                 cross_compile = 'aarch64-poky-linux'
                 cc = 'aarch64-poky-linux-gcc'
                 cxx = 'aarch64-poky-linux-g++'
+                chip_with_trusty_os = trusty
             else:
                 raise Exception('the value of env IMX_SDK_ROOT is not a valid path.')
         else:

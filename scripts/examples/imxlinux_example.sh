@@ -101,12 +101,17 @@ if [ -z "$target_cpu" -o -z "$cross_compile" ]; then
 fi
 
 release_build=true
-if [ "$3" = "debug" ]; then
+if [ "$3" == "debug" ] || [ "$4" == "debug" ]; then
     release_build=false
 fi
 
+has_trusty=0
+if [ "$3" == "trusty" ] || [ "$4" == "trusty" ]; then
+has_trusty=1
+fi
+
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\" chip_with_trusty_os=0
+gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\" chip_with_trusty_os=$has_trusty
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
 sysroot=\"$sdk_target_sysroot\"
