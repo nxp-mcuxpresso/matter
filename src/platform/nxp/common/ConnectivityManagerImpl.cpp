@@ -36,6 +36,8 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
+#include <app/server/Dnssd.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -277,6 +279,12 @@ int ConnectivityManagerImpl::_WlanEventCallback(enum wlan_event_reason event, vo
     return 0;
 }
 
+void RunDnsSrv(int arg)
+{
+    /* (Re-)start the DNSSD server */
+    chip::app::DnssdServer::Instance().StartServer();
+}
+
 void ConnectivityManagerImpl::OnStationConnected()
 {
     CHIP_ERROR err;
@@ -305,6 +313,11 @@ void ConnectivityManagerImpl::OnStationConnected()
                 }
             }
 #endif /* LWIP_IPV6 */
+            /**
+             * Now that the wlan connection is established and the netif up,
+             * (re-)run the DNS server, in order to publish the service
+            */
+            PlatformMgr().ScheduleWork(RunDnsSrv, 0);
         }
     }
 
