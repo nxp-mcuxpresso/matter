@@ -97,13 +97,6 @@ static_library("nxp_platform") {
       sources += [ "../../../OpenThread/DnssdImpl.cpp" ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-
-  }
-  else {
-    sources += [
-      "../../common/DnssdImpl.cpp",
-      "../../common/DnssdImpl.h"
-    ]
   }
 
   if (chip_with_factory_data == 1) {
