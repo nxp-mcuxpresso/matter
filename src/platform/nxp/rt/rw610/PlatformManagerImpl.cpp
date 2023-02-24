@@ -505,7 +505,6 @@ void PlatformManagerImpl::_Shutdown()
 
     /* Handle the server shutting down & emit the ShutDown event*/
     PlatformMgr().HandleServerShuttingDown();
-    PlatformMgr().StopEventLoopTask();
     /* Shutdown all layers */
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
