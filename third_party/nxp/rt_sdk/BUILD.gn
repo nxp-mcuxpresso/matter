@@ -124,7 +124,7 @@ config("mbedtls_els_pkc_config") {
     defines = [ "MBEDTLS_PORT_INCLUDE=<els_pkc_mbedtls.h>" ]
 
     if (chip_enable_openthread) {
-      defines += [ "MBEDTLS_CONFIG_FILE=<rw610-mbedtls-config.h>" ]
+      defines += [ "MBEDTLS_CONFIG_FILE=<rw612-mbedtls-config.h>" ]
     }
     else {
       defines += [ "MBEDTLS_CONFIG_FILE=<els_pkc_mbedtls_config.h>" ]

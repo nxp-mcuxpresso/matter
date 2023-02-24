@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
 rt_platform = "rw610"
-rt_fwk_platform = "rdrw610"
+rt_fwk_platform = "rw61x"
 nxp_platform = "rt/${rt_platform}"
 nxp_sdk_name = "rt_sdk"
 chip_device_platform = "nxp"
@@ -52,5 +52,5 @@ openthread_external_mbedtls = mbedtls_target
 openthread_external_platform = "${nxp_sdk_build_root}:nxp_sdk"
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:openthread_core_config_rw610" ]
-openthread_core_config_platform_check_file = "openthread-core-rw610-config-check.h"
+openthread_core_config_platform_check_file = "openthread-core-rw612-config-check.h"
 openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:libopenthread-rw610"

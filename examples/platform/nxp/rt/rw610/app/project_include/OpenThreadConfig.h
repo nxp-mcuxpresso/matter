@@ -68,7 +68,7 @@
 #endif /* SPINEL_INTERFACE_RPMSG */
 
 /* 
-* "ot-nxp/src/rw/rw610/platform/radio.c" has a dependency on 
+* "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on 
 * "examples/platforms/utils/link_metrics.cpp" which is not built in the Matter build system
 * for this reason, currently we are disabling this feature
 */
@@ -81,4 +81,4 @@
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
-#include "openthread-core-rw610-config.h"
+#include "openthread-core-rw612-config.h"

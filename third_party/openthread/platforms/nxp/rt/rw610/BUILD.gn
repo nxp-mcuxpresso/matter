@@ -25,7 +25,7 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_rw610_config") {
   include_dirs = [
       "${openthread_nxp_root}/src/common", 
-      "${openthread_nxp_root}/src/rw/rw610",
+      "${openthread_nxp_root}/src/rw/rw612",
       "${openthread_nxp_root}/third_party/mbedtls/configs",
       "${openthread_root}/third_party/mbedtls",
       "${openthread_root}/examples/platforms",
@@ -48,8 +48,8 @@ source_set("libopenthread-rw610") {
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
     "${openthread_nxp_root}/src/common/uart.c",
-    "${openthread_nxp_root}/src/rw/rw610/platform/entropy.c",
-    "${openthread_nxp_root}/src/rw/rw610/platform/diag.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
   ]
 
   if (spinel_interface_rpmsg) {
@@ -63,9 +63,9 @@ source_set("libopenthread-rw610") {
   }
   else {
     sources += [
-      "${openthread_nxp_root}/src/rw/rw610/platform/radio.c",
-      "${openthread_nxp_root}/src/rw/rw610/platform/misc.c",
-      "${openthread_nxp_root}/src/rw/rw610/platform/system.c",
+      "${openthread_nxp_root}/src/rw/rw612/platform/radio.c",
+      "${openthread_nxp_root}/src/rw/rw612/platform/misc.c",
+      "${openthread_nxp_root}/src/rw/rw612/platform/system.c",
     ]
   }
 
