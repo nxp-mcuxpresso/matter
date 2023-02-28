@@ -42,7 +42,7 @@ rt1170_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
 if (nxp_device_type == "thermostat")
 {
-  app_common_folder = "${nxp_device_type}/${nxp_device_type}-common"
+  app_common_folder = "${nxp_device_type}/nxp/zap"
 }
 else 
 {
