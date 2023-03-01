@@ -27,6 +27,7 @@ declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
+  build_without_pw = false
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -176,10 +177,12 @@ config("optimize_default") {
       configs = [ ":optimize_zero" ]
     }
   } else {
-    if (optimize_for_size) {
-      configs = [ "$dir_pw_build:optimize_size" ]
-    } else {
-      configs = [ "$dir_pw_build:optimize_speed" ]
+    if (!build_without_pw) {
+      if (optimize_for_size) {
+        configs = [ "$dir_pw_build:optimize_size" ]
+      } else {
+        configs = [ "$dir_pw_build:optimize_speed" ]
+      }
     }
 
     if (current_os != "mac") {
@@ -339,7 +342,9 @@ config("std_default") {
 }
 
 config("cosmetic_default") {
-  configs = [ "$dir_pw_build:colorize_output" ]
+  if (!build_without_pw) {
+    configs = [ "$dir_pw_build:colorize_output" ]
+  }
 }
 
 config("runtime_default") {
