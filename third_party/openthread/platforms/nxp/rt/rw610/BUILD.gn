@@ -47,7 +47,6 @@ source_set("libopenthread-rw610") {
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
-    "${openthread_nxp_root}/src/common/uart.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
   ]
