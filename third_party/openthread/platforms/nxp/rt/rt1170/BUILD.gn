@@ -45,7 +45,6 @@ source_set("libopenthread-rt1170") {
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/diag.c",
     "${openthread_nxp_root}/src/common/logging.c",
-    "${openthread_nxp_root}/src/common/uart.c",
     "${openthread_nxp_root}/src/common/spinel/misc.c",
     "${openthread_nxp_root}/src/common/spinel/radio.cpp",
     "${openthread_nxp_root}/src/common/spinel/system.c",
