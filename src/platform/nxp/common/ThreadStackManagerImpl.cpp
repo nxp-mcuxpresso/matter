@@ -41,6 +41,17 @@
 
 extern "C" CHIP_ERROR AppMatterCli_RegisterCommands(void);
 
+/*
+* Empty content for otPlatCliUartProcess, as the openthread CLI 
+* is managed by the matter cli if enabled.
+* An empty content is required as system.c from ot_nxp is always
+* calling this function. This could be removed once system.c will
+* be reworked to support more dynamically the openthread cli.
+*/
+extern "C" void otPlatCliUartProcess(void)
+{
+}
+
 namespace chip {
 namespace DeviceLayer {
 
