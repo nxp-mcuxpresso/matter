@@ -48,7 +48,6 @@ source_set("libopenthread-rt1060") {
     "${openthread_nxp_root}/src/common/diag.c",
     "${openthread_nxp_root}/src/common/entropy.c",
     "${openthread_nxp_root}/src/common/logging.c",
-    "${openthread_nxp_root}/src/common/uart.c",
     "${openthread_nxp_root}/src/common/spinel/misc.c",
     "${openthread_nxp_root}/src/common/spinel/radio.cpp",
     "${openthread_nxp_root}/src/common/spinel/spinel_hdlc.cpp",
