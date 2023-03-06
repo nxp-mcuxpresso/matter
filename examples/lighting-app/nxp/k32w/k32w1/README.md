@@ -1,86 +1,85 @@
-# CHIP K32W1 Lighting Example Application
+<a name="matter-k32w1-lighting-example-application"></a>
 
-The Project CHIP K32W1 Lighting Example demonstrates how to remotely control a
+# Matter K32W1 Lighting Example Application
+
+Matter K32W1 Lighting Example demonstrates how to remotely control a
 light bulb. The light bulb is simulated using one of the LEDs from the expansion
 board. It uses buttons to test turn on/turn off of the light bulb. You can use
 this example as a reference for creating your own application.
 
 The example is based on
-[Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP K32W1
+[Matter](https://github.com/project-chip/connectedhomeip) and the NXP K32W1
 SDK, and supports remote access and control of a light bulb over a low-power,
 802.15.4 Thread network.
 
-The example behaves as a Project CHIP accessory, that is a device that can be
-paired into an existing Project CHIP network and can be controlled by this
+The example behaves as a Matter accessory, that is a device that can be
+paired into an existing Matter network and can be controlled by this
 network.
 
 <hr>
 
--   [CHIP K32W1 Lighting Example Application](#chip-k32w-lighting-example-application) -
+-   [Matter K32W1 Lighting Example Application](#matter-k32w1-lighting-example-application)
 -   [Introduction](#introduction)
     -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
--   [Flashing and debugging](#flashdebug)
--   [Testing the example](#testing-the-example)
+-   [Flashing](#flashing)
+    -    [Flashing the NBU image](flashing-the-nbu-image)
+    -    [Flashing the host image](flashing-the-host-image)
+-   [Debugging](#debugging)
 -   [OTA](#ota)
-    -   [Compiling FTD image](#ota-compiling)
-    -   [Convert .elf into .srec file](#ota-convert-to-srec)
-    -   [Convert .srec into .sb3 file](#ota-convert-to-sb3)
-    -   [Convert .sb3 into .ota file](#ota-convert-to-ota)
-    -   [Running OTA](#ota-running)
-    -   [Known issues](#ota-issues)
+    -   [Convert srec into sb3 file](#convert-srec-into-sb3-file)
+    -   [Convert sb3 into ota file](#convert-sb3-into-ota-file)
+    -   [Running OTA](#running-ota)
+    -   [Known issues](#known-issues)
 
     </hr>
 
-<a name="intro"></a>
+<a name="introduction"></a>
 
 ## Introduction
 
 ![K32W1 EVK](../../../../platform/nxp/k32w/k32w1/doc/images/k32w1-evk.jpg)
 
 The K32W1 lighting example application provides a working demonstration of a
-light bulb device, built using the Project CHIP codebase and the NXP K32W1
+light bulb device, built using the Matter codebase and the NXP K32W1
 SDK. The example supports remote access (e.g.: using CHIP Tool from a mobile
 phone) and control of a light bulb over a low-power, 802.15.4 Thread network. It
-is capable of being paired into an existing Project CHIP network along with
-other Project CHIP-enabled devices.
+is capable of being paired into an existing Matter network along with
+other Matter-enabled devices.
 
-The CHIP device that runs the lighting application is controlled by the CHIP
-controller device over the Thread protocol. By default, the CHIP device has
-Thread disabled, and it should be paired over Bluetooth LE with the CHIP
+The Matter device that runs the lighting application is controlled by the Matter
+controller device over the Thread protocol. By default, the Matter device has
+Thread disabled, and it should be paired over Bluetooth LE with the Matter
 controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing a button. However, this mode does not guarantee
-that the device will be able to communicate with the CHIP controller and other
-devices.
+
+<a name="bluetooth-le-advertising"></a>
 
 ### Bluetooth LE Advertising
 
-In this example, to commission the device onto a Project CHIP network, it must
+In this example, to commission the device onto a Matter network, it must
 be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button SW2.
 
+<a name="bluetooth-le-rendezvous"></a>
+
 ### Bluetooth LE Rendezvous
 
 In this example, the commissioning procedure (called rendezvous) is done over
-Bluetooth LE between a CHIP device and the CHIP controller, where the controller
+Bluetooth LE between a Matter device and the Matter controller, where the controller
 has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
-from the CHIP device. The data payload is encoded within a QR code, or printed to
+from the Matter device. The data payload is encoded within a QR code, or printed to
 the UART console.
 
 ### Thread Provisioning
 
-Last part of the rendezvous procedure, the provisioning operation involves
-sending the Thread network credentials from the CHIP controller to the CHIP
-device. As a result, device is able to join the Thread network and communicate
-with other Thread devices in the network.
+<a name="device-ui"></a>
 
 ## Device UI
 
@@ -110,15 +109,12 @@ NOTE:
     On K32W1 EVK board, PTB0 is wired to LED2 also is wired to CS (Chip Select) 
     External Flash Memory. OTA image is stored in external memory because of it's size.
     If LED2 is enabled then it will affect External Memory CS and OTA will not work.
-    This is a workaround for an hardware issue particular to this board.
 
 **RGB LED** shows the state of the simulated light bulb. When the LED is lit the
 light bulb is on; when not lit, the light bulb is off.
 
 **Button SW2** can be used to start BLE adevertising. A SHORT press of the buttton 
-will enable Bluetooth LE advertising for a predefined period of time.
-
-**Button SW2 LP** can be used to reset the device to a default state. A LONG Press
+will enable Bluetooth LE advertising for a predefined period of time. A LONG Press
 Button SW2 initiates a factory reset. After an initial period of 3 seconds, LED 2
 and RGB LED will flash in unison to signal the pending reset. After 6 seconds will
 cause the device to reset its persistent configuration and initiate a reboot.
@@ -129,28 +125,19 @@ second limit.
 can be used to mimic a user manually operating a switch. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-**Button SW3 LP** can be used for joining a predefined Thread network advertised by
-a Border Router. Default parameters for a Thread network are hard-coded and are
-being used if this button is pressed. A LONG press of SW3 will trigger the action.
-
-Directly on the development board, **Button USERINTERFACE** can be used for
-enabling Bluetooth LE advertising for a predefined period of time. Also, pushing
-this button starts the NFC emulation by writing the onboarding information in
-the NTAG.
-
 <a name="building"></a>
 
 ## Building
 
-In order to build the Project CHIP example, we recommend using a Linux
+In order to build the Matter example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W1 SDK for Project CHIP](https://mcuxpresso.nxp.com/).
+-   Download [K32W1 SDK for Matter](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
     K32W1 SDK. The SDK Builder UI selection should be similar with
     the one from the image below.
-    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w1/doc/images/mcux-sdk-download.JPG)
+    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w1/doc/images/mcux-sdk-download.jpg)
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
@@ -163,132 +150,239 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
-The resulting elf output file can be found in out/debug/chip-k32w1-light-example.
+After a successful build, the `elf` and `srec` files are found in `out/debug/` - `see the files prefixed with chip-k32w1-light-example`.
 
-Also chip-k32w1-light-example.srec cand be found in the directory. This can be used for flashing with jlink.exe
+<a name="flashing"></a>
 
-<a name="flashdebug"></a>
+## Flashing
 
-## Flashing and debugging
-Program the CM33 image by using Jlink.exe using the following steps:
+Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
 
-1. Copy chip-k32w1-light-example.srec to folder where jlink.exe is located.
-2. Copy Matter_root/third_party/nxp/k32w1_sdk/Jlink_Script/K32W1.jlink folder where jlink.exe is located.
-3. Open a command prompt and type: 
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_a1.sb3`.
 
-    **jlink.exe -device KW45B41Z83 -if SWD -speed 4000 -autoconnect 1 -CommanderScript K32W1.jlink**
+<a name="flashing-the-nbu-image"></a>
 
-Note: Steps 1 and 2 are not mandatory if the K32W1.jlink is modified to point to the corect location of the chip-k32w1-light-example.srec file on the machine. Furthermore when running the jlink.exe command the correct path to the script must be provided.
+### Flashing the NBU image
 
-For NBU firmware programming steps see the K32W148-EVK NBU Programming User’s Guide (available from your NXP contact)
+NBU image should be written only when a new NXP-SDK is released. [blhost tool](https://cache.nxp.com/secured/assets/downloads/en/device-drivers/blhost_2.6.7.zip?fileExt=.zip) can be used for flashing. Before writing the image, please make sure that K32W1 is in bootloader mode by keeping the SW4 button pressed while connecting the K32W1 board to an USB port (unplug the board if already connected to an USB port):
 
-<a name="testing-the-example"></a>
+```bash
+C:\nxp\blhost_2.6.7> blhost.exe -p COM50 -- receive-sb-file .\k32w1_nbu_ble_15_4_dyn_a1.sb3
+```
 
-## Testing the example
+Please note that COM50 should be replaced with the COM port that corresponds to the K32W1 device.
 
-The app can be deployed against any generic OpenThread Border Router. See the
-guide
-[Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
-for step-by-step instructions.
+<a name="flashing-the-host-image"></a>
+
+### Flashing the host image
+
+Host image is the one found under `out/debug/`. It should be written after each build process. 
+
+If debugging is needed then jump directly to the [Debugging](#debugging) section. Otherwise, if only flashing is needed then [JLink 7.84b](https://www.segger.com/downloads/jlink/) can be used:
+
+- Plug K32W1 to the USB port (no need to keep the SW4 button pressed while doing this)
+
+- Create a new file, `commands_script`, with the following content (change application name accordingly):
+
+```bash
+reset
+halt
+loadfile chip-k32w1-light-example.srec
+reset
+go
+quit
+```
+
+- copy the application and `commands_script` in the same folder that JLink executable is placed. Execute:
+
+```bash
+$  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
+```
+
+<a name="debugging"></a>
+
+## Debugging
+
+One option for debugging would be to use MCUXpresso IDE.
+
+- Drag-and-drop the zip file containing the NXP SDK in the "Installed SDKs" tab:
+
+![Installed SDKs](../../../../platform/nxp/k32w/k32w1/doc/images/installed_sdks.jpg)
+
+- Import any demo application from the installed SDK:
+
+```
+Import SDK example(s).. -> choose a demo app (demo_apps -> hello_world) -> Finish
+```
+
+![Import demo](../../../../platform/nxp/k32w/k32w1/doc/images/import_demo.jpg)
+
+- Flash the previously imported demo application on the board:
+
+```
+Right click on the application (from Project Explorer) -> Debug as -> JLink/CMSIS-DAP
+```
+
+After this step, a debug configuration specific for the K32W1 board was created. This debug configuration will
+be used later on for debugging the application resulted after ot-nxp compilation.
+
+- Import Matter repo in MCUXpresso IDE as Makefile Project. Use _none_ as
+  _Toolchain for Indexer Settings_:
+
+```
+File -> Import -> C/C++ -> Existing Code as Makefile Project
+```
+
+![New Project](../../../../platform/nxp/k32w/k32w1/doc/images/new_project.jpg)
+
+- Replace the path of the existing demo application with the path of the K32W1 application:
+
+```
+Run -> Debug Configurations... -> C/C++ Application
+```
+
+![Debug K32W1](../../../../platform/nxp/k32w/k32w1/doc/images/debug_k32w1.jpg)
 
 <a name="ota"></a>
 
 ## OTA
 
-OTA support is added on K4 for Matter FTD device.
-OTA support is enabled in file: "examples/lighting-app/nxp/k32w/k32w1/args.gni" at line: "chip_enable_ota_requestor = true"
-Requirements: 
-Before running an OTA firmware upgrade decryption keys should be writen onto the board.
-With these decryption keys the bootloader will decrypt the .sb3 encrypted file which is encapsulated as payload into the .ota file.
-Decryption keys should match with pairing encryption keys used at .sb3 generation.
-Note: The flow of converting .elf file into .ota file is subject to be changed in the future, support will be added to existing tools.
-Note: Regarding OTA image header version (`-vn` option). 
-    An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`). 
-    For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. 
-    A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
+<a name="convert-srec-into-sb3-file"></a>
 
-<a name="ota-compiling"></a>
+### Convert srec into sb3 file
 
-### Compiling FTD image
+The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the OTAP correct keys. 
 
-Use following commands to compile FTD image
-```
-> set NXP_K32W1_SDK_ROOT=<SDK Path>
-> gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=true sdk_release=0 chip_crypto=\"platform\""
-> ninja -C out\debug
-```
-this will generate the elf which contains only the CM33 image. 
-Important: NBU image is supposed to be preloaded. 
+.srec file is input for Over The air Programming (OTAP) application (unencrypted) and it's converted to .sb3 format (encrypted).
 
-<a name="ota-convert-to-srec"></a>
-
-### Convert .elf into .srec file
-
-.elf file should be converted into srec using arm-none-eabi-objcopy, for example:
-```
-> arm-none-eabi-objcopy chip-k32w1-light-example -O srec chip-k32w1-light-example.srec
-```
-
-<a name="ota-convert-to-sb3"></a>
-
-### Convert .srec into .sb3 file
-
-.srec file is input for Over The air Programming (OTAP) application.
-.srec is converted into .sb3 file which is the encrypted image with same encryption keys as bootloader is expecting.
 In OTAP application
-- select OTA protocol => OTAP Bluetooth LE
-- push Browse File 
-- follow default options (KW45, Preserve NVM) 
-- At image information is important to choose will update "KW45Z (MCU)" this will generate the image only for CM33
+- select OTA protocol => OTAP Matter
+- Browse File 
+- follow default options (KW45/K32W148, Preserve NVM) 
+- image information: will update "Application Core (MCU)" - this will generate the image only for the CM33 core
 - keep other settings at default values
-- and will generate the .sb3 image file 
-.sb3 file is the encrypted image which bootloader is expecting.
 
-<a name="ota-convert-to-ota"></a>
+<a name="convert-sb3-into-ota-file"></a>
 
-### Convert .sb3 into .ota file
+### Convert sb3 into ota file
 
-.sb3 file should be loaded into RaspberryPI (RPI) and converted into .ota file.
-Load the .sb3 file into ~/binaries for example and to convert sb3 into ota.
-Run:
+.sb3 file should be packed in a Matter specific header (e.g.: using the following Python script availabe in the Matter repo):
 ```
 $ ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
 ```
-Is important to know -vn 43033 is the version for the image in OTA header file and this should be bigger than current image.
-If OTA file is generated with lower version numbers the OTA firmware upgrade will inform about this is a lower version and will discard the OTA.
 
-<a name="ota-running"></a>
+A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
+
+<a name="running-ota"></a>
 
 ### Running OTA
 
-After a fresh restart RPI to run an OTA firmware upgrade run following commands:
-```
-$ sudo ip link set dev eth0 down
-$ sudo ifconfig eth0 -multicast
-$ docker kill $(docker ps -q)
-$ ./start_otbr.sh 
-$ rm -rf /tmp/chip_*
-$ ~/apps/ota-provider-app -f ~/binaries/chip-k32w1-43033.ota   
-```
-at this point ssh will keep the promt and you need other ssh window to proceed further.
+The OTA topology used for OTA testing is illustrated in the figure below.
+Topology is similar with the one used for Matter Test Events.
 
-Run into the second ssh window
+![OTA_TOPOLOGY](../../../../platform/nxp/k32w/k32w1/doc/images/ota_topology.JPG)
+
+The concept for OTA is the next one:
+
+-   there is an OTA Provider Application that holds the OTA image. In our case,
+    this is a Linux application running on an Ubuntu based-system;
+-   the OTA Requestor functionality is embedded inside the Lighting Application.
+    It will be used for requesting OTA blocks from the OTA Provider;
+-   the controller (a linux application called chip-tool) will be used for
+    commissioning both the device and the OTA Provider App. The device will be
+    commissioned using the standard Matter flow (BLE + IEEE 802.15.4) while the
+    OTA Provider Application will be commissioned using the _onnetwork_ option
+    of chip-tool;
+-   during commissioning, each device is assigned a node id by the chip-tool
+    (can be specified manually by the user). Using the node id of the device and
+    of the lighting application, chip-tool triggers the OTA transfer by invoking
+    the _announce-ota-provider_ command - basically, the OTA Requestor is
+    informed of the node id of the OTA Provider Application.
+
+_Computer #1_ can be any system running an Ubuntu distribution. We recommand
+using CSA official instructions from
+[here](https://groups.csa-iot.org/wg/matter-csg/document/28566), where RPi 4 are
+proposed. Also, CSA official instructions document point to the OS/Docker images that
+should be used on the RPis. For compatibility reasons, we recommand compiling
+chip-tool and OTA Provider applications with the same commit id that was used
+for compiling the Lighting Application. Also, please note that there is a single
+controller (chip-tool) running on Computer #1 which is used for commissioning
+both the device and the OTA Provider Application. If needed,
+[these instructions](https://itsfoss.com/connect-wifi-terminal-ubuntu/) could be
+used for connecting the RPis to WiFi.
+
+Build the Linux OTA provider application:
+
 ```
-$ ~/apps/chip-tool pairing onnetwork 1 20202021
-$ ~/apps/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
-```   
-Only after this commands you can join the device (it is a known issue, if the device is already joined before the OTA will not work).
-Press on board to start BLE advertising and ...
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
-$ ~/apps/chip-tool pairing ble-thread 2 hex: <...dataset...> 20202021 3840
+
+Build Linux chip-tool:
+
 ```
-After all above commands completed with succes start the OTA with command:
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
-$ ~/apps/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+
+Start the OTA Provider Application:
+
 ```
-<a name="ota-issues"></a>
-    
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w1-43033.ota
+```
+
+Provision the OTA provider application and assign node id _1_. Also, grant ACL
+entries to allow OTA requestors:
+
+```
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing onnetwork 1 20202021
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+```
+
+Provision the device and assign node id _2_:
+
+```
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
+```
+
+Start the OTA process:
+
+```
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+```
+
+<a name="known-issues"></a>
+
 ### Known issues
 
-It is a known issue that the order of the command are important.
-If you join the FTD into the network first and after that initiate the OTA commands it will fail.
+-   SRP cache on the openthread border router needs to flushed each time a new
+    commissioning process is attempted. For this, factory reset the device, then
+    execute _ot-ctl server disable_ followed by _ot-ctl server enable_. After
+    this step, the commissioning process of the device can start;
+-   Due to some MDNS issues, the commissioning of the OTA Provider Application
+    may fail. Please make sure that the SRP cache is disabled (_ot-ctl srp
+    server disable_) on the openthread border router while commissioning the OTA
+    Provider Application;
+-   No other Docker image should be running (e.g.: Docker image needed by Test
+    Harness) except the OTBR one. A docker image can be killed using the
+    command:
+
+```
+user@computer1:~/connectedhomeip$ : sudo docker kill $container_id
+```
+
+-   In order to avoid MDNS issues, only one interface should be active at one
+    time. E.g.: if WiFi is used then disable the Ethernet interface and also
+    disable multicast on that interface:
+
+```
+user@computer1:~/connectedhomeip$ sudo ip link set dev eth0 down
+user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
+```
+
+-   If OTBR Docker image is used, then the "-B" parameter should point to the
+    interface used for the backbone.
+
+-   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
+    Otherwise, issues related to BLE-WiFi combo may appear.
+
