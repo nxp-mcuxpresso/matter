@@ -388,12 +388,6 @@ void AppTask::SwitchCommissioningState(intptr_t arg)
     }
 }
 
-void AppTask::FactoryReset(intptr_t arg)
-{
-    // Actually trigger Factory Reset
-    ConfigurationMgr().InitiateFactoryReset();
-}
-
 void AppTask::StartCommissioningHandler(void)
 {
     /* Publish an event to the Matter task to always set the commissioning state in the Matter task context */
@@ -414,6 +408,5 @@ void AppTask::SwitchCommissioningStateHandler(void)
 
 void AppTask::FactoryResetHandler(void)
 {
-    /* Publish an event to the Matter task to trigger the factory reset in the Matter task context */
-    PlatformMgr().ScheduleWork(FactoryReset, 0);
+    ConfigurationMgr().InitiateFactoryReset();
 }

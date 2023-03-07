@@ -68,7 +68,6 @@ private:
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
     static void SwitchCommissioningState(intptr_t arg);
-    static void FactoryReset(intptr_t arg);
     static void InitServer(intptr_t arg);
 
     /* Functions that would be called in the App task context */
