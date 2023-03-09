@@ -1699,9 +1699,9 @@ endpoint 0 {
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    ram      attribute generatedCommandList;
-    ram      attribute acceptedCommandList;
-    ram      attribute attributeList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
   }
