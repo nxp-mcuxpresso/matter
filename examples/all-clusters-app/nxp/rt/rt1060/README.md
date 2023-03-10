@@ -191,9 +191,10 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 <a name="testing-the-example"></a>
 
 ## Testing the example
+### Testing the all-clusters application without Matter CLI (default)
 
 1. Prepare the board with the flashed `All-cluster application` (as shown above). 
-2. The All-cluster example example uses UART to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+2. The All-cluster example uses UART to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -202,6 +203,26 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
    - No flow control
 
 3. Open a terminal connection on the board and watch the printed logs.
+
+4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+
+### Testing the all-clusters application with Matter CLI enabled
+1. Prepare the board with the flashed `All-cluster application` (as shown above).
+2. The matter CLI is accessible in UART1. For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+
+   - Baud rate: 115200
+   - 8 data bits
+   - 1 stop bit
+   - No parity
+   - No flow control
+
+3. The All-cluster example uses UART2 to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector J16 pin 7 in case of MIMXRT1060-EVKB board or connector J22 pin 7 in case of EVK-MIMXRT1060 board), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+
+   - Baud rate: 115200
+   - 8 data bits
+   - 1 stop bit
+   - No parity
+   - No flow control
 
 4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
 
