@@ -49,7 +49,7 @@ board by default.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [RD-RW610 SDK 2.13.0 EAR3.2 for Project CHIP](https://mcuxpresso.nxp.com/en/select).
+-   Download [RD-RW610 SDK 2.13.0 EAR4 for Project CHIP](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
     SDK_2.13.0_RW610. The SDK Builder UI selection should be similar with
