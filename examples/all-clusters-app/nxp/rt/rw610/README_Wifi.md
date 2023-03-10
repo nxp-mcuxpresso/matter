@@ -13,7 +13,7 @@ First instructions from [README.md 'Building section'][readme_building_section] 
 
 [readme_building_section]: README.md#building
 
-Note : Building with SDK package and SDK internal are both supported, for this replace ```is_<sdk_type>``` with ```is_sdk_package``` if building with SDK package, or with ```is_sdk_internal``` if internal SDK is used instead. 
+Note : Building with SDK package and SDK internal are both supported, for this replace ```is_<sdk_type>``` with ```is_sdk_package``` if building with SDK package, or with ```is_sdk_internal``` if internal SDK is used instead. The argument ```is_debug=true optimize_debug=false``` could be used to build the application in debug mode. 
 
 To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
 
