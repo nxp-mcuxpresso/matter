@@ -63,6 +63,8 @@ First instructions from [README.md 'Building section'][readme_building_section] 
 
 Note : To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added to the *gn gen* command.
 
+The argument ```is_debug=true optimize_debug=false``` could be used to build the application in debug mode.
+
 -   Build the Wi-fi configuration for MIMXRT1060-EVKB board (with BLE for commissioning):
 
 ```
