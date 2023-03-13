@@ -39,10 +39,6 @@ using namespace ::chip::DeviceManager;
 
 #include <AppTask.h>
 
-#if ENABLE_OTW_K32W0
-#include "ISPInterface.h"
-#endif
-
 #if configAPPLICATION_ALLOCATED_HEAP
 uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 #endif
@@ -73,14 +69,6 @@ void main_task(void *pvParameters)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-
-#if ENABLE_OTW_K32W0
-    if (RT::ISPInterface::getInstance().runOTWUpdater() != E_PRG_OK)
-    {
-        ChipLogError(DeviceLayer, "OTW Updater failed!");
-        goto exit;
-    }
-#endif
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
     /*
