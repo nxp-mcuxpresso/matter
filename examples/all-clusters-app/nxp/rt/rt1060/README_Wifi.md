@@ -1,6 +1,10 @@
 # RT1060 All-cluster Application for Matter over Wi-Fi
 
-## Hardware requirements
+## Configuration supported
+- RT1060 + IW416
+- RT1060 + 8801
+
+## Hardware requirements RT1060+IW416
 
 Host part:
 
@@ -10,8 +14,6 @@ Host part:
 Transceiver part:
 
 - 1 AzureWave AW-AM510-uSD evaluation board
-
-## Board settings
 
 Jumper settings for MIMXRT1060-EVKB (enables external 5V supply):
 
@@ -55,6 +57,19 @@ Additional information about the AW-AM510-uSD can be found in the user manual *U
 
 <a name="building"></a>
 
+## Hardware requirements RT1060+8801
+Host part:
+
+- 1 MIMXRT1060-EVKB
+
+Transceiver part :
+- 1 8801 2DS M.2 Module (rev A)
+- 1 Murata uSD-M.2 Adapter (rev B1)
+
+The 8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and insterted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to position 1-2 (towards the center of the Adapter).
+
+Note: as the 8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory to connect it to a Wi-Fi access point on the 2.4 GHz band.
+
 ## Building
 
 First instructions from [README.md 'Building section'][readme_building_section] should be followed.
@@ -65,17 +80,17 @@ Note : To enable the [matter CLI](README.md#matter-shell), the argument ```chip_
 
 The argument ```is_debug=true optimize_debug=false``` could be used to build the application in debug mode.
 
--   Build the Wi-fi configuration for MIMXRT1060-EVKB board (with BLE for commissioning):
+-   Build the Wi-fi configuration for MIMXRT1060-EVKB board + IW416 transceiver (with BLE for commissioning). For EVK-MIMXRT1060, evkname=\"evkmimxrt1060\" should be added:
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true iw416_transceiver=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
--   Build the Wi-fi configuration for EVK-MIMXRT1060 board (with BLE for commissioning):
+-   Build the Wi-fi configuration for EVK-MIMXRT1060 board + 8801. Matter-over-Wifi configuration with onnetwork commissioning (without BLE, the WiFi network credentials are provided at build-time which will enable the device to join the network at the startup):
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true iw416_transceiver=true evkname=\"evkmimxrt1060\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_config_network_layer_ble=false tcp_download=true wifi_ssid=\"your_wifi_ssid\" wifi_password=\"your_wifi_password\"" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
@@ -98,6 +113,10 @@ Follow instructions from [README.md 'Testing the example'][readme_test_example_s
 To commision the device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
 
 [readme_ble_commissioning_section]:../../../../chip-tool/README.md#commission-a-device-over-ble
+
+To commissioning the device over IP, follow the instructions from [chip-tool's README.md 'Pair a device over IP'][readme_pair_ip_commissioning_section]
+
+[readme_pair_ip_commissioning_section]: ../../../../chip-tool/README.md#pair-a-device-over-ip
 
 ### Known issues/limitations
 
