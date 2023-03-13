@@ -32,15 +32,6 @@ To know how to flash and debug follow instructions from [README.md 'Flashing and
 
 [readme_flash_debug_section]:README.md#flashdebug
 
-## Application UI
-
-To interact with the server running on the RT1060 we recomand using the [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool) application. For this setup you will need a Raspberry PI model 4 or later that has a Linux Ubuntu Server 20.04 distrubution runnig on it. To prepare the board please follow this [ubuntu tutorial](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi) on how to install ubuntu on a raspberry pi. 
-After you followed the the steps in the guide and prepared the chip-tool go into the build directory and use this command for pairing:
-
-```
-./chip-tool pairing onnetwork 1234 20202021, where 20202021 is the SetUpPinCode and 1234 is the NodeID 
-```
-
 ## Testing the example
 
 Follow instructions from [README.md 'Testing the example'][readme_test_example_section].

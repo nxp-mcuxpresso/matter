@@ -9,14 +9,14 @@ Host part:
 Transceiver part:
 
 - 1 OM15076-3 Carrier Board (DK6 board)
-- 1 K32W061 Module to be plugged on the Carrier Board
+- 1 K32W0 Module to be plugged on the Carrier Board
 
 
 ## Board settings
 
 Board settings are described [here][ot_cli_rt1060_readme].
 
-[ot_cli_rt1060_readme]:https://github.com/NXP/ot-nxp/blob/v1.0-branch-nxp/src/imx_rt/rt1060/README.md#board-settings-for-mimxrt1060-evkb
+[ot_cli_rt1060_readme]:https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/src/imx_rt/rt1060/README.md#board-settings-for-mimxrt1060-evkb
 
 <a name="building"></a>
 
@@ -25,52 +25,38 @@ Board settings are described [here][ot_cli_rt1060_readme].
 ### Pre-build instructions
 First instructions from [README.md 'Building section'][readme_building_section] should be followed.
 
-Make sure to update ot_nxp submodules if not already done:
-
-```
-user@ubuntu: cd ~/Desktop/git/connectedhomeip/third_party/openthread/ot-nxp
-user@ubuntu: git submodule update --init
-```
-
 [readme_building_section]: README.md#building
 
 ### Build instructions
 
 ### Build the Openthread configuration with BLE commissioning.
 
-Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB. Also argument is_debug=true optimize_debug=false could be used to build the application in debug mode. For this configuration a K32W061 image supporting HCI and spinel on a single UART should be used.
+For this configuration a K32W0 RCP image is required and must support in a single image the openthread RCP configuration and the BLE HCI BB configuration. Messages between the host and the K32W0 transceiver are transfered on a single UART with flow control support.
+For that the HDLC-Lite framing protocol is used to transfert spinel and hci frames. In addition, hci and spinel frames can be distinguished by using the Spinel convention which is line compatible with BT/BLE HCI.
 
-To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the option chip_with_factory_data=1 should be added (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+Before building the Matter host application, it is required to generate the K32W0 image supporting features as described above. To build this binary the target ````ot_rcp_ble_hci_bb_single_uart_fc```` should be built by following the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme]. After a successfull build, a ````".h"```` file will be generated and would contain the K32W0 RCP binary. As described in the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme], the application binaries will be generated in `ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h`.
 
- To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
+The generate K32W0 transceiver binary ````".h"```` file path must be indicated to the host Matter application build. In fact the Matter host application is in charge of storing the K32W0 firmware in its flash to be able to use the ````The Over The Wire (OTW) protocol (over UART)```` to download (at host startup) the k32w0 transceiver image from the host to the K32W0 internal flash.  For more information on the k32w0 OTW protocol, user can consult the doxygen header of [fwk_otw.c][fwk_otw_sdk_path].
+
+Here is a summary of the k32w0 *gn gen* arguments that are mandatory or optional:
+- Mandatory: ````k32w0_transceiver=true````
+- Mandatory: ````hci_spinel_single_uart=true````
+- Optional: ````k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"```` This argument is optional, by default, if not set, the binary file located in "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" will be used. If the K32W061 transceiver binary is saved at another location an absolute path of its location should be given.
+
+[fwk_otw_sdk_path]:../../../../../third_party/nxp/rt_sdk/repo/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c
+
+[ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md#building-the-examples
+
+Below is presented an example of *gn gen* argument that could be used to generate the host matter application with a k32w0 transceiver.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
-### Build the Openthread configuration (without BLE)
-In this configuration the matter-cli must be enabled to join an existing thread network, **not the standard way, only for test purpose**) - argument is_debug=true optimize_debug=false could be used to build the application in debug mode. Argument evkname=\"evkmimxrt1060\" must be used in *gn gen* command when building for EVK-MIMXRT1060 board instead of the default MIMXRT1060-EVKB.
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" chip_inet_config_enable_ipv4=false chip_enable_matter_cli=true chip_config_network_layer_ble=false" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
-```
-
-Note : 
-- If the K32W061 transceiver is selected, by default if the gn option k32w0_transceiver_bin_path is not set, the binary file located in "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" will be used. If the K32W061 transceiver binary is saved at another location an absolute path of its location should be given in the k32w0_transceiver_bin_path gn option (as shown above in the examples).
-
 The resulting output file can be found in out/debug/chip-rt1060-all-cluster-example
 
 ## Flash Binaries
-
-### K32W061 transceiver image
-
-A dedicated k32w0 transceiver binary should be built. This binary must support OT+BLE and must support spinel and hci on a single UART. To build this binary the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme] should be followed.
-
-The Over The Wire (OTW) protocol (over UART) would be used to download the k32w0 transceiver image from the RT1060 to the its internal flash.
-
-[ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0-branch-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md
 
 ### Flashing and debugging the RT1060
 
@@ -78,7 +64,7 @@ To know how to flash and debug follow instructions from [README.md 'Flashing and
 
 [readme_flash_debug_section]:README.md#flashdebug
 
-## Raspberrypi Test harness setup
+## Raspberrypi Border Router setup
 
 Instructions to start an openthread border router should be followed. In this section a mechanism to start the BR, without accessing the web interface, is described.
 
@@ -93,45 +79,25 @@ Get the docker ID of the BR image:
 sudo docker container ls
 ```
 
-Create a thread network on the border router (048bf89bb3dd should be replaced by the previously gotten BR docker ID):
+Create a thread network on the border router (44bd463c5ba9 should be replaced by the previously gotten BR docker ID):
 
 ```
-sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset init new"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset channel 17"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset panid 0x1222"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset extpanid 1111111122222222"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset networkkey 00112233445566778899aabbccddeeaa"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset commit active"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl ifconfig up"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl thread start"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl prefix add fd11:22::/64 pasor"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl netdata register"
+sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset init new"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset channel 17"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset panid 0x12aa"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset extpanid 1111111122222222"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset networkkey 00112233445566778899aabbccaaaaaa"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl dataset commit active"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl ifconfig up"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl thread start"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl prefix add fd11:22::/64 pasor"; sudo docker exec -it 44bd463c5ba9 sh -c "sudo ot-ctl netdata register"
 ```
 
+## Testing the all cluster app example (with BLE commissioning support) - default configuration
 
+The pairing "ble-thread" feature must be used and instructions from [README.md 'Testing the example'][readme_test_example_section] should be followed.
 
-## Testing the all custer app example (with BLE commissioning support)
-1. Prepare the board with the flashed `All-cluster application` supporting Openthread and BLE.
-2. The All-cluster example uses UART1 to print logs while runing the server. To view logs, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+[readme_test_example_section]:README.md#testing-the-example
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
+## Testing the all cluster app example (without BLE commissioning support) - only for testing purpose
 
-3. Once flashed, BLE advertising will be started automatically.
+For such test, having the Matter CLI is mandatory, instructions from [README.md 'Testing the all-clusters application with Matter CLI enabled'][readme_test_with_matter_cli_section] should be followed.
 
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "ble-thread" feature should be used and is described [here](../../../../../examples/chip-tool/README.md#Using-the-Client-to-commission-a-device).
-## Testing the all custer app example (without BLE commissioning support) - only for testing purpose
-1. Prepare the board with the flashed `All-cluster application` supporting Openthread only.
-2. The matter CLI is accessible in UART1. For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+[readme_test_with_matter_cli_section]:README.md#testing-the-all-clusters-application-with-matter-cli-enabled
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-2. The All-cluster example uses UART2 to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector J16 pin 7 in case of MIMXRT1060-EVKB board or connector J22 pin 7 in case of EVK-MIMXRT1060 board), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
-
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-
-3. On the matter CLI enter the below commands:
+Then using the Matter CLI below commands to join an existing thread network should be enterred, networkey and panid should be changed depending on thread network configurations:
 
 ```
 otcli dataset networkkey 00112233445566778899aabbccddeeff
@@ -141,25 +107,4 @@ otcli ifconfig up
 otcli thread start
 ```
 
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "onnetwork" feature should be used as the pairing/commissioning over BLE is not supported in this version.
-
-## Matter Commissioning recommendations
-
-Before starting a commissioning stage it is recommended to run the following commands on the Border Router and to remove files located in /tmp/chip_*: 
-
-1. Get the "CONTAINER ID"
-```
-sudo docker container ls
-```
-2. Disable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server disable"
-```
-3. Enable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server enable"
-```
-
-### Known issues/limitations
-
-- If the Matter commissioning failed for some reasons, it is recommended to always either reflash the RT1060 with a new `All-clusters application` binary, or use the ```matterfactoryreset``` command if the shell is enabled, before starting a new commissioning. This would allow to erase all previously saved settings.
+Note: The pairing "onnetwork" feature should be used as the pairing/commissioning method.
