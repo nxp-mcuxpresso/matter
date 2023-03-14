@@ -73,6 +73,13 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170/
 ```
 
+Optional GN options that can be added when building an application:
+
+- To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
+- To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
+- To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
+- To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+
 Refer to the Building section in wi-fi or openthread specific README file.
 
 <a name="hardware"></a>
@@ -139,12 +146,7 @@ See [Guide for writing manufacturing data on NXP devices](../../../platform/nxp/
 
 Other comments:
 
-The RT1170 all cluster app demonstrates the usage of encrypted Matter manufacturing data storage. Matter manufacturing data should be encrypted before flashing them to the RT1170 flash. 
-
-For development purpose the RT1170 all cluster app code could use the hardcoded AES 128 software key. This software key should be used only during development stage. 
-
-For production usage, it is recommended to use the OTP key which needs to be fused in the RT1170 SW_GP2. The application note AN12800 should be followed to get more information. In this case the all cluster app should be updated to indicate to the DCP module to use the OTP key instead of the software key.
-For that the call to "dataReaderEncryptedDCPInstance->SetAes128Key(&aes128TestKey[0]);" should be changed to "dataReaderEncryptedDCPInstance->SetKeySelected(arg);" with the arg value specifying where the OTP key is stored (kDCP_OCOTPKeyLow for [127:0] of SW_GP2 or kDCP_OCOTPKeyHigh for [255:128] of SW_GP2).
+TODO add information
 
 <a name="flashdebug"></a>
 
@@ -225,12 +227,20 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 - Debug using the newly created configuration file:
 
-
 ## Testing the example
-### Testing the all-clusters application without Matter CLI (default)
 
-1. Prepare the board with the flashed `All-cluster application` (as shown above). 
-2. The All-cluster example uses UART to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+To know how to commision a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
+
+[readme_ble_commissioning_section]:../../../../chip-tool/README.md#commission-a-device-over-ble
+
+To know how to commissioning a device over IP, follow the instructions from [chip-tool's README.md 'Pair a device over IP'][readme_pair_ip_commissioning_section]
+
+[readme_pair_ip_commissioning_section]: ../../../../chip-tool/README.md#pair-a-device-over-ip
+
+### Testing the all-clusters application without Matter CLI:
+
+1. Prepare the board with the flashed `All-cluster application` (as shown above).
+2. The All-cluster example uses UART1 to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -240,8 +250,27 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 3. Open a terminal connection on the board and watch the printed logs.
 
-4. On the client side, start sending commands using the [chip-tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool)  application as it is described [here](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
-### Testing the all-clusters application with Matter CLI enabled
+4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+
+### Testing the all-clusters application with Matter CLI enabled:
+
+The Matter CLI can be enabled with the all-clusters application.
+
+For more information about the Matter CLI default commands, you can refer to the dedicated [ReadMe](../../../../shell/README.md).
+
+The All-clusters application supports additional commands :
+```
+> help
+[...]
+mattercommissioning     Open/close the commissioning window. Usage : mattercommissioning [on|off]
+matterfactoryreset      Perform a factory reset on the device
+matterreset             Reset the device
+```
+- ```matterfactoryreset``` command erases the file system completely (all Matter settings are erased).
+- ```matterreset``` enables the device to reboot without erasing the settings.
+
+Here are described steps to use the all-cluster-app with the Matter CLI enabled
+
 1. Prepare the board with the flashed `All-cluster application` (as shown above).
 2. The matter CLI is accessible in UART1. For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
@@ -260,20 +289,3 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
    - No flow control
 
 4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
-
-### Matter Shell
-
-The Matter CLI can be enabled with the all-clusters application.
-
-For more information about the Matter CLI default commands, you can refer to the dedicated [ReadMe](../../../../shell/README.md).
-
-The All-clusters application supports additional commands :
-```
-> help
-[...]
-mattercommissioning     Open/close the commissioning window. Usage : mattercommissioning [on|off]
-matterfactoryreset      Perform a factory reset on the device
-matterreset             Reset the device
-```
-- ```matterfactoryreset``` command erases the file system completely (all Matter settings are erased).
-- ```matterreset``` enables the device to reboot without erasing the settings.

@@ -33,13 +33,10 @@ First instructions from [README.md 'Building section'][readme_building_section] 
 -   Build the Openthread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170$ gn gen --args="chip_enable_openthread=true iwx12_transceiver=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true is_debug=true optimize_debug=false" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170$ gn gen --args="chip_enable_openthread=true iwx12_transceiver=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170/$ ninja -C out/debug
 ```
-Use is_sdk_package=true as above if SDK is a package downloaded.
-If SDK is retrieved from NXP internal repository, use is_sdk_internal=true instead.
 
-To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
   
 The resulting output file can be found in out/debug/chip-rt1170-all-cluster-example
 
@@ -49,7 +46,7 @@ To know how to flash and debug follow instructions from [README.md 'Flashing and
 
 [readme_flash_debug_section]:README.md#Flashing-and-debugging
 
-## Raspberrypi Test harness setup
+## Raspberrypi Border Router setup
 
 Instructions to start an openthread border router should be followed. In this section a mechanism to start the BR, without accessing the web interface, is described.
 
@@ -73,65 +70,7 @@ sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset init new"; sudo doc
 
 
 # Testing the all custer app example (with BLE commissioning support)
-1. Prepare the board with the flashed `All-cluster application` supporting Openthread and BLE.
-2. The All-cluster example uses UART1 to print logs while runing the server. To view logs, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
+The pairing "ble-thread" feature must be used and instructions from [README.md 'Testing the example'][readme_test_example_section] should be followed.
 
-3. Once flashed, BLE advertising will be started automatically.
-
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "ble-thread" feature should be used and is described [here](../../../../../examples/chip-tool/README.md#Using-the-Client-to-commission-a-device).
-
-## Testing the all custer app example (without BLE commissioning support) - only for testing purpose
-1. Prepare the board with the flashed `All-cluster application` supporting Openthread only.
-2. The matter CLI is accessible in UART1. For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
-
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-2. The All-cluster example uses UART2 to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector J16 pin 7 in case of MIMXRT1060-EVKB board or connector J22 pin 7 in case of EVK-MIMXRT1060 board), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
-
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-
-3. On the matter CLI enter the below commands:
-
-```
-otcli networkkey 00112233445566778899aabbccddeeff
-otcli panid 0x1234
-otcli commit active
-otcli ifconfig up
-otcli thread start
-```
-
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "onnetwork" feature should be used as the pairing/commissioning over BLE is not supported in this version.
-
-## Matter Commissioning recommendations
-
-Before starting a commissioning stage it is recommended to run the following commands on the Border Router and to remove files located in /tmp/chip_*: 
-
-1. Get the "CONTAINER ID"
-```
-sudo docker container ls
-```
-2. Disable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server disable"
-```
-3. Enable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server enable"
-```
-
-### Known issues/limitations
-
-- If the Matter commissioning failed for some reasons, it is recommended to always either reflash the RT1170 with a new `All-clusters application` binary, or use the ```matterfactoryreset``` command if the shell is enabled, before starting a new commissioning. This would allow to erase all previously saved settings.
+[readme_test_example_section]:README.md#testing-the-example
