@@ -65,9 +65,25 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_2_13_0_RW610/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rw610/
 ```
 
+Optional GN options that can be added when building an application:
+
+- To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
+- To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
+- To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
+- To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+
 Note : **For internal use only**, the SDK branch "*develop/2.13.0_rw612*" (from *mcu-sdk-2.0* repo) can be used to build the application.
+
+## Manufacturing data
+
+See [Guide for writing manufacturing data on NXP devices](../../../platform/nxp/doc/manufacturing_flow.md)
+
+Other comments:
+
+TODO add information
 
 <a name="flashdebug"></a>
 
@@ -135,10 +151,19 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
 <a name="testing-the-example"></a>
 
 ## Testing the example
-### Testing the all-clusters application without Matter CLI (default)
 
-1. Prepare the board with the flashed `All-cluster application` (as shown above). 
-2. The All-clusters example uses UART (FlexComm3) to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+To know how to commision a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
+
+[readme_ble_commissioning_section]:../../../../chip-tool/README.md#commission-a-device-over-ble
+
+To know how to commissioning a device over IP, follow the instructions from [chip-tool's README.md 'Pair a device over IP'][readme_pair_ip_commissioning_section]
+
+[readme_pair_ip_commissioning_section]: ../../../../chip-tool/README.md#pair-a-device-over-ip
+
+### Testing the all-clusters application without Matter CLI:
+
+1. Prepare the board with the flashed `All-cluster application` (as shown above).
+2. The All-cluster example uses UART1 (FlexComm3) to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -150,9 +175,27 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
 
 4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
 
-### Testing the all-clusters application with Matter CLI enabled
+### Testing the all-clusters application with Matter CLI enabled:
+
+The Matter CLI can be enabled with the all-clusters application.
+
+For more information about the Matter CLI default commands, you can refer to the dedicated [ReadMe](../../../../shell/README.md).
+
+The All-clusters application supports additional commands :
+```
+> help
+[...]
+mattercommissioning     Open/close the commissioning window. Usage : mattercommissioning [on|off]
+matterfactoryreset      Perform a factory reset on the device
+matterreset             Reset the device
+```
+- ```matterfactoryreset``` command erases the file system completely (all Matter settings are erased).
+- ```matterreset``` enables the device to reboot without erasing the settings.
+
+Here are described steps to use the all-cluster-app with the Matter CLI enabled
+
 1. Prepare the board with the flashed `All-cluster application` (as shown above).
-2. The matter CLI is accessible in UART1 (FlexComm3). For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+2. The matter CLI is accessible in UART1. For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -169,20 +212,3 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
    - No flow control
 
 4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
-
-### Matter Shell
-
-The Matter CLI can be enabled with the all-clusters application.
-
-For more information about the Matter CLI default commands, you can refer to the dedicated [ReadMe](../../../../shell/README.md).
-
-The All-clusters application supports additional commands :
-```
-> help
-[...]
-mattercommissioning     Open/close the commissioning window. Usage : mattercommissioning [on|off]
-matterfactoryreset      Perform a factory reset on the device
-matterreset             Reset the device
-```
-- ```matterfactoryreset``` command erases the file system completely (all Matter settings are erased).
-- ```matterreset``` enables the device to reboot without erasing the settings.

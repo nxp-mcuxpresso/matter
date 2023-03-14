@@ -12,30 +12,14 @@
 ### Pre-build instructions
 First instructions from [README.md 'Building section'][readme_building_section] should be followed.
 
-Make sure to update ot-nxp submodules if not already done:
-
-```
-user@ubuntu: cd ~/Desktop/git/connectedhomeip/third_party/openthread/ot-nxp
-user@ubuntu: git submodule update
-```
-
 [readme_building_section]: README.md#building
 
 ### Build instructions
 
-Note : Building with SDK package and SDK internal are both supported, for this replace ```is_<sdk_type>``` with ```is_sdk_package``` if building with SDK package, or with ```is_sdk_internal``` if internal SDK is used instead.
-
--   Build the Openthread configuration with BLE commissioning. The argument ```is_debug=true optimize_debug=false``` could be used to build the application in debug mode. To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` could be added.
+-   Build the Openthread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_<sdk_type>=true" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
-```
-
--   Build the Openthread configuration (without BLE, matter-cli enabled to join an existing thread network, **not the standard way, only for test purpose**) - argument is_debug=true optimize_debug=false could be used to build the application in debug mode.
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_enable_matter_cli=true chip_config_network_layer_ble=false is_<sdk_type>=true" out/debug 
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
@@ -48,7 +32,7 @@ To know how to flash and debug follow instructions from [README.md 'Flashing and
 
 [readme_flash_debug_section]:README.md#flashdebug
 
-## Raspberrypi Test harness setup
+## Raspberrypi Border Router setup
 
 Instructions to start an openthread border router should be followed. In this section a mechanism to start the BR, without accessing the web interface, is described.
 
@@ -75,77 +59,27 @@ sudo docker exec -it <container_id> sh -c "sudo ot-ctl dataset active -x"
 ```
 
 
-## Testing the all custer app example (with BLE commissioning support)
-1. Prepare the board with the flashed `All-clusters application` supporting Openthread and BLE.
-2. The All-cluster example uses UART (FlexComm3) to print logs while runing the server. To view logs, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+## Testing the all cluster app example (with BLE commissioning support) - default configuration
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
+The pairing "ble-thread" feature must be used and instructions from [README.md 'Testing the example'][readme_test_example_section] should be followed.
 
-3. Once flashed, BLE advertising will be started automatically.
+[readme_test_example_section]:README.md#testing-the-example
 
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "ble-thread" feature should be used and is described [here](../../../../../examples/chip-tool/README.md#Using-the-Client-to-commission-a-device).
+## Testing the all cluster app example (without BLE commissioning support) - only for testing purpose
 
-## Testing the all custers app example (without BLE commissioning support) - only for testing purpose
-1. Prepare the board with the flashed `All-clusters application` supporting Openthread only.
-2. The matter CLI is accessible in UART1 (FlexComm3). For that, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+For such test, having the Matter CLI is mandatory, instructions from [README.md 'Testing the all-clusters application with Matter CLI enabled'][readme_test_with_matter_cli_section] should be followed.
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-2. The All-cluster example uses UART2 (FlexComm0) to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector HD2 pin 03), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+[readme_test_with_matter_cli_section]:README.md#testing-the-all-clusters-application-with-matter-cli-enabled
 
-   - Baud rate: 115200
-   - 8 data bits
-   - 1 stop bit
-   - No parity
-   - No flow control
-
-3. On the matter CLI enter the below commands:
+Then using the Matter CLI below commands to join an existing thread network should be enterred, networkey and panid should be changed depending on thread network configurations:
 
 ```
-otcli networkkey 00112233445566778899aabbccddeeaa
-otcli panid 0x1222
+otcli networkkey 00112233445566778899aabbccddeeff
+otcli panid 0x1234
 otcli channel 17
-otcli dataset commit active
+otcli commit active
 otcli ifconfig up
 otcli thread start
 ```
 
-4. On the BR, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands). The pairing "onnetwork" feature should be used as the pairing/commissioning over BLE is not supported in this version.
-
-### Chip-tool commands shortcut
-- Matter-over-Thread commissioning with BLE :
-```
-user@ubuntu:~/apps$ ./chip-tool pairing ble-thread ${NODE_ID_TO_ASSIGN} hex:<active_dataset> 20202021 3840
-```
-- Matter-over-Thread commissioning onnetwork (for testing purpose only) :
-```
-user@ubuntu:~/apps$ ./chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
-```
-## Matter Commissioning recommendations
-
-Before starting a commissioning stage it is recommended to run the following commands on the Border Router and to remove files located in /tmp/chip_*: 
-
-1. Get the "CONTAINER ID"
-```
-sudo docker container ls
-```
-2. Disable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server disable"
-```
-3. Enable SRP server
-```
-sudo docker exec -it <container_id> sh -c "sudo ot-ctl srp server enable"
-```
-
-
-### Known issues/limitations
-
-- If the Matter commissioning failed for some reasons, it is recommended to always either reflash the RW610 with a new `All-clusters application` binary, or use the ```matterfactoryreset``` command if the shell is enabled, before starting a new commissioning. This would allow to erase all previously saved settings.
+Note: The pairing "onnetwork" feature should be used as the pairing/commissioning method.
