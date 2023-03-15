@@ -153,9 +153,9 @@ template("rw610_sdk_drivers") {
         "${rt_core_sdk_root}/components/flash/mflash/rdrw612bga",
         # loader files
         "${rt_core_sdk_root}/components/conn_fwloader/include",
-        #power manager 
+        #power manager
         "${rt_core_sdk_root}/components/power_manager/core",
-        "${rt_core_sdk_root}/components/power_manager/boards/rdrw612bga",
+        "${rt_core_sdk_root}/components/power_manager/devices/RW612",
         #flash config
         "${rt_core_sdk_root}/boards/rdrw612bga/flash_config",
         # freertos
