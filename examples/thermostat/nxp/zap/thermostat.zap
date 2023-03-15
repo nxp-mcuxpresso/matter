@@ -12583,6 +12583,22 @@
               "reportableChange": 0
             },
             {
+              "name": "HVACSystemTypeConfiguration",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap8",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "OccupiedCoolingSetpoint",
               "code": 17,
               "mfgCode": null,
