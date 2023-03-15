@@ -209,7 +209,11 @@ CHIP_ERROR AppTask::Init()
     PRINTF("\r\nProduct ID: %u (0x%x)\r\n", productId, productId);
      
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork));
+#if CONFIG_NETWORK_LAYER_BLE
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     err = ClusterMgr().Init();
     if (err != CHIP_NO_ERROR)
