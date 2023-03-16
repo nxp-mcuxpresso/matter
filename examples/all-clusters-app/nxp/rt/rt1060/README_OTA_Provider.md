@@ -25,7 +25,7 @@ The concept for OTA is the next one:
 Build OTA image and add it the All Clusters App:
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/$ ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 path/to/lighting-app/binary/chip-k32w0x-light-example.bin ota-fw-placeholder.bin
+user@ubuntu:~/Desktop/git/connectedhomeip/$ ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-light-example.bin ota-fw-placeholder.bin
 user@ubuntu:~/Desktop/git/connectedhomeip/$ xxd -i ota-fw-placeholder.bin > ota-fw-placeholder.bin.h
 user@ubuntu:~/Desktop/git/connectedhomeip/$ sed -i 's/unsigned/const unsigned/g' ota-fw-placeholder.bin.h
 user@ubuntu:~/Desktop/git/connectedhomeip/$ mv ota-fw-placeholder.bin.h ./examples/all-clusters-app/nxp/rt/rt1060/ota_provider/include
