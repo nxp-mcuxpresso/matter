@@ -570,7 +570,7 @@ user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examp
 Build OTA image:
 
 In order to build an OTA image, use NXP's wrapper over the standard tool `src/app/ota_image_tool.py`:
-* `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`.
+* `scripts/tools/nxp/ota/ota_image_tool.py`.
 The tool can be used to generate an OTA image with the following format:
     ```
     | OTA image header | TLV1 | TLV2 | ... | TLVn |
