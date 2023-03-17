@@ -228,8 +228,11 @@ streamer_t * streamer_get(void)
 extern TaskHandle_t AppMatterCliTaskHandle;
 static void Uart_RxCallBack(void *pData, serial_manager_callback_message_t *message, serial_manager_status_t status)
 {
-    /* notify the main loop that a RX buffer is available */
-    xTaskNotifyGive(AppMatterCliTaskHandle);
+    if (AppMatterCliTaskHandle != NULL)
+    {
+        /* notify the main loop that a RX buffer is available */
+        xTaskNotifyGive(AppMatterCliTaskHandle);
+    }
 }
 
 static void Uart_TxCallBack(void *pBuffer, serial_manager_callback_message_t *message, serial_manager_status_t status)
