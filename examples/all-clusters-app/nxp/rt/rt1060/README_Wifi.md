@@ -64,7 +64,7 @@ Transceiver part :
 - 1 8801 2DS M.2 Module (rev A)
 - 1 Murata uSD-M.2 Adapter (rev B1)
 
-The 8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and inserted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to position 1-2 (towards the center of the Adapter).
+The 8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and inserted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD connector).
 
 Note: as the 8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory to connect it to a Wi-Fi access point on the 2.4 GHz band.
 
