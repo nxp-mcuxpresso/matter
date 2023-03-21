@@ -115,6 +115,8 @@ protected:
      */
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 
+    void ClearInternal();
+
     bool IsError(CHIP_ERROR & status);
 
     uint32_t mLength = 0;

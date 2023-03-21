@@ -97,6 +97,11 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
+    /**
+     * Call AbortAction for all processors that were used
+     */
+    void AbortAllProcessors();
+
     MutableByteSpan      mBlock;
     OTADownloader *      mDownloader;
     OTAImageHeaderParser mHeaderParser;
