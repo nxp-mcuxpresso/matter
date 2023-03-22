@@ -204,9 +204,7 @@ exit:
 
         if (callback != nullptr)
         {
-            PlatformMgr().LockChipStack();
             callback->OnResult(networkingStatus, CharSpan(), 0);
-            PlatformMgr().UnlockChipStack();
         }
     }
 }
