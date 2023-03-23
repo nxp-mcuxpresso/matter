@@ -18,6 +18,13 @@
  */
 #include "AppTask.h"
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/attribute-table.h>
+#include <app/clusters/bindings/BindingManager.h>
+#include <platform/nxp/mw320/ConnectivityUtils.h>
+
+
 /* platform specific */
 #include "board.h"
 #include "clock_config.h"
@@ -40,6 +47,13 @@ extern "C" {
 }
 #include "fsl_aes.h"
 #include "lpm.h"
+#include "mw320_ota.h"
+#include "mw320-binding-handler.h"
+
+
+#define SSID_FNAME "ssid_fname"
+#define PSK_FNAME "psk_fname"
+#define DEV_OP_STATE_FNAME "ops_fname"
 
 #define RUN_RST_LT_DELAY 10
 #define APP_AES AES
@@ -48,9 +62,9 @@ extern "C" {
 volatile int g_ButtonPress = 0;
 bool need2sync_sw_attr     = false;
 
-//using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::DeviceLayer;
 
 static SemaphoreHandle_t aesLock;
 static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState);
@@ -70,6 +84,7 @@ static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState)
     // PRINTF("%s(), Turn off lights \r\n", __FUNCTION__);
     led_on_off(led_amber, false);
     led_on_off(led_yellow, false);
+    ::mw320_dev_reset(1000);
     return;
 }
 
@@ -103,17 +118,6 @@ static status_t APP_AES_Lock(void)
 static void APP_AES_Unlock(void)
 {
     xSemaphoreGiveRecursive(aesLock);
-}
-
-
-AppTask AppTask::sAppTask;
-
-
-CHIP_ERROR AppTask::Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    return err;
 }
 
 void led_on_off(led_id_t lt_id, bool is_on)
@@ -289,7 +293,6 @@ int init_mw320_sdk(int (*wlan_event_callback)(enum wlan_event_reason reason, voi
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
         wlan_init((const uint8_t *) (wififw + 2U), *(wififw + 1U));
-        // PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
         // demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
@@ -423,3 +426,233 @@ void board_init(void)
 	return;
 }
 
+AppTask AppTask::sAppTask;
+op_state_t AppTask::ReadOpState(void)
+{
+    op_state_t op_state = frst_state;
+    int ret;
+    unsigned char ops_buf[1];
+    uint32_t len=1;
+
+    ret = get_saved_wifi_network((char *) DEV_OP_STATE_FNAME, ops_buf, &len);
+    if (ret != WM_SUCCESS) {
+        // Can't get the device commission state => It's right after doing factory_reset
+        return frst_state;
+    }
+    op_state = (op_state_t)ops_buf[0];
+    return op_state;
+}
+
+void AppTask::WriteOpState(op_state_t opstat)
+{
+    int ret;
+
+    ret = save_wifi_network((char *)DEV_OP_STATE_FNAME, (uint8_t *)&opstat, sizeof(uint8_t));
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: save comm_state to flash failed\r\n");
+    }
+
+    return;
+}
+
+void AppTask::SetOpState(op_state_t opstat)
+{
+    OpState = opstat;
+    WriteOpState(opstat);
+    return;
+};
+
+CHIP_ERROR AppTask::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Get the device commission state
+    OpState = ReadOpState();
+    switch (OpState) {
+        case frst_state:
+            // start uap at initialization if it's not commissioned or uap_commissioned
+            UapInit();
+            UapOnoff(true);
+            break;
+        case work_state:
+        default:
+            char ssid[IEEEtypes_SSID_SIZE + 1];
+            char psk[WLAN_PSK_MAX_LENGTH];
+            LoadNetwork(ssid, psk);
+
+            assert(strlen(ssid) > 0);
+            assert(strlen(psk) > 0);
+            PRINTF("Connecting to [%s, %s] \r\n", ssid, psk);
+            chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(ssid, psk);
+            break;
+    }
+    return err;
+}
+
+
+void AppTask::AppTaskMain(void *pvParameter)
+{
+    CHIP_ERROR err = sAppTask.Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        PRINTF("AppTask.Init() failed\r\n");
+        return;
+    }
+    while (true)
+    {
+        /* wait for interface up */
+        os_thread_sleep(os_msec_to_ticks(500));
+        /*PRINTF("[%s]: looping\r\n", __FUNCTION__);*/
+        if (need2sync_sw_attr == true)
+        {
+            static bool is_on = false;
+            uint16_t value    = g_ButtonPress & 0x1;
+            is_on             = !is_on;
+            value             = (uint16_t) is_on;
+            // sync-up the switch attribute:
+            PRINTF("--> update Switch::Attributes::CurrentPosition::Id [%d], BndNotifyDone: %u \r\n", value, bnd_notify_done);
+            emAfWriteAttribute(1, Switch::Id, Switch::Attributes::CurrentPosition::Id, (uint8_t *) &value, sizeof(value), true,
+                               false);
+#ifdef SUPPORT_MANUAL_CTRL
+            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
+            PRINTF("--> update [OnOff::Id]: OnOff::Attributes::OnOff::Id [%d] \r\n", value);
+            emAfWriteAttribute(1, OnOff::Id, OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value), true, false);
+#endif // SUPPORT_MANUAL_CTRL
+            // Trigger to send on/off/toggle command to the bound devices
+            if ((BindingTable::GetInstance().Size()>0) && (bnd_notify_done == true)) {
+                bnd_notify_done = false;
+                chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
+            } else {
+                PRINTF("Last command is executing, skip the new ones\r\n");
+            }
+            need2sync_sw_attr = false;
+        }
+        // =============================
+        // Call sw2_handle to clear click_count if needed
+        sw2_handle(false);
+    }
+
+    return;
+}
+
+// uAP functions
+#define WIFI_AP_SSID	"mw320_uap"
+#define WIFI_AP_IP_ADDR  "192.168.1.1"
+#define WIFI_AP_NET_MASK "255.255.0.0" /* IP address configuration. */
+#define WIFI_PASSWORD "nxp12345"
+#define WIFI_AP_CHANNEL 1
+static const char def_uap_ssid[]={WIFI_AP_SSID};
+static const char def_uap_ip[]={WIFI_AP_IP_ADDR};
+static const char def_uap_pwd[]={WIFI_PASSWORD};
+
+// Initialize uap
+int AppTask::UapInit(void)
+{
+    int ret;
+    unsigned int uap_ip = ipaddr_addr(def_uap_ip);
+    uint8_t ssid_len = 0;
+    uint8_t psk_len  = 0;
+    wlan_initialize_uap_network(&uap_network);
+    /* Set IP address to WIFI_AP_IP_ADDR */
+    uap_network.ip.ipv4.address = uap_ip;
+    /* Set default gateway to WIFI_AP_IP_ADDR */
+    uap_network.ip.ipv4.gw = uap_ip;
+    /* Set SSID as passed by the user */
+    ssid_len = (strlen(def_uap_ssid) <= IEEEtypes_SSID_SIZE) ? strlen(def_uap_ssid) : IEEEtypes_SSID_SIZE;
+    memcpy(uap_network.ssid, def_uap_ssid, ssid_len);
+    uap_network.channel = WIFI_AP_CHANNEL;
+    uap_network.security.type = WLAN_SECURITY_WPA2;
+    /* Set the passphrase. Max WPA2 passphrase can be upto 64 ASCII chars */
+    psk_len = (strlen(def_uap_pwd) <= (WLAN_PSK_MAX_LENGTH - 1)) ? strlen(def_uap_pwd) : (WLAN_PSK_MAX_LENGTH - 1);
+    strncpy(uap_network.security.psk, def_uap_pwd, psk_len);
+    uap_network.security.psk_len = psk_len;
+    ret = wlan_add_network(&uap_network);
+    if (ret != WM_SUCCESS) {
+        PRINTF("Initialize uAP failed \r\n");
+        return WM_FAIL;
+    }
+    PRINTF("Intialize uAP successfully \r\n");
+    return WM_SUCCESS;
+}
+
+/*
+    Turn on/off uAP
+*/
+void AppTask::UapOnoff(bool do_on)
+{
+    int ret;
+    if (do_on == true) {    // Turn on uAP
+        PRINTF("Turning on uAP \r\n");
+        ret = wlan_start_network(uap_network.name);
+        if (ret != WM_SUCCESS) {
+            PRINTF("Failed to turn on uAP (%d)\r\n", ret);
+        } else {
+            PRINTF("start uAP sucessfully \r\n");
+        }
+    } else {    // Turn off uAP
+        PRINTF("Turning off uAP \r\n");
+        if (is_uap_started()) {
+            wlan_get_current_uap_network(&uap_network);
+            ret = wlan_stop_network(uap_network.name);
+            if (ret != WM_SUCCESS)
+                PRINTF("Error: unable to stop network\r\n");
+            else
+                PRINTF("stop uAP, SSID = [%s]\r\n", uap_network.ssid);
+        }
+    }
+    return;
+}
+
+void AppTask::LoadNetwork(char * ssid, char * pwd)
+{
+    int ret;
+    unsigned char ssid_buf[IEEEtypes_SSID_SIZE + 1];
+    unsigned char psk_buf[WLAN_PSK_MAX_LENGTH];
+    uint32_t len;
+
+    len = IEEEtypes_SSID_SIZE + 1;
+    ret = get_saved_wifi_network((char *) SSID_FNAME, ssid_buf, &len);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: Read saved SSID\r\n");
+        strcpy(ssid, "");
+    }
+    else
+    {
+        PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
+        strcpy(ssid, (const char *) ssid_buf);
+    }
+
+    len = WLAN_PSK_MAX_LENGTH;
+    ret = get_saved_wifi_network((char *) PSK_FNAME, psk_buf, &len);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: Read saved PSK\r\n");
+        strcpy(pwd, "");
+    }
+    else
+    {
+        PRINTF("saved_psk: [%s]\r\n", psk_buf);
+        strcpy(pwd, (const char *) psk_buf);
+    }
+}
+
+void AppTask::SaveNetwork(char * ssid, char * pwd)
+{
+    int ret;
+
+    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write ssid to flash failed\r\n");
+    }
+
+    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write psk to flash failed\r\n");
+    }
+
+    return;
+}

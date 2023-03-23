@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -38,13 +37,18 @@ using namespace ::chip::app::Clusters;
 */
 static void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
+#ifdef LT_SW_COMBO_DEMO
+    // Enable the restriction only in light-switch-combo demo
     VerifyOrExit(endpointId == 2, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+#endif // SW_LT_COMBO_DEMO
 
     // At this point we can assume that value points to a bool value.
     led_on_off(led_yellow, (*value != 0) ? true : false);
-
+    // Sync Global_Scene_Control attribute for TC-OO-2.3
+    emAfWriteAttribute(endpointId, OnOff::Id, OnOff::Attributes::GlobalSceneControl::Id, (uint8_t *) value,
+                           sizeof(uint8_t), true, false);
 exit:
     return;
 }
@@ -57,7 +61,7 @@ static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId a
     //  auto * pimEngine = chip::app::InteractionModelEngine::GetInstance();
     //  bool do_sendrpt = false;
 
-    VerifyOrExit(attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == Switch::Attributes::CurrentPosition::Id,
                  ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
     // Send the switch status report now
 /*
@@ -99,7 +103,7 @@ void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
     if (pidt->identifyTimerCount)
     {
         pidt->identifyTimerCount--;
-        emAfWriteAttribute(pidt->ep, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
+        emAfWriteAttribute(pidt->ep, Identify::Id, Identify::Attributes::IdentifyTime::Id, (uint8_t *) &pidt->identifyTimerCount,
                            sizeof(identifyTimerCount), true, false);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
     }
@@ -107,7 +111,7 @@ void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 
 static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == Identify::Attributes::IdentifyTime::Id,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
     VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
                  ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));
@@ -131,16 +135,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     switch (path.mClusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case OnOff::Id:
         OnOnOffPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
-    case ZCL_SWITCH_CLUSTER_ID:
+    case Switch::Id:
         OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices => Do it while get button click
         // chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
         break;
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case Identify::Id:
         OnIdentifyPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
     default:

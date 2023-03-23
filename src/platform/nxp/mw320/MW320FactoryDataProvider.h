@@ -30,19 +30,42 @@ namespace DeviceLayer {
  *        and Device Instance Info.
  */
 
-class FactoryDataProvider : public CommissionableDataProvider,
-                            public Credentials::DeviceAttestationCredentialsProvider
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
-    ,
+class MW320FactoryDataProvider : public CommissionableDataProvider,
+                            public Credentials::DeviceAttestationCredentialsProvider,
                             public DeviceInstanceInfoProvider
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 {
 public:
-    static FactoryDataProvider & GetDefaultInstance();
+    // Default factory data IDs
+    enum FactoryDataId
+    {
+        kVerifierId = 1,
+        kSaltId,
+        kIcId,
+        kDacPrivateKeyId,
+        kDacCertificateId,
+        kPaiCertificateId,
+        kDiscriminatorId,
+        kSetupPasscodeId,
+        kVidId,
+        kPidId,
+        kCertDeclarationId,
+        kVendorNameId,
+        kProductNameId,
+        kSerialNumberId,
+        kManufacturingDateId,
+        kHardwareVersionId,
+        kHardwareVersionStrId,
+        kUniqueId,
+        kMaxId
+    };
+    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
 
-    FactoryDataProvider() {}
+    static MW320FactoryDataProvider & GetDefaultInstance();
+
+    MW320FactoryDataProvider();
 
     CHIP_ERROR Init();
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length);
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -60,7 +83,6 @@ public:
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     // ===== Members functions that implement the GenericDeviceInstanceInfoProvider
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
@@ -75,7 +97,9 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
 
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+
+protected:
+    uint16_t maxLengths[kNumberOfIds];
 };
 
 } // namespace DeviceLayer

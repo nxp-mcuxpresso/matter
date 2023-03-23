@@ -30,8 +30,10 @@
 extern "C" {
 #include "wlan.h"
 #include "network_flash_storage.h"
+void test_wlan_scan(int argc, char ** argv);
 }
 #include "AppTask.h"
+#include "mw320_ota.h"
 
 using chip::FormatCHIPError;
 using chip::Shell::Engine;
@@ -154,7 +156,6 @@ exit:
 } // namespace
 
 extern const char * mw320_get_verstr(void);
-extern void save_network(char * ssid, char * pwd);
 namespace chip {
 namespace Shell {
 
@@ -165,6 +166,10 @@ static CHIP_ERROR ShutdownHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Shutdown and Goodbye\r\n");
     chip::Server::GetInstance().DispatchShutDownAndStopEventLoop();
+    // TODO: This is assuming that we did (on a different thread from this one)
+    // RunEventLoop(), not StartEventLoopTask().  It will not work correctly
+    // with StartEventLoopTask().
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     AtExitShell();
     exit(0);
     return CHIP_NO_ERROR;
@@ -178,8 +183,7 @@ static void AtExitShell(void)
 
 static CHIP_ERROR VersionHandler(int argc, char ** argv)
 {
-    // streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
-    streamer_printf(streamer_get(), "CHIP %s\r\n", mw320_get_verstr());
+    streamer_printf(streamer_get(), "mw320 firmware: %s\r\n", mw320_get_verstr());
     return CHIP_NO_ERROR;
 }
 
@@ -197,12 +201,12 @@ static CHIP_ERROR SetDefAPHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
     PRINTF("[%s], [%s] \r\n", argv[0], argv[1]);
-    save_network(argv[0], argv[1]);
+    GetAppTask().SaveNetwork(argv[0], argv[1]);
 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR wlan_state_handler(int argc, char ** argv)
+static CHIP_ERROR WlanStateHandler(int argc, char ** argv)
 {
     enum wlan_connection_state state;
     int result;
@@ -236,7 +240,7 @@ static CHIP_ERROR wlan_state_handler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR wlan_abort_handler(int argc, char ** argv)
+static CHIP_ERROR WlanAbortHandler(int argc, char ** argv)
 {
 #ifdef WIFI_CONN_ABORT_SUPPORT
     wlan_abort_connect();
@@ -244,7 +248,7 @@ static CHIP_ERROR wlan_abort_handler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR wlan_conn_handler(int argc, char ** argv)
+static CHIP_ERROR WlanConnHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
     PRINTF("[%s], [%s] \r\n", argv[0], argv[1]);
@@ -253,9 +257,55 @@ static CHIP_ERROR wlan_conn_handler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR factory_rst_handler(int argc, char **argv)
+static CHIP_ERROR WlanScanHandler(int argc, char ** argv)
 {
+    test_wlan_scan(0, NULL);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR FactoryRstHandler(int argc, char **argv)
+{
+    // Eraseing the saved parameters
     ::erase_all_params();
+    // Do factory reset from Matter Stack
+    chip::Server::GetInstance().ScheduleFactoryReset();
+    if (argc == 1) {
+        if (!strcmp(argv[0], "1")) {
+            char defap_ssid[] = {"nxp_matter"};
+            char defap_pwd[] = {"nxp12345"};
+            // Set default AP (ssid, pwd)=(nxp_matter, nxp12345)
+            GetAppTask().SaveNetwork(defap_ssid, defap_pwd);
+            // Set op_state to working
+            GetAppTask().SetOpState(work_state);
+        }
+    }
+    // Reboot the device
+    ::mw320_dev_reset(1000);
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR SetOpStatHandler(int argc, char ** argv)
+{
+    op_state_t opstat;
+    VerifyOrReturnError(argc == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    opstat = (op_state_t)atoi(argv[0]);
+    VerifyOrReturnError(opstat < max_op_state, CHIP_ERROR_INVALID_ARGUMENT);
+    PRINTF("Operation State: %d\r\n", (int)opstat);
+    GetAppTask().SetOpState(opstat);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR GetOpStatHandler(int argc, char ** argv)
+{
+    op_state_t opstat = GetAppTask().GetOpState();
+    PRINTF("Current operation state: %d \r\n", (int)opstat);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR CmdRebootHandler(int argc, char ** argv)
+{
+    ::mw320_dev_reset(1000);
     return CHIP_NO_ERROR;
 }
 
@@ -267,10 +317,14 @@ static void RegisterMetaCommands(void)
         { &VersionHandler, "version", "Output the software version" },
         { &SetPinCodeHandler, "pincode", "Set the pin code" },
         { &SetDefAPHandler, "set-defap", "Set default AP SSID/PWD" },
-        { &wlan_state_handler, "wlan-stat", "Check the wifi status" },
-        { &wlan_abort_handler, "wlan-abort", "Abort the scan/reconnect" },
-	{ &wlan_conn_handler, "wlan-connect", "Connect to AP" },
-	{ &factory_rst_handler, "factory-reset", "Do factory reset"},
+        { &WlanStateHandler, "wlan-stat", "Check the wifi status" },
+        { &WlanAbortHandler, "wlan-abort", "Abort the scan/reconnect" },
+        { &WlanConnHandler, "wlan-connect", "Connect to AP" },
+        { &WlanScanHandler, "wlan-scan", "Scan the environment"},
+        { &FactoryRstHandler, "factory-reset", "Do factory reset"},
+        { &SetOpStatHandler, "set-opstate", "Set the Operation State [0:factory_rest|1:work]"},
+        { &GetOpStatHandler, "get-opstate", "Get the Operation State [0:factory_rest|1:work]"},
+        { &CmdRebootHandler, "reboot", "Reboot the device"},
     };
 
     std::atexit(AtExitShell);

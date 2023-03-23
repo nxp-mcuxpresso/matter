@@ -27,21 +27,45 @@ extern "C" {
 #include "wlan.h"
 }
 
+// Device operation state
+typedef enum
+{
+    frst_state=0,		// Factory Reset State, both uap & sta interfaces are on
+    work_state,		// working state, UUT can connect to AP & uap is not needed anymore
+    max_op_state,		// Max OpState
+} op_state_t;
+
 class AppTask
 {
 public:
-//    CHIP_ERROR StartAppTask();
-//    static void AppTaskMain(void * pvParameter);
+    static void AppTaskMain(void * pvParameter);
+    op_state_t GetOpState(void);
+    void SetOpState(op_state_t op_state);
+    void SaveNetwork(char * ssid, char * pwd);
+    void UapOnoff(bool do_on);
+
+	struct wlan_network uap_network;
 private:
     friend AppTask & GetAppTask(void);
-
     CHIP_ERROR Init();
+    // Device operation state functions
+    op_state_t ReadOpState(void);
+    void WriteOpState(op_state_t opstat);
+    int UapInit(void);
+    void LoadNetwork(char * ssid, char * pwd);
+
     static AppTask sAppTask;
+    op_state_t	OpState;	// Device operation state
 };
 
 inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
+}
+
+inline op_state_t AppTask::GetOpState(void)
+{
+	return OpState;
 }
 
 typedef enum

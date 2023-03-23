@@ -66,8 +66,8 @@ static_library("mw320") {
 
   if (chip_with_factory_data == 1) {
     sources += [
-      "FactoryDataProvider.cpp",
-      "FactoryDataProvider.h",
+      "MW320FactoryDataProvider.cpp",
+      "MW320FactoryDataProvider.h",
     ]
   }
 

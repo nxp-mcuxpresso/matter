@@ -22,9 +22,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-//#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -38,10 +37,9 @@
 #include <setup_payload/SetupPayload.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <ChipShellCollection.h>
-#include <platform/nxp/mw320/ConnectivityUtils.h>
 
 #if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
-#include "FactoryDataProvider.h"
+#include "MW320FactoryDataProvider.h"
 #else
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -78,14 +76,11 @@ using namespace chip::DeviceLayer;
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define SSID_FNAME "ssid_fname"
-#define PSK_FNAME "psk_fname"
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 static struct wlan_network sta_network;
-static struct wlan_network uap_network;
 
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
@@ -107,7 +102,6 @@ static bool is_connected = false;
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void load_network(char * ssid, char * pwd);
 static int wlan_event_callback(enum wlan_event_reason reason, void * data);
 static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState);
 static void run_dnssrv(System::Layer * aSystemLayer, void * aAppState);
@@ -128,7 +122,6 @@ OTAImageProcessorImpl gImageProcessor;
 // static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
 static void InitOTARequestor(void);
 const char * mw320_get_verstr(void);
-void save_network(char * ssid, char * pwd);
 
 static void InitOTARequestor(void)
 {
@@ -191,89 +184,7 @@ static struct cli_command mcuPower[] = {
 /*******************************************************************************
  * Code
  ******************************************************************************/
-static void load_network(char * ssid, char * pwd)
-{
-    int ret;
-    unsigned char ssid_buf[IEEEtypes_SSID_SIZE + 1];
-    unsigned char psk_buf[WLAN_PSK_MAX_LENGTH];
-    uint32_t len;
-
-    len = IEEEtypes_SSID_SIZE + 1;
-    ret = get_saved_wifi_network((char *) SSID_FNAME, ssid_buf, &len);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: Read saved SSID\r\n");
-        strcpy(ssid, "");
-    }
-    else
-    {
-        PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
-        strcpy(ssid, (const char *) ssid_buf);
-    }
-
-    len = WLAN_PSK_MAX_LENGTH;
-    ret = get_saved_wifi_network((char *) PSK_FNAME, psk_buf, &len);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: Read saved PSK\r\n");
-        strcpy(pwd, "");
-    }
-    else
-    {
-        PRINTF("saved_psk: [%s]\r\n", psk_buf);
-        strcpy(pwd, (const char *) psk_buf);
-    }
-}
-
 /*
-static void saveProfile(int argc, char **argv)
-{
-    int ret;
-    struct wlan_network network;
-
-    if (argc < 2)
-    {
-        PRINTF("Usage: %s <profile_name>\r\n", argv[0]);
-        PRINTF("Error: specify network to save\r\n");
-        return;
-    }
-
-    ret = wlan_get_network_byname(argv[1], &network);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: network not found\r\n");
-    }
-    else
-    {
-        ret = save_wifi_network((char *)CONNECTION_INFO_FILENAME, (uint8_t *)&network, sizeof(network));
-        if (ret != WM_SUCCESS)
-        {
-            PRINTF("Error: write network to flash failed\r\n");
-        }
-    }
-}
-
-static void loadProfile(int argc, char **argv)
-{
-    int ret;
-    struct wlan_network network;
-    uint32_t len = sizeof(network);
-
-    ret = get_saved_wifi_network((char *)CONNECTION_INFO_FILENAME, (uint8_t *)&network, &len);
-    if (ret != WM_SUCCESS || len != sizeof(network))
-    {
-        PRINTF("Error: No network saved\r\n");
-    }
-    else
-    {
-        ret = wlan_add_network(&network);
-        if (ret != WM_SUCCESS)
-        {
-            PRINTF("Error: network data corrupted or network already added\r\n");
-        }
-    }
-}
-
 static void resetProfile(int argc, char **argv)
 {
     int ret;
@@ -490,7 +401,7 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
 
         PRINTF("Connected to following BSS:\r\n");
         PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
-        save_network(sta_network.ssid, sta_network.security.psk);
+        GetAppTask().SaveNetwork(sta_network.ssid, sta_network.security.psk);
 
 #ifdef CONFIG_IPV6
         {
@@ -510,19 +421,25 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
 #endif
         auth_fail    = 0;
         is_connected = true;
-        run_update_chipsrv(dns_srv);
-
-        if (is_uap_started())
-        {
-            wlan_get_current_uap_network(&uap_network);
-            ret = wlan_stop_network(uap_network.name);
-            /*
-			if (ret != WM_SUCCESS)
-				PRINTF("Error: unable to stop network\r\n");
-			else
-					PRINTF("stop uAP, SSID = [%s]\r\n", uap_network.ssid);
-            */
+        switch (GetAppTask().GetOpState()) {
+            case frst_state:
+                GetAppTask().UapOnoff(false);
+                // Reset the fabric
+                chip::Server::GetInstance().ScheduleFactoryReset();
+                // Save the AP profile
+                GetAppTask().SaveNetwork(sta_network.ssid, sta_network.security.psk);
+                // Save the op_state
+                GetAppTask().SetOpState(work_state);
+                // Reset the device
+                PRINTF("Entering working mode. Reset the device \r\n");
+                ::mw320_dev_reset(1000);
+                break;
+            case work_state:
+            default:
+                // Nothing to do in work_state
+                break;
         }
+        run_update_chipsrv(dns_srv);
         break;
     case WLAN_REASON_CONNECT_FAILED:
         //            PRINTF("app_cb: WLAN: connect failed\r\n");
@@ -549,6 +466,8 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
     case WLAN_REASON_USER_DISCONNECT:
         //            PRINTF("app_cb: disconnected\r\n");
         auth_fail = 0;
+        is_connected = false;
+        run_update_chipsrv(dns_srv);
         break;
     case WLAN_REASON_LINK_LOST:
         is_connected = false;
@@ -560,7 +479,7 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
         break;
     case WLAN_REASON_UAP_SUCCESS:
         //            PRINTF("app_cb: WLAN: UAP Started\r\n");
-        ret = wlan_get_current_uap_network(&uap_network);
+        ret = wlan_get_current_uap_network(&GetAppTask().uap_network);
 
         if (ret != WM_SUCCESS)
         {
@@ -575,6 +494,8 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
         break;
     case WLAN_REASON_UAP_CLIENT_ASSOC:
         PRINTF("app_cb: WLAN: UAP a Client Associated\r\n");
+        // Start MDNS after a client is connected to the uap interface so that it can be discovered
+        run_update_chipsrv(dns_srv);
         //            PRINTF("Client => ");
         //            print_mac((const char *)data);
         //            PRINTF("Associated with Soft AP\r\n");
@@ -694,33 +615,10 @@ std::string createSetupPayload()
 
 static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
 {
-    // Init ZCL Data Model and CHIP App Server
-    {
-        // Initialize device attestation config
-#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
-        FactoryDataProvider::GetDefaultInstance().Init();
-#if (CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER == 1)
-        SetDeviceInstanceInfoProvider(&FactoryDataProvider::GetDefaultInstance());
-#endif // USE_LOCAL_DEVICEINSTANCEINFOPROVIDER
-        SetDeviceAttestationCredentialsProvider(&FactoryDataProvider::GetDefaultInstance());
-        SetCommissionableDataProvider(&FactoryDataProvider::GetDefaultInstance());
-#else
-        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif // CONFIG_CHIP_MW320_REAL_FACTORY_DATA
-    }
-    {
-        //    chip::Server::GetInstance().Init();
-        // uint16_t securePort   = CHIP_PORT;
-        // uint16_t unsecurePort = CHIP_UDC_PORT;
-
-        // PRINTF("==> call chip::Server() \r\n");
-        // chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
-
-        static chip::CommonCaseDeviceServerInitParams initParams;
-        (void) initParams.InitializeStaticResourcesBeforeServerInit();
-        chip::Server::GetInstance().Init(initParams);
-        PRINTF("Done to call chip::Server() \r\n");
-    }
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+    PRINTF("Done to call chip::Server() \r\n");
     // ota ++
     {
         InitOTARequestor();
@@ -770,36 +668,7 @@ static void run_update_chipsrv(srv_type_t srv_type)
 
 static void task_test_main(void * param)
 {
-    while (1)
-    {
-        /* wait for interface up */
-        os_thread_sleep(os_msec_to_ticks(500));
-        /*PRINTF("[%s]: looping\r\n", __FUNCTION__);*/
-        if (need2sync_sw_attr == true)
-        {
-            static bool is_on = false;
-            uint16_t value    = g_ButtonPress & 0x1;
-            is_on             = !is_on;
-            value             = (uint16_t) is_on;
-            // sync-up the switch attribute:
-            PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
-                               false);
-#ifdef SUPPORT_MANUAL_CTRL
-            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
-#endif // SUPPORT_MANUAL_CTRL
-            // Trigger to send on/off/toggle command to the bound devices
-            chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
-
-            need2sync_sw_attr = false;
-        }
-        // =============================
-        // Call sw2_handle to clear click_count if needed
-        sw2_handle(false);
-        // =============================
-    }
+    GetAppTask().AppTaskMain(NULL);
     return;
 }
 
@@ -817,12 +686,29 @@ static void ShellCLIMain(void * pvParameter)
     // Initialize the SDK components
     init_mw320_sdk(wlan_event_callback);
 
-    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
+    ChipLogProgress(Shell, "Initializing CHIP shell commands: %d", rc);
 
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
+
+    // Init ZCL Data Model and CHIP App Server
+    {
+        // Initialize device attestation config
+#if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
+        MW320FactoryDataProvider::GetDefaultInstance().Init();
+	SetDeviceInstanceInfoProvider(&MW320FactoryDataProvider::GetDefaultInstance());
+	SetDeviceAttestationCredentialsProvider(&MW320FactoryDataProvider::GetDefaultInstance());
+	SetCommissionableDataProvider(&MW320FactoryDataProvider::GetDefaultInstance());
+#else
+	SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_CHIP_MW320_REAL_FACTORY_DATA
+    }
+
+    ChipLogProgress(NotSpecified, "+++++++++ [Device Config] +++++++++ ");
     ConfigurationMgr().LogDeviceConfig();
+    ChipLogProgress(NotSpecified, "+++++++++ [OnboardingCodes] +++++++++ ");
     PrintOnboardingCodes(chip::RendezvousInformationFlag::kOnNetwork);
+    ChipLogProgress(NotSpecified, "------------------------------------- ");
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
@@ -830,24 +716,16 @@ static void ShellCLIMain(void * pvParameter)
 
     cmd_misc_init();
     // cmd_otcli_init();
-    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
+    ChipLogProgress(Shell, "Run CHIP shell Task: %d", rc);
 
     //    std::string qrCodeText = createSetupPayload();
     //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
+    // Create the task thread to handle the always running tasks
+    if (xTaskCreate(task_test_main, "testmain", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO,
+                        &task_main_task_handler) != pdPASS)
     {
-        char def_ssid[IEEEtypes_SSID_SIZE + 1];
-        char def_psk[WLAN_PSK_MAX_LENGTH];
-        load_network(def_ssid, def_psk);
-
-        if ((strlen(def_ssid) <= 0) || (strlen(def_psk) <= 0))
-        {
-            // No saved connected_ap_info => Using the default ssid/password
-            strcpy(def_ssid, "nxp_matter");
-            strcpy(def_psk, "nxp12345");
-        }
-        PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
-        //ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
-	chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(def_ssid, def_psk);
+        PRINTF("Failed to crete task_test_main() \r\n");
+        return;
     }
 
     // Run CHIP servers
@@ -859,19 +737,11 @@ static void ShellCLIMain(void * pvParameter)
 static int StartShellTask(void)
 {
     int ret = 0;
-
     // Start Shell task.
     if (xTaskCreate(ShellCLIMain, "SHELL", TASK_MAIN_STACK_SIZE, NULL, TASK_MAIN_PRIO, &sShellTaskHandle) != pdPASS)
     {
         ret = -1;
     }
-    if (xTaskCreate(task_test_main, "testmain", TASK_MAIN_STACK_SIZE, task_main_stack, TASK_MAIN_PRIO,
-                    &task_main_task_handler) != pdPASS)
-    {
-        PRINTF("Failed to crete task_test_main() \r\n");
-        ret = -1;
-    }
-
     return ret;
 }
 
@@ -879,26 +749,6 @@ const char * mw320_get_verstr(void)
 {
     return CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING;
 }
-
-void save_network(char * ssid, char * pwd)
-{
-    int ret;
-
-    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: write ssid to flash failed\r\n");
-    }
-
-    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
-    if (ret != WM_SUCCESS)
-    {
-        PRINTF("Error: write psk to flash failed\r\n");
-    }
-
-    return;
-}
-
 
 int main(void)
 {
