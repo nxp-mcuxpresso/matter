@@ -378,6 +378,9 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
             help_command(0, NULL);
 #endif
         break;
+    case WLAN_REASON_AUTH_SUCCESS:
+            PRINTF("app_cb: WLAN: authenticated to network\r\n");
+        break;
     case WLAN_REASON_INITIALIZATION_FAILED:
         // PRINTF("app_cb: WLAN: initialization failed\r\n");
         break;
@@ -407,7 +410,7 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
         {
             int i;
             (void) PRINTF("\r\n\tIPv6 Addresses\r\n");
-            for (i = 0; i < MAX_IPV6_ADDRESSES; i++)
+            for (i = 0; i < CONFIG_MAX_IPV6_ADDRESSES; i++)
             {
                 if (sta_network.ip.ipv6[i].addr_state != IP6_ADDR_INVALID)
                 {

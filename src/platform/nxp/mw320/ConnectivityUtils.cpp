@@ -295,7 +295,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
         return CHIP_NO_ERROR;
     }
 
-    for (i = 0; i < MAX_IPV6_ADDRESSES; i++)
+    for (i = 0; i < CONFIG_MAX_IPV6_ADDRESSES; i++)
     {
         if (sta_network.ip.ipv6[i].addr_state == IP6_ADDR_INVALID)
         {

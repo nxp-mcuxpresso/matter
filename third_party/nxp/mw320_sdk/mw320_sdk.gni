@@ -94,6 +94,10 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip/apps",
       "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common/",
+      "${mw320_sdk_root}/middleware/wifi/wps",
+      "${mw320_sdk_root}/middleware/wifi/incl/port/mbedtls",
+      "${mw320_sdk_root}/middleware/wifi/port/mbedtls",
+      "${mw320_sdk_root}/middleware/mbedtls/include",
     ]
 
     defines = [
@@ -245,7 +249,7 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/wifi/dhcpd/dhcp-server.c",
       "${mw320_sdk_root}/middleware/wifi/dhcpd/dns-server.c",
       "${mw320_sdk_root}/middleware/wifi/nw_utils/iperf.c",
-      "${mw320_sdk_root}/middleware/wifi/nw_utils/ping.c",
+      "${mw320_sdk_root}/middleware/wifi/nw_utils/wifi_ping.c",
       "${mw320_sdk_root}/middleware/wifi/port/lwip/net.c",
       "${mw320_sdk_root}/middleware/wifi/port/lwip/wifi_netif.c",
       "${mw320_sdk_root}/middleware/wifi/port/os/os.c",
@@ -279,6 +283,9 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi-uap.c",
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi.c",
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi_pwrmgr.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi-wps.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/sdio.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/firmware_dnld.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan_basic_cli.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan_tests.c",

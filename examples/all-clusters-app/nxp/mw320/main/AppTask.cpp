@@ -41,7 +41,7 @@ extern "C" {
 #include "mflash_drv.h"
 #include "network_flash_storage.h"
 #include "partition.h"
-#include "ping.h"
+#include "wifi_ping.h"
 #include "wlan.h"
 #include "wm_net.h"
 }
