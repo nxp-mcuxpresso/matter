@@ -24,19 +24,20 @@ import("${mw320_sdk_build_root}/mw320_sdk.gni")
 assert(current_os == "freertos")
 
 examples_plat_dir = "${chip_root}/examples/platform/nxp/mw320"
+src_root_dir = "${chip_root}/examples/all-clusters-app/nxp/mw320"
 
 mw320_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
     "${examples_plat_dir}/app/project_include",
     "${chip_root}/src/app/util",
-    "${chip_root}/examples/light-switch-combo-app/nxp/mw320/include",
-    "${chip_root}/examples/light-switch-combo-app/nxp/mw320/main/include",
+    "${src_root_dir}/include",
+    "${src_root_dir}/main/include",
   ]
 
   sources = [
-    "include/CHIPProjectConfig.h",
-    "include/FreeRTOSConfig.h",
+    "${src_root_dir}/include/CHIPProjectConfig.h",
+    "${src_root_dir}/include/FreeRTOSConfig.h",
   ]
 
   defines = [ "CHIP_CONFIG_MAX_FABRICS=5" ]
@@ -60,21 +61,18 @@ mw320_executable("light_switch_combo_app") {
     "${chip_root}/src/platform/nxp/mw320",
     "${examples_plat_dir}/app/project_include",
     "${chip_root}/src/app/util",
-    "${chip_root}/examples/light-switch-combo-app/nxp/mw320/include",
+    "${src_root_dir}/include",
   ]
 
   sources = [
-
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
-    "include/CHIPProjectConfig.h",
-    "include/FreeRTOSConfig.h",
-
-
-    "main/AppTask.cpp",
-    "main/ZclCallbacks.cpp",
-    "main/include/binding-handler.h",
-    "main/binding-handler.cpp",
-    "main/main.cpp",
+    "${src_root_dir}/include/CHIPProjectConfig.h",
+    "${src_root_dir}/include/FreeRTOSConfig.h",
+    "${src_root_dir}/main/AppTask.cpp",
+    "${src_root_dir}/main/ZclCallbacks.cpp",
+    "${src_root_dir}/main/include/binding-handler.h",
+    "${src_root_dir}/main/binding-handler.cpp",
+    "${src_root_dir}/main/main.cpp",
   ]
 
   public_deps = [
@@ -101,6 +99,11 @@ mw320_executable("light_switch_combo_app") {
   defines = [
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",
+  ]
+
+  # features of this app
+  defines += [
+    "MW320_FEATURE_UAP=0",
   ]
 }
 

@@ -35,6 +35,9 @@ typedef enum
     max_op_state,		// Max OpState
 } op_state_t;
 
+#define DEFAP_SSID		"nxp_matter"
+#define DEFAP_PWD		"nxp12345"
+
 class AppTask
 {
 public:

@@ -490,7 +490,12 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Get the device commission state
+#if (MW320_FEATURE_UAP == 0)
+    // If uap is not enabled => switching to work_state directly
+    SetOpState(work_state);
+#else
     OpState = ReadOpState();
+#endif
     switch (OpState) {
         case frst_state:
             // start uap at initialization if it's not commissioned or uap_commissioned
@@ -502,9 +507,12 @@ CHIP_ERROR AppTask::Init()
             char ssid[IEEEtypes_SSID_SIZE + 1];
             char psk[WLAN_PSK_MAX_LENGTH];
             LoadNetwork(ssid, psk);
-
-            assert(strlen(ssid) > 0);
-            assert(strlen(psk) > 0);
+            if ((strlen(ssid) == 0) || (strlen(psk) > 0)) {
+                // Has moved to the work_state, but AP information is missing or insufficient => Use the default ssid/password
+                SaveNetwork((char*)DEFAP_SSID, (char*)DEFAP_PWD);
+                strcpy(ssid, DEFAP_SSID);
+                strcpy(psk, DEFAP_PWD);
+            }
             PRINTF("Connecting to [%s, %s] \r\n", ssid, psk);
             chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(ssid, psk);
             break;

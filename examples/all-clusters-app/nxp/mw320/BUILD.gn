@@ -95,6 +95,11 @@ mw320_executable("shell_mw320") {
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",
   ]
+
+  # features of this app
+  defines += [
+    "MW320_FEATURE_UAP=1",
+  ]
 }
 
 group("mw320") {

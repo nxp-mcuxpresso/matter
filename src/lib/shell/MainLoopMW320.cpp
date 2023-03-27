@@ -271,10 +271,8 @@ static CHIP_ERROR FactoryRstHandler(int argc, char **argv)
     chip::Server::GetInstance().ScheduleFactoryReset();
     if (argc == 1) {
         if (!strcmp(argv[0], "1")) {
-            char defap_ssid[] = {"nxp_matter"};
-            char defap_pwd[] = {"nxp12345"};
-            // Set default AP (ssid, pwd)=(nxp_matter, nxp12345)
-            GetAppTask().SaveNetwork(defap_ssid, defap_pwd);
+            // Set default AP
+            GetAppTask().SaveNetwork((char*)DEFAP_SSID, (char*)DEFAP_PWD);
             // Set op_state to working
             GetAppTask().SetOpState(work_state);
         }
