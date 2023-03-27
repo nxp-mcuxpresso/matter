@@ -31,6 +31,8 @@
 #include "fsl_debug_console.h"
 #include "fsl_gpio.h"
 #include "pin_mux.h"
+#include "fsl_pinmux.h"
+
 
 #include <wm_os.h>
 extern "C" {
@@ -352,11 +354,31 @@ void gpio_init(void)
     return;
 }
 
+// Ref: BOARD_InitPins() of repo/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/pin_mux.c
+void Mw320_BOARD_InitPins(void)
+{                                /*!< Function assigned for the core: Cortex-M4[cm4] */
+    PINMUX_PinMuxSet(BOARD_UART0_TX_PIN, BOARD_UART0_TX_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+    PINMUX_PinMuxSet(BOARD_UART0_RX_PIN, BOARD_UART0_RX_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+    PINMUX_PinMuxSet(BOARD_PUSH_SW1_PIN, BOARD_PUSH_SW1_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+
+    PINMUX_PinMuxSet(BOARD_PUSH_SW2_PIN, BOARD_PUSH_SW2_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+    PINMUX_PinMuxSet(BOARD_PUSH_SW4_PIN, BOARD_PUSH_SW4_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+
+    PINMUX_PinMuxSet(BOARD_UART2_TX_PIN, BOARD_UART2_TX_PIN_FUNCTION_ID | BOARD_UART2_TX_PULL_STATE);
+    PINMUX_PinMuxSet(BOARD_UART2_RX_PIN, BOARD_UART2_RX_PIN_FUNCTION_ID | BOARD_UART2_RX_PULL_STATE);
+
+    PINMUX_PinMuxSet(BOARD_REQ_PIN,   BOARD_COEX_PIN_FUNCTION_ID | PINMUX_MODE_PULLDOWN);
+    // Note: BOARD_PRI_PIN has a conflict with BOARD_LED_YELLOW_PIN that LED may fail to work
+    //PINMUX_PinMuxSet(BOARD_PRI_PIN,   BOARD_COEX_PIN_FUNCTION_ID | PINMUX_MODE_PULLDOWN);
+    ////PINMUX_PinMuxSet(BOARD_GRANT_PIN, BOARD_COEX_PIN_FUNCTION_ID | PINMUX_MODE_PULLDOWN);
+    PINMUX_PinMuxSet(BOARD_LED_YELLOW_PIN, BOARD_LED_YELLOW_PIN_FUNCTION_ID | PINMUX_MODE_DEFAULT);
+}
+
 void board_init(void)
 {
     /* Initialize platform */
     // BOARD_ConfigMPU();
-    BOARD_InitPins();
+    Mw320_BOARD_InitPins();
     BOARD_BootClockRUN();
 
     BOARD_InitDebugConsole();
