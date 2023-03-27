@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Google LLC.
+ *    Copyright (c) 2021-2023 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,18 +22,8 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "ClusterManager.h"
+#include "DeviceCallbacks.h"
 
-#include <platform/CHIPDeviceLayer.h>
-
-#include "fsl_component_button.h"
-
-#include "FreeRTOS.h"
-#include "timers.h"
-
-#if ENABLE_OTA_PROVIDER
-#include <OTAProvider.h>
-#endif
 
 class AppTask
 {
@@ -41,7 +31,6 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostTurnOnActionRequest(int32_t aActor, ClusterManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
     /* Commissioning handlers */
@@ -52,38 +41,20 @@ public:
     /* FactoryResetHandler */
     void FactoryResetHandler(void);
 
-    void UpdateClusterState(void);
-
 private:
+    DeviceCallbacks deviceCallbacks;
+
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
-
-    static void ActionInitiated(ClusterManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(ClusterManager::Action_t aAction);
-
     void DispatchEvent(AppEvent * event);
+    CHIP_ERROR DisplayDeviceInformation(void);
 
     /* Functions that would be called in the Matter task context */
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
     static void SwitchCommissioningState(intptr_t arg);
     static void InitServer(intptr_t arg);
-
-    /* Functions that would be called in the App task context */
-    static void ClusterActionEventHandler(AppEvent * aEvent);
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_FactoryReset,
-        kFunctionTurnOnTurnOff,
-
-        kFunction_Invalid
-    } Function;
-
-    Function_t mFunction;
 
     static AppTask sAppTask;
 };

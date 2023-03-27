@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
  *    All rights reserved.
  *
@@ -18,6 +18,9 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
+#include "binding-handler.h"
 #include "lib/support/ErrorStr.h"
 #include <app/server/Server.h>
 #include <app/server/Dnssd.h>
@@ -37,9 +40,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "application_config.h"
@@ -51,18 +51,36 @@
 #include "OTARequestorInitiator.h"
 #endif
 
-#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataProvider.h"
+#if ENABLE_OTA_PROVIDER
+#include <OTAProvider.h>
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #endif
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
+#if TCP_DOWNLOAD
+#include "TcpDownload.h"
+#endif
+
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+#include "FactoryDataProvider.h"
+#include "DataReaderEncryptedDCP.h"
+/*
+* Test key used to encrypt factory data before storing it to the flash.
+* The software key should be used only during development stage.
+* For production usage, it is recommended to use the OTP key which needs to be fused in the RT1060 SW_GP2.
+*/
+static const uint8_t aes128TestKey[] __attribute__((aligned)) = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+                                                                0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+#endif
+
+#ifndef APP_TASK_STACK_SIZE
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE)4096 / sizeof(portSTACK_TYPE))
+#endif
+#ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
+#endif
 #define APP_EVENT_QUEUE_SIZE 10
 
 static QueueHandle_t sAppEventQueue;
@@ -71,6 +89,7 @@ using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -104,7 +123,7 @@ CHIP_ERROR AppTask::StartAppTask()
         assert(err == CHIP_NO_ERROR);
     }
 
-    if (xTaskCreate(&AppTask::AppTaskMain, "AppTaskMain", 1600,
+    if (xTaskCreate(&AppTask::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE,
                     &sAppTask, APP_TASK_PRIORITY, &taskHandle) != pdPASS)
     {
         err = CHIP_ERROR_NO_MEMORY;
@@ -158,10 +177,29 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Init ZCL Data Model and start server
-    PlatformMgr().ScheduleWork(InitServer, 0);
+    /* Init Chip memory management before the stack */
+    chip::Platform::MemoryInit();
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+    /*
+    * Load factory data from the flash to the RAM.
+    * Needs to be done before starting other Matter modules to avoid concurrent access issues with DCP hardware module.
+    */
+    DataReaderEncryptedDCP *dataReaderEncryptedDCPInstance = nullptr;
+    dataReaderEncryptedDCPInstance = &DataReaderEncryptedDCP::GetDefaultInstance();
+    /*
+    * This example demonstrates the usage of the ecb with a software key, to use other encryption mode,
+    * or to use hardware keys, check available methodes from the DataReaderEncryptedDCP class.
+    */
+    dataReaderEncryptedDCPInstance->SetEncryptionMode(encrypt_ecb);
+    dataReaderEncryptedDCPInstance->SetAes128Key(&aes128TestKey[0]);
+
+    err = FactoryDataProvider::GetDefaultInstance().Init(dataReaderEncryptedDCPInstance);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Factory Data Provider init failed");
+        goto exit;
+    }
     FactoryDataProvider *factoryDataProvider = &FactoryDataProvider::GetDefaultInstance();
     SetDeviceInstanceInfoProvider(factoryDataProvider);
     SetDeviceAttestationCredentialsProvider(factoryDataProvider);
@@ -171,69 +209,63 @@ CHIP_ERROR AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
+    /*
+    * Initialize the CHIP stack.
+    * Would also initialize all required platform modules
+    */
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "PlatformMgr().InitChipStack() failed: %s", ErrorStr(err));
+        goto exit;
+    }
+
+    /*
+    * Register all application callbacks allowing to be informed of stack events
+    */
+    err = CHIPDeviceManager::GetInstance().Init(&deviceCallbacks);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "CHIPDeviceManager.Init() failed: %s", ErrorStr(err));
+        goto exit;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    ConnectivityMgrImpl().StartWiFiManagement();
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
+        goto exit;
+    }
+
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (err != CHIP_NO_ERROR)
+    {
+        goto exit;
+    }
+#endif
+
+    /*
+    * Schedule an event to the Matter stack to initialize
+    * the ZCL Data Model and start server
+    */
+    PlatformMgr().ScheduleWork(InitServer, 0);
+
+    /* Init binding handlers */
+    err = InitBindingHandlers();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "InitBindingHandlers failed: %s", ErrorStr(err));
+        goto exit;
+    }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     NetWorkCommissioningInstInit();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-    uint16_t discriminator;
-    err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        PRINTF("\r\nCouldn't get discriminator: %s", chip::ErrorStr(err));
-    }
-    PRINTF("\r\nSetup discriminator: %u (0x%x)", discriminator, discriminator);
-
-    uint32_t setupPasscode=20202021;
-    err = GetCommissionableDataProvider()->GetSetupPasscode(setupPasscode);
-    if (err != CHIP_NO_ERROR)
-    {
-        PRINTF("\r\nCouldn't get setupPasscode: %s", chip::ErrorStr(err));
-    }
-    PRINTF("\r\nSetup passcode: %u (0x%x)", setupPasscode, setupPasscode);
-
-    uint16_t vendorId;
-    err = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
-    if (err != CHIP_NO_ERROR)
-    {
-        PRINTF("\r\nCouldn't get vendorId: %s", chip::ErrorStr(err));
-    }
-    PRINTF("\r\nVendor ID: %u (0x%x)", vendorId, vendorId);
-
-
-    uint16_t productId;
-    err = GetDeviceInstanceInfoProvider()->GetProductId(productId);
-    if (err != CHIP_NO_ERROR)
-    {
-        PRINTF("\r\nCouldn't get productId: %s", chip::ErrorStr(err));
-    }
-    PRINTF("\r\nProduct ID: %u (0x%x)\r\n", productId, productId);
-     
-    // QR code will be used with CHIP Tool
-#if CONFIG_NETWORK_LAYER_BLE
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
-#endif /* CONFIG_NETWORK_LAYER_BLE */
-
-    err = ClusterMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ClusterMgr().Init() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
-
-    ClusterMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-    // Print the current software version
-    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
-    err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Get version error");
-        assert(err == CHIP_NO_ERROR);
-    }
-
-    ChipLogProgress(DeviceLayer, "Current Software Version: %s", currentSoftwareVer);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR 
     /* If an update is under test make it permanent */
@@ -244,11 +276,46 @@ CHIP_ERROR AppTask::Init()
 
     /* Register Matter CLI cmds */
     err = AppMatterCli_RegisterCommands();
-    assert(err == CHIP_NO_ERROR);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during AppMatterCli_RegisterCommands");
+        goto exit;
+    }
     /* Register Matter buttons */
     err = AppMatterButton_registerButtons();
-    assert(err == CHIP_NO_ERROR);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during AppMatterButton_registerButtons");
+        goto exit;
+    }
 
+    err = DisplayDeviceInformation();
+    if (err != CHIP_NO_ERROR)
+        goto exit;
+
+    /* Start a task to run the CHIP Device event loop. */
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during PlatformMgr().StartEventLoopTask()");
+        goto exit;
+    }
+
+#if CHIP_ENABLE_OPENTHREAD
+    // Start OpenThread task
+    err = ThreadStackMgrImpl().StartThreadTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
+        goto exit;
+    }
+#endif
+
+#if TCP_DOWNLOAD
+    EnableTcpDownloadComponent();
+#endif
+
+exit:
     return err;
 }
 
@@ -257,6 +324,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     AppTask *task = (AppTask *)pvParameter;
     CHIP_ERROR err;
     AppEvent event;
+
+    ChipLogProgress(DeviceLayer, "Welcome to NXP All Clusters Demo App");
 
     err = task->Init();
     if (err != CHIP_NO_ERROR)
@@ -276,33 +345,67 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::ActionInitiated(ClusterManager::Action_t aAction, int32_t aActor)
+CHIP_ERROR AppTask::DisplayDeviceInformation(void)
 {
-    // start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == ClusterManager::TURNON_ACTION)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t discriminator;
+    uint32_t setupPasscode;
+    uint16_t vendorId;
+    uint16_t productId;
+    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionStringLength + 1];
+
+    err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Turn on Action has been initiated");
+        ChipLogError(DeviceLayer, "Couldn't get discriminator: %s", ErrorStr(err));
+        goto exit;
     }
-    else if (aAction == ClusterManager::TURNOFF_ACTION)
+    ChipLogProgress(DeviceLayer, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
+
+
+    err = GetCommissionableDataProvider()->GetSetupPasscode(setupPasscode);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Turn off Action has been initiated");
+        ChipLogError(DeviceLayer, "Couldn't get setupPasscode: %s", ErrorStr(err));
+        goto exit;
+    }
+    ChipLogProgress(DeviceLayer, "Setup passcode: %lu (0x%lx)", setupPasscode, setupPasscode);
+
+    err = GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Couldn't get vendorId: %s", ErrorStr(err));
+        goto exit;
+    }
+    ChipLogProgress(DeviceLayer, "Vendor ID: %u (0x%x)", vendorId, vendorId);
+
+
+    err = GetDeviceInstanceInfoProvider()->GetProductId(productId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Couldn't get productId: %s", ErrorStr(err));
+        goto exit;
+    }
+    ChipLogProgress(DeviceLayer, "nProduct ID: %u (0x%x)", productId, productId);
+
+    // QR code will be used with CHIP Tool
+#if CONFIG_NETWORK_LAYER_BLE
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
+
+    err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Get current software version error");
+        goto exit;
     }
 
-    sAppTask.mFunction = kFunctionTurnOnTurnOff;
-}
+    ChipLogProgress(DeviceLayer, "Current Software Version: %s", currentSoftwareVer);
 
-void AppTask::ActionCompleted(ClusterManager::Action_t aAction)
-{
-    if (aAction == ClusterManager::TURNON_ACTION)
-    {
-        ChipLogProgress(DeviceLayer, "Turn on action has been completed");
-    }
-    else if (aAction == ClusterManager::TURNOFF_ACTION)
-    {
-        ChipLogProgress(DeviceLayer, "Turn off action has been completed");
-    }
-
-    sAppTask.mFunction = kFunction_NoneSelected;
+exit:
+    return err;
 }
 
 void AppTask::PostEvent(const AppEvent * aEvent)
@@ -325,19 +428,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         ChipLogProgress(DeviceLayer, "Event received with no handler. Dropping event.");
-    }
-}
-
-void AppTask::UpdateClusterState(void)
-{
-    uint8_t newValue = 0;//!ClusterMgr().IsTurnedOff();
-
-    // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "ERR: updating on/off %x", status);
     }
 }
 

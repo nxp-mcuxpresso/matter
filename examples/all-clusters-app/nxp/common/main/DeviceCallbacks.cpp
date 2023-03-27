@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@
  **/
 #include "DeviceCallbacks.h"
 
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 
@@ -33,16 +34,30 @@
 #include "ot_platform_common.h"
 #endif /* CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED */
 
+Identify gIdentify0 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+};
+
+Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+};
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::app::Clusters;
 using namespace ::chip::DeviceLayer;
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
-
     switch (event->Type)
     {
     case DeviceEventType::kWiFiConnectivityChange:
@@ -68,14 +83,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                   uint8_t type, uint16_t size, uint8_t * value)
 {
-    switch (clusterId)
-    {
-        case Identify::Id:
-            OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
-            break;
-        default:
-            break;
-    }
+    ChipLogProgress(DeviceLayer, "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
 }
 
 void DeviceCallbacks::OnWiFiConnectivityChange(const ChipDeviceEvent * event)
@@ -153,45 +162,3 @@ void DeviceCallbacks::OnComissioningComplete(const chip::DeviceLayer::ChipDevice
     }
 }
 #endif
-
-/**
- * Identify Cluster puts an endpoint in identification state
- * The IdentifyTime attribute indicates the remaining length of time (in seconds)
- * that the device will continue to identify itself.
-*/
-
-typedef struct _Identify_Timer
-{
-    EndpointId ep;
-    uint32_t identifyTimerCount;
-} Identify_Time_t;
-Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
-
-void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    Identify_Time_t * pidt = (Identify_Time_t *) appState;
-    if (pidt->identifyTimerCount)
-    {
-        pidt->identifyTimerCount--;
-        emAfWriteAttribute(pidt->ep, Identify::Id, Identify::Attributes::IdentifyTime::Id,
-                           (uint8_t *) &pidt->identifyTimerCount, sizeof(pidt->identifyTimerCount), true, false);
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
-    }
-}
-
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == Identify::Attributes::IdentifyTime::Id,
-                 ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
-    VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
-                 ChipLogError(DeviceLayer, "EndPoint > max: [%u, %u]", endpointId, MAX_ENDPOINT_COUNT));
-    if (id_time[endpointId].identifyTimerCount != *value)
-    {
-        id_time[endpointId].ep                 = endpointId;
-        id_time[endpointId].identifyTimerCount = *value;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, &id_time[endpointId]);
-    }
-
-exit:
-    return;
-}
