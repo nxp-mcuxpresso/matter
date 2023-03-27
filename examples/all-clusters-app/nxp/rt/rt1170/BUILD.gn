@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,23 +60,22 @@ rt_executable("all_cluster_app") {
     "../../common/main/include",
     "../../common/main",
 
-    "${chip_root}/examples/${app_common_folder}/include",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   sources = [
     "../../common/main/AppMatterButtonEmpty.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/CHIPDeviceManager.cpp",
-    "../../common/main/ClusterManager.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
     "../../common/main/AppMatterCli.cpp",
     "../../common/main/include/CHIPDeviceManager.h",
-    "../../common/main/include/ClusterManager.h",
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/include/AppEvent.h",
     "../../common/main/include/AppTask.h",
     "../../common/main/main.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
   ]
 
   deps = [
@@ -93,7 +92,6 @@ rt_executable("all_cluster_app") {
     defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
     sources += [
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/binding-handler.cpp",
       "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
     ]
   }
