@@ -468,7 +468,6 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #if LWIP_IPV6
 #define LWIP_IPV6_NUM_ADDRESSES 5
 
-#define LWIP_IPV6_ND 0
 #define LWIP_IPV6_MLD 1
 #define LWIP_ND6_QUEUEING 0
 #define LWIP_IPV6_SCOPES 0
