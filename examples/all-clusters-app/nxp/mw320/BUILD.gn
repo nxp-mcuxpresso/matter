@@ -90,7 +90,9 @@ mw320_executable("shell_mw320") {
 
   ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+  ]
   defines = [
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",

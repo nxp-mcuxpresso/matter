@@ -94,7 +94,9 @@ mw320_executable("light_switch_combo_app") {
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+  ]
 
   defines = [
     "MW320_SHELL_STREAMER",
