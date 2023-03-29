@@ -342,39 +342,46 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
     return err;
 }
 
+
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconRxCount(const char * ifname, uint32_t & beaconRxCount)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef GET_FROM_SDK
     int ret;
-    wifi_pkt_stats_t stats;
+    static wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
     if (ret != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
-
     beaconRxCount = stats.bcn_rcv_cnt;
     ChipLogProgress(DeviceLayer, "GetWiFiBeaconRxCount [%ld] -> working in sdk", beaconRxCount);
-
+#else
+    beaconRxCount = 1024;
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconRxCount [%ld]", beaconRxCount);
+#endif //GET_FROM_SDK
     return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef GET_FROM_SDK
     int ret;
-    wifi_pkt_stats_t stats;
+    static wifi_pkt_stats_t stats;
 
-    ret = wifi_get_log(&stats);
+    ret = wifi_get_log(&g_stats);
     if (ret != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
-
     beaconLostCount = stats.bcn_miss_cnt;
     ChipLogProgress(DeviceLayer, "GetWiFiBeaconLostCount [%ld] -> working in sdk", beaconLostCount);
-
+#else
+    beaconLostCount = 0;
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconLostCount [%ld]", beaconLostCount);
+#endif //GET_FROM_SDK
     return err;
 }
 
