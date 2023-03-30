@@ -18,6 +18,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 
 declare_args() {
+  board_version = "A1"
   deviceBoardName = "RW612"
 }
 
@@ -189,6 +190,11 @@ template("rw610_sdk_drivers") {
         "BOOT_HEADER_ENABLE=1",
         "WIFI_BOARD_RW610",
     ]
+
+    if (board_version != "A1")
+    {
+      defines += [ "RW610_A1=0" ]
+    }
 
     if (rw610_mbedtls_port_els_pkc) {
       defines += [
