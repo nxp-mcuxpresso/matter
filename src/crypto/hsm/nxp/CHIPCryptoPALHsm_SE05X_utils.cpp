@@ -75,11 +75,11 @@ static Mutex sSEObjMutex;
 
 #endif //#if ENABLE_REENTRANCY
 
+int se05x_session_open = 0;
 /* Open session to se05x */
 void se05x_sessionOpen(void)
 {
-    static int is_session_open = 0;
-    if (is_session_open)
+    if (se05x_session_open)
     {
         return;
     }
@@ -108,7 +108,7 @@ void se05x_sessionOpen(void)
         return;
     }
 
-    is_session_open = 1;
+    se05x_session_open = 1;
 }
 
 /* Delete key in se05x */

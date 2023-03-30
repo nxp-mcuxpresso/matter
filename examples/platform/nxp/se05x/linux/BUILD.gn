@@ -53,6 +53,8 @@ source_set("app-main") {
     "${chip_root}/examples/platform/nxp/se05x/DeviceAttestationSe05xCredsExample_v2.cpp",
     "${chip_root}/examples/platform/nxp/se05x/LinuxCommissionableDataProviderSE05xTP.cpp",
     "${chip_root}/examples/platform/nxp/se05x/LinuxCommissionableDataProviderSE05xTP.h",
+    "${chip_root}/examples/platform/nxp/se05x/se05x_t4t_set_read.cpp",
+    "${chip_root}/examples/platform/nxp/se05x/linux/se05x_set_gpio.cpp",
     "AppMain.cpp",
   ]
 

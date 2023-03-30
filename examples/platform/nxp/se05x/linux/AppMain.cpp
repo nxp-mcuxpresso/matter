@@ -78,9 +78,10 @@
 
 #if CHIP_CRYPTO_HSM
 #include "DeviceAttestationSe05xCredsExample.h"
-#include "se05x_t4t_utils.h"
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
+#include "se05x_set_gpio.h"
+#include "se05x_t4t_set_read.h"
 #endif
 
 using namespace chip;
@@ -151,6 +152,16 @@ static bool EnsureWiFiIsStarted()
 
 int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 {
+#if CHIP_CRYPTO_HSM
+    ChipLogProgress(NotSpecified, "power on, T4T read locked");
+    if (se05x_set_pin(SE05x_ON) != 0){
+        ChipLogProgress(NotSpecified, "Error in se05x_set_pin.");
+    }
+    if (se05x_lock_read() != 0) {
+        ChipLogProgress(NotSpecified, "Error in se05x_lock_read.");
+    }
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
@@ -369,9 +380,6 @@ void ChipLinuxAppMainLoop()
     static chip::CommonCaseDeviceServerInitParams initParams;
 #endif
 
-#if CHIP_CRYPTO_HSM
-    VerifyOrDie(se05x_enable_contactless_interface() == 0);
-#endif
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -434,6 +442,16 @@ void ChipLinuxAppMainLoop()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ApplicationInit();
+
+#if CHIP_CRYPTO_HSM
+    ChipLogProgress(NotSpecified, "power off, T4T read unlocked");
+    if (se05x_unlock_read() != 0){
+        ChipLogProgress(NotSpecified, "Error in se05x_unlock_read.");
+    }
+    if ( se05x_set_pin(SE05x_OFF) != 0){
+        ChipLogProgress(NotSpecified, "Error in se05x_set_pin.");   
+    }
+#endif
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 

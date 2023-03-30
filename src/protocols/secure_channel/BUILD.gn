@@ -31,6 +31,10 @@ static_library("secure_channel") {
 
   cflags = [ "-Wconversion" ]
 
+  include_dirs = [
+    "${chip_root}/examples/platform/nxp/se05x",
+  ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

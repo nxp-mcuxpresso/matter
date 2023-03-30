@@ -47,6 +47,11 @@
 #include <trace/trace.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_CRYPTO_HSM
+#include "se05x_set_gpio.h"
+#include "se05x_t4t_set_read.h"
+#endif
+
 namespace chip {
 
 using namespace Crypto;
@@ -804,6 +809,9 @@ CHIP_ERROR PASESession::OnUnsolicitedMessageReceived(const PayloadHeader & paylo
 CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
+#if CHIP_CRYPTO_HSM
+    static bool se051_has_been_set = false;
+#endif
     CHIP_ERROR err  = ValidateReceivedMessage(exchange, payloadHeader, msg);
     MsgType msgType = static_cast<MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
@@ -815,6 +823,19 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
         SuccessOrExit(mExchangeCtxt->FlushAcks());
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
+
+#if CHIP_CRYPTO_HSM
+    if(!se051_has_been_set) {
+        ChipLogProgress(NotSpecified, "power on, T4T read locked");
+        if (se05x_set_pin(SE05x_ON) != 0) {
+            ChipLogProgress(NotSpecified, "Error in se05x_set_pin. ");
+        }
+        if (se05x_lock_read() != 0){
+            ChipLogProgress(NotSpecified, "Error in se05x_lock_read. ");   
+        }
+        se051_has_been_set = true;
+    }
+#endif
 
     switch (msgType)
     {
