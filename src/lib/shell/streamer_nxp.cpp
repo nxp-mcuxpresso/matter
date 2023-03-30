@@ -126,6 +126,12 @@ int streamer_nxp_init(streamer_t * streamer)
 
     uartConfig.clockRate = BOARD_APP_UART_CLK_FREQ;
 
+    /*
+     * Make sure to disable interrupts while initializating the serial manager interface
+     * Some issues could happen if a UART IRQ is firing during serial manager initialization
+     */
+    OSA_InterruptDisable();
+
     do
     {
         if (SerialManager_Init((serial_handle_t)streamerSerialHandle, &s_serialManagerConfig) !=
@@ -146,6 +152,8 @@ int streamer_nxp_init(streamer_t * streamer)
             break;
         status = kStatus_SerialManager_Success;
     } while (0);
+
+    OSA_InterruptEnable();
 
     return status;
 }
