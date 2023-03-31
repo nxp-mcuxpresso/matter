@@ -329,8 +329,13 @@ template("rt_sdk") {
         "SERIAL_MANAGER_TASK_STACK_SIZE=4048",
     #LWIP common options
         "USE_RTOS=1",
-        "RT_MATTER_SUPPORT",
       ]
+
+    if (rt_platform != "rw610")
+    {
+      # This adds a temporary workakound to fix mbdetls concurrent access to crypto hardware
+      defines += [ "RT_MATTER_SUPPORT" ]
+    }
 
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
