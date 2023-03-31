@@ -135,9 +135,12 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Download [K32W1 SDK for Matter](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    K32W1 SDK. The SDK Builder UI selection should be similar with
+    K32W148-EVK MCUXpresso SDK. The SDK Builder UI selection should be similar with
     the one from the image below.
+
     ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w1/doc/images/mcux-sdk-download.jpg)
+
+    Please refer to Matter release notes for getting the latest released SDK.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
