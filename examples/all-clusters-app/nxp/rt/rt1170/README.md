@@ -55,19 +55,23 @@ board by default.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [IMXRT1170 SDK 2.13.0_firecrest_EAR4.6](https://mcuxpresso.nxp.com/).
-  For internal SDK delivery, the SDK can be downloaded using the [KEX STAGE](https://kex-stage.nxp.com/en/welcome)
+- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environement to be able to build Matter.
+
+-   Download the [IMXRT1170 SDK](https://mcuxpresso.nxp.com/).
   Creating an nxp.com account is required before being able to download the
   SDK. Once the account is created, login and follow the steps for downloading
-  SDK_2.13.0_EVK-MIMXRT1170. In the SDK Builder UI selection you should select
-  the **FreeRTOS component**, the **BT/BLE component** and the **ARM GCC Toolchain**.
-  SDK could also be retrieved with cloning [Internal SDK repository](https://bitbucket.sw.nxp.com/projects/MCUCORE/repos/mcu-sdk-2.0/browse ) 
-  and setting branch develop/2.13.0_firecrest .
+  SDK. The SDK Builder UI selection should be similar with the one from the image below with the **FreeRTOS component**, the **BT/BLE component** and the **ARM GCC Toolchain** selected.
+
+![MCUXpresso SDK Download](../../../../platform/nxp/rt/rt1170/doc/images/mcux-sdk-download.png)
+
+Please refer to release notes for getting the latest released SDK.
+
+Note: if the IWX12 transceiver is chosen a dedicated SDK with this support should be chosen.
 
 -   Start building the application
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_2_13_0_EVK-MIMXRT1170/ # or use the EVK-MIMXRT1170 SDK path when building for EVK-MIMXRT1170 board
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/path/to/previously/downloaded/SDK
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170/
 ```
@@ -83,7 +87,7 @@ Refer to the Building section in wi-fi or openthread specific README file.
 
 <a name="hardware"></a>
 
-## Hardware requirements
+## Hardware requirements for RT1170 and IWX12
 
 Host part:
 - 1 EVK-MIMXRT1170
@@ -91,13 +95,11 @@ Host part:
 Transceiver part :
 - 1 WIFI IWX12 BOARD RD USD
 
-## Hardware rework for SPI support on EVK-MIMXRT1170
+### Hardware rework for SPI support on EVK-MIMXRT1170
 
 To support SPI on the EVK-MIMXRT1170 board, it is required to remove 0Ω resistors R404,R406,R408.
 
-## Board settings
-
-### RT1170 + IWX12 (Spinel over SPI, BLE over UART)
+### Board settings (Spinel over SPI, BLE over UART)
 
 The below table explains pin settings (SPI settings) to connect the evkmimxrt1170 (host) to a IWX12 transceiver (rcp).
 Note, for the RESET, IWX12-J10-pin37 is the full reset of the board, to reset only the rcp, use J10-pin16.

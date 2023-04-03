@@ -1,23 +1,16 @@
-# RT1170 All-cluster Application for Matter over Openthread
+# Matter over Thread on RT1170 + transceiver
 
-## Hardware requirements
+## Configuration(s) supported
 
-Host part:
+Here are listed configurations that allow to support Matter over Thread on RT1170:
 
-- 1 MIMXRT1170-EVK board
+- RT1170 + IWX12 (Wi-Fi + BLE + 15.4)
 
-Transceiver part:
+## Hardware requirements for RT1170 + IWX12
 
-- 1 IW612 module
+To know hardware and board settings for such a configuration follow instructions form  [README.md 'Hardware requirements for RT1170 + IWX12'][readme_rt1170_iwx12_hardware].
 
-
-## Board settings
-
-Board settings are described [here][ot_cli_rt1170_readme].
-
-[ot_cli_rt1170_readme]:../../../../../third_party/openthread/ot-nxp/src/imx_rt/rt1170/README.md#Board-settings
-
-<a name="building"></a>
+[readme_rt1170_iwx12_hardware]:README.md#hardware-requirements-for-rt1170-and-iwx12
 
 ## Building
 
@@ -25,12 +18,9 @@ Board settings are described [here][ot_cli_rt1170_readme].
 
 First instructions from [README.md 'Building section'][readme_building_section] should be followed.
 
-
 [readme_building_section]: README.md#Building
 
-
-
--   Build the Openthread configuration with BLE commissioning.
+-   Build the Openthread configuration for MIMXRT1170 board + IWX12 transceiver (with BLE for commissioning).
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-cluster/nxp/rt/rt1170$ gn gen --args="chip_enable_openthread=true iwx12_transceiver=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
@@ -66,8 +56,6 @@ Create a thread network on the border router (048bf89bb3dd should be replaced by
 ```
 sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset init new"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset channel 17"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset panid 0x1222"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset extpanid 1111111122222222"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset networkkey 00112233445566778899aabbccddeeaa"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl dataset commit active"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl ifconfig up"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl thread start"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl prefix add fd11:22::/64 pasor"; sudo docker exec -it 048bf89bb3dd sh -c "sudo ot-ctl netdata register"
 ```
-
-
 
 # Testing the all custer app example (with BLE commissioning support)
 
