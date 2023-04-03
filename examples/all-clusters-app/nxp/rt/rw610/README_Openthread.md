@@ -1,4 +1,4 @@
-# RW612 All-Cluster Application for Matter over Openthread
+# Matter over Thread on RW612
 
 ## Hardware requirements
 

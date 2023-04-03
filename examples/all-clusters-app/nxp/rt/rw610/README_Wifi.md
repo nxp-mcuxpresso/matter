@@ -1,4 +1,4 @@
-# RW612 All-cluster Application for Matter over Wi-Fi
+# Matter over Wi-Fi on RW612
 
 ## Hardware requirements
 

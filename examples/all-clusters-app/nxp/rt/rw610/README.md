@@ -48,6 +48,8 @@ board by default.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
+- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environement to be able to build Matter.
+
 -   Download [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
