@@ -96,7 +96,7 @@ The resulting output file can be found in out/debug/chip-rt1060-all-cluster-exam
 
 To know how to flash and debug follow instructions from [README.md 'Flashing and debugging'][readme_flash_debug_section].
 
-[readme_flash_debug_section]:README.md#flashdebug
+[readme_flash_debug_section]:README.md#flashing-and-debugging
 
 ## Testing the example
 

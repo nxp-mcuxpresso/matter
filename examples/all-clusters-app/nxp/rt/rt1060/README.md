@@ -1,7 +1,6 @@
-# CHIP RT1060 All-cluster Application
+# CHIP RT1060 All-clusters Application
 
-The all-cluster example implements a server wich can be accesed by a CHIP controller and acts 
-on software level as a zigbee coordinator and accepts basic ZCL comands on a number of clusters.
+The all-clusters example implements a server which can be accesed by a CHIP controller and can accept basic cluster commands.
 
 The example is based on
 [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP RT1060 SDK,
@@ -30,7 +29,7 @@ control.
 
 The RT1060 all-cluster application provides a working demonstration of the
 RT1060 board integration, built using the Project CHIP codebase and the NXP
-RT1060 SDK. The example supports basic ZCL commands.
+RT1060 SDK. The example supports basic ZCL commands and acts as a thermostat device-type.
 
 The example supports:
 
@@ -261,4 +260,4 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    - No parity
    - No flow control
 
-4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool/README.md)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
