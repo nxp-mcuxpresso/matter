@@ -1,6 +1,12 @@
-# RT1060 All-cluster Application for Matter over Openthread
+# Matter over Thread on RT1060 + transceiver
 
-## Hardware requirements
+## Configuration(s) supported
+
+Here are listed configurations that allow to support Matter over Wi-Fi on RT1060:
+
+- RT1060 + K32W0 (15.4 + BLE)
+
+## Hardware requirements RT1060 + K32W0
 
 Host part:
 
@@ -12,22 +18,33 @@ Transceiver part:
 - 1 K32W0 Module to be plugged on the Carrier Board
 
 
-## Board settings
+### Board settings
 
-Board settings are described [here][ot_cli_rt1060_readme].
+The below table explains pin settings (UART settings) to connect the
+evkbmimxrt1060 (host) to a k32w061 transceiver (rcp).
 
-[ot_cli_rt1060_readme]:https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/src/imx_rt/rt1060/README.md#board-settings-for-mimxrt1060-evkb
+|    PIN NAME    | DK6 (K32W061) | I.MXRT1060-EVKB | I.MXRT1060-EVK | PIN NAME OF RT1060 | GPIO NAME OF RT1060 |
+| :------------: | :-----------: | :-------------: | :------------: | :----------------: | :-----------------: |
+|    UART_TXD    |  PIO, pin 8   |   J16, pin 1    |   J22, pin 1   |    LPUART3_RXD     |    GPIO_AD_B1_07    |
+|    UART_RXD    |  PIO, pin 9   |   J16, pin 2    |   J22, pin 2   |    LPUART3_TXD     |    GPIO_AD_B1_06    |
+|    UART_RTS    |  PIO, pin 6   |   J33, pin 3    |   J23, pin 3   |    LPUART3_CTS     |    GPIO_AD_B1_04    |
+|    UART_CTS    |  PIO, pin 7   |   J33, pin 4    |   J23, pin 4   |    LPUART3_RTS     |    GPIO_AD_B1_05    |
+|      GND       |   J3, pin 1   |   J32, pin 7    |   J25, pin 7   |         XX         |         XX          |
+|     RESET      |     RSTN      |   J17, pin 2    |   J24, pin 2   |   GPIO_AD_B0_02    |    GPIO_AD_B0_02    |
+| DIO5/ISP Entry |  PIO, pin 5   |   J33, pin 1    |   J23, pin 1   |   GPIO_AD_B1_10    |    GPIO_AD_B1_10    |
+
+The below picture shows pins connections for the EVK-MIMXRT1060.
+
+![rt1060_k32w061_pin_settings](../../../../platform/nxp/rt/rt1060/doc/images/rt1060_k32w061_pin_settings.jpg)
 
 <a name="building"></a>
 
-## Building
+### Building
 
 ### Pre-build instructions
 First instructions from [README.md 'Building section'][readme_building_section] should be followed.
 
 [readme_building_section]: README.md#building
-
-### Build instructions
 
 ### Build the Openthread configuration with BLE commissioning.
 
@@ -36,14 +53,12 @@ For that the HDLC-Lite framing protocol is used to transfert spinel and hci fram
 
 Before building the Matter host application, it is required to generate the K32W0 image supporting features as described above. To build this binary the target ````ot_rcp_ble_hci_bb_single_uart_fc```` should be built by following the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme]. After a successfull build, a ````".h"```` file will be generated and would contain the K32W0 RCP binary. As described in the [Readme.md][ot_rcp_ble_hci_bb_k32w0_readme], the application binaries will be generated in `ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h`.
 
-The generate K32W0 transceiver binary ````".h"```` file path must be indicated to the host Matter application build. In fact the Matter host application is in charge of storing the K32W0 firmware in its flash to be able to use the ````The Over The Wire (OTW) protocol (over UART)```` to download (at host startup) the k32w0 transceiver image from the host to the K32W0 internal flash.  For more information on the k32w0 OTW protocol, user can consult the doxygen header of [fwk_otw.c][fwk_otw_sdk_path].
+The generate K32W0 transceiver binary ````".h"```` file path must be indicated to the host Matter application build. In fact the Matter host application is in charge of storing the K32W0 firmware in its flash to be able to use the ````The Over The Wire (OTW) protocol (over UART)```` to download (at host startup) the k32w0 transceiver image from the host to the K32W0 internal flash.  For more information on the k32w0 OTW protocol, user can consult the doxygen header of the file located in `<repo_root>/third_party/nxp/rt_sdk/repo/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c`.
 
 Here is a summary of the k32w0 *gn gen* arguments that are mandatory or optional:
 - Mandatory: ````k32w0_transceiver=true````
 - Mandatory: ````hci_spinel_single_uart=true````
 - Optional: ````k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"```` This argument is optional, by default, if not set, the binary file located in "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" will be used. If the K32W061 transceiver binary is saved at another location an absolute path of its location should be given.
-
-[fwk_otw_sdk_path]:../../../../../third_party/nxp/rt_sdk/repo/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c
 
 [ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md#building-the-examples
 

@@ -1,8 +1,11 @@
-# RT1060 All-cluster Application for Matter over Wi-Fi
+# Matter over Wi-Fi on RT1060 + transceiver
 
-## Configuration supported
-- RT1060 + IW416
-- RT1060 + 8801
+## Configuration(s) supported
+
+Here are listed configurations that allow to support Matter over Wi-Fi on RT1060:
+
+- RT1060 + IW416 (Wi-Fi + BLE)
+- RT1060 + 8801 (Wi-Fi)
 
 ## Hardware requirements RT1060+IW416
 

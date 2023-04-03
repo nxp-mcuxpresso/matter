@@ -33,7 +33,6 @@ RT1060 SDK. The example supports basic ZCL commands and acts as a thermostat dev
 
 The example supports:
 
-- Matter over ethernet. For that follow instructions from [README_Ethernet.md][README_Ethernet.md].
 - Matter over wi-fi. For that follow instructions from [README_Wifi.md][README_Wifi.md].
 - Matter over openthread. For that follow instructions from [README_Openthread.md][README_Openthread.md].
 
@@ -53,7 +52,9 @@ board by default. It is also possible to use the older EVK-MIMXRT1060 board, bui
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download the NXP MCUXpresso git SDK 2.13.0 and associated middleware from GitHub using the west tool.
+- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environement to be able to build Matter
+
+-   Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
