@@ -1,8 +1,8 @@
-# RW610 All-cluster Application for Matter over Wi-Fi
+# RW612 All-cluster Application for Matter over Wi-Fi
 
 ## Hardware requirements
 
-- RD-RW610-BGA board
+- RD-RW612-BGA board
 - Wi-Fi antenna (to plug in Ant1) + BLE antenna (to plug in Ant2)
 
 <a name="building"></a>
@@ -33,7 +33,7 @@ The resulting output file can be found in out/debug/chip-rw610-all-cluster-examp
 
 To know how to flash and debug follow instructions from [README.md 'Flashing and debugging'][readme_flash_debug_section].
 
-[readme_flash_debug_section]:README.md#flashdebug
+[readme_flash_debug_section]:README.md#flashing-and-debugging
 
 ## Testing the example
 

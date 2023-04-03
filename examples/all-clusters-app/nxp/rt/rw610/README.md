@@ -1,10 +1,9 @@
-# CHIP RW610 All-cluster Application
+# CHIP RW612 All-clusters Application
 
-The all-cluster example implements a server wich can be accesed by a CHIP controller and acts 
-on software level as a zigbee coordinator and accepts basic ZCL comands on a number of clusters.
+The all-clusters example implements a server which can be accesed by a CHIP controller and can accept basic cluster commands.
 
 The example is based on
-[Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP RW610 SDK,
+[Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP RW612 SDK,
 and provides a prototype application that demonstrates device commissioning and different cluster
 control.
 
@@ -25,9 +24,9 @@ control.
 
 ## Introduction
 
-The RW610 all-cluster application provides a working demonstration of the
-RW610 board integration, built using the Project CHIP codebase and the NXP
-RW610 SDK. The example supports basic ZCL commands.
+The RW612 all-cluster application provides a working demonstration of the
+RW612 board integration, built using the Project CHIP codebase and the NXP
+RW612 SDK. The example supports basic ZCL commands and acts as a thermostat device-type.
 
 The example supports:
 
@@ -38,7 +37,7 @@ The example supports:
 [README_Openthread.md]: README_Openthread.md
 
 The example targets the
-[NXP RD-RW610-BGA]
+[NXP RD-RW612-BGA]
 board by default.
 
 
@@ -49,38 +48,39 @@ board by default.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [RD-RW610 SDK 2.13.0 EAR4 for Project CHIP](https://mcuxpresso.nxp.com/en/select).
+-   Download [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2.13.0_RW610. The SDK Builder UI selection should be similar with
+    SDK. The SDK Builder UI selection should be similar with
     the one from the image below.
-    (For internal SDK delivery, the SDK can be downloaded from [Kex-stage](https://kex-stage.nxp.com/).)
 
     ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw610/doc/images/mcux-sdk-download.PNG)
 
     (Note: All SDK components should be selected. If size is an issue Azure RTOS component can be omitted.)
 
+    Please refer to Matter release notes for getting the latest released SDK.
+
 -   Start building the application.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_2_13_0_RW610/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rw610/
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw610/
 ```
+(Note : The "rw610" folder is dedicated to the RW612 example.)
 
 Optional GN options that can be added when building an application:
 
 - To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
 - To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
-- By default, the RW610 A1 board version will be chosen. To switch to an A0 version, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
+- By default, the RW612 A1 board version will be chosen. To switch to an A0 version, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
-Note : **For internal use only**, the SDK branch "*develop/2.13.0_rw612*" (from *mcu-sdk-2.0* repo) can be used to build the application.
 
 ## Manufacturing data
 
-See [Guide for writing manufacturing data on NXP devices](../../../platform/nxp/doc/manufacturing_flow.md)
+See [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md)
 
 Other comments:
 
@@ -92,11 +92,11 @@ TODO add information
 
 ### Pre-requisites
 
-Prior to flashing the all-clusters-application, RW610 should be flashed with CPU1/CPU2 firmware binaries :
+Prior to flashing the all-clusters-application, RW612 should be flashed with CPU1/CPU2 firmware binaries :
 
-- CPU1 wifi image to flash : "rw610w_raw_cpu1.bin" at address 0x08400000
-- CPU2 BLE image to flash : "rw610n_raw_cpu2_ble.bin" at address 0x08540000
-- CPU2 15.4/BLE combo image to flash : "rw610n_combo_raw_cpu2_ble_15_4_combo.bin" at address 0x085E0000
+- CPU1 wifi image to flash : "rw610_sb_wifi.bin" at address 0x08400000
+- CPU2 BLE image to flash : "rw610_sb_ble.bin" at address 0x08540000
+- CPU2 15.4/BLE combo image to flash : "rw610_sb_ble_15d4_combo.bin" at address 0x085E0000
 
 The respective firmware binaries can be found in components/conn_fwloader/fw_bin/ folder in the SDK. For more information about the FW loading process, the readme provided in conn_fwloader can be followed.
 
@@ -127,7 +127,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 - Configure MCU Settings:
 
 ```
-Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Select RW610 -> Apply & Close
+Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Select RW612 -> Apply & Close
 ```
 
 ![MCU_Set](../../../../platform/nxp/rt/rw610/doc/images/mcu-set.PNG)
@@ -212,4 +212,4 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    - No parity
    - No flow control
 
-4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool/README.md)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).

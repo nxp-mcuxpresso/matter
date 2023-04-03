@@ -1,8 +1,8 @@
-# RW610 All-Cluster Application for Matter over Openthread
+# RW612 All-Cluster Application for Matter over Openthread
 
 ## Hardware requirements
 
-- RD-RW610 board
+- RD-RW612-BGA board
 - BLE/15.4 antenna
 
 <a name="building"></a>
@@ -26,11 +26,11 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610
 The resulting output file can be found in out/debug/chip-rw610-all-cluster-example.
 
 ## Flash Binaries
-### Flashing and debugging RW610
+### Flashing and debugging RW612
 
 To know how to flash and debug follow instructions from [README.md 'Flashing and debugging'][readme_flash_debug_section].
 
-[readme_flash_debug_section]:README.md#flashdebug
+[readme_flash_debug_section]:README.md#flashing-and-debugging
 
 ## Raspberrypi Border Router setup
 
