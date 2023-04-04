@@ -323,10 +323,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     /* Mask of combined controllers to initialize */
     uint8_t controllerMask = 0U;
 
-    /* Initialize platform services */
-    err = ServiceInit();
-    SuccessOrExit(err);
-
     // Initialize the configuration system.
     err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
@@ -361,6 +357,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     PLATFORM_InitControllers(controllerMask);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+
 #ifdef SPINEL_INTERFACE_RPMSG
     otPlatRadioInitSpinelInterface();
 #endif /* SPINEL_INTERFACE_RPMSG */
@@ -391,6 +392,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         chipDie();
     }
     ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
+
+    /* Initialize platform services */
+    err = ServiceInit();
+    SuccessOrExit(err);
+
 #elif !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     err = EthernetInterfaceInit();
 
