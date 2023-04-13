@@ -97,7 +97,7 @@ private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR _ConnectWiFiNetwork(void);
+    void ProcessWlanEvent(enum wlan_event_reason wlanEvent);
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
     ConnectivityManager::WiFiStationState _GetWiFiStationState(void);
@@ -129,18 +129,13 @@ private:
     };
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
-    EventGroupHandle_t mWiFiEventGroup;
     static netif_ext_callback_t sNetifCallback;
 
     static int _WlanEventCallback(enum wlan_event_reason event, void *data);
     static void _NetifExtCallback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args);
 
     void OnStationConnected(void);
-    void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
-    void OnStationIPv4AddressAvailable(void);
-    void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 

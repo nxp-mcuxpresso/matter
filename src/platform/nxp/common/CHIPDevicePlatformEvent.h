@@ -27,8 +27,18 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <toolchain.h>
 #include <sys/atomic.h>
-#include <platform/Zephyr/CHIPDevicePlatformEvent.h>
-#else
+#include <zephyr/bluetooth/bluetooth.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if defined(__cplusplus)
+extern "C" {
+#endif /* _cplusplus */
+#include "wlan.h"
+#if defined(__cplusplus)
+}
+#endif
+#endif
+
 #include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
@@ -37,7 +47,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates NXP platform-specific event types that are visible to the application.
+ * Enumerates platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -45,28 +55,69 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates NXP platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates platform-specific event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    /* None currently defined */
+    kPlatformZephyrEvent = kRange_InternalPlatformSpecific,
+    kPlatformZephyrBleConnected,
+    kPlatformZephyrBleDisconnected,
+    kPlatformZephyrBleCCCWrite,
+    kPlatformZephyrBleC1WriteEvent,
+    kPlatformZephyrBleC2IndDoneEvent,
+    kPlatformZephyrBleOutOfBuffersEvent,
+    kPlatformNxpWlanEvent,
+    kPlatformNxpIpChangeEvent,
 };
 
 } // namespace DeviceEventType
 
-/**
- * Represents platform-specific event information for NXP platforms.
- */
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+struct BleConnEventType
+{
+    bt_conn * BtConn;
+    uint8_t HciResult;
+};
 
+struct BleCCCWriteEventType
+{
+    bt_conn * BtConn;
+    uint16_t Value;
+};
+
+struct BleC1WriteEventType
+{
+    bt_conn * BtConn;
+    ::chip::System::PacketBuffer * Data;
+};
+
+struct BleC2IndDoneEventType
+{
+    bt_conn * BtConn;
+    uint8_t Result;
+};
+
+#endif
+
+/**
+ * Represents platform-specific event information for Zephyr platforms.
+ */
 struct ChipDevicePlatformEvent final
 {
     union
     {
-        /* None currently defined */
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        BleConnEventType BleConnEvent;
+        BleCCCWriteEventType BleCCCWriteEvent;
+        BleC1WriteEventType BleC1WriteEvent;
+        BleC2IndDoneEventType BleC2IndDoneEvent;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+        enum wlan_event_reason WlanEventReason;
+#endif
+
     };
 };
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif

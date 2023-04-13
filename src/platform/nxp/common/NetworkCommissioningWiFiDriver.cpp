@@ -169,9 +169,7 @@ void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan deb
 {
     if (mpConnectCallback != nullptr)
     {
-        PlatformMgr().LockChipStack();
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
-        PlatformMgr().UnlockChipStack();
         mpConnectCallback = nullptr;
     }
 }
@@ -237,6 +235,7 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
+//TODO should be modified to do it in the context of the Matter stack
 int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) done, found: %u", count);
