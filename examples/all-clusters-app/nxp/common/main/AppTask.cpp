@@ -76,7 +76,7 @@ static const uint8_t aes128TestKey[] __attribute__((aligned)) = {0x2b, 0x7e, 0x1
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
-#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE)4096 / sizeof(portSTACK_TYPE))
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE)6144 / sizeof(portSTACK_TYPE))
 #endif
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
