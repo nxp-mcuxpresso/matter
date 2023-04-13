@@ -150,10 +150,21 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
+    InterfaceId interfaceId;
 #if HAVE_LWIP_UDP_BIND_NETIF
-    return InterfaceId(netif_get_by_index(mUDP->netif_idx));
+    // Lock LwIP stack
+    LOCK_TCPIP_CORE();
+    interfaceId = InterfaceId(netif_get_by_index(mUDP->netif_idx));
+    // Unlock LwIP stack
+    UNLOCK_TCPIP_CORE();
+    return interfaceId;
 #else
-    return InterfaceId(mUDP->intf_filter);
+    // Lock LwIP stack
+    LOCK_TCPIP_CORE();
+    interfaceId = InterfaceId(mUDP->intf_filter);
+    // Unlock LwIP stack
+    UNLOCK_TCPIP_CORE();
+    return interfaceId;
 #endif
 }
 
@@ -512,13 +523,21 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
         struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
         VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
+        // Lock LwIP stack
+        LOCK_TCPIP_CORE();
         lStatus = join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
                        : igmp_leavegroup_netif(lNetif, &lIPv4Address);
+        // Unlock LwIP stack
+        UNLOCK_TCPIP_CORE();
     }
     else
     {
+        // Lock LwIP stack
+        LOCK_TCPIP_CORE();
         lStatus = join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
                        : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
+        // Unlock LwIP stack
+        UNLOCK_TCPIP_CORE();
     }
 
     if (lStatus == ERR_MEM)
@@ -541,13 +560,21 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInt
     {
         struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
         VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+        // Lock LwIP stack
+        LOCK_TCPIP_CORE();
         lStatus = join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
                        : mld6_leavegroup_netif(lNetif, &lIPv6Address);
+         // Unlock LwIP stack
+        UNLOCK_TCPIP_CORE();
     }
     else
     {
+        // Lock LwIP stack
+        LOCK_TCPIP_CORE();
         lStatus = join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
                        : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
+        // Unlock LwIP stack
+        UNLOCK_TCPIP_CORE();
     }
 
     if (lStatus == ERR_MEM)
