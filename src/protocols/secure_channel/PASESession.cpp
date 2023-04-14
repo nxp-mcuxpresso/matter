@@ -47,7 +47,7 @@
 #include <trace/trace.h>
 #include <transport/SessionManager.h>
 
-#if CHIP_CRYPTO_HSM
+#if (CHIP_CRYPTO_HSM && ENABLE_HSM_SPAKE_VERIFIER)
 #include "se05x_set_gpio.h"
 #include "se05x_t4t_set_read.h"
 #endif
@@ -809,7 +809,7 @@ CHIP_ERROR PASESession::OnUnsolicitedMessageReceived(const PayloadHeader & paylo
 CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
-#if CHIP_CRYPTO_HSM
+#if (CHIP_CRYPTO_HSM && ENABLE_HSM_SPAKE_VERIFIER)
     static bool se051_has_been_set = false;
 #endif
     CHIP_ERROR err  = ValidateReceivedMessage(exchange, payloadHeader, msg);
@@ -824,14 +824,14 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
-#if CHIP_CRYPTO_HSM
+#if (CHIP_CRYPTO_HSM && ENABLE_HSM_SPAKE_VERIFIER)
     if(!se051_has_been_set) {
         ChipLogProgress(NotSpecified, "power on, T4T read locked");
         if (se05x_set_pin(SE05x_ON) != 0) {
             ChipLogProgress(NotSpecified, "Error in se05x_set_pin. ");
         }
         if (se05x_lock_read() != 0){
-            ChipLogProgress(NotSpecified, "Error in se05x_lock_read. ");   
+            ChipLogProgress(NotSpecified, "Error in se05x_lock_read. ");
         }
         se051_has_been_set = true;
     }

@@ -86,7 +86,7 @@ void se05x_sessionOpen(void)
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
-    const char * portName = nullptr;
+    char * portName = nullptr;
     sss_status_t status   = ex_sss_boot_connectstring(0, NULL, &portName);
     if (kStatus_SSS_Success != status)
     {
