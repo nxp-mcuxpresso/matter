@@ -45,7 +45,7 @@
 /*
  * Enable HSM for HKDF SHA256
  */
-#define ENABLE_HSM_HKDF_SHA256 1
+#define ENABLE_HSM_HKDF_SHA256 0
 
 /*
  * Enable HSM for HMAC SHA256
