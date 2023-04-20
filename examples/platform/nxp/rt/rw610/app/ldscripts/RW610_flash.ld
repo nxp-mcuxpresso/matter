@@ -31,6 +31,63 @@
  *   Linker instructions for RW610
  */
 
+/** If OTA is enabled : MCUBoot bootloader resides at the base of the flash and occupies 0x20000 (128 kBytes) 
+  slot 0 : main application partition (active app)
+           slot0 = header + ivt + m_app_cpu3 + fw_storage (cpu1/cpu2 fw) + trailer
+  slot 1 : OTA Update storage partition (candidate app)
+           slot1 = OTA image (the image received is already wrapped with header & trailer)
+**/
+
+/************************ Flash Layout with OTA enabled *********************
+
+             0x0800_0000    FLASH_START
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          |               |                 
+          |    MCUBoot    |                 
+   128k   |   bootloader  |                 
+          |               |
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+   4k     |  Header_slot0 |                                 '
+          +---------------+ m_interrupts_start              '
+          |  m_interrupts |                   '             '
+          +---------------+ m_text_start      '             '
+          |               |                   '  m_app_cpu3 '      
+ m_app_   |               |                   '       +     '
+_stated_  |     m_text    |                   '  fw_storage '   ACTIVE_APP (slot 0)
+ _size    |               |                   '             '       (4.4 MB)
+          |               |                   '             '  
+          |               |                   '             '
+          +---------------+ m_text_end        '             '
+   4k     | Trailer_slot0 |                                 '
+          +---------------+                                 '
+   4k     |    padding    |                                 '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          |               | FW_UPDATE_STORAGE_START         '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |      OTA      |                                 '
+          |     Update    |                                 '   CANDIDATE_APP (slot 1)
+          |     Image     |                                 '        (4.4 MB)
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               | FW_UPDATE_STORAGE_END           '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          +               +
+          +               + 
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+    4k    |  FactoryData  |
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - - 
+          |               | NV_STORAGE_START_ADDRESS
+          |   NVM_region  | 
+          |               | NV_STORAGE_END_ADDRESS
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+             0x0C00_0000    FLASH_END
+
+*****************************************************************************/
 
 /* Entry Point */
 ENTRY(Reset_Handler)
@@ -44,7 +101,7 @@ M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000280 : 0;
 /* -------------------------------------------------------------------------- */
 
 m_flash_start                       = 0x08000000;
-m_flash_size                        = 0x00300000; /* 3MB */
+m_flash_size                        = 0x04000000; /* 64 MB */
 m_flash_end                         = m_flash_start + m_flash_size - 1;
 m_sector_size                       = 0x1000;
 m_vector_table_size                 = 0x280;
@@ -53,8 +110,69 @@ m_flash_config_start                = 0x08000400;
 m_flash_config_size                 = 0xC00;
 m_flash_config_end                  = m_flash_config_start + m_flash_config_size - 1;
 
-m_interrupts_start                  = m_flash_config_end + 1;
+/* 
+ * If OTA is enabled, we must reserve enough space for MCUboot and the image header.
+ * Note that MCUboot itself embeds the FlashConfig section.
+*/
+m_mcuboot_size                      = DEFINED(__m_mcuboot_size__)  ? __m_mcuboot_size__  : 0; /* 128 kB but 64kB could be enough */
+m_mcuboot_start                     = m_flash_start; /* The flash config section is comprised */
+m_mcuboot_end                       = m_mcuboot_start + m_mcuboot_size - 1;
+m_mcuboot_img_hdr_sz                = ((0x400 + (m_sector_size - 1))/m_sector_size)*m_sector_size;
+
+/* CPU1/CPU2 fw storage section */
+wifi_fw_size                        = 0xA0000; /* 640kB */
+ble_fw_size                         = 0x50000; /* 320kB */
+z154_fw_size                        = 0x50000; /* 320kB */
+/* fw_storage_size is the maximum possible size of CPU1 + CPU2 binaries. */
+fw_storage_size                     = (wifi_fw_size + ble_fw_size + z154_fw_size);
+
+
+/* Active application section
+ * If OTA is enabled, the application starts after mcuboot app + image header.
+ * We reserve cpu3_app max size plus enough to store CPU1 and CPU2 apps because
+ * CPU1 and CPU2 binaries are embedded in app core binary.
+*/
+
+m_app_start                         = DEFINED(__m_mcuboot_size__)  ? m_mcuboot_end + 1 : m_flash_config_end + 1;
+m_app_trailer_size                  = m_sector_size;
+m_padding_size                      = m_sector_size;
+
+/* Maximum number of sectors per slot */
+m_app_max_sectors                   = 0x440; /* (4.4MB / m_sector_size) */
+
+/* The active image section contains the mcuboot header + m_interrupts + cpu3/cpu2/cpu1 apps + trailer 
+ * The maximum image size available for the application is the (total_slot_size - m_padding_size).
+ * This is due to the last sector being used by mcuboot to perform the swap-move of the upgrade. 
+*/
+FW_ACTIVE_APP_START                 = m_app_start;
+FW_ACTIVE_APP_OFFSET                = m_app_start - m_flash_start;
+FW_ACTIVE_APP_SIZE                  = m_sector_size * m_app_max_sectors - m_padding_size;
+FW_ACTIVE_APP_END                   = FW_ACTIVE_APP_START + FW_ACTIVE_APP_SIZE - 1;
+
+/* The size of the stated application includes the sizes of cpu1/cpu2/cpu3 apps.
+ * Note that an empty sector (padding) must be kept at the end of the active image section,
+ * this would be used by mcuboot to perform a swap-move operation of the upgrade.
+ */
+m_app_stated_size                   = FW_ACTIVE_APP_SIZE - m_mcuboot_img_hdr_sz - m_app_trailer_size;
+
+m_interrupts_start                  = DEFINED(__m_mcuboot_size__)  ? m_app_start + m_mcuboot_img_hdr_sz : m_app_start;
 m_interrupts_end                    = m_interrupts_start + m_vector_table_size - 1;
+
+m_text_start                        = m_interrupts_end + 1;
+m_text_size                         = m_app_stated_size - m_vector_table_size;
+m_text_end                          = m_text_start + m_text_size - 1;
+
+
+
+/* Candidate application (OTA Update Image) section 
+ * The size of the candidate image (slot 1) is equal to the active image (slot 0) size
+*/
+FW_UPDATE_STORAGE_START             = FW_ACTIVE_APP_END + 1 + m_padding_size;
+FW_UPDATE_STORAGE_SIZE              = FW_ACTIVE_APP_SIZE;
+FW_UPDATE_STORAGE_OFFSET            = FW_UPDATE_STORAGE_START - m_flash_start;
+FW_UPDATE_STORAGE_END               = FW_UPDATE_STORAGE_START + FW_UPDATE_STORAGE_SIZE - 1;
+
+fw_top                              = FW_UPDATE_STORAGE_END + 1;
 
 /* FileSystem Configuration */
 NV_STORAGE_END_ADDRESS              = m_flash_end;
@@ -69,11 +187,6 @@ __FACTORY_DATA_SIZE                 = m_sector_size;
 __FACTORY_DATA_END                  = NV_STORAGE_START_ADDRESS -1;
 __FACTORY_DATA_START                = __FACTORY_DATA_END - __FACTORY_DATA_SIZE + 1;
 __FACTORY_DATA_START_OFFSET         = __FACTORY_DATA_START - m_flash_start;
-
-m_text_start                        = m_interrupts_end + 1;
-m_text_end                          = NV_STORAGE_START_ADDRESS - 1;
-m_text_size                         = m_text_end - m_text_start;
-
 
 /* -------------------------------------------------------------------------- */
 /*                                    RAM                                     */
@@ -469,4 +582,8 @@ SECTIONS
   .ARM.attributes 0 : { *(.ARM.attributes) }
 
   /*ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")*/
+
+  ASSERT( (DEFINED(__m_mcuboot_size__) ? (__m_mcuboot_size__ % m_sector_size) : 0) == 0, "mcuboot size is not aligned on flash sector size")
+  
+  ASSERT(NV_STORAGE_START_ADDRESS >= FW_UPDATE_STORAGE_END, "OTA storage section overflowed")
 }

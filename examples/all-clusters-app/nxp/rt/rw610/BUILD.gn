@@ -113,14 +113,9 @@ rt_executable("all_cluster_app") {
     sources += [
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.cpp",
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.h",
-#Adding mcuboot files      
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/mcuboot_app_support.c",
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/mcuboot_app_support.h",
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/flash_partitioning.h",
     ]
     include_dirs += [
       "${chip_root}/examples/platform/nxp/common",
-      "${chip_root}/examples/platform/nxp/common/mcuboot_app_support",
     ]
   }
 
@@ -218,11 +213,18 @@ rt_executable("all_cluster_app") {
 
   if (chip_enable_ota_requestor)
   {
-    # If OTA build flag is enabled,
-    # we would need to reserve enough space for the bootloader (MCUBoot) 
-    # MCUBoot requires 0x11000 Bytes to be reserved at the base of the flash 
-    # Consequently, some sections will need to be shifted
-    ldflags += [ "-Wl,--defsym=__mcu_boot_size__=0x11000" ]
+    if (no_mcuboot)
+    {
+      # If "no_mcuboot" is set to true, the application will be linked at the base of the flash.
+      print("Warning : The OTA Requestor is enabled without MCUBoot. This will prevent the application from applying software updates.")
+    }
+    else
+    {
+      # we need to reserve enough space for the bootloader (MCUBoot) 
+      # MCUBoot requires 0x20000 Bytes to be reserved at the base of the flash 
+      # Consequently, some sections will need to be shifted
+      ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x20000" ]
+    }
   }
 
   output_dir = root_out_dir
