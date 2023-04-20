@@ -91,25 +91,6 @@ The all cluster app demonstrates the usage of encrypted Matter manufacturing dat
 <a name="flashdebug"></a>
 
 ## Flashing and debugging
-
-### Pre-requisites
-
-Prior to flashing the all-clusters-application, RW612 should be flashed with CPU1/CPU2 firmware binaries :
-
-- CPU1 wifi image to flash : "rw610_sb_wifi.bin" at address 0x08400000
-- CPU2 BLE image to flash : "rw610_sb_ble.bin" at address 0x08540000
-- CPU2 15.4/BLE combo image to flash : "rw610_sb_ble_15d4_combo.bin" at address 0x085E0000
-
-The respective firmware binaries can be found in components/conn_fwloader/fw_bin/ folder in the SDK. For more information about the FW loading process, the readme provided in conn_fwloader can be followed.
-
-Note : FW binaries should only be flashed at the address values mentioned above.
-
-For each Matter configuration, the following firmwares are required : 
-
-- For Matter-over-WiFi onnetwork : CPU1 Wifi FW.
-- For Matter-over-WiFi ble-wifi : CPU1 Wifi FW + CPU2 BLE FW.
-- For Matter-over-Thread : CPU2 15.4/BLE combo FW.
-
 ### Flashing the All-Clusters application
 
 In order to flash the application we recommend using
