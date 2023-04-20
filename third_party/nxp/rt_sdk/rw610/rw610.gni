@@ -191,6 +191,8 @@ template("rw610_sdk_drivers") {
         "USE_RTOS=1",
         "BOOT_HEADER_ENABLE=1",
         "WIFI_BOARD_RW610",
+        # This allows the CPU1/CPU2 fw to be embedded in the application 
+        "gPlatformMonolithicApp_d",
     ]
 
     if (board_version != "A1")
@@ -384,6 +386,10 @@ template("rw610_sdk_drivers") {
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_coex.c",
         # this platform file is needed for BLE/15.4 Controller wake up
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ble.c",
+        # fw binaries for cpu1/cpu2
+        "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu1.c",
+        "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_ble.c",
+        "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_combo.c",
     ]
 
     if (sdk_fsl_assert_support) {

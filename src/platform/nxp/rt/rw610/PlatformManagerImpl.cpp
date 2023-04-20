@@ -109,6 +109,13 @@ extern "C" {
 #include "wm_net.h"
 }
 
+#ifdef gPlatformMonolithicApp_d
+extern const uint32_t fw_cpu1[];
+#define WIFI_FW_BIN_ADDRESS (uint32_t) & fw_cpu1[0]
+#else
+#define WIFI_FW_BIN_ADDRESS wlan_fw_bin
+#endif
+
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
 extern "C" void vApplicationMallocFailedHook(void)
@@ -233,7 +240,7 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
     otPlatRadioSetCoexEnabled(NULL, false);
 #endif
 
-    wifi_status = wlan_init(wlan_fw_bin, wlan_fw_bin_len);
+    wifi_status = wlan_init((uint8_t*)WIFI_FW_BIN_ADDRESS, wlan_fw_bin_len);
     if (wifi_status != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "WLAN initialization failed");
