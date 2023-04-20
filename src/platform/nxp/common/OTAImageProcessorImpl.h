@@ -22,7 +22,6 @@
 #include <include/platform/CHIPDeviceLayer.h>
 #include <include/platform/OTAImageProcessor.h>
 #include <lib/core/OTAImageHeader.h>
-#include "mcuboot_app_support.h"
 
 #include "OtaSupport.h"
 
@@ -58,7 +57,6 @@ private:
     static void HandleProcessBlock(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleBlockEraseComplete(uint32_t param);
-    static void HandleReset(System::Layer * aLayer, void * appState);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
 
@@ -77,9 +75,6 @@ private:
     OTAImageHeaderParser mHeaderParser;
     uint32_t mSoftwareVersion;
     const char * mImageFile = nullptr;
-
-    /* Update partition info */
-    partition_t mOTAPartition;
 
     /* Buffer used for transaction storage */
     uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS*TRANSACTION_SZ];

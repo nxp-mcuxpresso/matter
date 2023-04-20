@@ -481,7 +481,8 @@ template("rt_sdk") {
       sources += [
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaPrivate.h",
-        "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/ExternalMflash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_extflash.c",
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ota.c",
         ]
     }

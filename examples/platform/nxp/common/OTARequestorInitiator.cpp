@@ -47,18 +47,15 @@ void OTARequestorInitiator::HandleSelfTest()
        (if we have arrived this far, the bootloader had validated the image) */
 
     mflash_drv_init();
+    
+    OtaImgState_t update_state;
 
     /* Retrieve current update state */
-    uint32_t update_state;
+    update_state = OTA_GetImgState();
 
-    if (bl_get_image_state(&update_state) != kStatus_Success)
+    if (update_state == kOtaImg_RunCandidate)
     {
-        ChipLogError(SoftwareUpdate, "Failed to get current update state");
-    }
-
-    if (update_state == kSwapType_Testing)
-    {
-        if (bl_update_image_state(kSwapType_Permanent) != kStatus_Success)
+        if (OTA_UpdateImgState(kOtaImg_Permanent) != gOtaSuccess_c)
         {
             ChipLogError(SoftwareUpdate, "Self-testing : Failed to switch update state to permanent");
             return;
@@ -66,6 +63,5 @@ void OTARequestorInitiator::HandleSelfTest()
 
         ChipLogProgress(SoftwareUpdate, "Successful software update... applied permanently");
     }
-
     /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */  
 }

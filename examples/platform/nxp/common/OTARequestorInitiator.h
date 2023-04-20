@@ -20,12 +20,10 @@
 
 #include <stdint.h>
 #include "platform/nxp/common/OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-#include "mcuboot_app_support.h"
 
 using namespace chip;
 
