@@ -37,6 +37,41 @@ class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentia
                             public DeviceInstanceInfoProvider
 {
 public:
+
+    struct Header
+    {
+        uint32_t hashId;
+        uint32_t size;
+        uint8_t hash[4];
+    };
+
+    // Default factory data IDs
+    enum FactoryDataId
+    {
+        kVerifierId = 1,
+        kSaltId,
+        kIcId,
+        kDacPrivateKeyId,
+        kDacCertificateId,
+        kPaiCertificateId,
+        kDiscriminatorId,
+        kSetupPasscodeId,
+        kVidId,
+        kPidId,
+        kCertDeclarationId,
+        kVendorNameId,
+        kProductNameId,
+        kSerialNumberId,
+        kManufacturingDateId,
+        kHardwareVersionId,
+        kHardwareVersionStrId,
+        kUniqueId,
+        kPartNumber,
+        kProductURL,
+        kProductLabel,
+        kMaxId
+    };
+
     static FactoryDataProvider & GetDefaultInstance();
 
     CHIP_ERROR Init(DataReaderEncryptedDCP *encryptedReader);
@@ -60,6 +95,10 @@ public:
     // ===== Members functions that implement the DeviceInstanceInfoProvider
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
+
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
@@ -72,10 +111,10 @@ public:
 
 private:
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
-
-    uint8_t * SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length);
+    Header mHeader;
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length, uint32_t *contentAddr);
     CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
-
 };
 
 } // namespace DeviceLayer

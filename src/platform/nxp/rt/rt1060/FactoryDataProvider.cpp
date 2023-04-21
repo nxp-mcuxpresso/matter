@@ -63,18 +63,10 @@ extern "C" {
 #define FACTORY_DATA_PROVIDER_PRINTF(...)
 #endif
 
-#define VERIFIER_ID 1
-#define SALT_ID 2
-#define IC_ID 3
-#define DAC_PRIVATE_KEY_ID 4
-#define DAC_CERTIFICATE_ID 5
-#define PAI_CERTIFICATE_ID 6
-#define DISCRIMINATOR_ID 7
-#define MAX_KEY_LEN 32
 #define BLOCK_SIZE_16_BYTES 16
-#define BLOCK_SIZE_4_BYTES 4
 #define SHA256_OUTPUT_SIZE 32
 #define HASH_ID 0xCE47BA5E
+#define HASH_LEN 4
 
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
@@ -92,8 +84,14 @@ FactoryDataProvider & FactoryDataProvider::GetDefaultInstance()
     return sInstance;
 }
 
-uint8_t * FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length)
+CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length)
 {
+    return SearchForId(searchedType, pBuf, bufLength, length, NULL);
+}
+
+CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length, uint32_t *contentAddr)
+{
+    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint8_t type = 0;
     uint32_t index = 0;
     uint8_t *addrContent = NULL;
@@ -126,7 +124,11 @@ uint8_t * FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, 
                 memcpy((uint8_t *)pBuf, factoryDataAddress+index, currentLen); 
             }
             length = currentLen;
-            addrContent = factoryDataAddress+index;
+            if (contentAddr != NULL)
+            {
+                *contentAddr = (uint32_t) factoryDataAddress+index;
+            }
+            err = CHIP_NO_ERROR;
             break;
         }
         else if (type == 0)
@@ -141,7 +143,7 @@ uint8_t * FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, 
         }
     }
 
-    return addrContent;
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
@@ -159,11 +161,8 @@ CHIP_ERROR FactoryDataProvider::Init(DataReaderEncryptedDCP *encryptedReader)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t)__FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize = (uint32_t)__FACTORY_DATA_SIZE;
-    uint32_t sizeOfFactoryData = 0;
     uint32_t hashId;
-	uint32_t kHashId = HASH_ID;
     uint8_t currentBlock[BLOCK_SIZE_16_BYTES];
-    uint8_t hashReadFromFlash[BLOCK_SIZE_4_BYTES];
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     size_t outputHashSize;
     uint16_t i;
@@ -176,36 +175,19 @@ CHIP_ERROR FactoryDataProvider::Init(DataReaderEncryptedDCP *encryptedReader)
         return CHIP_ERROR_INTERNAL;
 
     /* Read hash id saved in flash */
-    if (mflash_drv_read(factoryDataAddress, (uint32_t *)&hashId, sizeof(hashId)) != kStatus_Success)
+    if (mflash_drv_read(factoryDataAddress, (uint32_t *)&mHeader, sizeof(mHeader)) != kStatus_Success)
     {
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (memcmp(&hashId, &kHashId, BLOCK_SIZE_4_BYTES) != 0)
+    if (mHeader.hashId != HASH_ID)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
 
     /* Update address to start after hash id to read size of factory data */
-    factoryDataAddress += BLOCK_SIZE_4_BYTES;
+    factoryDataAddress += sizeof(mHeader);
 
-    /* Read size of data saved in flash to be used in calculating the hash */
-    if (mflash_drv_read(factoryDataAddress, (uint32_t *)&sizeOfFactoryData, sizeof(sizeOfFactoryData)) != kStatus_Success)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    /* Update address to start after size to read actual hash */
-    factoryDataAddress += BLOCK_SIZE_4_BYTES;
-
-    /* Read hash saved in flash */
-    if (mflash_drv_read(factoryDataAddress, (uint32_t *)&hashReadFromFlash[0], sizeof(hashReadFromFlash)) != kStatus_Success)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    /* Update address to start after hash to read factory data */
-    factoryDataAddress += BLOCK_SIZE_4_BYTES;
 
     /* Load the buffer into RAM by reading each 16 bytes blocks */
     for (i=0; i<(factoryDataSize/BLOCK_SIZE_16_BYTES); i++)
@@ -232,7 +214,7 @@ CHIP_ERROR FactoryDataProvider::Init(DataReaderEncryptedDCP *encryptedReader)
     /* Calculate SHA256 value over the factory data and compare with stored value */
     if (encryptedReader != nullptr)
     {
-    	res = encryptedReader->Hash256(&factoryDataRamBuffer[0], sizeOfFactoryData, &calculatedHash[0], &outputHashSize);
+        res = encryptedReader->Hash256(&factoryDataRamBuffer[0], mHeader.size, &calculatedHash[0], &outputHashSize);
     }
     else
     {
@@ -242,39 +224,35 @@ CHIP_ERROR FactoryDataProvider::Init(DataReaderEncryptedDCP *encryptedReader)
     if (res != CHIP_NO_ERROR)
         return res;
 
-    if (memcmp(&calculatedHash[0], &hashReadFromFlash[0], BLOCK_SIZE_4_BYTES) != 0)
+    if (memcmp(&calculatedHash[0], &mHeader.hash[0], HASH_LEN) != 0)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    if (SearchForId(VERIFIER_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", VERIFIER_ID, len);
-    if (SearchForId(SALT_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", SALT_ID, len);
-    if (SearchForId(IC_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", IC_ID, len);
-    if (SearchForId(DAC_PRIVATE_KEY_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", DAC_PRIVATE_KEY_ID, len);
-    if (SearchForId(DAC_CERTIFICATE_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", DAC_CERTIFICATE_ID, len);
-    if (SearchForId(PAI_CERTIFICATE_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
-    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", PAI_CERTIFICATE_ID, len);
-    if (SearchForId(DISCRIMINATOR_ID, NULL, 0, len) == NULL)
-        return CHIP_ERROR_INTERNAL;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVerifierId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kVerifierId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSaltId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kSaltId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kIcId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kIcId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kDacPrivateKeyId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kDacCertificateId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPaiCertificateId, NULL, 0, len));
+    FACTORY_DATA_PROVIDER_PRINTF("[%d] len = %d", FactoryDataId::kPaiCertificateId, len);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDiscriminatorId, NULL, 0, len));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-    constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
-    return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+    uint16_t declarationSize = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kCertDeclarationId, outBuffer.data(), outBuffer.size(), declarationSize));
+    outBuffer.reduce_size(declarationSize);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -285,27 +263,18 @@ CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_fir
 
 CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint16_t certificateSize = 0;
-    uint8_t *certificateAddr = SearchForId(DAC_CERTIFICATE_ID, NULL, 0, certificateSize);
-
-    if (certificateAddr != NULL && certificateSize > 0 && outBuffer.size() >= certificateSize)
-    {
-        memcpy(outBuffer.data(), certificateAddr, certificateSize);
-        err = CHIP_NO_ERROR;
-    }
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, outBuffer.data(), outBuffer.size(), certificateSize));
     outBuffer.reduce_size(certificateSize);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint16_t certificateSize = 0;
-    if (SearchForId(PAI_CERTIFICATE_ID, outBuffer.data(), outBuffer.size(), certificateSize) != NULL)
-        err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPaiCertificateId, outBuffer.data(), outBuffer.size(), certificateSize));
     outBuffer.reduce_size(certificateSize);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
@@ -321,20 +290,18 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & di
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     Crypto::P256PublicKey dacPublicKey;
     uint16_t certificateSize = 0;
-    uint8_t *certificateAddr = SearchForId(DAC_CERTIFICATE_ID, NULL, 0, certificateSize);
-    if (certificateAddr == NULL)
-        return CHIP_ERROR_NOT_FOUND;
-    MutableByteSpan dacCertSpan(certificateAddr, certificateSize);
+    uint32_t certificateAddr;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, certificateSize, &certificateAddr));
+    MutableByteSpan dacCertSpan((uint8_t *)certificateAddr, certificateSize);
 
     /* Extract Public Key of DAC certificate from itself */
     ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
 
     /* Get private key of DAC certificate from reserved section */
     uint16_t keySize = 0;
-    uint8_t *keyAddr = SearchForId(DAC_PRIVATE_KEY_ID, NULL, 0, keySize);
-    if (keyAddr == NULL)
-        return CHIP_ERROR_NOT_FOUND;
-    MutableByteSpan dacPrivateKeySpan(keyAddr, keySize);
+    uint32_t keyAddr;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
+    MutableByteSpan dacPrivateKeySpan((uint8_t *)keyAddr, keySize);
 
     ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()), ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
 
@@ -345,13 +312,11 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & di
 
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint16_t discriminatorLen = 0;
 
-    if (SearchForId(DISCRIMINATOR_ID, (uint8_t *)&setupDiscriminator, sizeof(setupDiscriminator), discriminatorLen) != NULL)
-        err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDiscriminatorId, (uint8_t *)&setupDiscriminator, sizeof(setupDiscriminator), discriminatorLen));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider:: SetSetupDiscriminator(uint16_t setupDiscriminator)
@@ -361,13 +326,10 @@ CHIP_ERROR FactoryDataProvider:: SetSetupDiscriminator(uint16_t setupDiscriminat
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    uint16_t iterationCountLen = 0;
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
+    uint16_t temp = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kIcId, (uint8_t *) &iterationCount, sizeof(iterationCount), temp));
 
-    if (SearchForId(IC_ID, (uint8_t *)&iterationCount, sizeof(iterationCount), iterationCountLen) != NULL)
-        err = CHIP_NO_ERROR;
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
@@ -376,8 +338,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     uint8_t saltB64[kSpake2pSalt_MaxBase64Len];
     uint16_t saltB64Len                       = 0;
 
-    if (SearchForId(SALT_ID, &saltB64[0], sizeof(saltB64), saltB64Len) == NULL)
-        return CHIP_ERROR_NOT_FOUND;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSaltId, &saltB64[0], sizeof(saltB64), saltB64Len));
 
     size_t saltLen = chip::Base64Decode32((char *)saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
 
@@ -395,8 +356,7 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     uint8_t verifierB64[kSpake2pSerializedVerifier_MaxBase64Len];
     uint16_t verifierB64Len                                     = 0;
     
-    if (SearchForId(VERIFIER_ID, &verifierB64[0], sizeof(verifierB64), verifierB64Len) == NULL)
-        return CHIP_ERROR_NOT_FOUND;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVerifierId, &verifierB64[0], sizeof(verifierB64), verifierB64Len));
 
     verifierLen = chip::Base64Decode32((char *) verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
     ReturnErrorCodeIf(verifierLen > verifierBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -408,7 +368,10 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
 
 CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSetupPasscodeId, (uint8_t *) &setupPasscode, sizeof(setupPasscode), length));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
@@ -418,83 +381,141 @@ CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVendorNameId, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
-    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kVidId, (uint8_t *) &vendorId, sizeof(vendorId), length));
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductNameId, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 {
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPidId, (uint8_t *) &productId, sizeof(productId), length));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPartNumber, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductURL, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductLabel, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
-    ChipError err       = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    size_t serialNumLen = 0; // without counting null-terminator
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kSerialNumberId, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
 
-#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0)
-    {
-        ReturnErrorCodeIf(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
-        err          = CHIP_NO_ERROR;
-    }
-#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-
-    ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    uint16_t length = 0;
+    uint8_t date[ConfigurationManager::kMaxManufacturingDateLength];
+
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kManufacturingDateId, date, ConfigurationManager::kMaxManufacturingDateLength, length));
+    date[length] = '\0';
+
+    if (length == 10 && isdigit(date[0]) && isdigit(date[1]) && isdigit(date[2]) &&
+        isdigit(date[3]) && date[4] == '-' && isdigit(date[5]) && isdigit(date[6]) &&
+        date[7] == '-' && isdigit(date[8]) && isdigit(date[9]))
+    {
+        year  = 1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0';
+        month = 10 * (date[5] - '0') + date[6] - '0';
+        day   = 10 * (date[8] - '0') + date[9] - '0';
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Manufacturing date is not formatted correctly: YYYY-MM-DD.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
-    hardwareVersion = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(
+        SearchForId(FactoryDataId::kHardwareVersionId, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), length)
+    );
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+    uint16_t length = 0;
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kHardwareVersionStrId, (uint8_t *)buf, bufSize, length));
+    buf[length] = '\0';
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
-    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    uint16_t uniqueIdLen = 0;
+    err = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+#if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    if (err != CHIP_NO_ERROR)
+    {
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
-    uniqueIdSpan.reduce_size(sizeof(uniqueId));
-    return CHIP_NO_ERROR;
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdLen = sizeof(uniqueId);
+        err = CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    ReturnErrorOnFailure(err);
+    uniqueIdSpan.reduce_size(uniqueIdLen);
 #endif
+
     return err;
 }
 
