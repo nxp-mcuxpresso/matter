@@ -185,8 +185,8 @@ CHIP_ERROR AppTask::Init()
     * Load factory data from the flash to the RAM.
     * Needs to be done before starting other Matter modules to avoid concurrent access issues with DCP hardware module.
     */
-    DataReaderEncryptedDCP *dataReaderEncryptedDCPInstance = nullptr;
-    dataReaderEncryptedDCPInstance = &DataReaderEncryptedDCP::GetDefaultInstance();
+    FactoryDataProvider *factoryDataProvider = &FactoryDataProvider::GetDefaultInstance();
+    DataReaderEncryptedDCP *dataReaderEncryptedDCPInstance = &DataReaderEncryptedDCP::GetDefaultInstance();
     /*
     * This example demonstrates the usage of the ecb with a software key, to use other encryption mode,
     * or to use hardware keys, check available methodes from the DataReaderEncryptedDCP class.
@@ -194,19 +194,12 @@ CHIP_ERROR AppTask::Init()
     dataReaderEncryptedDCPInstance->SetEncryptionMode(encrypt_ecb);
     dataReaderEncryptedDCPInstance->SetAes128Key(&aes128TestKey[0]);
 
-    err = FactoryDataProvider::GetDefaultInstance().Init(dataReaderEncryptedDCPInstance);
+    err = factoryDataProvider->Init(dataReaderEncryptedDCPInstance);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Factory Data Provider init failed");
         goto exit;
     }
-    FactoryDataProvider *factoryDataProvider = &FactoryDataProvider::GetDefaultInstance();
-    SetDeviceInstanceInfoProvider(factoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(factoryDataProvider);
-    SetCommissionableDataProvider(factoryDataProvider);
-#else
-    // Initialize device attestation when the example (only for debug purpose)
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
     /*
@@ -262,6 +255,15 @@ CHIP_ERROR AppTask::Init()
         ChipLogError(DeviceLayer, "InitBindingHandlers failed: %s", ErrorStr(err));
         goto exit;
     }
+
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(factoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(factoryDataProvider);
+    SetCommissionableDataProvider(factoryDataProvider);
+#else
+    // Initialize device attestation with example one (only for debug purpose)
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     NetWorkCommissioningInstInit();
