@@ -171,10 +171,7 @@ rt_executable("all_cluster_app") {
     deps += [
       "${chip_root}/src/app/server",
       "${chip_root}/src/protocols/bdx",
-      "${chip_root}/src/lib/shell",
       "${chip_root}/third_party/jsoncpp",
-      "${chip_root}/src/lib/shell:shell_core",
-      "${chip_root}/src/lib/shell:shell",
     ]
   }
 
