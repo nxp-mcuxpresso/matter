@@ -189,6 +189,8 @@ void sw2_handle(bool frm_clk)
         ::erase_all_params();
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(RUN_RST_LT_DELAY), rst_args_lt, nullptr);
         click_cnt = 0;
+        // Reboot the device
+        ::mw320_dev_reset(1000);
     }
     if (run_times >= 2)
     {
