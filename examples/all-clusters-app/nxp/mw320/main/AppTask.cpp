@@ -384,7 +384,7 @@ void board_init(void)
     BOARD_BootClockRUN();
 
     BOARD_InitDebugConsole();
-    PRINTF("=====> MW320 MCU firmware \r\n");
+    PRINTF("<< MW320 MCU firmware: [%s] >>\r\n", img_name_str);
 #ifdef CONFIGURE_UAP
     PRINTF("\nDo you want to use the default SSID and key for mw320 uAP? [y/n]\r\n");
     do
