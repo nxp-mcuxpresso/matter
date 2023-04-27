@@ -107,6 +107,7 @@ mw320_executable("light_switch_combo_app") {
   defines += [
     "img_name_str=\"light-switch-combo-app\"",
     "MW320_FEATURE_UAP=0",
+    "MW320_FEATURE_BIND=1",
   ]
 }
 

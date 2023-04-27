@@ -21,7 +21,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-table.h>
-#include <app/clusters/bindings/BindingManager.h>
+#if (MW320_FEATURE_BIND==1)
+    #include <app/clusters/bindings/BindingManager.h>
+#endif // MW320_FEATURE_BIND
 #include <platform/nxp/mw320/ConnectivityUtils.h>
 
 
@@ -543,7 +545,7 @@ void AppTask::AppTaskMain(void *pvParameter)
             is_on             = !is_on;
             value             = (uint16_t) is_on;
             // sync-up the switch attribute:
-            PRINTF("--> update Switch::Attributes::CurrentPosition::Id [%d], BndNotifyDone: %u \r\n", value, bnd_notify_done);
+            PRINTF("--> update Switch::Attributes::CurrentPosition::Id [%d] \r\n", value);
             emAfWriteAttribute(1, Switch::Id, Switch::Attributes::CurrentPosition::Id, (uint8_t *) &value, sizeof(value), true,
                                false);
 #ifdef SUPPORT_MANUAL_CTRL
@@ -551,13 +553,16 @@ void AppTask::AppTaskMain(void *pvParameter)
             PRINTF("--> update [OnOff::Id]: OnOff::Attributes::OnOff::Id [%d] \r\n", value);
             emAfWriteAttribute(1, OnOff::Id, OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value), true, false);
 #endif // SUPPORT_MANUAL_CTRL
+#if (MW320_FEATURE_BIND == 1)
+	    PRINTF("Bind notify status: (%u, %u) \r\n", BindingTable::GetInstance().Size(), bnd_notify_done);
             // Trigger to send on/off/toggle command to the bound devices
             if ((BindingTable::GetInstance().Size()>0) && (bnd_notify_done == true)) {
                 bnd_notify_done = false;
                 chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
             } else {
-                PRINTF("Last command is executing, skip the new ones\r\n");
+                PRINTF("Last command is executing or haven't bound yet, skip the new ones\r\n");
             }
+#endif //MW320_FEATURE_BIND
             need2sync_sw_attr = false;
         }
         // =============================

@@ -102,6 +102,7 @@ mw320_executable("shell_mw320") {
   defines += [
     "img_name_str=\"all-cluster-app\"",
     "MW320_FEATURE_UAP=1",
+    "MW320_FEATURE_BIND=1",
   ]
 }
 

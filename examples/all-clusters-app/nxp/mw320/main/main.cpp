@@ -631,9 +631,9 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
 #endif // MW320_OTA_TEST
     }
     // ota --
-    // binding ++
+#if (MW320_FEATURE_BIND == 1)
     InitBindingHandlers();
-    // binding --
+#endif // MW320_FEATURE_BIND
 
     return;
 }
