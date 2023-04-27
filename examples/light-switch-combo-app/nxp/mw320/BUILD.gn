@@ -40,7 +40,7 @@ mw320_sdk("sdk") {
     "${src_root_dir}/include/FreeRTOSConfig.h",
   ]
 
-  defines = [ "CHIP_CONFIG_MAX_FABRICS=5" ]
+  defines = [ "CHIP_CONFIG_MAX_FABRICS=8" ]
 
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
