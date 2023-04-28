@@ -379,7 +379,7 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
 #endif
         break;
     case WLAN_REASON_AUTH_SUCCESS:
-            PRINTF("app_cb: WLAN: authenticated to network\r\n");
+            ChipLogProgress(NotSpecified, "app_cb: WLAN: authenticated to network");
         break;
     case WLAN_REASON_INITIALIZATION_FAILED:
         // PRINTF("app_cb: WLAN: initialization failed\r\n");
@@ -402,24 +402,24 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
             return 0;
         }
 
-        PRINTF("Connected to following BSS:\r\n");
-        PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
+        ChipLogProgress(NotSpecified, "Connected to following BSS:");
+        ChipLogProgress(NotSpecified, "SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
         GetAppTask().SaveNetwork(sta_network.ssid, sta_network.security.psk);
 
 #ifdef CONFIG_IPV6
         {
             int i;
-            (void) PRINTF("\r\n\tIPv6 Addresses\r\n");
+            ChipLogProgress(NotSpecified, "\tIPv6 Addresses");
             for (i = 0; i < CONFIG_MAX_IPV6_ADDRESSES; i++)
             {
                 if (sta_network.ip.ipv6[i].addr_state != IP6_ADDR_INVALID)
                 {
-                    (void) PRINTF("\t%-13s:\t%s (%s)\r\n", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
+                    ChipLogProgress(NotSpecified, "\t%-13s:\t%s (%s)", ipv6_addr_type_to_desc(&(sta_network.ip.ipv6[i])),
                                   inet6_ntoa(sta_network.ip.ipv6[i].address),
                                   ipv6_addr_state_to_desc(sta_network.ip.ipv6[i].addr_state));
                 }
             }
-            (void) PRINTF("\r\n");
+            ChipLogProgress(NotSpecified, "\n");
         }
 #endif
         auth_fail    = 0;
@@ -434,7 +434,7 @@ static int wlan_event_callback (enum wlan_event_reason reason, void * data)
                 // Save the op_state
                 GetAppTask().SetOpState(work_state);
                 // Reset the device
-                PRINTF("Entering working mode. Reset the device \r\n");
+                ChipLogProgress(NotSpecified, "Entering working mode. Reset the device");
                 ::mw320_dev_reset(1000);
                 break;
             case work_state:
@@ -621,7 +621,7 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
-    PRINTF("Done to call chip::Server() \r\n");
+    ChipLogProgress(NotSpecified, "Done from chip::Server() ");
     // ota ++
     {
         InitOTARequestor();

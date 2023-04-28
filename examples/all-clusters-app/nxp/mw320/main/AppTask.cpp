@@ -179,7 +179,7 @@ void sw2_handle(bool frm_clk)
     {
         // Called while user clicks the button
         click_cnt++;
-        PRINTF(" (%d times) \r\n", click_cnt);
+        ChipLogProgress(NotSpecified, " (%d times)", click_cnt);
         return;
     }
     // Called regularlly from a thread every 500ms
@@ -245,12 +245,11 @@ int init_mw320_sdk(int (*wlan_event_callback)(enum wlan_event_reason reason, voi
     uint8_t * pmfdat;
 #endif // CONFIG_CHIP_MW320_REAL_FACTORY_DATA
 
-    PRINTF("=> init mw320 sdk \r\n");
-	if (wlan_event_callback == NULL) {
-		return -WM_E_INVAL;
-	}
+    ChipLogProgress(NotSpecified, " init mw320 sdk ");
+    if (wlan_event_callback == NULL) {
+        return -WM_E_INVAL;
+    }
 
-    PRINTF("call mcuInitPower() \r\n");
     mcuInitPower();
     boot_init();
     get_hash_from_uninit_mem();
@@ -261,12 +260,12 @@ int init_mw320_sdk(int (*wlan_event_callback)(enum wlan_event_reason reason, voi
     psm = part_get_layout_by_id(FC_COMP_PSM, NULL);
     part_to_flash_desc(psm, &fl);
     init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
-    PRINTF("[PSM]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+    ChipLogProgress(NotSpecified, "[PSM]: (start, len)=(0x%x, 0x%x)", fl.fl_start, fl.fl_size);
 
 #if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
     manu_dat = part_get_layout_by_id(FC_COMP_USER_APP, NULL);
     part_to_flash_desc(manu_dat, &fl);
-    PRINTF("[Manufacture_Data]: (start, len)=(0x%x, 0x%x)\r\n", fl.fl_start, fl.fl_size);
+    ChipLogProgress(NotSpecified, "[Manufacture_Data]: (start, len)=(0x%x, 0x%x)", fl.fl_start, fl.fl_size);
     pmfdat               = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
     __FACTORY_DATA_START = pmfdat;
     __FACTORY_DATA_SIZE  = (uint32_t) fl.fl_size;
@@ -303,7 +302,7 @@ int init_mw320_sdk(int (*wlan_event_callback)(enum wlan_event_reason reason, voi
         // demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
     }
-    PRINTF(" mw320 init complete! \r\n");
+    ChipLogProgress(NotSpecified, " mw320 init complete!");
 
     return WM_SUCCESS;
 }
@@ -517,7 +516,7 @@ CHIP_ERROR AppTask::Init()
                 strcpy(ssid, DEFAP_SSID);
                 strcpy(psk, DEFAP_PWD);
             }
-            PRINTF("Connecting to [%s, %s] \r\n", ssid, psk);
+            ChipLogProgress(NotSpecified, "Connecting to [%s, %s]", ssid, psk);
             chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(ssid, psk);
             break;
     }
@@ -545,22 +544,22 @@ void AppTask::AppTaskMain(void *pvParameter)
             is_on             = !is_on;
             value             = (uint16_t) is_on;
             // sync-up the switch attribute:
-            PRINTF("--> update Switch::Attributes::CurrentPosition::Id [%d] \r\n", value);
+            ChipLogProgress(NotSpecified, "--> update Switch::Attributes::CurrentPosition::Id [%d]", value);
             emAfWriteAttribute(1, Switch::Id, Switch::Attributes::CurrentPosition::Id, (uint8_t *) &value, sizeof(value), true,
                                false);
 #ifdef SUPPORT_MANUAL_CTRL
             // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [OnOff::Id]: OnOff::Attributes::OnOff::Id [%d] \r\n", value);
+            ChipLogProgress(NotSpecified, "--> update [OnOff::Id]: OnOff::Attributes::OnOff::Id [%d]", value);
             emAfWriteAttribute(1, OnOff::Id, OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value), true, false);
 #endif // SUPPORT_MANUAL_CTRL
 #if (MW320_FEATURE_BIND == 1)
-	    PRINTF("Bind notify status: (%u, %u) \r\n", BindingTable::GetInstance().Size(), bnd_notify_done);
+	    ChipLogProgress(NotSpecified, "Bind notify status: (%u, %u)", BindingTable::GetInstance().Size(), bnd_notify_done);
             // Trigger to send on/off/toggle command to the bound devices
             if ((BindingTable::GetInstance().Size()>0) && (bnd_notify_done == true)) {
                 bnd_notify_done = false;
                 chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
             } else {
-                PRINTF("Last command is executing or haven't bound yet, skip the new ones\r\n");
+                ChipLogProgress(NotSpecified, "Last command is executing or haven't bound yet, skip the new ones");
             }
 #endif //MW320_FEATURE_BIND
             need2sync_sw_attr = false;
@@ -609,7 +608,7 @@ int AppTask::UapInit(void)
         PRINTF("Initialize uAP failed \r\n");
         return WM_FAIL;
     }
-    PRINTF("Intialize uAP successfully \r\n");
+    ChipLogProgress(NotSpecified, "Intialize uAP successfully \r\n");
     return WM_SUCCESS;
 }
 
@@ -620,12 +619,12 @@ void AppTask::UapOnoff(bool do_on)
 {
     int ret;
     if (do_on == true) {    // Turn on uAP
-        PRINTF("Turning on uAP \r\n");
+        ChipLogProgress(NotSpecified, "Turning on uAP");
         ret = wlan_start_network(uap_network.name);
         if (ret != WM_SUCCESS) {
             PRINTF("Failed to turn on uAP (%d)\r\n", ret);
         } else {
-            PRINTF("start uAP sucessfully \r\n");
+            ChipLogProgress(NotSpecified, "start uAP sucessfully");
         }
     } else {    // Turn off uAP
         PRINTF("Turning off uAP \r\n");
@@ -635,7 +634,7 @@ void AppTask::UapOnoff(bool do_on)
             if (ret != WM_SUCCESS)
                 PRINTF("Error: unable to stop network\r\n");
             else
-                PRINTF("stop uAP, SSID = [%s]\r\n", uap_network.ssid);
+                ChipLogProgress(NotSpecified, "stop uAP, SSID = [%s]", uap_network.ssid);
         }
     }
     return;
@@ -657,7 +656,7 @@ void AppTask::LoadNetwork(char * ssid, char * pwd)
     }
     else
     {
-        PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
+        ChipLogProgress(NotSpecified, "saved_ssid: [%s]", ssid_buf);
         strcpy(ssid, (const char *) ssid_buf);
     }
 
@@ -670,7 +669,7 @@ void AppTask::LoadNetwork(char * ssid, char * pwd)
     }
     else
     {
-        PRINTF("saved_psk: [%s]\r\n", psk_buf);
+        ChipLogProgress(NotSpecified, "saved_psk: [%s]\r\n", psk_buf);
         strcpy(pwd, (const char *) psk_buf);
     }
 }
