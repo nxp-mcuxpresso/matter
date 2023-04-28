@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 #
 #    Copyright (c) 2022 Project CHIP Authors
 #
@@ -16,13 +15,52 @@
 #    limitations under the License.
 #
 
-set -e
-set -x
-if [ "$#" != 2 && "$#" != 3 ]; then
-    exit -1
+helpFunction()
+{
+    cat << EOF
+Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty]
+    -s, --src       Source folder
+    -o, --out       Output folder
+    -d, --debug     Debug build (optional)
+    -n, --no-init   No init mode (optional)
+    -t, --trusty    Build with Trusty OS backed security enhancement (optional)
+EOF
+exit 1
+}
+
+trusty=0
+release_build=true
+PARSED_OPTIONS="$(getopt -o s:o:tdn --long src:,out:,trusty,debug,no-init -- "$@")"
+if [ $? -ne 0 ];
+then
+  helpFunction
+fi
+eval set -- "$PARSED_OPTIONS"
+while true; do
+    case "$1" in
+        -s|--src) src="$2"; shift 2 ;;
+        -o|--out) out="$2"; shift 2 ;;
+        -t|--trusty) trusty=1; shift ;;
+        -d|--debug) release_build=false; shift ;;
+        -n|--no-init) no_init=1; shift ;;
+        --) shift; break ;;
+        *) echo "Invalid option: $1" >&2; exit 1 ;;
+    esac
+done
+
+if [ -z "$src" ] || [ -z "$out" ];
+then
+    echo "Some or all of the required -s|--src and -o|--out parameters are empty.";
+    helpFunction
 fi
 
-source "$(dirname "$0")/../../scripts/activate.sh"
+
+if [ "$no_init" != 1 ]; then
+    source "$(dirname "$0")/../../scripts/activate.sh"
+fi
+
+set -e
+set -x
 
 if [ "$IMX_SDK_ROOT" = "" -o ! -d "$IMX_SDK_ROOT" ]; then
     echo "the Yocto SDK path is not specified with the shell env IMX_SDK_ROOT or an invalid path is specified"
@@ -100,10 +138,13 @@ if [ -z "$target_cpu" -o -z "$cross_compile" ]; then
     exit 1
 fi
 
-release_build=true
-if [ "$3" = "debug" ]; then
-    release_build=false
+without_pw=false
+executable_python=""
+if [ "$no_init" = "1" ]; then
+    without_pw=true
+    executable_python=--script-executable="/usr/bin/python3"
 fi
+
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
 chip_with_web=${NXP_CHIPTOOL_WITH_WEB:-0}
@@ -111,7 +152,9 @@ additional_gn_args=""
 if [ "$chip_with_web" = 1 ]; then
     additional_gn_args+=" enable_rtti=true enable_exceptions=true chip_with_web=$chip_with_web"
 fi
-gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\" chip_with_trusty_os=0
+gn gen $executable_python --check --fail-on-unused-args --root="$src" "$out" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+chip_with_trusty_os=$trusty
+build_without_pw=$without_pw
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
 sysroot=\"$sdk_target_sysroot\"
@@ -123,4 +166,4 @@ target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$
 $(if [ "$release_build" = "true" ]; then echo "is_debug=false"; else echo "optimize_debug=true"; fi)
 $additional_gn_args"
 
-ninja -C "$2"
+ninja -C "$out"
