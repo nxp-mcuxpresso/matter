@@ -92,7 +92,7 @@ _stated_  |     m_text    |                   '  fw_storage '   ACTIVE_APP (slot
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0x0A00;
+HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0A00;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000280 : 0;
 
@@ -513,6 +513,17 @@ SECTIONS
     __END_BSS = .;
   } > m_data
 
+  .heap (NOLOAD) :
+  {
+    . = ALIGN(8);
+    __end__ = .;
+    PROVIDE(end = .);
+    __HeapBase = .;
+    KEEP(*(.heap*))
+    __HeapLimit = .;
+    __heap_limit = .; /* Add for _sbrk */
+  } > m_data
+
   .stack :
   {
     . = ALIGN(8);
@@ -521,23 +532,7 @@ SECTIONS
     __StackTop = .;
   } > m_data
 
-  /* Initializes stack on the end of block */
-  /*__StackTop   = ORIGIN(m_data) + LENGTH(m_data);
-  __StackLimit = __StackTop - STACK_SIZE;*/
   PROVIDE(__stack = __StackTop);
-
-  .heap :
-  {
-    . = ALIGN(8);
-    PROVIDE(end = .);
-    __HeapBase = .;
-    . += HEAP_SIZE;
-    __HeapLimit = .;
-    __heap_limit = .; /* Add for _sbrk */
-    *(.heap)
-  } > m_data
-
-  __HEAP_end__ = m_data_end;
 
   .smu_cpu13_mbox (NOLOAD) :
   {
@@ -581,7 +576,7 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 
-  /*ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")*/
+  ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")
 
   ASSERT( (DEFINED(__m_mcuboot_size__) ? (__m_mcuboot_size__ % m_sector_size) : 0) == 0, "mcuboot size is not aligned on flash sector size")
   
