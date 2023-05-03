@@ -30,6 +30,11 @@ using namespace chip;
 class OTARequestorInitiator
 {
 public :
+    static OTARequestorInitiator & Instance(void)
+    {
+        static OTARequestorInitiator gOTARequestorInitiator;
+        return gOTARequestorInitiator;
+    }
     /* Initialize OTA components */
     static void InitOTA(intptr_t context); 
     /* Handle update under test */

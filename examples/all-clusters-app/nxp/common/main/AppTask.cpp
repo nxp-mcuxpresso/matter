@@ -80,9 +80,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestorInitiator gOTARequestorInitiator;
-#endif
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -250,9 +247,7 @@ CHIP_ERROR AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR 
     /* If an update is under test make it permanent */
-    gOTARequestorInitiator.HandleSelfTest();
-    /* Initialize OTA Requestor */
-    PlatformMgr().ScheduleWork(gOTARequestorInitiator.InitOTA, reinterpret_cast<intptr_t>(&gOTARequestorInitiator));
+    OTARequestorInitiator::Instance().HandleSelfTest();
 #endif
 
     /* Register Matter CLI cmds */

@@ -34,6 +34,10 @@
 #include "ot_platform_common.h"
 #endif /* CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED */
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OTARequestorInitiator.h"
+#endif
+
 Identify gIdentify0 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -79,6 +83,10 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 #endif
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
         ChipLogProgress(DeviceLayer, "kDnssdInitialized");
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        /* Initialize OTA Requestor */
+        OTARequestorInitiator::Instance().InitOTA(reinterpret_cast<intptr_t>(&OTARequestorInitiator::Instance()));
+#endif
         break;
     }
 }
