@@ -49,7 +49,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     static uint8_t rnd_offset=0;
     uint8_t *prand=NULL;
 
-    ChipLogProgress(NotSpecified, "app_entropy_source: len: %lu", len);
+    ChipLogProgress(NotSpecified, "app_entropy_source: len: %u", len);
     prand = get_uninit_mem_hash_buff(rnd_offset);
     if (prand != NULL) {
         memcpy(output, prand, len);

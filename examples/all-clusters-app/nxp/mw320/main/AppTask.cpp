@@ -260,12 +260,12 @@ int init_mw320_sdk(int (*wlan_event_callback)(enum wlan_event_reason reason, voi
     psm = part_get_layout_by_id(FC_COMP_PSM, NULL);
     part_to_flash_desc(psm, &fl);
     init_flash_storage((char *) CONNECTION_INFO_FILENAME, &fl);
-    ChipLogProgress(NotSpecified, "[PSM]: (start, len)=(0x%x, 0x%x)", fl.fl_start, fl.fl_size);
+    ChipLogProgress(NotSpecified, "[PSM]: (start, len)=(0x%lx, 0x%lx)", fl.fl_start, fl.fl_size);
 
 #if (defined(CONFIG_CHIP_MW320_REAL_FACTORY_DATA) && (CONFIG_CHIP_MW320_REAL_FACTORY_DATA == 1))
     manu_dat = part_get_layout_by_id(FC_COMP_USER_APP, NULL);
     part_to_flash_desc(manu_dat, &fl);
-    ChipLogProgress(NotSpecified, "[Manufacture_Data]: (start, len)=(0x%x, 0x%x)", fl.fl_start, fl.fl_size);
+    ChipLogProgress(NotSpecified, "[Manufacture_Data]: (start, len)=(0x%lx, 0x%lx)", fl.fl_start, fl.fl_size);
     pmfdat               = (uint8_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
     __FACTORY_DATA_START = pmfdat;
     __FACTORY_DATA_SIZE  = (uint32_t) fl.fl_size;
