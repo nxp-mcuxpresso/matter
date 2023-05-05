@@ -20,20 +20,12 @@
 // Prevent multiple inclusion
 #pragma once
 
-// User options for plugin Binding Table Library
-#define EMBER_BINDING_TABLE_SIZE 10
-
-/**** Network Section ****/
-#define EMBER_SUPPORTED_NETWORKS (1)
-
-#define EMBER_APS_UNICAST_MESSAGE_COUNT 10
-
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_ACCESS_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_BASIC_INFORMATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_UNIT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -53,77 +45,93 @@
 #define EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY
 
+
 // Use this macro to check if the server side of the Groups cluster is included
 #define ZCL_USING_GROUPS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GROUPS_SERVER
 #define EMBER_AF_PLUGIN_GROUPS
+
 
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_DESCRIPTOR_SERVER
 #define EMBER_AF_PLUGIN_DESCRIPTOR
 
+
 // Use this macro to check if the server side of the Access Control cluster is included
 #define ZCL_USING_ACCESS_CONTROL_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL
 
-// Use this macro to check if the server side of the Basic cluster is included
-#define ZCL_USING_BASIC_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_BASIC_SERVER
-#define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the server side of the Basic Information cluster is included
+#define ZCL_USING_BASIC_INFORMATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BASIC_INFORMATION_SERVER
+#define EMBER_AF_PLUGIN_BASIC_INFORMATION
+
 
 // Use this macro to check if the server side of the Localization Configuration cluster is included
 #define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
 #define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION
 
+
 // Use this macro to check if the server side of the Time Format Localization cluster is included
 #define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
 #define EMBER_AF_PLUGIN_TIME_FORMAT_LOCALIZATION
+
 
 // Use this macro to check if the server side of the Unit Localization cluster is included
 #define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_UNIT_LOCALIZATION_SERVER
 #define EMBER_AF_PLUGIN_UNIT_LOCALIZATION
 
+
 // Use this macro to check if the server side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING
+
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
 
+
 // Use this macro to check if the server side of the General Diagnostics cluster is included
 #define ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_DIAGNOSTICS
+
 
 // Use this macro to check if the server side of the WiFi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define EMBER_AF_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS
 
-// Use this macro to check if the server side of the AdministratorCommissioning cluster is included
+
+// Use this macro to check if the server side of the Administrator Commissioning cluster is included
 #define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING
+
 
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS
 
+
 // Use this macro to check if the server side of the Group Key Management cluster is included
 #define ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GROUP_KEY_MANAGEMENT_SERVER
 #define EMBER_AF_PLUGIN_GROUP_KEY_MANAGEMENT
 
+
 // Use this macro to check if the server side of the Thermostat cluster is included
 #define ZCL_USING_THERMOSTAT_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_THERMOSTAT_SERVER
 #define EMBER_AF_PLUGIN_THERMOSTAT
+
