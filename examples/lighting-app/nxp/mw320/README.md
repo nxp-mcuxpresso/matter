@@ -1,4 +1,4 @@
-# Matter MW320 All Clusters Example Application
+# Matter MW320 Lighting Example Application
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and the NXP MW320 SDK
@@ -7,7 +7,7 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 
 <hr>
 
--   [Matter MW320 All Clusters Example Application](#matter-mw320-all-clusters-example-application)
+-   [Matter MW320 Lighting Example Application](#matter-mw320-lighting-example-application)
 -   [Introduction](#introduction)
 -   [Building](#building)
 -   [Flashing](#flashing)
@@ -33,14 +33,14 @@ Building the example application is quite straightforward. It can be done via
 following commands:
 
 ```
-$ cd examples/all-clusters-app/nxp/mw320/
+$ cd examples/lighting-app/nxp/mw320/
 $ git submodule update --init
 $ source third_party/connectedhomeip/scripts/activate.sh
 $ gn gen out/debug
 $ ninja -v -C out/debug
 ```
 
-Example application binary file "chip-mw320-all-clusters-app.bin" will be
+Example application binary file "chip-mw320-lighting-example.bin" will be
 generated under directory "out/debug".
 
 Note:
@@ -77,7 +77,7 @@ Prepare MW320 download firmware image:
 
 ```
 $ ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
-$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/chip-mw320-all-clusters-app.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
+$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/chip-mw320-lighting-example.bin out/debug/chip-mw320-lighting-app.mcufw.bin 0x1F010000
 $ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 ```
 
@@ -91,7 +91,7 @@ Flashing firmware image to MW320:
 
 ```
 $ cd mw320_sdk/mw320_matter_flash
-$ sudo python2 flashprog.py -l Matter/layout-4m.txt --boot2 Matter/boot2.bin --wififw Matter/mw32x_uapsta_W14.88.36.p172.bin --mcufw Matter/all-cluster-mw320.mcufw.bin -r
+$ sudo python2 flashprog.py -l Matter/layout-4m.txt --boot2 Matter/boot2.bin --wififw Matter/mw32x_uapsta_W14.88.36.p172.bin --mcufw Matter/chip-mw320-lighting-app.mcufw.bin -r
 ```
 
 After MW320 is reset, console will allow you to enter commands:
