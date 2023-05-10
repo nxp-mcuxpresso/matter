@@ -31,6 +31,7 @@ network.
     -   [Convert sb3 into ota file](#convert-sb3-into-ota-file)
     -   [Running OTA](#running-ota)
     -   [Known issues](#known-issues)
+-   [Low power](#low-power)
 
     </hr>
 
@@ -347,6 +348,23 @@ Start the OTA process:
 ```
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
+
+
+## Low power
+
+The example also offers the possibility to run in low power mode. This means
+that the board will go in deep sleep most of the time and the power
+consumption will be very low.
+
+In order to build with low power support, the `chip_with_low_power=1` must be
+provided to the build system. In this case, please note that the GN build
+arguments `chip_openthread_ftd` and `chip_with_ot_cli` must be set to `false/0` and
+`chip_logging` must be set to `false` to disable logging.
+
+In order to maintain a low power consumption, the LEDs showing the state of the
+contact sensor and the internal state are disabled. Console logs can be used instead.
+Also, please note that once the board is flashed with MCUXpresso the debugger
+disconnects because the board enters low power.
 
 <a name="known-issues"></a>
 
