@@ -60,7 +60,7 @@ int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
         return -1;
     }
     config->clockSrc        = BOARD_BT_UART_CLK_FREQ;
-    config->defaultBaudrate = BOARD_BT_UART_BAUDRATE;
+    config->defaultBaudrate = BOARD_BT_UART_DEFAULT_BAUDRATE;
     config->runningBaudrate = BOARD_BT_UART_BAUDRATE;
     config->instance        = BOARD_BT_UART_INSTANCE;
 #if (defined(HAL_UART_DMA_ENABLE) && (HAL_UART_DMA_ENABLE > 0U))

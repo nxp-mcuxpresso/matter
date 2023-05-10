@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 NXP
+ * Copyright 2020-2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -23,7 +23,7 @@ processor: MIMXRT1176xxxxx
 package_id: MIMXRT1176DVMAA
 mcu_data: ksdk2_0
 processor_version: 0.0.0
-board: MIMXRT1170-EVK
+board: MIMXRT1170-EVKB
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 
 #include "clock_config.h"
@@ -350,7 +350,8 @@ void BOARD_BootClockRUN(void)
         ANADIG_OSC_OSC_24M_CTRL_BYPASS_CLK(0) | ANADIG_OSC_OSC_24M_CTRL_LP_EN(1) | ANADIG_OSC_OSC_24M_CTRL_OSC_24M_GATE(0);
     /* Wait for 24M OSC to be stable. */
     while (ANADIG_OSC_OSC_24M_CTRL_OSC_24M_STABLE_MASK != (ANADIG_OSC->OSC_24M_CTRL & ANADIG_OSC_OSC_24M_CTRL_OSC_24M_STABLE_MASK))
-    {}
+    {
+    }
 
     /* Swicth both core, M7 Systick and Bus_Lpsr to OscRC48MDiv2 first */
 #if __CORTEX_M == 7

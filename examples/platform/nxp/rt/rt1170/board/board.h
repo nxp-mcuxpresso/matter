@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 NXP
+ * Copyright 2020-2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -17,7 +17,7 @@
  * Definitions
  ******************************************************************************/
 /*! @brief The board name */
-#define BOARD_NAME "MIMXRT1170-EVK"
+#define BOARD_NAME "MIMXRT1170-EVKB"
 #ifndef DEBUG_CONSOLE_UART_INDEX
 #define DEBUG_CONSOLE_UART_INDEX 1
 #endif
@@ -183,6 +183,7 @@
 
 #define BOARD_BT_UART_INSTANCE 7
 #define BOARD_BT_UART_BASEADDR (uint32_t) LPUART7
+#define BOARD_BT_UART_DEFAULT_BAUDRATE 115200
 #define BOARD_BT_UART_BAUDRATE 3000000
 #define BOARD_BT_UART_CLK_FREQ (CLOCK_GetRootClockFreq(kCLOCK_Root_Lpuart7))
 #define BOARD_BT_UART_IRQ LPUART7_IRQn

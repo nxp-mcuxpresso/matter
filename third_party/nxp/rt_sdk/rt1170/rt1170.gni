@@ -17,7 +17,8 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 
 declare_args() {
-    evkname = "evkmimxrt1170"
+    evkname = "evkbmimxrt1170"
+    mevkname = "mimxrt1170evkb"
     deviceBoardName = "MIMXRT1176"
 }
 
@@ -116,7 +117,7 @@ template("rt1170_sdk_drivers") {
         # XIP
         "${rt_sdk_root}/boards/${evkname}/xip",
         "${rt_sdk_root}/components/flash/mflash",
-        "${rt_sdk_root}/components/flash/mflash/mimxrt1170",
+        "${rt_sdk_root}/components/flash/mflash/${mevkname}",
         "${rt_sdk_root}/core/components/internal_flash",
         # freertos
         "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
@@ -209,12 +210,12 @@ template("rt1170_sdk_drivers") {
         # XIP
         "${FSL_FLEXSPI_NOR_BOOT_FILES_PATH}/fsl_flexspi_nor_boot.c",
         "${rt_sdk_root}/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
-        "${rt_core_sdk_root}/components/internal_flash/fsl_adapter_flexspi_nor_flash.c",
+        "${rt_core_sdk_root}/components/internal_flash/${evkname}/fsl_adapter_flexspi_nor_flash.c",
         #startup files
         "${rt_sdk_root}/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}_cm7.S",
         "${rt_sdk_root}/devices/${deviceBoardName}/system_${deviceBoardName}_cm7.c",
         "${DRIVER_USDHC_FILES_PATH}/fsl_usdhc.c",
-        "${rt_sdk_root}/components/flash/mflash/mimxrt1170/mflash_drv.c",
+        "${rt_sdk_root}/components/flash/mflash/${mevkname}/mflash_drv.c",
         # freertos files
         # freertos
         "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
