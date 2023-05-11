@@ -61,6 +61,7 @@ rt_executable("all_cluster_app") {
     "../../common/main",
 
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/providers/",
   ]
 
   sources = [
@@ -77,6 +78,7 @@ rt_executable("all_cluster_app") {
     "../../common/main/include/AppTask.h",
     "../../common/main/main.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
   ]
 
   deps = [
