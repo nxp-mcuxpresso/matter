@@ -37,6 +37,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <DeviceInfoProviderImpl.h>
 
 #include <app/util/attribute-storage.h>
 
@@ -82,6 +83,8 @@ using namespace ::chip::app::Clusters;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 OTARequestorInitiator gOTARequestorInitiator;
 #endif
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
@@ -147,6 +150,9 @@ void AppTask::InitServer(intptr_t arg)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #ifdef DEVICE_TYPE_ALL_CLUSTERS
     // Disable last fixed endpoint, which is used as a placeholder for all of the
