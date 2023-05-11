@@ -37,6 +37,9 @@ chip_project_config_include_dirs = ["${chip_root}/examples/platform/${nxp_platfo
 
 chip_build_tests = false
 
+#This enables the EventList global attribute
+enable_eventlist_attribute = true
+
 declare_args() {
     chip_enable_ethernet = false
 }
