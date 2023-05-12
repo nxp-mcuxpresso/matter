@@ -12,18 +12,22 @@ control.
 
 <hr>
 
--   [CHIP RT1170 All-cluster Application](#chip-RT1170-all-cluster-application) 
--   [Introduction](#introduction)
--   [Application UI](#application-ui)
--   [Building](#building)
--   [Manufacturing data](#manufacturing)
--   [Flashing and debugging](#flashdebug)
--   [Testing the example](#testing-the-example)
--   [Matter Shell](#matter-shell)
+- [CHIP RT1170 All-clusters Application](#chip-rt1170-all-clusters-application)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Hardware requirements for RT1170 and IWX12](#hardware-requirements-for-rt1170-and-iwx12)
+    - [Hardware rework for SPI support on EVKB-MIMXRT1170](#hardware-rework-for-spi-support-on-evkb-mimxrt1170)
+    - [Hardware rework to connect SPI on 2EL M2 IW612 Module](#hardware-rework-to-connect-spi-on-2el-m2-iw612-module)
+    - [Board settings (Spinel over SPI, BLE over UART)](#board-settings-spinel-over-spi-ble-over-uart)
+  - [Manufacturing data](#manufacturing-data)
+  - [Flashing and debugging](#flashing-and-debugging)
+  - [Testing the example](#testing-the-example)
+    - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
+    - [Testing with matter shell](#testing-with-matter-shell)
 
 <hr>
 
-<a name="intro"></a>
+<a name="introduction"></a>
 
 ## Introduction
 
@@ -43,9 +47,7 @@ The example supports:
 
 [README_Wifi.md]: README_Wifi.md
 
-The example targets the
-[NXP MIMXRT1170-EVK](https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/i-mx-rt1170-evaluation-kit:MIMXRT1170-EVK)
-board by default.
+The example targets the [NXP MIMXRT1170-EVKB](https://www.nxp.com/part/MIMXRT1170-EVKB#/) board by default.
 
 
 <a name="building"></a>
@@ -78,68 +80,102 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170
 
 Optional GN options that can be added when building an application:
 
-- To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
+- To enable the [matter CLI](#testing-with-matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
 - To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 
 Refer to the Building section in wi-fi or openthread specific README file.
 
-<a name="hardware"></a>
+
+<a name="hardware-requirements-for-rt1170-and-iwx12"></a>
 
 ## Hardware requirements for RT1170 and IWX12
 
 Host part:
-- 1 EVK-MIMXRT1170
+- 1 EVKB-MIMXRT1170
 
 Transceiver part :
-- 1 WIFI IWX12 BOARD RD USD
+- 1 [2EL M2 A1 IW612 Secure Module]( https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth-plus-802-15-4/2-4-5-ghz-dual-band-1x1-wi-fi-6-802-11ax-plus-bluetooth-5-2-plus-802-15-4-tri-radio-solution:IW612)
 
-### Hardware rework for SPI support on EVK-MIMXRT1170
+![](../../../../platform/nxp/rt/rt1170/doc/images/iwx612_2EL.jpg)
+- 1 [Murata uSD to M2 adapter](https://www.murata.com/en-eu/products/connectivitymodule/wi-fi-bluetooth/overview/lineup/usd-m2-adapter)
 
-To support SPI on the EVK-MIMXRT1170 board, it is required to remove 0Ω resistors R404,R406,R408.
+![](../../../../platform/nxp/rt/rt1170/doc/images/murata_usd-M2_adapter.jpg)
+- TXS0108E level shifter module.
+
+![](../../../../platform/nxp/rt/rt1170/doc/images/level_shifter.jpg)
+- Male to female Burg cables – 20 number’s 
+
+### Hardware rework for SPI support on EVKB-MIMXRT1170
+
+To support SPI on the EVKB-MIMXRT1170 board, it is required to remove 0Ω resistors R404,R406,R2015.
+
+### Hardware rework to connect SPI on 2EL M2 IW612 Module
+
+- Solder burg wires (male to female) at JP1 for SPI interface.
+
+![](../../../../platform/nxp/rt/rt1170/doc/images/soldering_SPI_on_IW612-2EL.jpg)
+![](../../../../platform/nxp/rt/rt1170/doc/images/soldering_SPI_on_IW612-2EL_after.jpg)
+
+- Solder 2X10 Berg Pins to TXS0108E connector.
+- Solder 10 K ohm resistor between OE and GND. 
+- Connect OE and VA
+
+![](../../../../platform/nxp/rt/rt1170/doc/images/level_shifter_soldering.jpg)
+
 
 ### Board settings (Spinel over SPI, BLE over UART)
 
-The below table explains pin settings (SPI settings) to connect the evkmimxrt1170 (host) to a IWX12 transceiver (rcp).
-Note, for the RESET, IWX12-J10-pin37 is the full reset of the board, to reset only the rcp, use J10-pin16.
+- Murata uSD to M2 adapter connections description:
 
-| PIN NAME OF IWX12 |    IWX12    | I.MXRT1170  | PIN NAME OF RT1170 | GPIO NAME OF RT1170 |
-| :---------------: | :---------: | :---------: | :----------------: | :-----------------: |
-|     SPI_MOSI      | J10, pin 19 | J10, pin 8  |    LPSPI1_SOUT     |     GPIO_AD_30      |
-|     SPI_MISO      | J10, pin 21 | J10, pin 10 |     LPSPI1_SIN     |     GPIO_AD_31      |
-|     SPI_FRM       | J10, pin 24 | J10, pin 6  |    LPSPI1_PCS0     |     GPIO_AD_29      |
-|     SPI_CLK       | J10, pin 23 | J10, pin 12 |     LPSPI1_SCK     |     GPIO_AD_28      |
-|        GND        | J10, pin 9  | J10, pin 14 |         XX         |         XX          |
-|       RESET       | J10, pin 37 | J26, pin 2  |     GPIO_AD_10     |     GPIO_AD_10      |
-|      SPI_INT      | J10, pin 15 | J26, pin 4  |     GPIO_AD_11     |     GPIO_AD_11      |
+![](../../../../platform/nxp/rt/rt1170/doc/images/murata_usd-m2_connections_1.jpg)
 
-The below table explains pin settings (UART settings) to connect the evkmimxrt1170 (host) to a IWX12 transceiver (bluetooth).
+![](../../../../platform/nxp/rt/rt1170/doc/images/murata_usd-m2_connections_2.jpg)
 
-| PIN NAME OF IWX12 |    IWX12    | I.MXRT1170  | PIN NAME OF RT1170 | GPIO NAME OF RT1170 |
-| :---------------: | :---------: | :---------: | :----------------: | :-----------------: |
-|     UART_SIN      | J10, pin 8  | J25, pin 15 |    GPIO_AD_00      |     GPIO_AD_00      |
-|     UART_SOUT     | J10, pin 10 | J25, pin 13 |    GPIO_AD_01      |     GPIO_AD_01      |
-|     UART_CTS      | J10, pin 7  | J25, pin 9  |    GPIO_AD_02      |     GPIO_AD_02      |
-|     UART_RTS      | J10, pin 11 | J25, pin 11 |    GPIO_AD_03      |     GPIO_AD_03      |
 
-Hardware rework for RT1170 board:
+- SPI connection between RT1170 to TXS0108E level shifter
 
-- Populate a 0 ohm resistor in R97, it’s an 0201 size resistor footprint.
+|  MIMXRT1170-EVKB  | TXS0108E |
+| :---------------: | :------: |
+| VDD_3V3 (J10_16)  |     VB   |
+| SPI_MOSI (J10.8)  |     B1   |
+| SPI_MISO (J10.10) |     B2   |
+| SPI_CLK (J10.12)  |     B3   |
+| SPI_CS (J10.6)    |     B4   |
+| SPI_INT (J26.4)   |     B5   |
+| GND (J10.14)      |    GND   |
 
-The jumper settings for IWX12 board:
+- SPI line connection between IWX612 2EL M2 Module to TXS0108E level shifter
 
-- Connect JP19
-- Disconnect JP16
+|  IWX612 2EL M2  | TXS0108E |
+| :-------------: | :------: |
+| 1.8V_REF(J13.3) |     VA   |
+| SPI_MOSI (JP1.4)|     A1   |
+| SPI_MISO (JP1.5)|     A2   |
+| SPI_CLK (JP1.2) |     A3   |
+| SPI_SSEL (JP1.3)|     A4   |
+| SPI_INT (JP1.8) |     A5   |
 
-Power for IWX12 board:
+- UART BLE and Reset connections between RT1170  and uSD-M2 adapter 
 
-- Use external 5V power supply
+|  MIMXRT1170-EVKB  | Murata uSD-M2 |
+| :---------------: | :-----------: |
+| RESET (J26.2)     |      J9.3     |
+| UART RXD (J25.13) |      J9.1     |
+| UART TXD (J25.13) |      J9.2     |
+| UART CTS (J25.13) |      J8.4     |
+| UART RTS (J25.13) |      J8.3     |
+| GND (J26.1)       |      J7.6     |
 
-For IWX12 running on QFN_IPA board an external antenna should be plugged on ANT3 J4.
-The IWX12 board should be plugged to the RT1170 via SDIO.
 
-<a name="manufacturing"></a>
+The below tables explain pin settings (SPI settings) to connect the evkbmimxrt1170 (host) to a IWX12 transceiver (rcp).
+
+J1 jumper on Murata uSD-M2 adpter should be in 1-2 position, board is powered using USB connection.
+
+The murata uSD-M2 adapter should be plugged to the RT1170 via SDIO.
+
+<a name="manufacturing-data"></a>
 
 ## Manufacturing data
 
@@ -149,7 +185,7 @@ Other comments:
 
 The all cluster app demonstrates the usage of encrypted Matter manufacturing data storage. Matter manufacturing data should be encrypted using an AES 128 software key before flashing them to the device flash.
 
-<a name="flashdebug"></a>
+<a name="flashing-and-debugging"></a>
 
 ## Flashing and debugging
 
@@ -228,6 +264,8 @@ Right click on the Project -> Utilities -> Open Directory Browser here -> edit *
 
 - Debug using the newly created configuration file:
 
+<a name="testing-the-example"></a>
+
 ## Testing the example
 
 To know how to commision a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
@@ -241,7 +279,7 @@ To know how to commissioning a device over IP, follow the instructions from [chi
 ### Testing the all-clusters application without Matter CLI:
 
 1. Prepare the board with the flashed `All-cluster application` (as shown above).
-2. The All-cluster example uses UART1 to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+2. The All-cluster example uses UART1 to print logs while running the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -253,7 +291,12 @@ To know how to commissioning a device over IP, follow the instructions from [chi
 
 4. On the client side, start sending commands using the [chip-tool](../../../../../examples/chip-tool)  application as it is described [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
 
-### Testing the all-clusters application with Matter CLI enabled:
+
+<a name="testing-with-matter-shell"></a>
+
+### Testing with matter shell
+
+Testing the all-clusters application with Matter CLI enabled:
 
 The Matter CLI can be enabled with the all-clusters application.
 
@@ -281,7 +324,7 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    - No parity
    - No flow control
 
-3. The All-cluster example uses UART2 to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector J9 pin 4), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+3. The All-cluster example uses UART2 to print logs while running the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector J9 pin 4), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
