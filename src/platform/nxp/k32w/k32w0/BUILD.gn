@@ -27,9 +27,6 @@ if (chip_enable_openthread) {
 static_library("k32w0") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
-    "../common/RamStorage.cpp",
-    "../common/RamStorageKey.cpp",
-    "../common/RamStorageKey.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "../common/BLEManagerCommon.cpp",
@@ -53,6 +50,7 @@ static_library("k32w0") {
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "RamStorage.cpp",
     "SystemTimeSupport.cpp",
     "ble_function_mux.c",
   ]
