@@ -20,6 +20,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 declare_args() {
   board_version = "A1"
   deviceBoardName = "RW612"
+  cpu1_cpu2_fw_type = "sb"
 }
 
 if (is_sdk_internal) {
@@ -109,6 +110,16 @@ else {
 ELS_PKC_CL_PATH = "${rt_sdk_root}/components/els_pkc/"
 
 template("rw610_sdk_drivers") {
+  # Convert the CPU1/CPU2 fw binaries into src files
+  fw_bin_path = "${rt_sdk_root}/components/conn_fwloader"
+  fw_args = [
+      "-t",
+      cpu1_cpu2_fw_type,
+      rebase_path(fw_bin_path, root_build_dir),
+    ]
+  print(exec_script("${rt_sdk_root}/components/conn_fwloader/script/fw_bin2c_conv.py",
+                     fw_args, "list lines"))
+  
   config("${target_name}_config") {
     include_dirs = []
 
