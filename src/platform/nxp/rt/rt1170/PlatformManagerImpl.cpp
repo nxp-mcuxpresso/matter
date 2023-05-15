@@ -33,6 +33,7 @@
 #include "DiagnosticDataProviderImpl.h"
 #include "ksdk_mbedtls.h"
 #include "fsl_os_abstraction.h"
+#include "fwk_platform_coex.h"
 
 #include <lwip/tcpip.h>
 
@@ -112,7 +113,6 @@ extern "C" void BOARD_InitHardware(void);
 #include "fsl_os_abstraction.h"
 
 extern "C" {
-#include "wlan_bt_fw.h"
 #include "wlan.h"
 #include "wm_net.h"
 }
@@ -213,55 +213,6 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     return chipRes;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
-{
-    CHIP_ERROR result = CHIP_NO_ERROR;
-    int wifi_status   = WM_SUCCESS;
-
-    ChipLogProgress(DeviceLayer, "Initialize WLAN");
-
-#if defined(SD8801) && CHIP_ENABLE_OPENTHREAD
-    /*
-     * The 88W8801 is quirky with the REQ & PRIO lines
-     * at boot: they need to be held HIGH while booting.
-     * So disable the coexistence mechanism on the RCP,
-     * since internally this puts the lines HIGH.
-     */
-    otPlatRadioSetCoexEnabled(NULL, false);
-#endif
-
-    wifi_status = wlan_init(wlan_fw_bin, wlan_fw_bin_len);
-    if (wifi_status != WM_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "WLAN initialization failed");
-        result = CHIP_ERROR_INTERNAL;
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "WLAN initialized");
-    }
-
-#if defined(SD8801) && CHIP_ENABLE_OPENTHREAD
-    /* All done, so re-enable the coexistence mechanism on the RCP */
-    otPlatRadioSetCoexEnabled(NULL, true);
-#endif
-
-#if WIFI_PTA_ENABLED && (CHIP_ENABLE_OPENTHREAD)
-    if (result == CHIP_NO_ERROR)
-    {
-        /* In case we have both Wi-Fi and OpenThread active, enable coexistence on Wi-Fi side */
-        if (EnableWiFiCoexistence() != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to initialize Wi-Fi and OpenThread coexistence");
-        }
-    }
-#endif
-
-    return result;
-}
-#endif
-
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
 CHIP_ERROR PlatformManagerImpl::EthernetInterfaceInit()
 {
@@ -345,6 +296,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otPlatRadioInitSpinelInterface();
+#endif
+
+    /* Init the controller by giving as an arg the connectivity supported */
+    PLATFORM_InitControllers(connBle_c
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        |conn802_15_4_c
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+        |connWlan_c
+#endif
+    );
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
@@ -357,26 +320,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-    /* Init the reset output gpio */
-    status_gpio = HAL_GpioInit((hal_gpio_handle_t)otGpioResetHandle, &resetPinConfig);
-    assert(status_gpio == kStatus_HAL_GpioSuccess);
-
-    /* Reset RCP chip. */
-    // Set Reset pin to low level.
-    status_gpio = HAL_GpioSetOutput((hal_gpio_handle_t)otGpioResetHandle, 0);
-    assert(status_gpio == kStatus_HAL_GpioSuccess);
-
-    OSA_TimeDelay(200);
-
-    // Set Reset pin to high level.
-    status_gpio = HAL_GpioSetOutput((hal_gpio_handle_t)otGpioResetHandle, 1);
-    assert(status_gpio == kStatus_HAL_GpioSuccess);
-
-    ChipLogProgress(DeviceLayer, "Triggered hardware reset");
-
-    /* Waiting for the RCP chip starts up */
-    OSA_TimeDelay(2000);
-
     osError = os_setup_idle_function(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
@@ -385,13 +328,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
-    err = WiFiInterfaceInit();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected with the board and start again!");
-        chipDie();
-    }
     ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
 #elif !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     err = EthernetInterfaceInit();

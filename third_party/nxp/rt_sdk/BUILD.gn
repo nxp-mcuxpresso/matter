@@ -64,13 +64,9 @@ rt_sdk("nxp_sdk") {
   {
     defines += [ "WIFI_IW61x_BOARD_RD_USD", "SDIO_ENABLED" ]
     public_deps += [":nxp_transceiver"]
-
-    #TODO , Add source below in wifi as well once handled in framework platform
-    if (chip_enable_openthread) {
-      sources += [
-          "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/iw612/fwk_platform_coex.c",
-      ]
-    }
+    sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/iw612/fwk_platform_coex.c",
+    ]
   }
 
   if (k32w0_transceiver) {
