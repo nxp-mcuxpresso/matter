@@ -1,0 +1,73 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_executable.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+assert(current_os == "freertos")
+
+rt1060_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+
+rt_executable("test_driver") {
+  output_name = "chip-rt1060-test-driver"
+
+  sources = [ "../../common/main/main.cpp" ]
+
+  deps = [
+    "${chip_root}/src/crypto/tests:tests",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform",
+    "${nxp_sdk_build_root}:nxp_sdk",
+    "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  ldscript =
+      "${rt1060_platform_dir}/app/ldscripts/MIMXRT1062xxxxx_flexspi_nor.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-fno-common",
+    "-Wl,--defsym=__stack_size__=2048",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-mapcs",
+    "-u qspiflash_config",
+    "-u image_vector_table",
+    "-u boot_data",
+    "-u dcd_data",
+    "-Wl,-print-memory-usage",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("rt1060") {
+  deps = [ ":test_driver" ]
+}
+
+group("default") {
+  deps = [ ":rt1060" ]
+}

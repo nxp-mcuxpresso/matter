@@ -36,7 +36,7 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" bool isThreadInitialized();
 #endif
 
@@ -68,8 +68,14 @@ exit:
 
 void ThreadStackManagerImpl::ProcessThreadActivity()
 {
+    /* reuse thread task for ble processing.
+     * by doing this, we avoid allocating a new stack for short-lived
+     * BLE processing (e.g.: only during Matter commissioning)
+     */
+     auto* bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
+     bleManager->DoBleProcessing();
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     if (isThreadInitialized())
 #endif
     {

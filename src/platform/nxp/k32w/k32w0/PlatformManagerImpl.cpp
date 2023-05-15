@@ -50,13 +50,16 @@
 #include "board.h"
 #include "fsl_sha.h"
 #include "k32w0-chip-mbedtls-config.h"
+#include "SecLib.h"
+#include "PDM.h"
+#include "board.h"
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void InitLowPower();
 #endif
 
@@ -97,7 +100,7 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     BOARD_ADCWakeupInit();
 #endif
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* Low Power Init */
     InitLowPower();
 #endif

@@ -737,10 +737,10 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-    MutableByteSpan csr(out_csr, csr_length);
-    CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
-    csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
-    return err;
+	MutableByteSpan csr(out_csr, csr_length);
+	CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);
+	csr_length     = (CHIP_NO_ERROR == err) ? csr.size() : 0;
+	return err;
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
@@ -1505,7 +1505,6 @@ exit:
 
     return error;
 }
-
 namespace {
 
 CHIP_ERROR ExtractKIDFromX509Cert(bool extractSKID, const ByteSpan & certificate, MutableByteSpan & kid)

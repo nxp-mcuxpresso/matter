@@ -29,6 +29,10 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
 typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(

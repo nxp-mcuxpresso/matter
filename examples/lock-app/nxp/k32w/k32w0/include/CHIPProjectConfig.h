@@ -59,6 +59,11 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xA220
 
+// Set the following define to use the Certification Declaration from below and not use it stored in factory data section
+#ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+#define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
+#endif
+
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
 //-> vendor_id = 0x1037
@@ -199,6 +204,18 @@
 #endif // BUILD_RELEASE
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
+ *
+ * This define enables/disables the Gap_LeSetPhy request to switch to 2M.
+ * It is disabled here for interoperability reasons just to be extra cautious.
+ * Both devices may send a Link Layer control procedure in parallel resulting in a
+ * LPM Error Transaction Collision.
+ * If the peer device doesn't accept our reject command, this can result in a BLE
+ * connection timeout.
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ 0
 
 /**
  * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER

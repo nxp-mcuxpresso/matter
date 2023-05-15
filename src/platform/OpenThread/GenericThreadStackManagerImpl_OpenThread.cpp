@@ -45,6 +45,10 @@
 #include <openthread/srp_client.h>
 #endif
 
+#if IHD_SRP_SERVER
+#include <openthread/srp_server.h>
+#endif
+
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
@@ -94,6 +98,87 @@ void initNetworkCommissioningThreadDriver(void)
 
 NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter;
 } // namespace
+
+#if IHD_SRP_SERVER
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SrpServerHandler(otSrpServerServiceUpdateId aId,
+        const otSrpServerHost *    aHost,
+		uint32_t                   aTimeout,
+		void *                     aContext)
+{
+	static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(aContext)->_SrpServerHandler(aId, aHost, aTimeout);
+}
+
+/**
+ * This function handles SRP service updates.
+ * The handler may perform validations on the SRP host/services and reject the SRP updates
+ * if any validation fails. The handler returns the result by calling otSrpServerHandleServiceUpdateResult
+ * or times out after @p aTimeout.
+ *
+ * @param[in]  aId       The service update transaction ID. This ID must be passed back with
+ *                       `otSrpServerHandleServiceUpdateResult`.
+ * @param[in]  aHost     A pointer to the otSrpServerHost object which contains the SRP updates. The
+ *                       handler should publish/un-publish the host and each service points to this
+ *                       host with below rules:
+ *                         1. If the host is not deleted (indicated by `otSrpServerHostIsDeleted`),
+ *                            then it should be published or updated with mDNS. Otherwise, the host
+ *                            should be un-published (remove AAAA RRs).
+ *                         2. For each service points to this host, it must be un-published if the host
+ *                            is to be un-published. Otherwise, the handler should publish or update the
+ *                            service when it is not deleted (indicated by `otSrpServerServiceIsDeleted`)
+ *                            and un-publish it when deleted.
+ * @param[in]  aTimeout  The maximum time in milliseconds for the handler to process the service event.
+*/
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SrpServerHandler(otSrpServerServiceUpdateId aId,
+        const otSrpServerHost *    aHost, // this object contains the srp updates
+		uint32_t                   aTimeout)
+{
+	otError err = OT_ERROR_NONE;
+	static constexpr char *kAnyServiceName  = nullptr;
+	static constexpr char *kAnyInstanceName = nullptr;
+
+	if (otSrpServerHostIsDeleted(aHost)) {
+		const otSrpServerService *service = nullptr;
+
+		while ((service = otSrpServerHostFindNextService(aHost, service, OT_SRP_SERVER_FLAGS_BASE_TYPE_SERVICE_ONLY,
+				kAnyServiceName, kAnyInstanceName)) != nullptr)
+		{
+			// unpublish service on the host
+		}
+
+		// unpublish host
+
+	} else {
+		// host is not deleted, add your application logic regarding the host and its services
+		const otSrpServerService *service = nullptr;
+
+		while ((service = otSrpServerHostFindNextService(aHost, service, OT_SRP_SERVER_FLAGS_BASE_TYPE_SERVICE_ONLY,
+				kAnyServiceName, kAnyInstanceName)) != nullptr)
+		{
+			bool                      isDeleted    = otSrpServerServiceIsDeleted(service);
+			const char *              instanceName = otSrpServerServiceGetInstanceName(service);
+
+			if (isDeleted) {
+				// unpublish service then continue
+				continue;
+			}
+
+			// publish or update the service
+		}
+
+	}
+
+	if (err == OT_ERROR_NONE )
+	{
+		otSrpServerHandleServiceUpdateResult(mOTInst, aId, err);
+	}
+	return;
+
+}
+
+#endif // IHD_SRP_SERVER
 
 /**
  * Called by OpenThread to alert the ThreadStackManager of a change in the state of the Thread stack.
@@ -1714,6 +1799,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr  = OT_ERROR_NONE;
 
+#if IHD_SRP_SERVER
+    otSrpServerLeaseConfig leaseConfig;
+#endif
     // Arrange for OpenThread errors to be translated to text.
     RegisterOpenThreadErrorFormatter();
 
@@ -1763,6 +1851,34 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     otSrpClientEnableAutoStartMode(mOTInst, &OnSrpClientStateChange, nullptr);
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+#if IHD_SRP_SERVER
+
+    // Before enabling the SRP server, set domain and address mode
+    otErr = otSrpServerSetDomain(mOTInst, mSrpServer.kDefaultDomainName);
+    if (otErr) {
+    	ChipLogDetail(DeviceLayer, "SRP_SERVER: Error setting domain %u", otErr);
+    }
+
+    otErr = otSrpServerSetAddressMode(mOTInst, OT_SRP_SERVER_ADDRESS_MODE_UNICAST );
+    if (otErr) {
+    	ChipLogDetail(DeviceLayer, "SRP_SERVER: Error setting address mode %u", otErr);
+    }
+
+    // Set the default lease configuration
+    leaseConfig.mMinLease = 60u * 30;           // 30 min (in seconds);
+    leaseConfig.mMaxLease = 3600u * 2;          // 2 hours (in seconds).
+    leaseConfig.mMinKeyLease = 3600u * 24;      // 1 day (in seconds).
+    leaseConfig.mMaxKeyLease = 3600u * 24 * 14; // 14 days (in seconds).
+    otErr = otSrpServerSetLeaseConfig(mOTInst, &leaseConfig);
+    if (otErr) {
+    	ChipLogDetail(DeviceLayer, "SRP_SERVER: Error setting lease configuration %u", otErr);
+    }
+
+    // Set the service update handler
+    otSrpServerSetServiceUpdateHandler(mOTInst, _SrpServerHandler, this);
+
+#endif // IHD_SRP_SERVER
 
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))

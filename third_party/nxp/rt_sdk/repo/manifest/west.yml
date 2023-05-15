@@ -1,0 +1,31 @@
+# The west manifest file (west.yml) for MCUXpresso SDK delivery.
+#
+# See the west documentation for more information:
+#
+# https://docs.zephyrproject.org/latest/guides/west/index.html
+manifest:
+  remotes:
+  - name: nxpmicro
+    url-base: https://github.com/NXPmicro
+  defaults:
+    remote: nxpmicro
+  projects:
+  - name: mcux-sdk
+    revision: df3766a7a8289510a6e30ac2f6d1760131a38e8f
+    path: core
+    import:
+      name-allowlist:
+        - FreeRTOS-Kernel
+        - CMSIS_5
+        - mcux-sdk-middleware-sdmmc
+        - fatfs
+        - mcux-sdk-middleware-edgefast-bluetooth
+        - mcux-sdk-middleware-ethermind
+        - mbedtls
+        - wifi_nxp
+        - lwip
+        - littlefs
+  - name: framework
+    url: ssh://git@bitbucket.sw.nxp.com/connint/connectivity-framework.git
+    revision: master
+    path: middleware/wireless/framework  

@@ -40,7 +40,7 @@ void NotifyAdvertisingStopped(const sys_snode_t * node)
 {
     const Request & request = ToRequest(node);
 
-    if (request.onStopped != nullptr)
+    if (node && request.onStopped != nullptr)
     {
         request.onStopped();
     }

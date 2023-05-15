@@ -4618,6 +4618,7 @@ server cluster FaultInjection = 4294048774 {
 endpoint 0 {
   device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
+  binding cluster OtaSoftwareUpdateRequestor;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
@@ -4686,6 +4687,11 @@ endpoint 0 {
     callback attribute productAppearance;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster OtaSoftwareUpdateProvider {
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -5116,7 +5122,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
-    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {
@@ -5655,5 +5660,3 @@ endpoint 65534 {
     callback attribute clusterRevision default = 1;
   }
 }
-
-

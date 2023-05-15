@@ -1,0 +1,86 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
+import("${chip_root}/src/platform/device.gni") # declares chip_enable_wifi and chip_enable_openthread
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
+
+rt1170_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+
+rt1170_sdk_drivers("rt_sdk_drivers") {
+    include_dirs = []
+    public_configs = []
+    sources = []
+    defines = []
+
+    public_configs += [ 
+        "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_sdk_config",
+        # needs include path to freeRTOSConfig.h
+        "${rt1170_platform_dir}:chip_app_project_config",
+    ]
+
+    if (is_sdk_package) {
+        WIRELESS_CONFIG_TEMPLATE_PATH = "${rt_sdk_root}/boards/${evkname}/wireless_config_template"
+    }
+    else {
+        WIRELESS_CONFIG_TEMPLATE_PATH = "${rt_sdk_root}/boards/${evkname}"
+    }
+
+    sources += [
+      "${WIRELESS_CONFIG_TEMPLATE_PATH}/wifi_bt_config.c",
+      "${rt1170_platform_dir}/board/sdmmc_config.c",
+    ]
+    public_configs += ["..:nxp_transceiver_config"]
+
+    if (k32w0_transceiver)
+    {
+      defines += [
+        #Framework defines to support hdlc over UART on UART7 and a reset pin
+        "SPINEL_UART_INSTANCE=7",
+        "SPINEL_ENABLE_RX_RTS=1",
+        "SPINEL_ENABLE_TX_RTS=1",
+        #OTW configurations
+        "PLATFORM_OTW_RESET_PIN_PORT=3",
+        "PLATFORM_OTW_RESET_PIN_NUM=9",
+        "PLATFORM_OTW_DIO5_PIN_PORT=6", # TODO indentify DIO port/pin for RT1170
+        "PLATFORM_OTW_DIO5_PIN_NUM=26",
+      ]
+    }
+    else if (iwx12_transceiver)
+    {
+      defines += [
+         "PLATFORM_RESET_PIN_PORT=3",
+         "DPLATFORM_RESET_PIN_NUM=9",
+      ]
+    }
+
+
+    if (chip_enable_ble) {
+        public_configs += [
+        "..:nxp_bt_ble_config",
+        ]
+    }
+}
+
+group("nxp_mbedtls") {
+  public_deps = ["${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_ksdk_mbedtls"]
+}
+
+group("rt_sdk_mbedtls_config") {
+  public_configs = ["${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_ksdk_mbedtls_config"]
+  public_configs += ["${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls_ksdk_config"]
+}

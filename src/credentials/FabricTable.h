@@ -32,9 +32,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>

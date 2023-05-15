@@ -38,9 +38,7 @@ network.
     -   [OTA Testing](#ota-testing)
     -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
-
-    -   [Known issues power](#known-issues-low-power)
-
+    -   [Known issues low power](#known-issues-low-power)
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
     </hr>
@@ -168,8 +166,7 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-When low power is enabled, the **ISP button** on DK6 board is used to change
-contact status.
+When low power is enabled, the **ISP button** on DK6 board is used to change contact status.
 
 ## Building
 
@@ -190,7 +187,6 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
-    user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
     ```
 
     -   with Secure element Exactly the same steps as above but set
@@ -200,7 +196,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
 
--   K32W041AM flavor
+- K32W041AM flavor
 
     Exactly the same steps as above but set argument build_for_k32w041am=1 in
     the gn command and use
@@ -214,12 +210,12 @@ In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
-running oscillator as a clock source. In this case one must set the use_fro_32k
+running oscilator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto,
-pycryptodome):
+(run automatically) install the recommanded packages
+(python version > 3, pip3, pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -237,6 +233,15 @@ The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
+
+## Rotating device id
+This is an optional feature and can be used in multiple ways (please see section 5.4.2.4.5 from Matter specification).
+One use case is Amazon FFS, which leverages the C3 Characteristic (Additional commissioning-related data) to offer an easier way to set up the device.
+The rotating device id will be encoded in this additional data and is programmed to rotate at pre-defined moments. The algorithm uses a unique per-device identifier that must be programmed during factory provisioning.
+
+Please use the following build args:
+- `chip_enable_rotating_device_id=1` - to enable rotating device id.
+- `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
 
 ## Manufacturing data
 
@@ -346,16 +351,24 @@ unplug and plug the board and then rerun the script.
 
 ### Building steps
 
-By default, the application builds with NXP Ultrafast P256 ECC Library. To build
-with this library, use the following arguments:
+By default, the application builds with NXP Ultrafast P256 ECC Library.
+To build with this library, use the following arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
     (_chip_crypto=\"platform\"_).
 
-To stop using Ultrafast P256 ECC Library, simply build with
-_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
+To stop using  Ultrafast P256 ECC Library, simply build with _chip_crypto=\"mbedtls\"_
+or with Tinycrypt.
 
 ## Tinycrypt ECC library
+
+### Building steps
+
+In order to use the Tinycrypt ECC library, use the following build arguments:
+
+-   Build without Secure element (_chip_with_se05x=0_), with crypto platform
+    (_chip_crypto=\"platform\"_) and with tinycrypt selected
+    (_chip_crypto_flavour=\"tinycrypt\"_).
 
 ### Building steps
 
@@ -374,19 +387,28 @@ related data (PSECT). The space between these two zones will be filled by the
 application.
 
 ### Writing the SSBL
+The SDK already provides an SSBL binary compiled with external
+flash support: `boards/k32w061dk6/wireless_examples/framework/ssbl/binary/ssbl_ext_flash_pdm_support.bin`, but it does not offer
+multi-image OTA support.
 
-The SSBL can ge generated from one of the SDK demo examples. The SDK demo
-example needs to be compiled inside MCUXpresso with the define _PDM_EXT_FLASH_.
-The SSBL demo application can be imported from the _Quickstart panel_: _Import
-SDK example(s)_ -> select _wireless->framework->ssbl_ application.
+Alternatively, the SSBL can ge generated from one of the SDK demo examples.
+The SSBL demo application can be imported from the `Quickstart panel`: `Import SDK example(s) -> select wireless -> framework -> ssbl` application.
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
-The SSBL project must be compiled using the PDM_EXT_FLASH define.
+To support multi-image OTA feature, the SSBL project must be compiled using the following defines:
+- `PDM_EXT_FLASH=1` - support PDM in external flash.
+- `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
+- `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
+- `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI flash (e.g. K32W041AM variant).
 
-![PDM_EXT_FLASH](../../../../platform/nxp/k32w/k32w0/doc/images/pdm_ext_flash.JPG)
+Optionally, add the following defines:
+- `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
+- `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
 
-Once compiled, the required ssbl file is called k32w061dk6_ssbl.bin
+![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
+
+Once compiled, the required SSBL file is called `k32w061dk6_ssbl.bin`.
 
 ![SSBL_BIN](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_bin.JPG)
 
@@ -396,7 +418,7 @@ Before writing the SSBL, it it recommanded to fully erase the internal flash:
 DK6Programmer.exe -V 5 -P 1000000 -s <COM_PORT> -e Flash
 ```
 
-k32w061dk6_ssbl.bin must be written at address 0 in the internal flash:
+`k32w061dk6_ssbl.bin` must be written at address 0 in the internal flash:
 
 ```
 DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl.bin"
@@ -404,7 +426,45 @@ DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl
 
 ### Writing the PSECT
 
-First, image directory 0 must be written:
+This is the list of all supported partitions:
+```
+0000000010000000 : SSBL partition
+
+    00000000 -----------> Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    00 -----------------> 0x00 Image type (0x00 = SSBL)
+
+004000000f020101: Application partition
+
+    00400000 -----------> 0x00004000 Start Address
+    0f02 ---------------> 0x020f Number of 512-bytes pages
+    01 -----------------> 0x01 Bootable flag
+    01 -----------------> 0x01 Image type (0x01 = Application)
+
+00000010800000fe: Ext Flash text partition
+
+    00000010 -----------> 0x10000000 Start Address (external flash)
+    8000 ---------------> 0x0080 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fe -----------------> 0xFE Image type (0xFE = Ext Flash text)
+
+00000110300200fc : OTA Image partition
+
+    00000110 -----------> 0x10010000 Start Address
+    3002----------------> 0x0230 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fc -----------------> 0xFC Image type (0x00 = SSBL)
+
+00000510100000fd: NVM partition
+
+    00000510 -----------> 0x10050000 Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fd -----------------> 0xFC Image type (0xFC = NVM)
+```
+
+First, image directory 0 (SSBL partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_0=0000000010000000
@@ -419,7 +479,7 @@ Here is the interpretation of the fields:
 00       -> SSBL Image Type
 ```
 
-Second, image directory 1 must be written:
+Second, image directory 1 (application partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000C9040101
@@ -429,10 +489,13 @@ Here is the interpretation of the fields:
 
 ```
 00400000 -> start address 0x00004000
-CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
+C904     -> 0x4C9 pages of 512-bytes (= 612.5kB)
 01       -> bootable flag
 01       -> image type for the application
 ```
+
+Please note the user can write additional partitions by
+writing `image_dir_2/3/4` with the wanted configuration.
 
 ### Writing the application
 
@@ -505,32 +568,36 @@ In order to build an OTA image, use NXP wrapper over the standard tool
     `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
     form `|tag|length|value|`
 
-Note that "standard" TLV format is used. Matter TLV format is only used for
-factory data TLV value. A user can enable the default processors by specifying
-`chip_enable_ota_default_processors=1` in the build command. Please see more in
-the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
 
-Here is an example that generate an OTA image with factory data and app TLV:
-`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+A user can select which default processors to enable:
+- `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL) update processor (enabled by default).
+- `chip_enable_ota_factory_data_processor=1` to enable default factory data update processor (disabled by default).
+
+The address for storing the custom OTA entry can also be specified:
+- `ota_custom_entry_address="0x000C1000"` is the default value, where `0x000C1000` is the end address of the PDM area.
+  PDM area ends at `0x00100000` (top of external flash) and has a size of `63 * 4096` bytes.
+  The user should be aware of the external flash configuration and use an address that does not overlap with anything else.
+
+Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generates an OTA image with application update TLV:
+```
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+```
+
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version, given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`42020` by default), which can be overwritten. For
+having a correct OTA process, the OTA header version should be the same as the
+binary embedded software version. A user can set a custom software version in
+the gn build args by setting `chip_software_version` to the wanted version.
 
 Start the OTA Provider Application:
 
 ```
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-contact-example.ota
-```
-
-A note regarding OTA image header version (`-vn` option). An application binary
-has its own software version (given by
-`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
-having a correct OTA process, the OTA header version should be the same as the
-binary embedded software version. A user can set a custom software version in
-the gn build args by setting `chip_software_version` to the wanted version.
-
-Build Linux chip-tool:
-
-```
-user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
@@ -623,19 +690,17 @@ professional tools must be used if exact power consumption needs to be known.
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.
 
+
 ## Removing SSBL Upgrade Region
 
-The example also offers the possibility to remove SSBL upgrade region, for
-reserving more space for application level.
+The example also offers the possibility to remove SSBL upgrade region, for reserving more
+space for application level.
 
-A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL
-upgrade region, `chip_reduce_ssbl_size=true` must be provided to the build
-system
+A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL upgrade region,
+`chip_reduce_ssbl_size=true` must be provided to the build system
 
 The programming method will change:
-
--   writing image directory 1 should change to
-
+* writing image directory 1 should change to
     ```
     DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00200000D9040101
     ```
@@ -648,8 +713,7 @@ The programming method will change:
     01       -> bootable flag
     01       -> image type for the application
     ```
-
--   Matter application offset address should change to
+* Matter application offset address should change to
     ```
     DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x2000="chip-k32w0x-contact-example.bin"
     ```

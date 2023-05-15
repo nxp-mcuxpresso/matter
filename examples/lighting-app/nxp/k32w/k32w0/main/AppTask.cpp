@@ -20,6 +20,7 @@
 #include "AppEvent.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
@@ -39,6 +40,7 @@
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include "OtaSupport.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
@@ -109,6 +111,15 @@ static BDXDownloader gDownloader;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
+{
+    K32W_LOG("This is a custom factory data restore mechanism.");
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -124,6 +135,40 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static void CheckOtaEntry()
+{
+	K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
+
+	CustomOtaEntries_t ota_entries;
+	if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+	{
+		if(ota_entries.ota_state == otaApplied)
+		{
+			K32W_LOG("OTA successfully applied");
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+            // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
+            // Delete the factory data backup to stop doing a restore when the factory data provider
+            // is initialized. This ensures that both the factory data and app were updated, otherwise
+            // revert to the backed up factory data.
+			PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
+		}
+		else
+		{
+			K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
+		}
+
+		// Clear the entry
+		OTA_ResetCustomEntries();
+	}
+	else
+	{
+		K32W_LOG("Unable to access OTA entries structure");
+	}
+}
+#endif
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -133,10 +178,15 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-// Initialize device attestation config
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    CheckOtaEntry();
+#endif
+
+    // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
+    AppTask::FactoryDataProvider::GetDefaultInstance().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
     SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
     SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
     SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
@@ -217,7 +267,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
@@ -579,7 +629,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     else
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");

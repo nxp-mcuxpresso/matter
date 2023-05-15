@@ -19,8 +19,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "PDM.h"
 #include "ram_storage.h"
+#include "PDM.h"
 
 namespace chip {
 namespace DeviceLayer {

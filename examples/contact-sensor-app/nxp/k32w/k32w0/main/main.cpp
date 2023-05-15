@@ -35,7 +35,7 @@
 #include <openthread/platform/settings.h>
 #endif
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "fsl_gpio.h"
 #include "fsl_iocon.h"
 #include "gpio_pins.h"
@@ -60,7 +60,7 @@ typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
-#define NORMAL_PWR_LIMIT 10 /* dBm */
+#define NORMAL_PWR_LIMIT        10    /* dBm */
 
 #ifdef K32WMCM_APP_BUILD
 /* Must be called before zps_eAplAfInit() */
@@ -70,7 +70,7 @@ void APP_SetHighTxPowerMode();
 void APP_SetMaxTxPower();
 
 #undef HIGH_TX_PWR_LIMIT
-#define HIGH_TX_PWR_LIMIT 15 /* dBm */
+#define HIGH_TX_PWR_LIMIT 15    /* dBm */
 /* High Tx power */
 void APP_SetHighTxPowerMode()
 {
@@ -86,7 +86,7 @@ void APP_SetMaxTxPower()
 #endif
 
 /* low power requirements */
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void setThreadInitialized(bool isInitialized);
 extern "C" bool isThreadInitialized();
 #endif
@@ -124,7 +124,7 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-
+    
 #ifdef K32WMCM_APP_BUILD
     APP_SetHighTxPowerMode();
 #endif
@@ -160,7 +160,7 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     setThreadInitialized(TRUE);
 #endif
 
@@ -206,7 +206,7 @@ exit:
 extern "C" void otSysEventSignalPending(void)
 {
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     /* make sure that 15.4 radio is initialized before waking up the Thread task */
     if (isThreadInitialized())
 #endif
@@ -216,7 +216,7 @@ extern "C" void otSysEventSignalPending(void)
     }
 }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" void vOptimizeConsumption(void)
 {
     /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */

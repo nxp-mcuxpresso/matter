@@ -1,0 +1,105 @@
+# Copyright (c) 2020-2022 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/mbedtls.gni")
+
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
+
+config("openthread_rw610_config") {
+  include_dirs = [
+      "${openthread_nxp_root}/src/common",
+      "${openthread_nxp_root}/src/rw/rw612",
+      "${openthread_nxp_root}/third_party/mbedtls/configs",
+      "${openthread_root}/third_party/mbedtls",
+      "${openthread_root}/examples/platforms",
+  ]
+  if (spinel_interface_rpmsg) {
+    include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
+  }
+}
+
+#Config used by the openthread stack to get the path to OpenthreadConfig.h
+source_set("openthread_core_config_rw610") {
+  public_configs = [
+      "${chip_root}/examples/platform/nxp/${nxp_platform}:chip_app_project_config",
+      ":openthread_rw610_config"
+  ]
+}
+
+source_set("libopenthread-rw610") {
+  sources = [
+    "${openthread_nxp_root}/src/common/alarm_freertos.c",
+    "${openthread_nxp_root}/src/common/logging.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
+  ]
+
+  if (spinel_interface_rpmsg) {
+    sources += [
+      "${openthread_nxp_root}/src/common/spinel/spinel_hdlc.cpp",
+      "${openthread_nxp_root}/src/common/spinel/radio.cpp",
+      "${openthread_nxp_root}/src/common/spinel/misc.c",
+      "${openthread_nxp_root}/src/common/spinel/system.c",
+      "${openthread_root}/src/lib/hdlc/hdlc.cpp",
+    ]
+  }
+  else {
+    sources += [
+      "${openthread_nxp_root}/src/rw/rw612/platform/radio.c",
+      "${openthread_nxp_root}/src/rw/rw612/platform/misc.c",
+      "${openthread_nxp_root}/src/rw/rw612/platform/system.c",
+    ]
+  }
+
+  if (rt_nvm_component == "nvm_fwk")
+  {
+    sources += ["${openthread_nxp_root}/src/common/flash_nvm.c"]
+  }
+  else if (rt_nvm_component == "littlefs")
+  {
+    sources += ["${openthread_nxp_root}/src/common/flash_littlefs.c"]
+  }
+  else
+  {
+    sources += ["${openthread_nxp_root}/src/common/flash_ks.c"]
+  }
+
+  defines = [
+    "OPENTHREAD_FTD",
+    "OT_PLAT_UART_INSTANCE=3",
+  ]
+
+  public_configs = [
+    ":openthread_rw610_config"
+  ]
+
+  deps = [
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "../../..:libopenthread-platform",
+    "${nxp_sdk_build_root}:nxp_sdk",
+    "${nxp_sdk_build_root}:nxp_mbedtls",
+    "../../..:libopenthread-platform-utils",
+  ]
+
+  if (spinel_interface_rpmsg) {
+    defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
+    deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
+  }
+}

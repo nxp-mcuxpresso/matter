@@ -17,6 +17,7 @@
 
 #include <openthread/platform/memory.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <openthread/platform/memory.h>
 
 #include <platform/nxp/k32w/common/RamStorage.h>
 

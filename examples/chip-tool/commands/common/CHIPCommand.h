@@ -29,6 +29,9 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
+#endif
 #include <crypto/RawKeySessionKeystore.h>
 
 #pragma once
@@ -146,7 +149,11 @@ protected:
     // identity without shutting it down or something in between...
     PersistentStorage mCommissionerStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
+#ifdef ENABLE_HSM_EC_KEY
+    chip::PersistentStorageOperationalKeystoreHSM mOperationalKeystore;
+#else
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
+#endif //#ifdef ENABLE_HSM_EC_KEY
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 

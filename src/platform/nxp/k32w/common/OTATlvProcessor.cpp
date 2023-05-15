@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
@@ -36,16 +36,27 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
     {
         mProcessedLength += bytes;
         block = block.SubSpan(bytes);
-        if (mProcessedLength == mLength && block.size() > 0)
+        if (mProcessedLength == mLength)
         {
-            // If current block was processed fully and the block still contains data, it
-            // means that the block contains another TLV's data and the current processor
-            // should be changed by OTAImageProcessorImpl.
-            return CHIP_OTA_CHANGE_PROCESSOR;
+            status = ExitAction();
+            if(!IsError(status) && (block.size() > 0))
+            {
+                // If current block was processed fully and the block still contains data, it
+                // means that the block contains another TLV's data and the current processor
+                // should be changed by OTAImageProcessorImpl.
+                return CHIP_OTA_CHANGE_PROCESSOR;
+            }
         }
     }
 
     return status;
+}
+
+void OTATlvProcessor::ClearInternal()
+{
+    mLength = 0;
+    mProcessedLength = 0;
+    mWasSelected = false;
 }
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)

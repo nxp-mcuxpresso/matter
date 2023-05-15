@@ -40,5 +40,15 @@ public:
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
+class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateRequestorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateRequestor::Id, endpoint)
+    {}
+    ~OtaSoftwareUpdateRequestorCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip

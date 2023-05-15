@@ -71,8 +71,8 @@ public:
     bool IsSyncClusterToButtonAction();
     void SetSyncClusterToButtonAction(bool value);
     // Identify cluster callbacks.
-    static void OnIdentifyStart(Identify * identify);
-    static void OnIdentifyStop(Identify * identify);
+    static void OnIdentifyStart(Identify* identify);
+    static void OnIdentifyStop(Identify* identify);
 
 private:
     friend AppTask & GetAppTask(void);

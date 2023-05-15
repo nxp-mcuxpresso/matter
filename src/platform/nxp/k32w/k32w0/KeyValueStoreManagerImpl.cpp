@@ -137,7 +137,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     if (kMaxNumberOfKeys == keyId)
     {
         putKey = true;
-        keyId  = freeKeyId;
+        keyId = freeKeyId;
     }
 
     pdmInternalId = Internal::RamStorageKey::GetPdmId(kKeyId_KvsValues, keyId);

@@ -1594,7 +1594,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -1602,7 +1602,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -1610,11 +1610,27 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -1639,14 +1655,14 @@
           "mfgCode": null,
           "define": "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "QueryImageResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -1681,7 +1697,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "bitmap32",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -1715,7 +1731,7 @@
           "mfgCode": null,
           "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AnnounceOTAProvider",
@@ -1723,10 +1739,26 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12939,22 +12971,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ManufacturerExtension",
-              "code": 4293984257,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "255",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

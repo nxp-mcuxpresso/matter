@@ -31,13 +31,6 @@ group("mw320_sdk") {
   public_deps = [ mw320_sdk_target ]
 }
 
-if (chip_crypto == "tinycrypt") {
-  assert(
-      mbedtls_repo ==
-          "//third_party/connectedhomeip/third_party/nxp/libs/mbedtls",
-      "mbedtls_repo must be set to nxp mbedtls-tinycrypt library when chip_crypto == \"tinycrypt\"")
-}
-
 config("mbedtls_mw320_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<src/platform/nxp/mw320/mw320-chip-mbedtls-config.h>",
@@ -79,8 +72,7 @@ config("mbedtls_mw320_config") {
     ]
   }
 
-  #if (mbedtls_use_tinycrypt) {
-  if (chip_crypto == "tinycrypt") {
+  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
     defines += [
       "MBEDTLS_USE_TINYCRYPT",
       "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
@@ -89,24 +81,24 @@ config("mbedtls_mw320_config") {
 
   include_dirs = [ chip_root ]
 
-  #if (mbedtls_use_tinycrypt) {
-  if (chip_crypto == "tinycrypt") {
-    include_dirs += [ "${mbedtls_repo}/repo/include/tinycrypt" ]
+  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
+    include_dirs += [ "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc" ]
+#    include_dirs += [ "${chip_root}/third_party/openthread/ot-nxp/src/common" ]
   }
 }
 
 mbedtls_target("mbedtls") {
   import("${mw320_sdk_build_root}/mw320_sdk.gni")
 
-  #if (mbedtls_use_tinycrypt) {
-  if (chip_crypto == "tinycrypt") {
+  if (chip_crypto == "platform" && chip_crypto_flavour == "tinycrypt") {
     if (!defined(sources)) {
       sources = []
     }
     sources += [
-      "${mbedtls_repo}/repo/tinycrypt/ecc.c",
-      "${mbedtls_repo}/repo/tinycrypt/ecc_dh.c",
-      "${mbedtls_repo}/repo/tinycrypt/ecc_dsa.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dh.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dsa.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/tinycrypt_util.c",
     ]
   }
   public_configs = [ ":mbedtls_mw320_config" ]

@@ -186,7 +186,7 @@ static int verify_load_firmware(uint32_t flash_addr, uint32_t size)
     return WM_SUCCESS;
 }
 
-static void mw320_dev_reset(unsigned int delay_ms)
+void mw320_dev_reset(unsigned int delay_ms)
 {
     vTaskDelay(1000 / portTICK_PERIOD_MS);
     NVIC_SystemReset();

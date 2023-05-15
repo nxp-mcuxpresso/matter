@@ -81,6 +81,7 @@
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "IdentifyTime",
@@ -583,6 +584,7 @@
           "define": "ON_OFF_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "OnOff",
@@ -625,6 +627,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -651,6 +654,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "switch type",
@@ -843,6 +847,7 @@
           "define": "DESCRIPTOR_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -975,6 +980,7 @@
           "define": "ACCESS_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1001,6 +1007,7 @@
           "define": "ACCESS_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "ACL",
@@ -1155,6 +1162,7 @@
           "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1181,6 +1189,7 @@
           "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "DataModelRevision",
@@ -1730,6 +1739,7 @@
           "define": "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [],
           "attributes": [
             {
               "name": "DefaultOTAProviders",
