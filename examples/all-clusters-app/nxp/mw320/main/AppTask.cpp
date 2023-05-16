@@ -510,7 +510,7 @@ CHIP_ERROR AppTask::Init()
             char ssid[IEEEtypes_SSID_SIZE + 1];
             char psk[WLAN_PSK_MAX_LENGTH];
             LoadNetwork(ssid, psk);
-            if ((strlen(ssid) == 0) || (strlen(psk) > 0)) {
+            if ((strlen(ssid) == 0) || (strlen(psk) == 0)) {
                 // Has moved to the work_state, but AP information is missing or insufficient => Use the default ssid/password
                 SaveNetwork((char*)DEFAP_SSID, (char*)DEFAP_PWD);
                 strcpy(ssid, DEFAP_SSID);
