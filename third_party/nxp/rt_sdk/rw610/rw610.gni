@@ -272,7 +272,11 @@ template("rw610_sdk_drivers") {
     }
 
     if (chip_enable_wifi) {
-      _rw610_sdk_drivers_include_dirs += [ "${rt_sdk_root}/middleware/wifi_nxp/wifidriver" ]
+      _rw610_sdk_drivers_include_dirs += [ 
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
+        # Include lpm.h and host_sleep.h files
+        "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/wifi_cli",
+        ]
     }
 
     if (chip_enable_ble) {
