@@ -40,31 +40,43 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {0};
     size_t prefixLen;
 
-    snprintf(formattedMsg, sizeof(formattedMsg), "[%s] ", module);
+    /* First add the timestamp to the log message */
+    snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] ", xTaskGetTickCount());
+    prefixLen = strlen(formattedMsg);
 
+    /* Then add log category */
+    switch (category)
+    {
+    case kLogCategory_Error:
+        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[ERR]");
+        break;
+
+    case kLogCategory_Progress:
+        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[INFO]");
+        break;
+
+    default:
+        snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s ", "[TRACE]");
+        break;
+    }
+
+    prefixLen = strlen(formattedMsg);
+
+    /* Add the module to the log output */
+    snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "[%s] ", module);
     prefixLen = strlen(formattedMsg);
 
     // Append the log message.
     vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
+    prefixLen = strlen(formattedMsg);
 
-    PRINTF("[%d] ", xTaskGetTickCount());
-    switch (category)
-    {
-    case kLogCategory_Error:
-        PRINTF("[ERR] ");
-        break;
-    case kLogCategory_Progress:
-        PRINTF("[INFO] ");
-        break;
-    default:
-        PRINTF("[TRACE] ");
-        break;
-    }
+    /* Add CR+LF */
+    snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "%s", "\r\n");
+
     PRINTF("%s", formattedMsg);
-    PRINTF("\r\n");
 }
 
 /**
