@@ -63,7 +63,13 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 static QueueHandle_t sAppEventQueue;
 
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+/*
+ * The status LED and the external flash CS pin are wired together.
+ * The OTA image writing may fail if used together.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static LEDWidget sStatusLED;
+#endif
 static LEDWidget sContactSensorLED;
 #endif
 
@@ -141,9 +147,11 @@ CHIP_ERROR AppTask::Init()
 
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     /* start with all LEDS turnedd off */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     sStatusLED.Init(SYSTEM_STATE_LED, false);
-    sContactSensorLED.Init(CONTACT_SENSOR_STATE_LED, false);
+#endif
 
+    sContactSensorLED.Init(CONTACT_SENSOR_STATE_LED, false);
     sContactSensorLED.Set(ContactSensorMgr().IsContactClosed());
 #endif
 
@@ -306,6 +314,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
 
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         if (sAppTask.mFunction != Function::kFactoryReset && sAppTask.mFunction != Function::kIdentify)
         {
             if (sIsThreadProvisioned)
@@ -323,6 +332,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
+#endif
+
         sContactSensorLED.Animate();
 #endif
     }
@@ -480,10 +491,11 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         sStatusLED.Set(false);
-        sContactSensorLED.Set(false);
-
         sStatusLED.Blink(500);
+#endif
+        sContactSensorLED.Set(false);
         sContactSensorLED.Blink(500);
 #endif
 
@@ -577,9 +589,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-    #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
-        sStatusLED.Set(false);
-    #endif
         K32W_LOG("Stopped BLE Advertising!");
     }
     else
@@ -588,9 +597,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
 
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
-        #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
-            sStatusLED.Set(true);
-        #endif
             K32W_LOG("Started BLE Advertising!");
         }
         else
@@ -692,8 +698,10 @@ void AppTask::OnIdentifyStart(Identify* identify)
         K32W_LOG("Identify process has started. Status LED should blink every 0.5 seconds.");
         sAppTask.mFunction = Function::kIdentify;
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
+#endif
 #endif
     }
 }

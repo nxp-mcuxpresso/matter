@@ -64,6 +64,10 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static QueueHandle_t sAppEventQueue;
 
+/*
+ * The status LED and the external flash CS pin are wired together.
+ * The OTA image writing may fail if used together.
+ */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static LEDWidget sStatusLED;
 #endif
