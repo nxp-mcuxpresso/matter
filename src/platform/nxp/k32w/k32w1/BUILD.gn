@@ -67,9 +67,15 @@ static_library("k32w1") {
   }
   
   if (chip_enable_ota_requestor) {
+
     sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+      "../common/OTATlvProcessor.cpp",
+      "../common/OTATlvProcessor.h",
+      "OTAFirmwareProcessor.cpp",
+      "OTAFirmwareProcessor.h",
+      "OTAHooks.cpp",
     ]
   }
   

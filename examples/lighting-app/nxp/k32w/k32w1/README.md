@@ -161,11 +161,14 @@ After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 ### SMU2 Memory
 
 Some Matter instances and global variables can be placed in the NBU's SMU2 memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_as_system_memory=true`, the following components are placed in SMU2 memory:
-* `gImageProcessor` from AppTask.cpp.
+* `gImageProcessor` from OTAImageProcessorImpl.cpp.
+* `gApplicationProcessor` from OTAHooks.cpp.
 * `Server::sServer` from Server.cpp.
 * `ThreadStackManagerImpl::sInstance` from ThreadStackManagerImpl.cpp.
 
 These instances and global variables are placed in SMU2 memory through name matching in the application linker script. They should not be changed or, if changed, the names must be updated in `k32w1_app.ld`. See [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld) for names and SMU2 memory range size.
+
+To use the SMU2 Memory an optimized NBU binary is also needed. See [Flashing the NBU image](#flashing-the-nbu-image).
 
 <a name="flashing"></a>
 
@@ -281,9 +284,23 @@ In OTAP application
 
 ### Convert sb3 into ota file
 
-.sb3 file should be packed in a Matter specific header (e.g.: using the following Python script availabe in the Matter repo):
+In order to build an OTA image, use NXP wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py` The tool can be
+    used to generate an OTA image with the following format:
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
+
+Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generates an OTA image with application update TLV from a sb3 file:
+
 ```
-$ ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 --app-input-file ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
+
 ```
 
 A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.

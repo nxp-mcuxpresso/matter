@@ -39,6 +39,7 @@ SECTIONS
     /* specific Matter instances/global variables. */
     *(.bss.*chip*Server*sServer*)
     *(*gImageProcessor)
+    *(*gApplicationProcessor)
     *(.bss.*ThreadStackManagerImpl*sInstance*)
     . = ALIGN(4);
     __smu2_end__ = .;

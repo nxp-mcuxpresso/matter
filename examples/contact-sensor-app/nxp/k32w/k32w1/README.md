@@ -264,9 +264,23 @@ In OTAP application
 
 ### Convert sb3 into ota file
 
-.sb3 file should be packed in a Matter specific header (e.g.: using the following Python script availabe in the Matter repo):
+In order to build an OTA image, use NXP wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py` The tool can be
+    used to generate an OTA image with the following format:
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
+
+Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generates an OTA image with application update TLV from a sb3 file:
+
 ```
-$ ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 --app-input-file ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
+
 ```
 
 A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
