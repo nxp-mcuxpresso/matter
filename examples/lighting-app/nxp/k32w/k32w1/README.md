@@ -185,7 +185,8 @@ NBU image should be written only when a new NXP-SDK is released. [blhost tool](h
 C:\nxp\blhost_2.6.7> blhost.exe -p COM50 -- receive-sb-file .\k32w1_nbu_ble_15_4_dyn_a1.sb3
 ```
 
-Please note that COM50 should be replaced with the COM port that corresponds to the K32W1 device.
+Please note that `COM50` should be replaced with the COM port that corresponds to the K32W1 device. If SMU2 optimizations are needed, then the NBU image should be `k32w1_nbu_ble_15_4_dyn_matter.bin`. 
+Please note that SMU2 optimizations cannnot be used when low power is enabled.
 
 <a name="flashing-the-host-image"></a>
 
