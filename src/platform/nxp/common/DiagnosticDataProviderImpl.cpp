@@ -164,15 +164,18 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
+    constexpr size_t bssIdSize = 6;
     struct wlan_network current_network;
+
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     int ret = wlan_get_current_network(&current_network);
-    uint8_t bssid[6];
     if (ret == WM_SUCCESS)
     {
-        memcpy(bssid, current_network.bssid, 6);
-        BssId = ByteSpan(bssid, 6);
+        memcpy(BssId.data(), current_network.bssid, bssIdSize);
+        BssId.reduce_size(bssIdSize);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
