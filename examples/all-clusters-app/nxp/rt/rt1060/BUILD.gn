@@ -88,6 +88,7 @@ rt_executable("all_cluster_app") {
     "${chip_root}/examples/${app_common_folder}",
     "${chip_root}/src/lib",
     "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
+    "${chip_root}/src/platform:syscalls_stub",
   ]
 
   if (nxp_device_type == "all-clusters")
@@ -200,7 +201,8 @@ rt_executable("all_cluster_app") {
               "-u image_vector_table",
               "-u boot_data",
               "-u dcd_data",
-              "-Wl,-print-memory-usage", ]
+              "-Wl,-print-memory-usage",
+              "-Wl,--no-warn-rwx-segments", ]
 
   if (enable_ota_provider)
   {

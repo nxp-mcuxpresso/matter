@@ -162,7 +162,7 @@ SECTIONS
     . = ALIGN(4);
   } > m_flash_config
 
-  ivt_begin= ORIGIN(m_flash_config) + LENGTH(m_flash_config);
+  ivt_begin = ORIGIN(m_flash_config) + LENGTH(m_flash_config);
 
   /* If OTA is enabled this section should not be loaded as mcuboot already includes it*/
   .ivt : AT(ivt_begin)
