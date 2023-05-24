@@ -300,7 +300,6 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     OTA_CancelImage();
 
-    remove(imageProcessor->mImageFile);
     imageProcessor->ReleaseBlock();
 }
 
