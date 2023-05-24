@@ -331,4 +331,4 @@
 	platforms = infineon
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
-	url = https://github.com/nxp-imx/libtrustymatter
+	url = http://androidsource.nxp.com/project/libtrustymatter
