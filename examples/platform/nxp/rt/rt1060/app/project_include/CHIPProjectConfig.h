@@ -153,3 +153,8 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
+
+/* Increasing the retransmission interval of the MRP messages after subsequent failures */
+#ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+#endif
