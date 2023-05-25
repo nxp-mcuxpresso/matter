@@ -98,7 +98,7 @@ CHIP_ERROR AppTask::Init()
     PlatformMgr().ScheduleWork(InitServer, 0);
 
 // Initialize device attestation config
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
     SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
@@ -110,7 +110,7 @@ CHIP_ERROR AppTask::Init()
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();

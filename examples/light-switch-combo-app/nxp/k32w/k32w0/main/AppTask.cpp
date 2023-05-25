@@ -118,7 +118,7 @@ CHIP_ERROR AppTask::Init()
     PlatformMgr().ScheduleWork(InitServer, 0);
 
 // Initialize device attestation config
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(K32W0FactoryDataProvider::GetDefaultInstance().Init());
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
