@@ -29,8 +29,8 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
-#include "FactoryDataProvider.h"
 extern "C" {
 #include "Flash_Adapter.h"
 }
