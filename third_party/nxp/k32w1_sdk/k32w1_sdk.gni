@@ -242,6 +242,11 @@ template("k32w1_sdk") {
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
       "CHIP_PLAT_NVM_SUPPORT=1",
+      "mAdvertisingDefaultTxPower_c=0", # default advertising TX power
+      "mConnectionDefaultTxPower_c=0",  # default connection TX power
+      "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
+      "gAdvertisingPowerLeveldBm_c=0",
+      "gConnectPowerLeveldBm_c=0",
     ]
 
     if (chip_with_low_power == 1 && chip_logging == true) {
