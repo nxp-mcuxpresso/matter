@@ -29,6 +29,23 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 rt_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 mbedtls_root = "${rt_sdk_root}/middleware/mbedtls"
 
+declare_args() {
+  nxp_software_version = 1
+  nxp_software_version_string = "1.1"
+}
+
+config("nxp_config") {
+  defines = []
+  
+  if (nxp_software_version != "") {
+    defines += [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION=${nxp_software_version}" ]
+  }
+
+  if (nxp_software_version_string != "") {
+    defines += [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${nxp_software_version_string}\"" ]
+  }
+}
+
 rt_sdk("nxp_sdk") {
   defines = []
 
@@ -37,6 +54,9 @@ rt_sdk("nxp_sdk") {
   public_configs = []
   sources = []
   include_dirs = []
+
+  #Adding device config sw version
+  public_configs += [ ":nxp_config" ]
 
   #Adding common board files
   include_dirs += ["${rt_platform_dir}/board/"]
