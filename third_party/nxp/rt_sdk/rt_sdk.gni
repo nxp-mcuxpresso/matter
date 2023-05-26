@@ -334,6 +334,8 @@ template("rt_sdk") {
         "SERIAL_MANAGER_TASK_STACK_SIZE=4048",
     #LWIP common options
         "USE_RTOS=1",
+        "BUTTON_SHORT_PRESS_THRESHOLD=500",
+        "BUTTON_LONG_PRESS_THRESHOLD=2000",
       ]
 
     if (rt_platform != "rw610")

@@ -30,6 +30,7 @@ static button_status_t AppMatterButton_ButtonCallback(void *buttonHandle, button
     switch (message->event)
     {
         case kBUTTON_EventShortPress:
+        case kBUTTON_EventOneClick:
             GetAppTask().SwitchCommissioningStateHandler();
             break;
         case kBUTTON_EventLongPress:
