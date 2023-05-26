@@ -1,7 +1,6 @@
 /*
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
- *    Copyright (c) 2023 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +26,14 @@
  */
 
 #pragma once
+
+// Security and Authentication disabled for development build.
+// For convenience, enable CHIP Security Test Mode and disable the requirement for
+// authentication in various protocols.
+// WARNING: These options make it possible to circumvent basic CHIP security functionality,
+// including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
+#define CHIP_CONFIG_REQUIRE_AUTH 0
 
 // Use hard-coded test certificates already embedded in generic chip code => set it to 0
 // Use real/development certificates => set it to 1 + file the provisioning section from
@@ -92,6 +99,7 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
+ * 0x8006: example lock-app
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
@@ -150,6 +158,37 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+ *
+ * Enable support for CHIP-over-BLE (CHIPOBLE).
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
+ *
+ * Enables synchronizing the device's real time clock with a remote CHIP Time service
+ * using the CHIP Time Sync protocol.
+ */
+//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+
+/**
+ * CHIP_CONFIG_MAX_BINDINGS
+ *
+ * Maximum number of simultaneously active bindings per ChipExchangeManager
+ * 1 (Time Sync) + 2 (Two 1-way subscriptions) + 1 (Software Update) = 4
+ * in the worst case. Keeping another 4 as buffer.
+ */
+#define CHIP_CONFIG_MAX_BINDINGS 8
+
+/**
+ * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
+ *
+ * Select the ability to offload event logs to any interested subscribers using WDM.
+ */
+#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
+
+/**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
  *
  * The amount of time in miliseconds after which BLE should change his advertisements
@@ -172,7 +211,7 @@
 /**
  * CONFIG_CHIP_NFC_COMMISSIONING, CHIP_DEVICE_CONFIG_ENABLE_NFC
  *
- * NFC commissioning is not supported on K32W1
+ * Set these defines to 1 if NFC Commissioning is needed
  */
 #define CONFIG_CHIP_NFC_COMMISSIONING 0
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
@@ -185,25 +224,11 @@
  *    provision the device with its unique operational credentials and manage
  *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_FABRICS 5 // 5 is the minimum number of supported fabrics
+#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
 
-#define CHIP_DEVICE_CONFIG_ENABLE_SED 1
-#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 1000_ms32
-#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 100_ms32
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *
- * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
- */
-#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
-
-/**
- * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
- *
- * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
- */
-#define CHIP_IM_MAX_NUM_WRITE_HANDLER 2
+//#define CHIP_DEVICE_CONFIG_ENABLE_SED 1
+//#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 1000_ms32
+//#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 100_ms32
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
@@ -217,5 +242,3 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
-
-#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
