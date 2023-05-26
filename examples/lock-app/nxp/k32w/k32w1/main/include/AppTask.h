@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Google LLC.
+ *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,8 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "LightingManager.h"
+#include "BoltLockManager.h"
 
-#include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
@@ -35,14 +34,6 @@
 #include "timers.h"
 #include "fsl_component_button.h"
 
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
 class AppTask
 {
 public:
@@ -52,64 +43,48 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction);
+    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
     void UpdateClusterState(void);
-    void UpdateDeviceState(void);
-
-    // Identify cluster callbacks.
-    static void OnIdentifyStart(Identify * identify);
-    static void OnIdentifyStop(Identify * identify);
-    static void OnTriggerEffect(Identify * identify);
-    static void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState);
 
 private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction);
+    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(BoltLockManager::Action_t aAction);
 
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionTimerEventHandler(void * aGenericEvent);
     static button_status_t KBD_Callback(void *buttonHandle, button_callback_message_t *message,void *callbackParam);
-    static void OTAHandler(AppEvent * aEvent);
-    static void BleHandler(AppEvent * aEvent);
+    static void JoinHandler(void * aGenericEvent);
+    static void BleHandler(void * aGenericEvent);
     static void BleStartAdvertising(intptr_t arg);
-    static void LightActionEventHandler(AppEvent * aEvent);
-    static void ResetActionEventHandler(AppEvent * aEvent);
-    static void InstallEventHandler(AppEvent * aEvent);
+    static void LockActionEventHandler(void * aGenericEvent);
+    static void ResetActionEventHandler(void * aGenericEvent);
+    static void InstallEventHandler(void * aGenericEvent);
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    void StartTimer(uint32_t aTimeoutInMs);
-
-    static void RestoreLightingState(void);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static void InitOTA(intptr_t arg);
-    static void StartOTAQuery(intptr_t arg);
-#endif
-
+    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void UpdateClusterStateInternal(intptr_t arg);
-    static void UpdateDeviceStateInternal(intptr_t arg);
+    static void ThreadStart();
     static void InitServer(intptr_t arg);
-    static void PrintOnboardingInfo();
+    void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t
     {
         kFunction_NoneSelected   = 0,
+        kFunction_SoftwareUpdate = 0,
         kFunction_FactoryReset,
-        kFunctionTurnOnTurnOff,
-        kFunction_Identify,
-        kFunction_TriggerEffect,
+        kFunctionLockUnlock,
+
         kFunction_Invalid
     } Function;
 

@@ -1,5 +1,4 @@
-# Copyright (c) 2021-2023 Project CHIP Authors
-# Copyright (c) 2023 NXP
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,19 +15,12 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
-
-import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/lib/core/core.gni")
-import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
-
-declare_args() {
-  chip_software_version = 0
-}
 
 assert(current_os == "freertos")
 
@@ -50,7 +42,6 @@ k32w1_sdk("sdk") {
     "main/include",
     "main",
     "include",
-    "${k32w1_platform_dir}/app/project_include",
     "${k32w1_platform_dir}/app/support",
     "${k32w1_platform_dir}/util/include",
   ]
@@ -61,36 +52,29 @@ k32w1_sdk("sdk") {
   } else {
     defines += [ "BUILD_RELEASE=1" ]
   }
-
-  if (chip_software_version != 0) {
-    defines += [
-      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
-    ]
-  }
 }
 
-k32w1_executable("contact_sensor_app") {
-  output_name = "chip-k32w1-contact-example"
+k32w1_executable("lock_app") {
+  output_name = "chip-k32w1-lock-example"
 
   sources = [
     "${k32w1_platform_dir}/util/LEDWidget.cpp",
     "${k32w1_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
-    "main/ContactSensorManager.cpp",
+    "main/BoltLockManager.cpp",
     "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
-    "main/include/ContactSensorManager.h",
+    "main/include/BoltLockManager.h",
     "main/main.cpp",
   ]
 
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w1_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
@@ -113,26 +97,18 @@ k32w1_executable("contact_sensor_app") {
 
   ldscript = "${k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
 
-
   inputs = [ ldscript ]
 
   ldflags = [
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
-    "-Wl,--defsym=gNvmSectors=8",
-    "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
-    "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
     "-Wl,--defsym=gUseFactoryData_d=1",
-    "-Wl,-print-memory-usage",
-    "-Wl,--no-warn-rwx-segments",
-    "-T" + rebase_path(ldscript, root_build_dir),
+    "-T" + rebase_path(ldscript, root_build_dir)
   ]
-
-  output_dir = root_out_dir
 }
 
 group("k32w1") {
-  deps = [ ":contact_sensor_app" ]
+  deps = [ ":lock_app" ]
 }
 
 group("default") {

@@ -59,6 +59,13 @@ static_library("nxp_platform") {
     "ble_function_mux.c",
   ]
 
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h"
+  ]
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_with_low_power != 0) {
@@ -87,7 +94,18 @@ static_library("nxp_platform") {
       "CHIPCryptoPalK32W1.cpp",
     ]
 
-    public_deps += [
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "FactoryDataProviderImpl.cpp",
+    ]
+    public += [
+      "${chip_root}/src/credentials/CHIPCert.h",
+      "${chip_root}/src/credentials/CertificationDeclaration.h",
+    ]
+  }
+
+  public_deps += [
       "${mbedtls_root}:mbedtls",
     ]
   }
