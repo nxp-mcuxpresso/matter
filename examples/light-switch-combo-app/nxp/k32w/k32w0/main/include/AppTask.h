@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "K32W0FactoryDataProvider.h"
+#include "FactoryDataProvider.h"
 #include "LightingManager.h"
 
 #include <app/clusters/identify-server/identify-server.h>
