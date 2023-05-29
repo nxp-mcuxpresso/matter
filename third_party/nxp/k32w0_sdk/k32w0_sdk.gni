@@ -51,6 +51,8 @@ declare_args() {
   #ot active/idle intervals
   chip_ot_idle_interval_ms = 1000  # 1s fast poll
   chip_ot_active_interval_ms = 100  # 100ms slow poll
+
+  chip_enable_icd_subscription_handle = 0
   chip_active_mode_threshold = 500  # 500ms Active mode threshold
 }
 
@@ -404,6 +406,12 @@ template("k32w0_sdk") {
     if (chip_with_ot_cli == 1) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
+    
+    if (chip_enable_icd_subscription_handle == 1) {
+      defines += [
+        "CHIP_ICD_SUBSCRIPTION_HANDLING",
+      ]
+    }    
 
     if (chip_with_low_power == 1) {
       defines += [
