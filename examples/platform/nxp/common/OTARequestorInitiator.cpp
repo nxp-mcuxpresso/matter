@@ -53,9 +53,9 @@ void OTARequestorInitiator::HandleSelfTest()
     /* Retrieve current update state */
     update_state = OTA_GetImgState();
 
-    if (update_state == kOtaImg_RunCandidate)
+    if (update_state == OtaImgState_RunCandidate)
     {
-        if (OTA_UpdateImgState(kOtaImg_Permanent) != gOtaSuccess_c)
+        if (OTA_UpdateImgState(OtaImgState_Permanent) != gOtaSuccess_c)
         {
             ChipLogError(SoftwareUpdate, "Self-testing : Failed to switch update state to permanent");
             return;
