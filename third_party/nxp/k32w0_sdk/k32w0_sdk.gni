@@ -47,6 +47,7 @@ declare_args() {
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
+  chip_enable_icd_subscription_handle = 0
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -421,6 +422,12 @@ template("k32w0_sdk") {
 
     if (chip_with_ot_cli == 1) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+    }
+
+    if (chip_enable_icd_subscription_handle == 1) {
+      defines += [
+        "CHIP_ICD_SUBSCRIPTION_HANDLING",
+      ]
     }
 
     if (chip_with_low_power == 1) {

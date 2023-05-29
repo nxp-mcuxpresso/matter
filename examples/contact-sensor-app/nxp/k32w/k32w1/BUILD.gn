@@ -58,6 +58,12 @@ k32w1_sdk("sdk") {
     "${k32w1_platform_dir}/util/include",
   ]
 
+  if (chip_enable_icd_subscription_handle) {
+    include_dirs += [
+      "${chip_root}/examples/platform/nxp/k32w/common/icd/",
+    ]
+  }
+
   defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
@@ -86,6 +92,13 @@ k32w1_executable("contact_sensor_app") {
     "main/include/ContactSensorManager.h",
     "main/main.cpp",
   ]
+
+  if (chip_enable_icd_subscription_handle) {
+    sources += [
+      "${chip_root}/examples/platform/nxp/k32w/common/icd/ICDSubscriptionCallback.cpp",
+      "${chip_root}/examples/platform/nxp/k32w/common/icd/ICDSubscriptionCallback.h",
+    ]
+  }
 
 ###  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
 ###    sources += [

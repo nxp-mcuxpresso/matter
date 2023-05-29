@@ -27,6 +27,7 @@ declare_args() {
   # Location of the k32w1 SDK.
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
   use_smu2_as_system_memory = false
+  chip_enable_icd_subscription_handle = false
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
@@ -35,6 +36,9 @@ assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
 
 assert(!(use_smu2_as_system_memory && !chip_openthread_ftd),
     "SMU2 can be used as system memory only with OT-FTD suppport")
+
+assert(!(chip_enable_icd_subscription_handle && chip_openthread_ftd),
+    "Please use chip_openthread_ftd=false when chip_enable_icd_subscription_handle is needed")
 
 # Defines an k32w1 SDK build target.
 #
@@ -271,6 +275,12 @@ template("k32w1_sdk") {
       defines += [
         "__STARTUP_CLEAR_SMU2",
         "USE_SMU2_AS_SYSTEM_MEMORY",
+      ]
+    }
+
+    if (chip_enable_icd_subscription_handle) {
+      defines += [
+        "CHIP_ICD_SUBSCRIPTION_HANDLING",
       ]
     }
 
