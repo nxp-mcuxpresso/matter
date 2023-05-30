@@ -336,6 +336,8 @@ template("rt_sdk") {
         "USE_RTOS=1",
         "BUTTON_SHORT_PRESS_THRESHOLD=500",
         "BUTTON_LONG_PRESS_THRESHOLD=2000",
+    #Multithread tests
+        "PRINTF_ADVANCED_ENABLE=1",
       ]
 
     if (rt_platform != "rw610")
@@ -373,7 +375,6 @@ template("rt_sdk") {
         "__GCC",
         "__USE_CMSIS",
         "PRINT_FLOAT_ENABLE=0",
-        "PRINTF_ADVANCED_ENABLE=1",
         "CR_INTEGER_PRINTF",
     # No OSA main task
         "FSL_OSA_MAIN_FUNC_ENABLE=0",
