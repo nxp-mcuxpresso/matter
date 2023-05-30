@@ -38,7 +38,12 @@ namespace DeviceLayer {
 
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+static constexpr size_t kSpake2pSalt_MaxBase64Len =
+    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+/* Secure subsystem keypair blob size is 120.
+ * DAC private key may be used to store an SSS exported blob instead of the private key.
+ */
+static constexpr size_t kDacPrivateKey_MaxLen = 120;
 
 uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
 uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
@@ -46,10 +51,12 @@ uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + siz
 
 FactoryDataProvider::FactoryDataProvider()
 {
+    static_assert(Crypto::kP256_PrivateKey_Length <= kDacPrivateKey_MaxLen);
+
     maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
     maxLengths[FactoryDataId::kSaltId]               = kSpake2pSalt_MaxBase64Len;
     maxLengths[FactoryDataId::kIcId]                 = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kDacPrivateKeyId]      = Crypto::kP256_PrivateKey_Length;
+    maxLengths[FactoryDataId::kDacPrivateKeyId]      = kDacPrivateKey_MaxLen;
     maxLengths[FactoryDataId::kDacCertificateId]     = Credentials::kMaxDERCertLength;
     maxLengths[FactoryDataId::kPaiCertificateId]     = Credentials::kMaxDERCertLength;
     maxLengths[FactoryDataId::kDiscriminatorId]      = sizeof(uint32_t);
