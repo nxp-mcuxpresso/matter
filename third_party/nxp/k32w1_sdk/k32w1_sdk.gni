@@ -27,7 +27,12 @@ declare_args() {
   # Location of the k32w1 SDK.
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
   use_smu2_as_system_memory = false
+
+  # icd configuration flags
   chip_enable_icd_subscription_handle = false
+  chip_ot_idle_interval_ms = 1000  # 1s Idle Intervals
+  chip_ot_active_interval_ms = 100  # 100ms Active Intervals
+  chip_active_mode_threshold = 500  # 500ms Active mode threshold
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
@@ -251,6 +256,9 @@ template("k32w1_sdk") {
       "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
       "gAdvertisingPowerLeveldBm_c=0",
       "gConnectPowerLeveldBm_c=0",
+      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_ACTIVE_MODE_THRESHOLD=${chip_active_mode_threshold}",
     ]
 
     if (chip_with_low_power == 1 && chip_logging == true) {
