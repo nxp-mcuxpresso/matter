@@ -5,8 +5,6 @@ The OTA Requestor feature enables the device to be informed of, download and app
 
 This section explains how to perform an OTA Software Update using the RW612 All-Clusters application.
 
-The OTA Requestor feature is enabled by default in the build of the All-clusters application for RW612.
-
 In general, the Over-The-Air Software Update process consists of the following steps :
 - The OTA Requestor queries an update image from the OTA Provider which responds according to its availability.
 - The update image is received in blocks and stored in the external flash of the device.

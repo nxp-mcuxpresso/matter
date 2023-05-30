@@ -78,6 +78,7 @@ Optional GN options that can be added when building an application:
 - By default, the RW612 A1 board version will be chosen. To switch to an A0 version, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+- To build the application with the OTA Requestor enabled, the arguments ```chip_enable_ota_requestor=true no_mcuboot=false``` must be added to the *gn gen* command. (More information about the OTA Requestor feature in [OTA Requestor README](README_OTA_Requestor.md)))
 
 
 ## Manufacturing data
