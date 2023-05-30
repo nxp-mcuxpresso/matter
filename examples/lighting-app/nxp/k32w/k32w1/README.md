@@ -25,6 +25,7 @@ network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
     -    [SMU2](#smu2-memory)
+-   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -    [Flashing the NBU image](#flashing-the-nbu-image)
     -    [Flashing the host image](#flashing-the-host-image)
@@ -169,6 +170,30 @@ Some Matter instances and global variables can be placed in the `NBU` `SMU2` mem
 These instances and global variables are placed in `SMU2` memory through name matching in the application linker script. They should not be changed or, if changed, the names must be updated in `k32w1_app.ld`. See [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld) for names and `SMU2` memory range size.
 
 To use the `SMU2` Memory an optimized `NBU` binary is also needed. See [Flashing the NBU image](#flashing-the-nbu-image).
+
+## Manufacturing data
+
+Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+
+The following is a two-step example of writing factory data in internal flash.
+
+Create a `factory_data_jlink` commander script:
+```
+loadfile factory_data.bin, 0x00000000000ec000
+reset
+go
+quit
+```
+where `0x00000000000ec000` is the `__MATTER_FACTORY_DATA_START` address retrieved
+from the corresponding application `.map` file.
+
+Run
+```
+jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript factory_data_jlink
+```
+
+See
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 <a name="flashing"></a>
 
@@ -415,3 +440,4 @@ user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 
 -   If Wi-Fi is used on a RPI4, then a 5Ghz network should be selected.
     Otherwise, issues related to BLE-WiFi combo may appear.
+

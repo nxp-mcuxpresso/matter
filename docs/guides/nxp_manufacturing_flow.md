@@ -158,6 +158,14 @@ flash at location **0x9D600** using `DK6Programmer.exe`:
 DK6Programmer.exe -Y -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x9D600="factory_data.bin"
 ```
 
+For **K32W1** platform, the binary needs to be written in the internal flash at
+location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
+
+```
+loadfile factory_data.bin, 0xec000
+```
+where `0xec000` is the value of `__FACTORY_DATA_START` in the corresponding .map file.
+
 For the **RT1060**, **RT1170** and **RW61X** platform, the binary needs to be
 written using `MCUXpresso Flash Tool GUI` at the address value corresponding to
 `__FACTORY_DATA_START` (the map file of the application should be checked to get
