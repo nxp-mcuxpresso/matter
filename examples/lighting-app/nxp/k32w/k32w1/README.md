@@ -154,7 +154,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
-After a successful build, the `elf` and `srec` files are found in `out/debug/` - `see the files prefixed with chip-k32w1-light-example`.
+After a successful build, the `elf` and `srec` files are found in `out/debug/` - see the files prefixed with `chip-k32w1-light-example`.
 
 <a name="smu2-memory"></a>
 
@@ -173,20 +173,19 @@ These instances and global variables are placed in SMU2 memory through name matc
 
 Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
 
-The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_a1.sb3`.
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
+
+Please note the `_matter` suffix in the naming of the .sb3 image - this is the image that needs to be used for lighting application - a non low power application where <a href="#smu2-memory"> SMU2 Memory </a> can be used.
 
 <a name="flashing-the-nbu-image"></a>
 
 ### Flashing the NBU image
 
-NBU image should be written only when a new NXP-SDK is released. [blhost tool](https://cache.nxp.com/secured/assets/downloads/en/device-drivers/blhost_2.6.7.zip?fileExt=.zip) can be used for flashing. Before writing the image, please make sure that K32W1 is in bootloader mode by keeping the SW4 button pressed while connecting the K32W1 board to an USB port (unplug the board if already connected to an USB port):
+NBU image should be written only when a new NXP-SDK is released.
 
-```bash
-C:\nxp\blhost_2.6.7> blhost.exe -p COM50 -- receive-sb-file .\k32w1_nbu_ble_15_4_dyn_a1.sb3
-```
-
-Please note that `COM50` should be replaced with the COM port that corresponds to the K32W1 device. If SMU2 optimizations are needed, then the NBU image should be `k32w1_nbu_ble_15_4_dyn_matter.bin`. 
-Please note that SMU2 optimizations cannnot be used when low power is enabled.
+[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the NBU/radio core:
+- Section 2.4 – Get Software – install SPSDK (Secure Provisioning Command Line Tool)
+- Section 3.3 – Updating NBU for Wireless examples - use the corresponding .sb3 file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
 
 <a name="flashing-the-host-image"></a>
 
