@@ -22,6 +22,7 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_executable.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
 
 assert(current_os == "freertos")
 
@@ -30,7 +31,7 @@ rt1060_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 rt_executable("test_driver") {
   output_name = "chip-rt1060-test-driver"
 
-  sources = [ "../../common/main/main.cpp" ]
+  sources = [ "../../common/main/main.cpp"]
 
   deps = [
     "${chip_root}/src/crypto/tests:tests",
@@ -38,7 +39,17 @@ rt_executable("test_driver") {
     "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform",
     "${nxp_sdk_build_root}:nxp_sdk",
     "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
+    "${chip_root}/src/platform:syscalls_stub",
   ]
+  
+   if (chip_enable_openthread) {
+    deps += [
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
+      # Temporary needed to build ThreadStackManagerImpl
+      "${chip_root}/examples/thermostat/nxp/zap",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
@@ -59,6 +70,7 @@ rt_executable("test_driver") {
     "-u boot_data",
     "-u dcd_data",
     "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments", 
   ]
 
   output_dir = root_out_dir

@@ -10,12 +10,13 @@ Build the runner using gn:
 
 ```
 cd <connectedhomeip>/src/test_driver/nxp/rt/rt1060
-gn gen --args="chip_config_network_layer_ble=false chip_enable_ethernet=true chip_inet_config_enable_ipv4=false chip_build_tests=true chip_build_test_static_libraries=false" out/debug
+gn gen --args="chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/PATH/TO/TRANSCEIVER/IMAGE/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=false chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_build_tests=true chip_build_test_static_libraries=false" out/debug
 ninja -C out/debug
 ```
 
 Argument is_debug=true optimize_debug=false could be used to build the
-application in debug mode. Argument evkname="evkmimxrt1060" must be used in gn
+application in debug mode (recommand to build with is_debug=false to reduce
+execution time duration). Argument evkname="evkmimxrt1060" must be used in gn
 gen command when building for EVK-MIMXRT1060 board instead of the default
 MIMXRT1060-EVKB. Argument chip_build_test_static_libraries=false is mandatory in
 order to link unit test file during the build.
