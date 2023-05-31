@@ -689,6 +689,7 @@ def BuildIMXTarget():
     ])
 
     target.AppendModifier('release', release=True)
+    target.AppendModifier('trusty', trusty=True)
 
     return target
 
