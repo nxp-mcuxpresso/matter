@@ -49,11 +49,6 @@
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
 	branch  = master
-[submodule "qpg_sdk"]
-	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/QMatter
-	branch  = vlatest-libs
-	platforms = qpg
 [submodule "freertos"]
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
