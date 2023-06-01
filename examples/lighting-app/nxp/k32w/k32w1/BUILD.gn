@@ -88,6 +88,7 @@ k32w1_executable("light_app") {
     "${chip_root}/examples/lighting-app/nxp/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w1_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
@@ -120,6 +121,7 @@ k32w1_executable("light_app") {
     "-Wl,--defsym=__stack_size__=0x480",
     "-Wl,--defsym=gNvmSectors=8",
     "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
