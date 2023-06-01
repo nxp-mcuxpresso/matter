@@ -129,7 +129,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     uint32_t hashId;
     uint8_t currentBlock[BLOCK_SIZE_16_BYTES];
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
-    size_t outputHashSize;
+    size_t outputHashSize = sizeof(calculatedHash);
     uint16_t i;
     CHIP_ERROR res;
 
