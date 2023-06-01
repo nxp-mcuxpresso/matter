@@ -422,7 +422,7 @@ template("rw610_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Cipher.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Cmac.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Common.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Crc.c",
+        #"${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Crc.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Ecc.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Hash.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Hmac.c",
