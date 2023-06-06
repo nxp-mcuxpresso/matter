@@ -18,7 +18,7 @@
 
 #include "ICDSubscriptionCallback.h"
 #include <platform/CHIPDeviceConfig.h>
-e
+
 CHIP_ERROR ICDSubscriptionCallback::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                                             chip::Transport::SecureSession & aSecureSession)
 {
