@@ -162,7 +162,7 @@ Status NXPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableC
 
 CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    return ConnectivityMgrImpl().ProvisionWiFiNetwork(ssid, key);
+    return ConnectivityMgrImpl().ProvisionWiFiNetwork(ssid, ssidLen, key, keyLen);
 }
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
@@ -199,11 +199,14 @@ exit:
     {
         ChipLogError(NetworkProvisioning, "Failed to start connecting to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
+    }
 
-        if (callback != nullptr)
-        {
-            callback->OnResult(networkingStatus, CharSpan(), 0);
-        }
+    /* Always inform the cluster of the network status so that in case of success,
+    * we have time send the response to the controller before switching to a new network.
+    */
+    if (callback != nullptr)
+    {
+        callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }
 

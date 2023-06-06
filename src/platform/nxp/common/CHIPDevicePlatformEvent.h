@@ -68,6 +68,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformZephyrBleOutOfBuffersEvent,
     kPlatformNxpWlanEvent,
     kPlatformNxpIpChangeEvent,
+    kPlatformNxpStartWlanConnectEvent,
 };
 
 } // namespace DeviceEventType
@@ -114,6 +115,7 @@ struct ChipDevicePlatformEvent final
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
         enum wlan_event_reason WlanEventReason;
+        struct wlan_network * pNetworkDataEvent;
 #endif
 
     };

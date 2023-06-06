@@ -107,6 +107,19 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
         UpdateInternetConnectivityState();
     }
+    else if (event->Type == kPlatformNxpStartWlanConnectEvent)
+    {
+        if (wlan_add_network(event->Platform.pNetworkDataEvent) == WM_SUCCESS)
+        {
+            _SetWiFiStationState(kWiFiStationState_Connecting);
+            ChipLogProgress(DeviceLayer, "WLAN connecting to network.name = \"%s\"", event->Platform.pNetworkDataEvent->name);
+            wlan_connect(event->Platform.pNetworkDataEvent->name);
+        }
+        if (event->Platform.pNetworkDataEvent != NULL)
+        {
+            free(event->Platform.pNetworkDataEvent);
+        }
+    }
 #endif
 }
 
@@ -406,43 +419,48 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
+CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret = CHIP_NO_ERROR;
-    struct wlan_network network;
-    size_t key_len;
+    struct wlan_network * pNetworkData = (struct wlan_network *) malloc(sizeof(struct wlan_network));
+    ChipDeviceEvent event;
+
     int result;
 
-    memset(&network, 0, sizeof(struct wlan_network));
+    VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
 
-    strncpy(network.name, ssid, WLAN_NETWORK_NAME_MAX_LENGTH);
-    network.name[WLAN_NETWORK_NAME_MAX_LENGTH] = '\0';
+    memset(pNetworkData, 0, sizeof(struct wlan_network));
 
-    VerifyOrExit(strlen(ssid) <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(network.ssid, ssid, strlen(ssid));
-    network.ip.ipv4.addr_type = ADDR_TYPE_DHCP;
-    network.ssid_specific     = 1;
-
-    network.security.type = WLAN_SECURITY_NONE;
-
-    key_len = strlen(key);
-    if (key_len > 0)
+    if (ssidLen < WLAN_NETWORK_NAME_MAX_LENGTH)
     {
-        network.security.type = WLAN_SECURITY_WILDCARD;
-        strncpy(network.security.psk, key, key_len);
-        network.security.psk_len = key_len;
+        memcpy(pNetworkData->name, ssid, ssidLen);
+        pNetworkData->name[ssidLen] = '\0';
+    }
+    else
+    {
+        memcpy(pNetworkData->name, ssid, WLAN_NETWORK_NAME_MAX_LENGTH);
+        pNetworkData->name[WLAN_NETWORK_NAME_MAX_LENGTH] = '\0';
     }
 
-    result = wlan_add_network(&network);
-    VerifyOrExit(result == WM_SUCCESS, ret = CHIP_ERROR_INTERNAL);
+    memcpy(pNetworkData->ssid, ssid, ssidLen);
+    pNetworkData->ip.ipv4.addr_type = ADDR_TYPE_DHCP;
+    pNetworkData->ssid_specific     = 1;
 
-    _SetWiFiStationState(kWiFiStationState_Connecting);
+    pNetworkData->security.type = WLAN_SECURITY_NONE;
 
-    ChipLogProgress(DeviceLayer, "WLAN connecting to \"%s\"", ssid);
-    result = wlan_connect(network.name);
-    VerifyOrExit(result == WM_SUCCESS, ret = CHIP_ERROR_INTERNAL);
+    if (keyLen > 0)
+    {
+        pNetworkData->security.type = WLAN_SECURITY_WILDCARD;
+        memcpy(pNetworkData->security.psk, key, keyLen);
+        pNetworkData->security.psk_len = keyLen;
+    }
+
+    /* Post an event to start the connection asynchronously in the Matter task context */
+    event.Type                       = DeviceEventType::kPlatformNxpStartWlanConnectEvent;
+    event.Platform.pNetworkDataEvent = pNetworkData;
+    (void) PlatformMgr().PostEvent(&event);
 
 exit:
     return ret;

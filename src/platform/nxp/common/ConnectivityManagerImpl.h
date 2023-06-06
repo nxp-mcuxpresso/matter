@@ -82,7 +82,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 public:
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
