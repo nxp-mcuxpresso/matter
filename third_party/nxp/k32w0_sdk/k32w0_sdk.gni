@@ -47,6 +47,11 @@ declare_args() {
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
+
+  #ot active/idle intervals
+  chip_ot_idle_interval_ms = 1000  # 1s fast poll
+  chip_ot_active_interval_ms = 100  # 100ms slow poll
+  chip_active_mode_threshold = 500  # 500ms Active mode threshold
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -312,6 +317,9 @@ template("k32w0_sdk") {
       "gSecLibUseSha256Alt_d=1",
       "gOTA_UseSecLibAes=1",
       "gResetSystemReset_d=1",
+      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_ACTIVE_MODE_THRESHOLD=${chip_active_mode_threshold}",
     ]
 
     # If OTA default processors are enabled, then OTA custom entry structure
