@@ -99,6 +99,9 @@ rt_sdk("nxp_sdk") {
     include_dirs += ["${rt_sdk_root}/middleware/wireless/framework/OTW/Interface"]
     sources += ["${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/k32w0/fwk_platform_coex.c",
                 "${rt_sdk_root}/middleware/wireless/framework/OTW/k32w0_transceiver/fwk_otw.c"]
+    if (otw_logs_enabled) {
+      defines += ["OTW_LOG_ENABLED=1"]
+    }
   }
 
   # Add a dep to SDK driver files

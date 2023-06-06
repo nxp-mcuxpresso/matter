@@ -59,6 +59,7 @@ Here is a summary of the k32w0 *gn gen* arguments that are mandatory or optional
 - Mandatory: ````k32w0_transceiver=true````
 - Mandatory: ````hci_spinel_single_uart=true````
 - Optional: ````k32w0_transceiver_bin_path=\"/home/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\"```` This argument is optional, by default, if not set, the binary file located in "${chip_root}/third_party/openthread/ot_nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" will be used. If the K32W061 transceiver binary is saved at another location an absolute path of its location should be given.
+- Optional: ````otw_logs_enabled=true```` This argument is optional, by default being set to false. If set to true, RT logging will print the OTW logs.
 
 [ot_rcp_ble_hci_bb_k32w0_readme]:https://github.com/NXP/ot-nxp/blob/v1.0.0.2-tag-nxp/examples/hybrid/ot_rcp_ble_hci_bb/k32w061/README.md#building-the-examples
 
