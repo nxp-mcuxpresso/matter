@@ -424,12 +424,11 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret = CHIP_NO_ERROR;
     struct wlan_network * pNetworkData = (struct wlan_network *) malloc(sizeof(struct wlan_network));
-    ChipDeviceEvent event;
-
     int result;
 
     VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mWiFiStationState != kWiFiStationState_Connecting, ret = CHIP_ERROR_BUSY);
 
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 
@@ -457,10 +456,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
         pNetworkData->security.psk_len = keyLen;
     }
 
-    /* Post an event to start the connection asynchronously in the Matter task context */
-    event.Type                       = DeviceEventType::kPlatformNxpStartWlanConnectEvent;
-    event.Platform.pNetworkDataEvent = pNetworkData;
-    (void) PlatformMgr().PostEvent(&event);
+    ConnectNetworkTimerHandler(NULL, (void *) pNetworkData);
 
 exit:
     return ret;
@@ -468,6 +464,29 @@ exit:
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer * aLayer, void * context)
+{
+    ChipDeviceEvent event;
+
+    /*
+    * Make sure to have the Wi-Fi station enabled before scheduling a connect event .
+    * Otherwise start a new timer to check again the status later.
+    */
+    if (ConnectivityMgr().IsWiFiStationEnabled())
+    {
+        /* Post an event to start the connection asynchronously in the Matter task context */
+        event.Type                       = DeviceEventType::kPlatformNxpStartWlanConnectEvent;
+        event.Platform.pNetworkDataEvent = (struct wlan_network *) context;
+        (void) PlatformMgr().PostEvent(&event);
+    }
+    else
+    {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL), ConnectNetworkTimerHandler, context);
+    }
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

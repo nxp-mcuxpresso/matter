@@ -104,6 +104,8 @@ private:
     void _SetWiFiStationState(ConnectivityManager::WiFiStationState val);
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
 
+    static void ConnectNetworkTimerHandler(::chip::System::Layer * aLayer, void * context);
+
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
