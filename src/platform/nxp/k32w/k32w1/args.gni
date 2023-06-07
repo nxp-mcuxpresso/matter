@@ -20,6 +20,7 @@ declare_args() {
   chip_with_ot_cli = 0
   chip_with_low_power = 0
   chip_with_factory_data = 0
+  chip_convert_dac_private_key = 0
   sdk_release = 1
 }
 
