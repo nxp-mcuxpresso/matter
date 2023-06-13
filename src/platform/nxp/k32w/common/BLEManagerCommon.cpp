@@ -261,16 +261,14 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingMode(BLEAdvertisingMode mode)
     switch (mode)
     {
     case BLEAdvertisingMode::kFastAdvertising:
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Set(Flags::kFastAdvertisingEnabled);
         break;
     case BLEAdvertisingMode::kSlowAdvertising:
     {
-        auto err = BLEMgrImpl().StopAdvertising();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(DeviceLayer, "Stop advertising failed.");
-        }
-        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        // We are in FreeRTOS timer service context, which is a default daemon task and has
+        // the highest priority. Stop advertising should be scheduled to run from Matter task.
+        mFlags.Clear(Flags::kFastAdvertisingEnabled);
+        PlatformMgr().ScheduleWork(StopAdvertisingPriorToSwitchingMode, 0);
         break;
     }
     default:
@@ -794,7 +792,6 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
     {
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Clear(Flags::kRestartAdvertising);
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         if(!mDeviceConnected)
         {
@@ -838,7 +835,8 @@ void BLEManagerCommon::DriveBLEState(void)
     {
         err = StopAdvertising();
         SuccessOrExit(err);
-        ChipLogProgress(DeviceLayer, "Stopped Advertising");
+        // Reset to fast advertising mode only if SetBLEAdvertisingEnabled(false) was called (usually from app).
+        mFlags.Set(Flags::kFastAdvertisingEnabled);
     }
 
 exit:
@@ -852,6 +850,14 @@ exit:
 void BLEManagerCommon::DriveBLEState(intptr_t arg)
 {
     sImplInstance->DriveBLEState();
+}
+
+void BLEManagerCommon::StopAdvertisingPriorToSwitchingMode(intptr_t arg)
+{
+    if (CHIP_NO_ERROR != sImplInstance->StopAdvertising())
+    {
+        ChipLogProgress(DeviceLayer, "Failed to stop advertising");
+    }
 }
 
 void BLEManagerCommon::DoBleProcessing(void)
