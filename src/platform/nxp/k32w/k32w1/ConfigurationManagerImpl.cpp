@@ -92,6 +92,12 @@ exit:
     return err;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
+{
+    /* Empty implementation*/
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
     return ReadConfigValue(K32WConfig::kCounterKey_RebootCount, rebootCount);
