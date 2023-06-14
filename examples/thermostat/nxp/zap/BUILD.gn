@@ -17,9 +17,20 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("zap") {
-  zap_file = "thermostat.zap"
+import("${chip_root}/src/platform/device.gni")
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/thermostat/nxp/zap-generated"
+chip_data_model("zap") {
+
+  if (chip_enable_wifi) {
+    # zap config for matter-over-wifi
+    zap_file = "thermostat_matter_wifi.zap"
+  }
+  else {
+    # zap config for matter-over-thread
+    zap_file = "thermostat_matter_thread.zap"
+  }
+
+  # Defining zap_pregenerated_dir is required by chip_data_model.gni in order to build IMClusterCommandHandler.cpp
+  zap_pregenerated_dir = ""
   is_server = true
 }
