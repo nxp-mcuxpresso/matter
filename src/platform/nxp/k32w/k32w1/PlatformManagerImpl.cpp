@@ -49,6 +49,8 @@ extern "C" void APP_SysInitHook(void)
 {
     // NBU has to be initialized before calling this function
     PLATFORM_SetNbuConstraintFrequency(PLATFORM_NBU_MIN_FREQ_64MHZ);
+    // Disable low-power on NBU
+    PLATFORM_DisableControllerLowPower();
 }
 #endif
 
