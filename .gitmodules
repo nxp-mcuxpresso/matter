@@ -326,4 +326,4 @@
 	platforms = stm32
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
-	url = http://androidsource.nxp.com/project/libtrustymatter
+	url = https://github.com/nxp-imx/libtrustymatter
