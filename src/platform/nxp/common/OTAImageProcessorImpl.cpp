@@ -279,15 +279,24 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     
     ChipLogProgress(SoftwareUpdate, "Update ready for test");
 
-    /* Reset the device in order to apply the update image */
-    ChipLogProgress(SoftwareUpdate, "Resetting device...");
-    DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
+    /* 
+    * Restart the device in order to apply the update image.
+    * This should be done with a delay so the device has enough time to send
+    * the state-transition event when applying the update.
+    */
+    ChipLogProgress(SoftwareUpdate, "Restarting device in 5 seconds ...");
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(5*1000), HandleRestart, nullptr);
 
     /* 
      * At next boot time, the bootloader will test + validate new image.
      * If validated, the image is marked "ok" at run time and the update state is switched to permanent.
      * If the image is not valid, the bootloader will revert back to the primary application. 
     */
+}
+
+void OTAImageProcessorImpl::HandleRestart(System::Layer * aLayer, void * context)
+{
+    DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)

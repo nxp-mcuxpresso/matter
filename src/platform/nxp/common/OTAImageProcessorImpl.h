@@ -56,6 +56,7 @@ private:
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
     static void HandleApply(intptr_t context);
+    static void HandleRestart(System::Layer * aLayer, void * context);
     static void HandleBlockEraseComplete(uint32_t param);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
