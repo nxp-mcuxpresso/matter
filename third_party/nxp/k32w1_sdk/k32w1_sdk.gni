@@ -181,7 +181,7 @@ template("k32w1_sdk") {
     ]
 
     defines = [
-      "gMainThreadPriority_c=6",
+      "gMainThreadPriority_c=5",
       "CPU_K32W1480VFTA",
       "__STARTUP_CLEAR_BSS",
       "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
