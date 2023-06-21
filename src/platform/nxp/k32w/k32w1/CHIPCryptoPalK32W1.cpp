@@ -56,6 +56,7 @@
 #include <string.h>
 
 #include "sss_crypto.h"
+#include "SecLib_ecp256.h"
 
 namespace chip {
 namespace Crypto {
@@ -780,19 +781,19 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
 typedef struct Spake2p_Context
 {
-    mbedtls_ecp_group curve;
-    mbedtls_ecp_point M;
-    mbedtls_ecp_point N;
-    mbedtls_ecp_point X;
-    mbedtls_ecp_point Y;
-    mbedtls_ecp_point L;
-    mbedtls_ecp_point Z;
-    mbedtls_ecp_point V;
+    ecp256Point_t M;
+    ecp256Point_t N;
+    ecp256Point_t X;
+    ecp256Point_t Y;
+    ecp256Point_t L;
+    ecp256Point_t Z;
+    ecp256Point_t V;
 
-    mbedtls_mpi w0;
-    mbedtls_mpi w1;
-    mbedtls_mpi xy;
-    mbedtls_mpi tempbn;
+    big_int256_t w0;
+    big_int256_t w1;
+    big_int256_t xy;
+    big_int256_t tempbn;
+
 } Spake2p_Context;
 
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
@@ -806,22 +807,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     int result       = 0;
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
     memset(context, 0, sizeof(Spake2p_Context));
 
-    mbedtls_ecp_group_init(&context->curve);
-    result = mbedtls_ecp_group_load(&context->curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256) != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    mbedtls_ecp_point_init(&context->M);
-    mbedtls_ecp_point_init(&context->N);
-    mbedtls_ecp_point_init(&context->X);
-    mbedtls_ecp_point_init(&context->Y);
-    mbedtls_ecp_point_init(&context->L);
-    mbedtls_ecp_point_init(&context->V);
-    mbedtls_ecp_point_init(&context->Z);
     M = &context->M;
     N = &context->N;
     X = &context->X;
@@ -830,17 +817,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     V = &context->V;
     Z = &context->Z;
 
-    mbedtls_mpi_init(&context->w0);
-    mbedtls_mpi_init(&context->w1);
-    mbedtls_mpi_init(&context->xy);
-    mbedtls_mpi_init(&context->tempbn);
     w0     = &context->w0;
     w1     = &context->w1;
     xy     = &context->xy;
     tempbn = &context->tempbn;
-
-    G     = &context->curve.G;
-    order = &context->curve.N;
 
     return error;
 
@@ -854,21 +834,6 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
     VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
 
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-    mbedtls_ecp_point_free(&context->M);
-    mbedtls_ecp_point_free(&context->N);
-    mbedtls_ecp_point_free(&context->X);
-    mbedtls_ecp_point_free(&context->Y);
-    mbedtls_ecp_point_free(&context->L);
-    mbedtls_ecp_point_free(&context->Z);
-    mbedtls_ecp_point_free(&context->V);
-
-    mbedtls_mpi_free(&context->w0);
-    mbedtls_mpi_free(&context->w1);
-    mbedtls_mpi_free(&context->xy);
-    mbedtls_mpi_free(&context->tempbn);
-
-    mbedtls_ecp_group_free(&context->curve);
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
@@ -904,98 +869,72 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_len, void * fe)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    secEcp256Status_t result;
+    uint32_t FE[SEC_ECP256_COORDINATE_WLEN];
 
-    result = mbedtls_mpi_read_binary((mbedtls_mpi *) fe, Uint8::to_const_uchar(in), in_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = ECP256_ModularReductionN(FE, in, in_len);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fe, (mbedtls_mpi *) fe, (const mbedtls_mpi *) order);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = ECP256_FieldLoad((uint32_t *) fe, (const uint8_t *) FE, in_len);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-exit:
-    _log_mbedTLS_error(result);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
-    if (mbedtls_mpi_write_binary((const mbedtls_mpi *) fe, Uint8::to_uchar(out), out_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    secEcp256Status_t result;
+
+    result = ECP256_FieldWrite(out, (uint8_t *) fe);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    secEcp256Status_t result;
+    big_int256_t PrivateKey;
 
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    result = ECP256_GeneratePrivateKey(&PrivateKey);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_gen_privkey(&context->curve, (mbedtls_mpi *) fe, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = ECP256_FieldWrite((uint8_t *) fe, (uint8_t *) &PrivateKey);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-exit:
-    _log_mbedTLS_error(result);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, const void * fe2)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    secEcp256Status_t result;
 
-    result = mbedtls_mpi_mul_mpi((mbedtls_mpi *) fer, (const mbedtls_mpi *) fe1, (const mbedtls_mpi *) fe2);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = ECP256_ScalarMultiplicationModN((uint32_t *) fer, (const uint32_t *) fe1, (const uint32_t *) fe2);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fer, (mbedtls_mpi *) fer, (const mbedtls_mpi *) order);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    _log_mbedTLS_error(result);
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t in_len, void * R)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    if (mbedtls_ecp_point_read_binary(&context->curve, (mbedtls_ecp_point *) R, Uint8::to_const_uchar(in), in_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    ECP256_PointLoad((ecp256Point_t *) R, in, false);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * out, size_t out_len)
 {
-    memset(out, 0, out_len);
-
-    size_t mbedtls_out_len = out_len;
-
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    if (mbedtls_ecp_point_write_binary(&context->curve, (const mbedtls_ecp_point *) R, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                       &mbedtls_out_len, Uint8::to_uchar(out), out_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    ECP256_PointWrite(out, (ecp256Point_t *) R, false);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, const void * fe1)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    secEcp256Status_t result;
 
-    if (mbedtls_ecp_mul(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
-                        CryptoRNG, nullptr) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    result = ECP256_PointMult((ecp256Point_t *) R, (const uint8_t *) P1, (const uint8_t *) fe1);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
@@ -1003,26 +942,20 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1, const void * fe1, const void * P2,
                                                       const void * fe2)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    secEcp256Status_t result;
 
-    if (mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
-                           (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    result = ECP256_DoublePointMulAdd(R, P1, fe1, P2, fe2);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
-    mbedtls_ecp_point * Rp    = (mbedtls_ecp_point *) R;
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    secEcp256Status_t result;
 
-    if (mbedtls_mpi_sub_mpi(&Rp->CHIP_CRYPTO_PAL_PRIVATE(Y), &context->curve.P, &Rp->CHIP_CRYPTO_PAL_PRIVATE(Y)) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    result = ECP256_PointInvert((uint32_t *) R, (const uint32_t *) R);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
@@ -1034,51 +967,24 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointCofactorMul(void * R)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    secEcp256Status_t result;
+    ecp256Point_t gen_point;
+    uint32_t W1[SEC_ECP256_COORDINATE_WLEN];
 
-    mbedtls_ecp_group curve;
-    mbedtls_mpi w1_bn;
-    mbedtls_ecp_point Ltemp;
+    result = ECP256_ModularReductionN(W1, w1in, w1in_len);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-    mbedtls_ecp_group_init(&curve);
-    mbedtls_mpi_init(&w1_bn);
-    mbedtls_ecp_point_init(&Ltemp);
+    result = ECP256_GeneratePublicKey((uint8_t *) &gen_point, (uint8_t *) &W1, NULL);
+    VerifyOrReturnError(result == gSecEcp256Success_c, CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    ECP256_PointWrite(Lout, (ecp256Point_t *) &gen_point, false);
 
-    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    memset(Lout, 0, *L_len);
-
-    result = mbedtls_ecp_point_write_binary(&curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    _log_mbedTLS_error(result);
-    mbedtls_ecp_point_free(&Ltemp);
-    mbedtls_mpi_free(&w1_bn);
-    mbedtls_ecp_group_free(&curve);
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    if (mbedtls_ecp_check_pubkey(&context->curve, (mbedtls_ecp_point *) R) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+	VerifyOrReturnError(ECP256_PointValid((ecp256Point_t *) R), CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
