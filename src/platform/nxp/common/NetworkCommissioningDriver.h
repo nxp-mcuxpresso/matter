@@ -71,6 +71,9 @@ public:
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
+    Status GetNetworkSSID(char * ssid);
+    Status GetNetworkPassword(char * credentials);
+
     // WiFiDriver
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
