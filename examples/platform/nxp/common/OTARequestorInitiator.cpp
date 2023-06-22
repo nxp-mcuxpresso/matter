@@ -47,6 +47,8 @@ void OTARequestorInitiator::HandleSelfTest()
        (if we have arrived this far, the bootloader had validated the image) */
 
     mflash_drv_init();
+
+    OTA_Initialize();
     
     OtaImgState_t update_state;
 
