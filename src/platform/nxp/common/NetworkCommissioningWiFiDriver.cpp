@@ -146,6 +146,9 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
 
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
+    memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+    memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
+    return Status::kSuccess;
 }
 
 Status NXPWiFiDriver::GetNetworkSSID(char * ssid)
