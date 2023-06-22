@@ -245,14 +245,14 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             if (sInstance._GetWiFiStationState() == kWiFiStationState_Connected)
             {
                 sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-                UpdateInternetConnectivityState();
+                sInstance.OnStationDisconnected();
             }
             break;
 
         case WLAN_REASON_USER_DISCONNECT:
             ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-            UpdateInternetConnectivityState();
+            sInstance.OnStationDisconnected();
             break;
 
         case WLAN_REASON_INITIALIZED:
@@ -281,6 +281,19 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
+    (void ) PlatformMgr().PostEvent(&event);
+
+    /* Update the connectivity state in case the connected event has been received after getting an IP addr */
+    UpdateInternetConnectivityState();
+}
+
+void ConnectivityManagerImpl::OnStationDisconnected()
+{
+    CHIP_ERROR err;
+    ChipDeviceEvent event;
+
+    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
+    event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     (void ) PlatformMgr().PostEvent(&event);
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */

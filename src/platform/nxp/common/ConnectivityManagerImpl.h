@@ -137,6 +137,7 @@ private:
     static void _NetifExtCallback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args);
 
     void OnStationConnected(void);
+    void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
