@@ -47,8 +47,6 @@ void OTARequestorInitiator::HandleSelfTest()
        (if we have arrived this far, the bootloader had validated the image) */
 
     mflash_drv_init();
-
-    OTA_Initialize();
     
     OtaImgState_t update_state;
 
@@ -65,5 +63,8 @@ void OTARequestorInitiator::HandleSelfTest()
 
         ChipLogProgress(SoftwareUpdate, "Successful software update... applied permanently");
     }
+
+    OTA_Initialize();
+    
     /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */  
 }
