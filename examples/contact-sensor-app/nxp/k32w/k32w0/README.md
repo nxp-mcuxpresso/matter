@@ -227,7 +227,7 @@ to zero. The argument chip_with_OM15082 is set to zero by default.
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
-chip_enable_icd_subscription_handle can be set to 1: it will enable platform
+`chip_enable_icd_subscription_handle` can be set to 1: it will enable platform
 specific implementation that handles ICD subscription requests such that it selects
 subscription report interval value considering maximum interval preferred by the
 publisher.
