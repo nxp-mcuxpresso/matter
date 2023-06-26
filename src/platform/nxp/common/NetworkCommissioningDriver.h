@@ -71,7 +71,14 @@ public:
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
+    /* Returns the network SSID. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiSSIDLength.
+     * ssid - pointer to the returned SSID
+    */
     Status GetNetworkSSID(char * ssid);
+
+    /* Returns the network password. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiKeyLength.
+     * credentials - pointer to the returned password
+    */
     Status GetNetworkPassword(char * credentials);
 
     // WiFiDriver

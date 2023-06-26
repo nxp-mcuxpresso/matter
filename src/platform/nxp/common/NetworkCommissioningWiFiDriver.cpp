@@ -151,6 +151,9 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
     return Status::kSuccess;
 }
 
+/* Returns the network SSID. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiSSIDLength.
+ * ssid - pointer to the returned SSID
+ */
 Status NXPWiFiDriver::GetNetworkSSID(char * ssid)
 {
     VerifyOrReturnError(ssid != NULL, Status::kOutOfRange);
@@ -159,6 +162,9 @@ Status NXPWiFiDriver::GetNetworkSSID(char * ssid)
     return Status::kSuccess;
 }
 
+/* Returns the network password. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiKeyLength.
+ * credentials - pointer to the returned password
+ */
 Status NXPWiFiDriver::GetNetworkPassword(char * credentials)
 {
     VerifyOrReturnError(credentials != NULL, Status::kOutOfRange);
