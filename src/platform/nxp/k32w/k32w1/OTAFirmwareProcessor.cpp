@@ -34,7 +34,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     otaResult_t ota_status;
     ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS*TRANSACTION_SZ);
 
-    ReturnErrorCodeIf(ota_status == gOtaSuccess_c, CHIP_OTA_PROCESSOR_CLIENT_INIT);
+    ReturnErrorCodeIf(ota_status != gOtaSuccess_c, CHIP_OTA_PROCESSOR_CLIENT_INIT);
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;

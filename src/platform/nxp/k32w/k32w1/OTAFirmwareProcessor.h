@@ -51,7 +51,7 @@ private:
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
 
-    uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
+    alignas(4) uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
 };
 
 } // namespace chip
