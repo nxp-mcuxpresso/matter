@@ -156,9 +156,7 @@ After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 
 Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
 
-The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn.sb3`.
-
-Please note that `middleware\wireless\ieee-802.15.4\bin\k32w1\` also contains a `_matter` suffixed .sb3 file but that one shouldn't be used with low power applications.
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
 <a name="flashing-the-nbu-image"></a>
 

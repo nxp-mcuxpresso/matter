@@ -178,8 +178,6 @@ Two images must be written to the board: one for the host (CM33) and one for the
 
 The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
-Please note the `_matter` suffix in the naming of the .sb3 image - this is the image that needs to be used for lighting application - a non low power application where <a href="#smu2-memory"> SMU2 Memory </a> can be used.
-
 <a name="flashing-the-nbu-image"></a>
 
 ### Flashing the NBU image
