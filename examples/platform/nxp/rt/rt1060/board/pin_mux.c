@@ -37,7 +37,6 @@ void BOARD_InitBootPins(void) {
 BOARD_InitPins:
 - options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: M11, peripheral: GPIO6, signal: 'gpio_io, 02', pin_signal: GPIO_AD_B0_02, direction: OUTPUT, gpio_init_state: 'true'}
   - {pin_num: L11, peripheral: LPUART2, signal: TX, pin_signal: GPIO_AD_B1_02}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
@@ -48,24 +47,13 @@ BOARD_InitPins:
  * Description   : Configures pin routing and optionally pin electrical features.
  *
  * END ****************************************************************************************************************/
-void BOARD_InitPins(void) {
-  CLOCK_EnableClock(kCLOCK_Iomuxc);           
+void BOARD_InitPins(void)
+{
+    CLOCK_EnableClock(kCLOCK_Iomuxc);
 
-  /* GPIO configuration on GPIO_AD_B0_02 (pin M11) */
-  gpio_pin_config_t gpio6_pinM11_config = {
-      .direction = kGPIO_DigitalOutput,
-      .outputLogic = 1U,
-      .interruptMode = kGPIO_NoIntmode
-  };
-  /* Initialize GPIO functionality on GPIO_AD_B0_02 (pin M11) */
-  GPIO_PinInit(GPIO6, 2U, &gpio6_pinM11_config);
-
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_02_GPIO1_IO02, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_02_LPUART2_TX, 0U); 
-  IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 &
-    (~(BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK))) 
-      | IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x04U) 
-    );
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_02_LPUART2_TX, 0U);
+    IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 & (~(BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK))) |
+                         IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x04U));
 }
 
 
@@ -88,12 +76,13 @@ BOARD_InitDEBUG_UARTPins:
  *
  * END ****************************************************************************************************************/
 void BOARD_InitDEBUG_UARTPins(void) {
-  CLOCK_EnableClock(kCLOCK_Iomuxc);           
+  CLOCK_EnableClock(kCLOCK_Iomuxc);
 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_12_LPUART1_TX, 0x10B0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0x10B0U); 
+  /* These pins are used for Matter Logging/Matter CLI, based on definition of ENABLE_CHIP_SHELL */
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_12_LPUART1_TX, 0U);
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_12_LPUART1_TX, 0x10B0U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0x10B0U);
 }
 
 
@@ -356,7 +345,8 @@ void BOARD_InitQSPIPins(void) {
 BOARD_InitOTWPins:
 - options: {callFromInitBoot: 'false', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: L13, peripheral: GPIO6, signal: 'gpio_io, 26', pin_signal: GPIO_AD_B1_10, direction: OUTPUT, gpio_init_state: 'true'}
+  - {pin_num: L13, peripheral: GPIO1, signal: 'gpio_io, 26', pin_signal: GPIO_AD_B1_10, direction: OUTPUT, gpio_init_state: 'true'}
+  - {pin_num: M11, peripheral: GPIO1, signal: 'gpio_io, 27', pin_signal: GPIO_AD_B1_11, direction: OUTPUT, gpio_init_state: 'true'}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -366,25 +356,37 @@ BOARD_InitOTWPins:
  * Description   : Configures pin routing and optionally pin electrical features.
  *
  * END ****************************************************************************************************************/
-void BOARD_InitOTWPins(void) {
-  CLOCK_EnableClock(kCLOCK_Iomuxc);           
+void BOARD_InitOTWPins(void)
+{
+    CLOCK_EnableClock(kCLOCK_Iomuxc);
 
-  /* GPIO configuration of CSI_D7 on GPIO_AD_B1_10 (pin L13) */
-  gpio_pin_config_t CSI_D7_config = {
-      .direction = kGPIO_DigitalOutput,
-      .outputLogic = 1U,
-      .interruptMode = kGPIO_NoIntmode
-  };
-  /* Initialize GPIO functionality on GPIO_AD_B1_10 (pin L13) */
-  GPIO_PinInit(GPIO6, 26U, &CSI_D7_config);
+    /* This is GPIO pin used for K32W0x1 RCP ISP Entry/DIO5 pin */
+    /* GPIO configuration on GPIO_AD_B1_10 (pin L13) */
+    gpio_pin_config_t gpio1_pinL13_config = {
+        .direction = kGPIO_DigitalOutput,
+        .outputLogic = 1U,
+        .interruptMode = kGPIO_NoIntmode
+    };
+    /* Initialize GPIO functionality on GPIO_AD_B1_10 (pin L13) */
+    GPIO_PinInit(GPIO1, 26U, &gpio1_pinL13_config);
 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_10_GPIO1_IO26, 0U); 
-  IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 &
-    (~(BOARD_INITOTWPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK))) 
-      | IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x04000000U) 
-    );
+    /* This is GPIO pin used for K32W0x1 RCP Reset */
+    /* GPIO configuration on GPIO_AD_B1_11 (pin J13) */
+    gpio_pin_config_t gpio1_pinJ13_config = {
+        .direction = kGPIO_DigitalOutput,
+        .outputLogic = 1U,
+        .interruptMode = kGPIO_NoIntmode
+    };
+    /* Initialize GPIO functionality on GPIO_AD_B1_11 (pin J13) */
+    GPIO_PinInit(GPIO1, 27U, &gpio1_pinJ13_config);
+
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_10_GPIO1_IO26, 0U);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_11_GPIO1_IO27, 0U);
+    IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 &
+      (~(BOARD_INITPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK)))
+        | IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x00U)
+      );
 }
-
 
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
@@ -409,16 +411,17 @@ BOARD_InitArduinoUARTPins:
  *
  * END ****************************************************************************************************************/
 void BOARD_InitArduinoUARTPins(void) {
-  CLOCK_EnableClock(kCLOCK_Iomuxc);           
+  CLOCK_EnableClock(kCLOCK_Iomuxc);
 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_04_LPUART3_CTS_B, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_05_LPUART3_RTS_B, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_06_LPUART3_TX, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_07_LPUART3_RX, 0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_04_LPUART3_CTS_B, 0x10B0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_05_LPUART3_RTS_B, 0x10B0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_06_LPUART3_TX, 0x1098U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_07_LPUART3_RX, 0x10B0U); 
+  /* These pins are defined for the UART interface to K32W0x1 RCP with Spinel communication */
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_04_LPUART3_CTS_B, 0U);
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_05_LPUART3_RTS_B, 0U);
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_06_LPUART3_TX, 0U);
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_07_LPUART3_RX, 0U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_04_LPUART3_CTS_B, 0x10B0U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_05_LPUART3_RTS_B, 0x10B0U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_06_LPUART3_TX, 0x1098U);
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_07_LPUART3_RX, 0x10B0U);
 }
 
 

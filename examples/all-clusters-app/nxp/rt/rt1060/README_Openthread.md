@@ -30,7 +30,7 @@ evkbmimxrt1060 (host) to a k32w061 transceiver (rcp).
 |    UART_RTS    |  PIO, pin 6   |   J33, pin 3    |   J23, pin 3   |    LPUART3_CTS     |    GPIO_AD_B1_04    |
 |    UART_CTS    |  PIO, pin 7   |   J33, pin 4    |   J23, pin 4   |    LPUART3_RTS     |    GPIO_AD_B1_05    |
 |      GND       |   J3, pin 1   |   J32, pin 7    |   J25, pin 7   |         XX         |         XX          |
-|     RESET      |     RSTN      |   J17, pin 2    |   J24, pin 2   |   GPIO_AD_B0_02    |    GPIO_AD_B0_02    |
+|     RESET      |     RSTN      |   J33, pin 2    |   J23, pin 2   |   GPIO_AD_B1_11    |    GPIO_AD_B1_11    |
 | DIO5/ISP Entry |  PIO, pin 5   |   J33, pin 1    |   J23, pin 1   |   GPIO_AD_B1_10    |    GPIO_AD_B1_10    |
 
 The below picture shows pins connections for the EVK-MIMXRT1060.

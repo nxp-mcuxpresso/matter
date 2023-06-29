@@ -54,10 +54,10 @@ rt1060_sdk_drivers("rt_sdk_drivers") {
         "SPINEL_ENABLE_RX_RTS=1",
         "SPINEL_ENABLE_TX_RTS=1",
         #OTW configurations
-        "OTW_RESET_PIN_PORT=6",
-        "OTW_RESET_PIN_NUM=2",
-        "OTW_DIO5_PIN_PORT=6",
+        "OTW_DIO5_PIN_PORT=1",
         "OTW_DIO5_PIN_NUM=26",
+        "OTW_RESET_PIN_PORT=1",
+        "OTW_RESET_PIN_NUM=27"
       ]
     }
 
