@@ -28,6 +28,64 @@
  * @file
  *   Linker instructions for RT1170, cm7
  */
+
+ /** If OTA is enabled : MCUBoot bootloader resides at the base of the flash and occupies 0x40000 (256 kBytes) 
+  slot 0 : main application partition (active app)
+           slot0 = header + m_app_stated_size + trailer
+  slot 1 : OTA Update storage partition (candidate app)
+           slot1 = OTA image (the image received is already wrapped with header & trailer)
+**/
+
+/************************ Flash Layout with OTA enabled *********************
+
+             0x3000_0000    FLASH_START
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          |               |                 
+          |    MCUBoot    |                 
+   256k   |   bootloader  |                 
+          |               |
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+   4k     |  Header_slot0 |                                 '
+          +---------------+ m_interrupts_start              '
+          |  m_interrupts |                                 '
+          +---------------+ m_text_start                    '
+          |               |                                 '      
+ m_app_   |               |                                 '
+_stated_  |     m_text    |                                 '   ACTIVE_APP (slot 0)
+ _size    |               |                                 '       (2 MB)
+          |               |                                 '  
+          |               |                                 '
+          +---------------+ m_text_end                      '
+   4k     | Trailer_slot0 |                                 '
+          +---------------+                                 '
+   4k     |    padding    |                                 '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          |               | FW_UPDATE_STORAGE_START         '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |      OTA      |                                 '
+          |     Update    |                                 '   CANDIDATE_APP (slot 1)
+          |     Image     |                                 '        (2 MB)
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               | FW_UPDATE_STORAGE_END           '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          +               +
+          +               + 
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+    4k    |  FactoryData  |
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - - 
+          |               | NV_STORAGE_START_ADDRESS
+          |   NVM_region  | 
+          |               | NV_STORAGE_END_ADDRESS
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+             0x31000000     FLASH_END
+
+*****************************************************************************/
  
 /* Entry Point */
 ENTRY(Reset_Handler)
@@ -52,15 +110,69 @@ __FACTORY_DATA_END    = NV_STORAGE_START_ADDRESS -1;
 __FACTORY_DATA_START  = __FACTORY_DATA_END - __FACTORY_DATA_SIZE + 1;
 __FACTORY_DATA_START_OFFSET = __FACTORY_DATA_START - FLASH_START;
 
-/* OTA Update Image section */
-OTA_STORAGE_MAX_SECTORS      = 256;
-OTA_STORAGE_END_ADDRESS      = __FACTORY_DATA_START -1;
-OTA_STORAGE_SIZE             = FLASH_SECTOR_SIZE * OTA_STORAGE_MAX_SECTORS;
-OTA_STORAGE_START_ADDRESS    =  OTA_STORAGE_END_ADDRESS - OTA_STORAGE_SIZE + 1;
+m_flash_start                       = FLASH_START;
+m_flash_sector_size                 = FLASH_SECTOR_SIZE;
 
-m_text_end                   = OTA_STORAGE_START_ADDRESS -1;
-m_text_start                 = 0x30002400;
-m_text_size                  = OTA_STORAGE_START_ADDRESS - m_text_start;
+m_boot_flash_conf_sector_start      = m_flash_start;
+m_boot_flash_conf_offset            = 0x400;
+m_boot_flash_conf_start             = m_boot_flash_conf_sector_start + m_boot_flash_conf_offset;
+m_boot_flash_conf_sector_end        = m_boot_flash_conf_sector_start + m_flash_sector_size - 1;
+m_boot_flash_conf_size              = m_flash_sector_size - m_boot_flash_conf_offset;
+
+
+m_ivt_start                         = m_boot_flash_conf_sector_end + 1;
+m_ivt_size                          = m_flash_sector_size;
+m_ivt_end                           = m_ivt_start + m_ivt_size - 1;
+
+/* 
+ * If OTA is enabled, we must reserve enough space for MCUboot and the image header.
+ * Note that MCUboot itself embeds the FlashConfig section.
+*/
+m_mcuboot_size                      = DEFINED(__m_mcuboot_size__)  ? __m_mcuboot_size__  : 0; 
+m_mcuboot_start                     = m_flash_start; /* The flash config section is comprised */
+m_mcuboot_end                       = m_mcuboot_start + m_mcuboot_size - 1;
+m_mcuboot_img_hdr_sz                = ((0x400 + (m_flash_sector_size -1 )) / m_flash_sector_size) * m_flash_sector_size;
+
+/* 
+ * Active application section
+*/
+m_app_start                         = DEFINED(__m_mcuboot_size__)  ? m_mcuboot_end + 1 : m_ivt_end + 1;
+m_app_trailer_size                  = m_flash_sector_size;
+m_padding_size                      = m_flash_sector_size;
+
+/* Maximum number of sectors per slot */
+m_app_max_sectors                   = 0x200; /* (2MB / m_sector_size) */
+
+/* The active image section contains the mcuboot header + active app + trailer 
+ * Note that an empty sector (padding) must be kept at the end of the active image section,
+ * this would be used by mcuboot to perform a swap-move operation of the upgrade.
+ */
+FW_ACTIVE_APP_START                 = m_app_start;
+FW_ACTIVE_APP_OFFSET                = m_app_start - m_flash_start;
+FW_ACTIVE_APP_SIZE                  = m_flash_sector_size * m_app_max_sectors - m_padding_size;
+FW_ACTIVE_APP_END                   = FW_ACTIVE_APP_START + FW_ACTIVE_APP_SIZE - 1;
+
+m_app_stated_size                   = FW_ACTIVE_APP_SIZE - m_mcuboot_img_hdr_sz - m_app_trailer_size;
+
+m_interrupts_start                  = DEFINED(__m_mcuboot_size__)  ? m_app_start + m_mcuboot_img_hdr_sz : m_app_start;
+m_interrupts_size                   = 0x00000400;
+m_interrupts_end                    = m_interrupts_start + m_interrupts_size - 1;
+m_text_start                        = m_interrupts_end + 1;
+m_text_size                         = m_app_stated_size - m_interrupts_size;
+m_text_end                          = m_text_start + m_text_size - 1;
+
+
+/* Candidate application (OTA Update Image) section 
+ * The size of the candidate image (slot 1) is equal to the active image (slot 0) size
+*/
+FW_UPDATE_STORAGE_START             = FW_ACTIVE_APP_END + 1 + m_padding_size;
+FW_UPDATE_STORAGE_SIZE              = FW_ACTIVE_APP_SIZE;
+FW_UPDATE_STORAGE_OFFSET            = FW_UPDATE_STORAGE_START - m_flash_start;
+FW_UPDATE_STORAGE_END               = FW_UPDATE_STORAGE_START + FW_UPDATE_STORAGE_SIZE - 1;
+
+fw_top                              = FW_UPDATE_STORAGE_END + 1;
+
+
 
 OCRAM1_START                 = 0x20240000;
 OCRAM2_START                 = 0x202C0000;
@@ -74,9 +186,9 @@ VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000400 : 0;
 /* Specify the memory areas */
 MEMORY
 {
-  m_flash_config        (RX)  : ORIGIN = 0x30000400, LENGTH = 0x00000C00
-  m_ivt                 (RX)  : ORIGIN = 0x30001000, LENGTH = 0x00001000
-  m_interrupts          (RX)  : ORIGIN = 0x30002000, LENGTH = 0x00000400
+  m_flash_config        (RX)  : ORIGIN = m_boot_flash_conf_start, LENGTH = m_boot_flash_conf_size
+  m_ivt                 (RX)  : ORIGIN = m_ivt_start, LENGTH = m_ivt_size
+  m_interrupts          (RX)  : ORIGIN = m_interrupts_start, LENGTH = m_interrupts_size
   m_text                (RX)  : ORIGIN = m_text_start, LENGTH = m_text_size
   NVM_region            (RW)  : ORIGIN = NV_STORAGE_START_ADDRESS, LENGTH = NV_STORAGE_SIZE
   m_qacode              (RX)  : ORIGIN = 0x00000000, LENGTH = 0x00040000

@@ -212,6 +212,22 @@ rt_executable("all_cluster_app") {
     ldflags += [ "-Wl,--defsym=gNVMSectorCountLink_d=193" ]
   }
 
+  if (chip_enable_ota_requestor)
+  {
+    if (no_mcuboot)
+    {
+      # If "no_mcuboot" is set to true, the application will be linked at the base of the flash.
+      print("Warning : The OTA Requestor is enabled without MCUBoot. This will prevent the application from applying software updates.")
+    }
+    else
+    {
+      # we need to reserve enough space for the bootloader (MCUBoot) 
+      # MCUBoot requires 0x40000 Bytes to be reserved at the base of the flash 
+      # Consequently, some sections will need to be shifted
+      ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x40000" ]
+    }
+  }
+
   output_dir = root_out_dir
 }
 
