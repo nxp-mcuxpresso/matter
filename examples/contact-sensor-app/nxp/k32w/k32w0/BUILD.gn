@@ -59,7 +59,7 @@ k32w0_sdk("sdk") {
 
   if (chip_enable_icd_subscription_handle==1) {
     include_dirs += [
-      "${chip_root}/examples/platform/nxp/k32w/common/icd/",
+      "${chip_root}/examples/platform/nxp/common/icd/",
     ]
   }
 
@@ -94,8 +94,8 @@ k32w0_executable("contact_sensor_app") {
 
   if (chip_enable_icd_subscription_handle == 1) {
     sources += [
-      "${chip_root}/examples/platform/nxp/k32w/common/icd/ICDSubscriptionCallback.cpp",
-      "${chip_root}/examples/platform/nxp/k32w/common/icd/ICDSubscriptionCallback.h",
+      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.cpp",
+      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.h",
     ]
   }
 
