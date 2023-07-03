@@ -47,6 +47,7 @@ declare_args() {
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption=1
   ota_custom_entry_address="0x000C1000"
+  use_antenna_diversity = 0
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -138,6 +139,7 @@ template("k32w0_sdk") {
   print("OTA default firmware processor: ", chip_enable_ota_firmware_processor)
   print("OTA default factory data processor: ", chip_enable_ota_factory_data_processor)
   print("PDM Encryption: ", chip_with_pdm_encryption)
+  print("Antenna Diversity enabled: ", use_antenna_diversity)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
     print("WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
@@ -311,6 +313,13 @@ template("k32w0_sdk") {
       "gOTA_UseSecLibAes=1",
       "gResetSystemReset_d=1"
     ]
+
+    if (use_antenna_diversity == 1){
+      print("Check ADO/ADE pin configuration when using Antenna Diversity.")
+      defines += [
+        "ANTENNA_DIVERSITY_ENABLE",
+      ]
+    }
 
     # If OTA default processors are enabled, then OTA custom entry structure
     # will be saved in external flash: gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash (1)
