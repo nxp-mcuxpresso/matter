@@ -45,8 +45,8 @@ static constexpr size_t kSpake2pSalt_MaxBase64Len =
  */
 static constexpr size_t kDacPrivateKey_MaxLen = Crypto::kP256_PrivateKey_Length + 24;
 
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__MATTER_FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__MATTER_FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
 FactoryDataProvider::FactoryDataProvider()
