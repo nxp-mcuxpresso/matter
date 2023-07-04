@@ -30,6 +30,12 @@ In our use case, the bootloader runs the application residing in the primary par
 
 In order for the device to perform the software update, the MCUBoot bootloader must be flashed first at the base of the flash. A step-by-step guide is given below.
 
+- MIMXRT1170-EVKB board supports CMSIS-DAP debug protocol by default. It should be switched to JLink.
+    - download and install [MCU-LINK_INSTALLER 2.263](https://www.nxp.com/webapp/Download?colCode=MCU-LINK_INSTALLER_2.263_LIN)
+    - connect jumper JP3 to get board in ISP mode when powered
+    - connect board and run installed MCU-LINK, follow steps to flash JLINK firmware
+    - remove jumper JP3 and reboot board 
+
 - It is recommended to start with erasing the external flash of the device, for this JLink from Segger can be used. It can be downloaded and installed from https://www.segger.com/products/debug-probes/j-link. Once installed, JLink can be run using the command line :
 ```
 $ JLink
@@ -40,6 +46,11 @@ J-Link > erase 0x30000000, 0x3043f000
 ```
 - Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK previously downloaded.
 ![mcuboot_demo](../../../../platform/nxp/rt/rt1170/doc/images/mcuboot_demo.PNG)
+- Before building the demo example, MCUBoot should be configured to use swap mechanism. This can be done by defining `CONFIG_MCUBOOT_SWAP_MOVE` as 1 in the settings of the mcuboot_opensource project :
+```
+Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "CONFIG_MCUBOOT_SWAP_MOVE=1" in the Defined Symbols
+```
+![mcuboot_swap_config](../../../../platform/nxp/rt/rt1170/doc/images/mcuboot_swap_config.png)
 
 - Build the demo example project and program it to the target board.
 - To run the flashed demo, either press the reset button of the device or use the debugger IDE of MCUXpresso. If it runs successfully, the following logs will be displayed on the terminal :
