@@ -230,6 +230,12 @@ Right click on the Project -> C/C++ Build-> Tool Chain Editor -> NXP MCU Tools -
 
 - Create a debug configuration:
 
+  MIMXRT1170-EVKB board supports CMSIS-DAP debug protocol by default. It should be switched to JLink.
+    - download and install [MCU-LINK_INSTALLER 2.263](https://www.nxp.com/webapp/Download?colCode=MCU-LINK_INSTALLER_2.263_LIN)
+    - connect jumper JP3 to get board in ISP mode when powered
+    - connect board and run installed MCU-LINK, follow steps to flash JLINK firmware
+    - remove jumper JP3 and reboot board 
+
 ```
 Right click on the Project -> Debug -> As->SEGGER J-Link probes -> OK -> Select elf file
 ```
