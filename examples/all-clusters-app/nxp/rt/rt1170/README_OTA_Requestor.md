@@ -15,8 +15,10 @@ In general, the Over-The-Air Software Update process consists of the following s
 
 The RT1170 Flash is divided into different regions as follow :
 - Bootloader : MCUBoot resides at the base of the flash and occupies 0x40000 (256 kBytes).
-- Primary application partition : The all-clusters application which would be run by the bootloader (active application).
-- Secondary application partition : Update image received with the OTA (candidate application).
+- Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4MBytes.
+- Secondary application partition : Update image received with the OTA (candidate application). The size reserved for this partition is 4MBytes.
+
+Note : The sizes of the primary and secondary applications are provided as an example (currently 4MB is reserved for each partition). The size can be changed by modifying the `m_app_max_sectors` value in the linkerscript of the application (MIMXRT1176xxxxx_cm7_flexspi_nor.ld).
 
 ### MCUBoot Bootloader
 
@@ -66,6 +68,8 @@ erasing trailer; fa_id=2
 Unable to find bootable image
 ```
 
+Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "SDK_RT1170/boards/evkbmimxrt1170/mcuboot_opensource/".
+
 ### Generating and flashing the signed application image
 
 After flashing the bootloader, the application can be programmed to the board. The image must have the following format :
@@ -88,9 +92,14 @@ The following commands can be run (make sure to replace the /path/to/file/binary
 ```
 user@ubuntu: cd ~/Desktop/SDK_RT1170/middleware/mcuboot_opensource/scripts
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RT1170/boards/src/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x200000 --max-sectors 512 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RT1170/boards/evkbmimxrt1170/mcuboot_opensource/cm7/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x400000 --max-sectors 512 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example_SIGNED.bin
 ```
-Note : Here, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/boards/src/mcuboot_opensource/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
+Note : 
+- If internal SDK is used instead, the key can be found in : "/path_to_sdk/boards/src/mcuboot_opensource/keys/sign-rsa2048-priv.pem".
+
+- The arguments `slot-size` and `max-sectors` should be adjusted to the size of the partitions reserved for the primary and the secondary applications. (By default the size considered is 4MB)
+
+- In this example, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/boards/evkbmimxrt1170/mcuboot_opensource/cm7/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
 
 - To generate the private key :
 
