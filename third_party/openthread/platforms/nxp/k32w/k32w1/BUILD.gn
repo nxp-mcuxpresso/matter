@@ -58,6 +58,11 @@ source_set("libopenthread-k32w1") {
     "${openthread_nxp_root}/src/k32w1/k32w1/uart.c",
   ]
 
+  if (chip_crypto == "platform") {
+    sources +=
+        [ "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp" ]
+  }
+
   if (chip_with_ot_cli == 1) {
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
   }
