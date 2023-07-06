@@ -52,7 +52,7 @@
           |               |                                 '      
  m_app_   |               |                                 '
 _stated_  |     m_text    |                                 '   ACTIVE_APP (slot 0)
- _size    |               |                                 '       (2 MB)
+ _size    |               |                                 '       (4 MB)
           |               |                                 '  
           |               |                                 '
           +---------------+ m_text_end                      '
@@ -67,7 +67,7 @@ _stated_  |     m_text    |                                 '   ACTIVE_APP (slot
           |               |                                 '
           |      OTA      |                                 '
           |     Update    |                                 '   CANDIDATE_APP (slot 1)
-          |     Image     |                                 '        (2 MB)
+          |     Image     |                                 '        (4 MB)
           |               |                                 '
           |               |                                 '
           |               |                                 '
@@ -141,7 +141,7 @@ m_app_trailer_size                  = m_flash_sector_size;
 m_padding_size                      = m_flash_sector_size;
 
 /* Maximum number of sectors per slot */
-m_app_max_sectors                   = 0x200; /* (2MB / m_sector_size) */
+m_app_max_sectors                   = 0x400; /* (4MB / m_sector_size) */
 
 /* The active image section contains the mcuboot header + active app + trailer 
  * Note that an empty sector (padding) must be kept at the end of the active image section,
