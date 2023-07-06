@@ -19,11 +19,14 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni"
 import("${chip_root}/src/platform/device.gni") # declares chip_enable_wifi and chip_enable_openthread
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
 
+import("//build_overrides/openthread.gni")
+
 rt1170_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
 rt1170_sdk_drivers("rt_sdk_drivers") {
     include_dirs = []
     public_configs = []
+    public_deps = []
     sources = []
     defines = []
 
@@ -74,6 +77,14 @@ rt1170_sdk_drivers("rt_sdk_drivers") {
         "..:nxp_bt_ble_config",
         ]
     }
+
+    #FWK FactoryDataProvider is using mbedtls so add a dep to mbedtls includes+flags+configs
+    public_deps += [":rt_sdk_mbedtls_config"]
+
+    if (chip_enable_openthread) {
+      #Dep to ot header files required for mbedtls
+      public_deps +=  ["${openthread_root}/src/core:libopenthread_core_headers"]
+   }
 }
 
 group("nxp_mbedtls") {
