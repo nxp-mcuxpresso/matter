@@ -123,8 +123,6 @@ rt_sdk("nxp_sdk") {
     public_deps += [":nxp_wifi"]
   }
 
-  #SDK may use mbedtls so add to mbedtls includes+flags+configs
-  public_deps += ["${rt_platform}:rt_sdk_mbedtls_config"]
 }
 
 config("mbedtls_ksdk_config") {

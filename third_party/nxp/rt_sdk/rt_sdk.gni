@@ -286,7 +286,6 @@ template("rt_sdk") {
         "${rt_sdk_root}/middleware/wireless/framework/KeyStorage",
 #littlefs
         "${rt_sdk_root}/middleware/littlefs",
-        "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider",
     ]
 
 #OtaSupport
@@ -477,7 +476,6 @@ template("rt_sdk") {
     "${rt_core_sdk_root}/components/messaging/fsl_component_messaging.c",
 #Framework files
     "${rt_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
-    "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c",
     ]
 
 #OtaSupport files
