@@ -97,9 +97,10 @@ The following commands can be run (make sure to replace the /path/to/file/binary
 ```
 user@ubuntu: cd ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/scripts
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example_SIGNED.bin
 ```
 Notes : 
+- If internal SDK is used instead, the key can be found in : "~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem".
 - The arguments `slot-size` and `max-sectors` should be adjusted to the size of the partitions reserved for the primary and the secondary applications. (By default the size considered is 4.4 MB)
 - In this example, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
 
