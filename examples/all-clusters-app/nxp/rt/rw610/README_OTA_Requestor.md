@@ -15,10 +15,12 @@ In general, the Over-The-Air Software Update process consists of the following s
 
 The RW612 Flash is divided into different regions as follow :
 - Bootloader : MCUBoot resides at the base of the flash and occupies 0x20000 (128 kBytes).
-- Primary application partition : The all-clusters application which would be run by the bootloader (active application).
-- Secondary application partition : Update image received with the OTA (candidate application).
+- Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MBytes.
+- Secondary application partition : Update image received with the OTA (candidate application). The size reserved for the partition is 4.4 MBytes.
 
-Note : The CPU1/CPU2 firmwares are embedded in the CPU3 all-clusters application.
+Notes : 
+- The CPU1/CPU2 firmwares are embedded in the CPU3 all-clusters application.
+- The sizes of the primary and secondary applications are provided as an example (currently 4.4 MB is reserved for each partition). The size can be changed by modifying the `m_app_max_sectors` value in the linkerscript of the application (RW610_flash.ld).
 
 ### MCUBoot Bootloader
 
@@ -71,6 +73,8 @@ erasing trailer; fa_id=2
 Unable to find bootable image
 ```
 
+Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4.4 MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/".
+
 ### Generating and flashing the signed application image
 
 After flashing the bootloader, the application can be programmed to the board. The image must have the following format :
@@ -95,7 +99,9 @@ user@ubuntu: cd ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/scripts
 
 user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example_SIGNED.bin
 ```
-Note : Here, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
+Notes : 
+- The arguments `slot-size` and `max-sectors` should be adjusted to the size of the partitions reserved for the primary and the secondary applications. (By default the size considered is 4.4 MB)
+- In this example, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
 
 - To generate the private key :
 
