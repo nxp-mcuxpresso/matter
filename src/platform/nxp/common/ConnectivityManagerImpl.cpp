@@ -496,7 +496,9 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     }
     else
     {
+        PlatformMgr().LockChipStack();
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL), ConnectNetworkTimerHandler, context);
+        PlatformMgr().UnlockChipStack();
     }
 }
 #endif
