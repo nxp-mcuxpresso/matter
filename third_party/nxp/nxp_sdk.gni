@@ -15,6 +15,13 @@
 
 declare_args() {
     nxp_platform = ""
+    # Specifies the CHIP_DEVICE_LAYER_TARGET in src/platform/BUILD.gn
+    nxp_device_layer = "nxp/common"
+    # Enables target nxp_lwip. Used by RT platforms.
+    nxp_use_lwip = true
+    # Enables target nxp_mbedtls. Used by RT platforms.
+    nxp_use_mbedtls_port = true
+
     chip_enable_matter_cli = false
     chip_with_factory_data = 0
     chip_enable_pairing_autostart = 1
