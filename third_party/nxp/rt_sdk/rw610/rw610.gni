@@ -174,6 +174,7 @@ template("rw610_sdk_drivers") {
         "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM33_NTZ/non_secure",
         # framework
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/configs",
+        "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider",
     ]
 
     libs = []
@@ -405,6 +406,7 @@ template("rw610_sdk_drivers") {
         "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu1.c",
         "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_ble.c",
         "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_combo.c",
+        "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c",
     ]
 
     if (sdk_fsl_assert_support) {
