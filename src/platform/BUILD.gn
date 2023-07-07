@@ -213,8 +213,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       import("${nxp_sdk_build_root}/nxp_sdk.gni")
       device_layer_target_define = "NXP"
       defines += [
+# Nxp common files are used by default
+# If platform-specific files are to be used instead, EXTERNAL_COMPONENTNAMEMANAGERIMPL_HEADER should be defined
+        "CHIP_DEVICE_LAYER_TARGET_NXP=1",
         "CHIP_DEVICE_LAYER_TARGET=${nxp_device_layer}",
-        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}",
+        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}"
       ]
     } else if (chip_device_platform == "telink") {
       device_layer_target_define = "TELINK"

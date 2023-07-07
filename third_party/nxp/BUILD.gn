@@ -23,12 +23,16 @@ group("nxp_sdk") {
 
 if (nxp_use_lwip) {
   group("nxp_lwip") {
-    public_deps = [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_lwip" ]
+    public_deps = [
+          "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_lwip"
+    ]
   }
 }
 
 if (nxp_use_mbedtls_port) {
   group("nxp_mbedtls") {
-    public_deps = [ "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_mbedtls" ]
+    public_deps = [
+          "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls"
+    ]
   }
 }
