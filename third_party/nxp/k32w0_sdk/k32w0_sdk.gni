@@ -14,14 +14,15 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/lib/core/core.gni")
-import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   # Location of the k32w0 SDK.
@@ -38,7 +39,6 @@ declare_args() {
   board = "k32w061dk6"
   chip_with_ntag = 1
   chip_with_high_power = 0
-  chip_with_factory_data = 0
   use_fro_32k = 0
   use_custom_factory_provider = 0
   chip_crypto_flavor = "NXP-Ultrafast-P256"
