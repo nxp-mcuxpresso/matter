@@ -19,7 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/k32w0_executable.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 assert(current_os == "freertos")
