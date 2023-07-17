@@ -110,7 +110,7 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     }
 
     // TODO:Provision WiFi using WirelessDriver
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return ConnectivityMgr().ProvisionWiFiNetwork(argv[0], strlen(argv[0]), argv[1], strlen(argv[1]));
 }
 
 static CHIP_ERROR WiFiDispatch(int argc, char ** argv)

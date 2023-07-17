@@ -28,6 +28,14 @@
 #define MEMP_NUM_NETCONN (4)
 #define NETIF_MAX_HWADDR_LEN 8U
 
+//BR specific defines
+#define LWIP_IPV6_SCOPES 1
+#define MAX_SOCKETS_UDP 10
+#define MEMP_NUM_UDP_PCB (MAX_SOCKETS_UDP + 2)
+#define LWIP_IPV6_NUM_ADDRESSES 8
+#define LWIP_IPV6_FORWARD 1
+#define MEMP_NUM_RAW_PCB (2)
+
 #include "lwipopts_common.h"
 
 #endif /* __LWIPOPTS_H__ */

@@ -181,6 +181,7 @@ public:
     CHIP_ERROR GetAndLogWiFiStatsCounters();
 
     // WiFi AP methods
+    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     WiFiAPMode GetWiFiAPMode();
     CHIP_ERROR SetWiFiAPMode(WiFiAPMode val);
     bool IsWiFiAPActive();
@@ -322,6 +323,11 @@ inline chip::Inet::EndPointManager<Inet::TCPEndPoint> & ConnectivityManager::TCP
     return static_cast<ImplClass *>(this)->_TCPEndPointManager();
 }
 #endif
+
+inline CHIP_ERROR ConnectivityManager::ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
+{
+    return static_cast<ImplClass *>(this)->ProvisionWiFiNetwork(ssid, ssidLen, key, keyLen);
+}
 
 inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode()
 {

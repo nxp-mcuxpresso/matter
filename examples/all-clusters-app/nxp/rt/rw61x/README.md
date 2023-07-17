@@ -32,9 +32,12 @@ The example supports:
 
 - Matter over Wi-Fi. For that follow instructions from [README_Wifi.md][README_Wifi.md].
 - Matter over Openthread. For that follow instructions from [README_Openthread.md][README_Openthread.md].
+- Matter over Wi-Fi with Open Thead Border router support. For that follow instructions from
+ [README_Border_Router.md][README_Border_Router.md]. 
 
 [README_Wifi.md]: README_Wifi.md
 [README_Openthread.md]: README_Openthread.md
+[README_Border_Router.md]: README_Border_Router.md
 
 The example targets the
 [`NXP RD-RW610-BGA`] and the [`NXP RD-RW612-BGA`]

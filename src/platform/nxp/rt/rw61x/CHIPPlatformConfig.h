@@ -43,6 +43,9 @@
 /* For now on RW610, due to the current file system implementation only 5 fabrics are supported */
 #define CHIP_CONFIG_MAX_FABRICS 5
 
+/* Needed for OTBR, to disable Thread on endpoint 0, TODO find a better place for this */
+#define _NO_NETWORK_COMMISSIONING_DRIVER_
+
 // ==================== Security Configuration Overrides ====================
 
 /* Default NXP Platform security configuration overrides are used */
