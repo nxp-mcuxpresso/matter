@@ -45,6 +45,10 @@
 #include <openthread/srp_client.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include <openthread/mdns_server.h>
+#endif
+
 #if IHD_SRP_SERVER
 #include <openthread/srp_server.h>
 #endif
@@ -317,6 +321,20 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
 #endif // CHIP_DETAIL_LOGGING
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    otIp6Address newIpAddress;
+    
+    //Move this to connectivity manager
+    if (event->Type == DeviceEventType::kInternetConnectivityChange)
+    {
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+        {
+            memcpy(&newIpAddress.mFields.m32, event->InternetConnectivityChange.ipAddress.Addr, sizeof(Inet::IPAddress));
+            otMdnsServerAddAddress(mOTInst, &newIpAddress);
+        }
+ 
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 }
 
 template <class ImplClass>

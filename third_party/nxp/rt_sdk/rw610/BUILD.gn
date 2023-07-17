@@ -38,7 +38,7 @@ rw610_sdk_drivers("rt_sdk_drivers") {
 
     if (chip_enable_wifi)
     {
-      WIFI_BT_TEMPLATE_PATH = "${rt_core_sdk_root}/components/wifi_bt_module/template" 
+      WIFI_BT_TEMPLATE_PATH = "${chip_root}/third_party/nxp/rt_sdk/wifi/"
 
       include_dirs += [ "${WIFI_BT_TEMPLATE_PATH}" ]
       public_configs += ["..:nxp_transceiver_config"]

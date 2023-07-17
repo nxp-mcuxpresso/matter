@@ -115,7 +115,14 @@ static_library("nxp_platform") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../../../OpenThread/DnssdImpl.cpp" ]
+      if (chip_enable_wifi) {
+        sources += [ "../../common/DnssdImpl.cpp" ]
+      }
+      else {
+        sources += [
+            "../../../OpenThread/DnssdImpl.cpp",
+        ]
+      }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }

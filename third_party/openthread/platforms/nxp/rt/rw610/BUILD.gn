@@ -25,6 +25,7 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_rw610_config") {
   include_dirs = [
       "${openthread_nxp_root}/src/common",
+      "${openthread_nxp_root}/src/common/br",
       "${openthread_nxp_root}/src/rw/rw612",
       "${openthread_nxp_root}/third_party/mbedtls/configs",
       "${openthread_root}/third_party/mbedtls",
@@ -32,6 +33,16 @@ config("openthread_rw610_config") {
   ]
   if (spinel_interface_rpmsg) {
     include_dirs += [ "${openthread_nxp_root}/src/common/spinel" ]
+  }
+  if (chip_enable_openthread && chip_enable_openthread) {
+    defines = [
+      "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
+      "OPENTHREAD_CONFIG_MDNS_SERVER_ENABLE=1",
+      "OPENTHREAD_CONFIG_PLATFORM_UDP_ENABLE=1",
+      "OPENTHREAD_CONFIG_BACKBONE_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=2"
+    ]  
   }
 }
 
@@ -47,6 +58,8 @@ source_set("libopenthread-rw610") {
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
+    "${openthread_nxp_root}/src/common/br/infra_if.c",
+    "${openthread_nxp_root}/src/common/br/udp_plat.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
   ]

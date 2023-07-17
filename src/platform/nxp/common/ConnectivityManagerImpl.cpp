@@ -56,6 +56,14 @@ extern "C" {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+
+#include <openthread/srp_server.h>
+#include <openthread/mdns_server.h>
+#include <openthread/border_routing.h>
+#include <openthread/backbone_router_ftd.h>
+
+#include "udp_plat.h"
+#include "infra_if.h"
 #endif
 
 using namespace ::chip;
@@ -120,6 +128,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             free(event->Platform.pNetworkDataEvent);
         }
     }
+#endif
+
+    //Process Border router events
+#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_ENABLE_WPA
+    HandleBrEvents();
 #endif
 }
 
@@ -430,6 +443,39 @@ void ConnectivityManagerImpl::StartWiFiManagement()
         chipDie();
     }
 }
+#if CHIP_ENABLE_OPENTHREAD
+void ConnectivityManagerImpl::HandleBrEvents()
+{
+    if (mBorderRouterInit == false)
+    {
+        struct netif *extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());;
+        struct netif  *thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
+        otInstance *thrInstancePtr;
+
+        //Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
+        //properly. If the thread netif is !=null it means that it was fully initialized
+
+        //Lock OT task
+        if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
+        { 
+            mBorderRouterInit = true;
+            // Check if OT instance is init
+            thrInstancePtr = ThreadStackMgrImpl().OTInstance();
+
+            UdpPlatInit(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
+            InfraIfInit(thrInstancePtr, extNetIfPtr);
+
+            otMdnsServerStart(thrInstancePtr);
+
+            otSrpServerSetEnabled(thrInstancePtr, true);
+            otBorderRoutingInit(thrInstancePtr, netif_get_index(extNetIfPtr), true);
+            otBorderRoutingSetEnabled(thrInstancePtr, true);
+            otBackboneRouterSetEnabled(thrInstancePtr, true);
+        }
+    }
+
+}
+#endif // CHIP_ENABLE_OPENTHREAD
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
