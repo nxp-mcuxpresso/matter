@@ -221,6 +221,11 @@ The conversion process shall happen at manufacturing time:
 -   Build the application without `chip_convert_dac_private_key` arg.
 -   Write the application to the board.
 
+If you are using Jlink, you can see a conversion script example in:
+```
+./scripts/tools/nxp/factory_data_generator/k32w1/example_convert_dac_private_key.jlink
+```
+
 Factory data should now contain a corresponding encrypted blob instead of the DAC private key.
 
 If an encrypted blob of the DAC private key is already available (e.g. obtained previously, using
