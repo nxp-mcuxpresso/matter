@@ -169,24 +169,7 @@ To use the `SMU2` Memory an optimized `NBU` binary is also needed. See
 
 Use `chip_with_factory_data=1` in the gn build command to enable factory data.
 
-The following is a two-step example of writing factory data in internal flash.
-
-Create a `factory_data_jlink` commander script:
-```
-loadfile factory_data.bin, 0xf4000
-reset
-go
-quit
-```
-where `0xf4000` is the `__MATTER_FACTORY_DATA_START` address retrieved
-from the corresponding application `.map` file.
-
-Run
-```
-jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript factory_data_jlink
-```
-
-See
+For a full guide on manufacturing flow, please see
 [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 
