@@ -21,7 +21,7 @@
 
 #include "sss_crypto.h"
 
-/* This flag should be defined when the factory data contains
+/* This should be defined when the factory data contains
  * the DAC private key in plain text. It usually occurs in
  * manufacturing.
  *
@@ -30,13 +30,13 @@
  *
  * Should be used one time only for securing the private key.
  * The manufacturer will then flash the real image, which shall
- * not define this flag.
+ * not define this.
  */
 #ifndef CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
 #define CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY 0
 #endif
 
-/* This flag should be defined to run SSS_RunApiTest tests.
+/* This should be defined to run SSS_RunApiTest tests.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 #define CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST 0
