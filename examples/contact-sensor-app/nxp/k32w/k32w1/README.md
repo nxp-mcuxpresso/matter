@@ -141,7 +141,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\" chip_enable_icd_subscription_handle=true""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\" chip_enable_icd_subscription_handle=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
