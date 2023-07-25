@@ -117,6 +117,13 @@ template("rw610_sdk_drivers") {
       cpu1_cpu2_fw_type,
       rebase_path(fw_bin_path, root_build_dir),
     ]
+
+  #In case A0 target board version, explicitly generate A0 fw binaries
+  if (board_version == "A0")
+  {
+    fw_args += ["-r", board_version]
+  }
+
   print(exec_script("${rt_sdk_root}/components/conn_fwloader/script/fw_bin2c_conv.py",
                      fw_args, "list lines"))
   
