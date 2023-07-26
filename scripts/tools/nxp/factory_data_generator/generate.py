@@ -27,15 +27,16 @@ from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVe
                     SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
+# Global variable for hash ID
+hash_id = "CE47BA5E"
 
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.DEBUG, 
         format='[%(levelname)s] %(message)s',
         handlers=[stdout_handler]
     )
-
 
 class Spake2p:
 
@@ -61,7 +62,6 @@ class Spake2p:
         out = out.decode("utf-8").splitlines()
         return dict(zip(out[0].split(','), out[1].split(',')))
 
-
 class KlvGenerator:
 
     def __init__(self, args):
@@ -71,7 +71,7 @@ class KlvGenerator:
         if self.args.spake2p_verifier is None:
             self.spake2p.generate(self.args)
         self.args.dac_key.generate_private_key(self.args.dac_key_password)
-
+    
     def _validate_args(self):
         if self.args.dac_key_password is None:
             logging.warning(
@@ -123,7 +123,7 @@ class KlvGenerator:
                 fullContent = size.to_bytes(4, "little") + fullContent
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(hash_id)
                 hashId.reverse()
                 fullContent = hashId + fullContent
 
@@ -151,13 +151,13 @@ class KlvGenerator:
                 logging.info("4 byte section hash (for integrity check): {}".format(hashing))
                 fullContentCipher = bytearray.fromhex(hashing) + fullContentCipher
 
-                # Add length of data to binary to know how to calculate SHA on embedded
+                #Add length of data to binary to know how to calculate SHA on embedded
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(hash_id)
                 hashId.reverse()
-                fullContentCipher = hashId.reverse() + fullContentCipher
+                fullContentCipher = hashId + fullContentCipher
 
                 size = len(fullContentCipher)
 
@@ -166,7 +166,6 @@ class KlvGenerator:
 
         out_hash = hashlib.sha256(fullContent).hexdigest()
         logging.info("SHA256 of generated binary: {}".format(out_hash))
-
 
 def main():
     set_logger()
@@ -231,7 +230,6 @@ def main():
     klv = KlvGenerator(args)
     data = klv.generate()
     klv.to_bin(data, args.out, args.aes128_key)
-
 
 if __name__ == "__main__":
     main()
