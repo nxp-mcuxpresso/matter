@@ -60,6 +60,7 @@ class Verifier(Base64Argument):
     def key(self):
         return 1
 
+
 class Salt(Base64Argument):
 
     def __init__(self, arg):
@@ -68,6 +69,7 @@ class Salt(Base64Argument):
     def key(self):
         return 2
 
+
 class IterationCount(IntArgument):
 
     def __init__(self, arg):
@@ -75,6 +77,7 @@ class IterationCount(IntArgument):
 
     def key(self):
         return 3
+
 
 class DacPKey(FileArgument):
 
@@ -99,6 +102,7 @@ class DacPKey(FileArgument):
             32, byteorder='big'
         )
 
+
 class DacCert(FileArgument):
 
     def __init__(self, arg):
@@ -106,6 +110,7 @@ class DacCert(FileArgument):
 
     def key(self):
         return 5
+
 
 class PaiCert(FileArgument):
 
@@ -115,6 +120,7 @@ class PaiCert(FileArgument):
     def key(self):
         return 6
 
+
 class Discriminator(IntArgument):
 
     def __init__(self, arg):
@@ -123,6 +129,7 @@ class Discriminator(IntArgument):
     def key(self):
         return 7
 
+
 class SetupPasscode(IntArgument):
 
     def __init__(self, arg):
@@ -130,6 +137,7 @@ class SetupPasscode(IntArgument):
 
     def key(self):
         return 8
+
 
 class VendorId(IntArgument):
 
@@ -142,6 +150,7 @@ class VendorId(IntArgument):
     def length(self):
         return 2
 
+
 class ProductId(IntArgument):
 
     def __init__(self, arg):
@@ -153,6 +162,7 @@ class ProductId(IntArgument):
     def length(self):
         return 2
 
+
 class CertDeclaration(FileArgument):
 
     def __init__(self, arg):
@@ -160,6 +170,7 @@ class CertDeclaration(FileArgument):
 
     def key(self):
         return 11
+
 
 class VendorName(StrArgument):
 
@@ -169,6 +180,7 @@ class VendorName(StrArgument):
     def key(self):
         return 12
 
+
 class ProductName(StrArgument):
 
     def __init__(self, arg):
@@ -177,6 +189,7 @@ class ProductName(StrArgument):
     def key(self):
         return 13
 
+
 class SerialNum(StrArgument):
 
     def __init__(self, arg):
@@ -184,6 +197,7 @@ class SerialNum(StrArgument):
 
     def key(self):
         return 14
+
 
 class ManufacturingDate(StrArgument):
 
@@ -196,6 +210,7 @@ class ManufacturingDate(StrArgument):
     def max_length(self):
         return 16
 
+
 class HardwareVersion(IntArgument):
 
     def __init__(self, arg):
@@ -206,6 +221,7 @@ class HardwareVersion(IntArgument):
 
     def length(self):
         return 2
+
 
 class HardwareVersionStr(StrArgument):
 
@@ -218,6 +234,7 @@ class HardwareVersionStr(StrArgument):
     def max_length(self):
         return 64
 
+
 class UniqueId(StrArgument):
 
     def __init__(self, arg):
@@ -226,6 +243,7 @@ class UniqueId(StrArgument):
     def key(self):
         return 18
 
+
 class PartNumber(StrArgument):
 
     def __init__(self, arg):
@@ -233,6 +251,7 @@ class PartNumber(StrArgument):
 
     def key(self):
         return 19
+
 
 class ProductURL(StrArgument):
 
@@ -244,6 +263,7 @@ class ProductURL(StrArgument):
 
     def max_length(self):
         return 256
+
 
 class ProductLabel(StrArgument):
 
