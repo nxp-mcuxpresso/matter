@@ -55,6 +55,7 @@ source_set("openthread_mbedtls_config_k32w1") {
 
 source_set("libopenthread-k32w1") {
   sources = [
+    "${openthread_nxp_root}/src/common/crypto.c",
     "${openthread_nxp_root}/src/common/flash_nvm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/alarm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/diag.c",
