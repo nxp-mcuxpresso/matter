@@ -2,7 +2,7 @@
 
 ## Hardware requirements
 
-- RD-RW612-BGA board
+- `RD-RW612-BGA` board
 - BLE/15.4 antenna
 
 <a name="building"></a>
@@ -71,7 +71,7 @@ For such test, having the Matter CLI is mandatory, instructions from [README.md 
 
 [readme_test_with_matter_cli_section]:README.md#testing-the-all-clusters-application-with-matter-cli-enabled
 
-Then using the Matter CLI below commands to join an existing thread network should be enterred, networkey and panid should be changed depending on thread network configurations:
+Then using the Matter CLI below commands to join an existing thread network should be entered, `networkkey` and `panid` should be changed depending on thread network configurations:
 
 ```
 otcli networkkey 00112233445566778899aabbccddeeff

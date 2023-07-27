@@ -1,6 +1,6 @@
 # CHIP RW612 All-clusters Application
 
-The all-clusters example implements a server which can be accesed by a CHIP controller and can accept basic cluster commands.
+The all-clusters example implements a server which can be accessed by a CHIP controller and can accept basic cluster commands.
 
 The example is based on
 [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP RW612 SDK,
@@ -37,7 +37,7 @@ The example supports:
 [README_Openthread.md]: README_Openthread.md
 
 The example targets the
-[NXP RD-RW612-BGA]
+[`NXP RD-RW612-BGA`]
 board by default.
 
 
@@ -48,7 +48,7 @@ board by default.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
-- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environement to be able to build Matter.
+- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environment to be able to build Matter.
 
 -   Download [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
@@ -99,7 +99,7 @@ In order to flash the application we recommend using
 
 - Import the previously downloaded NXP SDK into MCUXpresso IDE.
 
-Right click the empty space in the MCUXpresso IDE's "Installed SDKs" tab to show the menu, select the "Import archive" (or "Import folder" if a folder is used) menu item.
+Right click the empty space in the MCUXpresso IDE "Installed SDKs" tab to show the menu, select the "Import archive" (or "Import folder" if a folder is used) menu item.
 
 
 -   Import the connectedhomeip repo in MCUXpresso IDE as Makefile Project. Use _none_ as _Toolchain for Indexer Settings_:
@@ -137,7 +137,7 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
 
 ## Testing the example
 
-To know how to commision a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
+To know how to commission a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
 
 [readme_ble_commissioning_section]:../../../../chip-tool/README.md#commission-a-device-over-ble
 
@@ -148,7 +148,7 @@ To know how to commissioning a device over IP, follow the instructions from [chi
 ### Testing the all-clusters application without Matter CLI:
 
 1. Prepare the board with the flashed `All-cluster application` (as shown above).
-2. The All-cluster example uses UART1 (FlexComm3) to print logs while runing the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+2. The All-cluster example uses UART1 (`FlexComm3`) to print logs while running the server. To view raw UART output, start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits
@@ -188,7 +188,7 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    - No parity
    - No flow control
 
-3. The All-cluster example uses UART2 (FlexComm0) to print logs while runing the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector HD2 pin 03), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
+3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running the server. To view raw UART output, a pin should be plugged to an USB to UART adapter (connector `HD2 pin 03`), then start a terminal emulator like PuTTY and connect to the used COM port with the following UART settings:
 
    - Baud rate: 115200
    - 8 data bits

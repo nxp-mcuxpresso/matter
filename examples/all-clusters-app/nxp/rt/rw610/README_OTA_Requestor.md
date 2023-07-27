@@ -14,13 +14,13 @@ In general, the Over-The-Air Software Update process consists of the following s
 ### Flash Memory Layout
 
 The RW612 Flash is divided into different regions as follow :
-- Bootloader : MCUBoot resides at the base of the flash and occupies 0x20000 (128 kBytes).
-- Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MBytes.
-- Secondary application partition : Update image received with the OTA (candidate application). The size reserved for the partition is 4.4 MBytes.
+- Bootloader : MCUBoot resides at the base of the flash and occupies 0x20000 (128 kB).
+- Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MB.
+- Secondary application partition : Update image received with the OTA (candidate application). The size reserved for the partition is 4.4 MB.
 
 Notes : 
-- The CPU1/CPU2 firmwares are embedded in the CPU3 all-clusters application.
-- The sizes of the primary and secondary applications are provided as an example (currently 4.4 MB is reserved for each partition). The size can be changed by modifying the `m_app_max_sectors` value in the linkerscript of the application (RW610_flash.ld).
+- The CPU1/CPU2 firmware are embedded in the CPU3 all-clusters application.
+- The sizes of the primary and secondary applications are provided as an example (currently 4.4 MB is reserved for each partition). The size can be changed by modifying the `m_app_max_sectors` value in the linker script of the application (`RW610_flash.ld`).
 
 ### MCUBoot Bootloader
 
@@ -54,7 +54,7 @@ J-Link > erase 0x8000000, 0x88a0000
 ```
 - Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK previously downloaded.
 ![mcuboot_demo](../../../../platform/nxp/rt/rw610/doc/images/mcuboot_demo.PNG)
-- Before building the demo example, it should be specified that the application to be run by the bootloader is monolithic. As a result, only one upgradable image will be considered by the bootloader. This can be done by defining `MONOLITHIC_APP` as 1 in the settings of the mcuboot_opensource project :
+- Before building the demo example, it should be specified that the application to be run by the bootloader is monolithic. As a result, only one image will be upgraded by the bootloader. This can be done by defining `MONOLITHIC_APP` as 1 in the settings of the `mcuboot_opensource` project :
 ```
 Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "MONOLITHIC_APP=1" in the Defined Symbols
 ```
@@ -73,7 +73,7 @@ erasing trailer; fa_id=2
 Unable to find bootable image
 ```
 
-Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4.4 MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/".
+Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4.4 MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "`SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/`".
 
 ### Generating and flashing the signed application image
 
@@ -90,7 +90,7 @@ The resulting executable file found in out/debug/chip-rw610-all-cluster-example 
 ```
 arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-rw610-all-cluster-example chip-rw610-all-cluster-example.bin
 ```
-To sign the image and wrap the raw binary of the application with the header and trailer, "imgtool" is provided in the SDK and can be found in "/middleware/mcuboot_opensource/scripts/".
+To sign the image and wrap the raw binary of the application with the header and trailer, "`imgtool`" is provided in the SDK and can be found in "`/middleware/mcuboot_opensource/scripts/`".
 
 The following commands can be run (make sure to replace the /path/to/file/binary with the adequate files): 
 
@@ -100,9 +100,9 @@ user@ubuntu: cd ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/scripts
 user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example_SIGNED.bin
 ```
 Notes : 
-- If internal SDK is used instead, the key can be found in : "~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem".
+- If internal SDK is used instead, the key can be found in : "`~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`".
 - The arguments `slot-size` and `max-sectors` should be adjusted to the size of the partitions reserved for the primary and the secondary applications. (By default the size considered is 4.4 MB)
-- In this example, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
+- In this example, the image is signed with the private key provided by the SDK as an example (`/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
 
 - To generate the private key :
 
@@ -114,7 +114,7 @@ user@ubuntu: python3 imgtool.py keygen -k priv_key.pem -t rsa-2048
 ```
 user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
-- The extracted public key can then be copied to the /path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c, given as a value to the rsa_pub_key[] array.
+- The extracted public key can then be copied to the `/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c`, given as a value to the rsa_pub_key[] array.
 
 
 The resulting output is the signed binary of the application version "1.0". 
@@ -151,7 +151,7 @@ user@ubuntu:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples
 user@ubuntu:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@ubuntu:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-rw610-all-cluster-example.ota
 ```
-The OTA Provider should first be provisionned with chip-tool by assigning it the node id 1, and then granted the ACL entries :
+The OTA Provider should first be provisioned with chip-tool by assigning it the node id 1, and then granted the ACL entries :
 ```
 user@ubuntu:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing onnetwork 1 20202021
 user@ubuntu:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0

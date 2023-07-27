@@ -2,7 +2,7 @@
 
 ## Hardware requirements
 
-- RD-RW612-BGA board
+- `RD-RW612-BGA` board
 - Wi-Fi antenna (to plug in Ant1) + BLE antenna (to plug in Ant2)
 
 <a name="building"></a>
