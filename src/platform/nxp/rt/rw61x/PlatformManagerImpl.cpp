@@ -21,7 +21,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for RW610 platforms using the NXP RW610 SDK.
+ *          for RW61x platform using the NXP RW610 SDK.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>

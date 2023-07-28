@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on RW610 platforms using the NXP SDK.
+ *          Layer on RW61x platform using the NXP SDK.
  *
  */
 

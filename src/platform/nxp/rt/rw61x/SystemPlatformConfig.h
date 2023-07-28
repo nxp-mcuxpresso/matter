@@ -21,7 +21,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP System
- *          Layer on NXP RW610 Platforms.
+ *          Layer on NXP RW61x Platform.
  *
  */
 

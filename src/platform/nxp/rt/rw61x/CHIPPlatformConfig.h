@@ -21,7 +21,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          NXP RW610 platforms.
+ *          NXP RW61x platform.
  */
 
 #pragma once
