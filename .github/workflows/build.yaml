@@ -51,7 +51,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -163,7 +163,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -335,7 +335,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -386,7 +386,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -494,7 +494,7 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3

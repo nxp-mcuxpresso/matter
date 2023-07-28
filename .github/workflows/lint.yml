@@ -32,7 +32,7 @@ jobs:
             image: connectedhomeip/chip-build:0.6.47
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               if: ${{ !env.ACT }}
               name: Checkout
               with:

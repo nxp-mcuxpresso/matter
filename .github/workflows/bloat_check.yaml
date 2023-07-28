@@ -36,7 +36,7 @@ jobs:
             image: connectedhomeip/chip-build:0.7.0
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3
