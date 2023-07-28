@@ -31,7 +31,6 @@ declare_args() {
   # This defines the device type as a "thermostat" by default,
   # use "all-clusters" in order to build the all-clusters-app
   nxp_device_type = "thermostat"
-  enable_ota_provider = false
 }
 
 rw610_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
@@ -122,33 +121,6 @@ rt_executable("all_cluster_app") {
     ]
   }
 
-  if (enable_ota_provider)
-  {
-    defines += [
-      "ENABLE_OTA_PROVIDER=1",
-    ]
-
-    include_dirs += [
-      "../../common/ota_provider/include",
-      "../../common/ota_provider/ota-provider-common",
-    ]
-
-    sources += [
-      "../../common/ota_provider/ota-provider-common/RTOTAProviderExample.cpp",
-      "../../common/ota_provider/ota-provider-common/RTBdxOtaSender.cpp",
-      "../../common/ota_provider/source/OTAProvider.cpp",
-    ]
-
-    deps += [
-      "${chip_root}/src/app/server",
-      "${chip_root}/src/protocols/bdx",
-      "${chip_root}/src/lib/shell",
-      "${chip_root}/third_party/jsoncpp",
-      "${chip_root}/src/lib/shell:shell_core",
-      "${chip_root}/src/lib/shell:shell",
-    ]
-  }
-
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
   # The would add to the build a dedicated application assert implementation.
   if (!sdk_fsl_assert_support) {
@@ -174,15 +146,6 @@ rt_executable("all_cluster_app") {
               "-Wl,-print-memory-usage",
               "-Wl,--no-warn-rwx-segments", ]
 
-  if (enable_ota_provider)
-  {
-    # As the OTA file will be stored in the littlefs file system, it is required to increase the size of the file system
-    # To be able to store an OTA file with a MAX size of 640K,
-    # it recommended to size the file system with:
-    # 161 sectors of 4K => reserved for the OTA file
-    # 32 sectors of 4K => reserved for Matter/OT/BLE settings storage
-    ldflags += [ "-Wl,--defsym=gNVMSectorCountLink_d=193" ]
-  }
 
   if (chip_enable_ota_requestor)
   {
