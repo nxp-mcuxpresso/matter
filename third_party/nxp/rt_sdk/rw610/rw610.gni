@@ -19,6 +19,7 @@ import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 # Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 declare_args() {
   board_version = "A1"
   deviceBoardName = "RW612"
@@ -73,6 +74,7 @@ if (is_sdk_package) {
   DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/debug_console_lite"
   FORMAT_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/format"
   STR_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/str"
+  WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
 } else {
   # sdk github or internal sdk (bitbucket) are used #
   COMPONENT_FILES_PATH = "${rt_core_sdk_root}/components"
@@ -110,6 +112,7 @@ if (is_sdk_package) {
   DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
   FORMAT_FILES_PATH = "${UTILITIES_FILES_PATH}/misc_utilities"
   STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
+  WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
 }
 
 ELS_PKC_CL_PATH = "${rt_sdk_root}/components/els_pkc/"
@@ -300,6 +303,9 @@ template("rw610_sdk_drivers") {
 
         # Include lpm.h and host_sleep.h files
         "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/wifi_cli",
+
+        # wifi config file path
+        "${WIFI_BT_TEMPLATE_PATH}",
       ]
     }
 
@@ -662,6 +668,23 @@ template("rw610_sdk_drivers") {
       public_configs = []
     }
 
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
     public_configs += [ ":${target_name}_config" ]
+    public_deps += [ nxp_sdk_target ]
+
+    # The FactoryDataProvider/fwk_factory_data_provider.c component has a dependency to mbedtls
+    deps += [ "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config" ]
+
+    if (chip_enable_openthread) {
+      #Dep to ot header files required for mbedtls as mbedtls config file has a dependency to ot
+      deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
+    }
   }
 }

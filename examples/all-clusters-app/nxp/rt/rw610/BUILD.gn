@@ -15,12 +15,19 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
-import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
-import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+# Allows to get various RT gn options
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import(
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 
 assert(current_os == "freertos")
@@ -33,23 +40,52 @@ declare_args() {
   nxp_device_type = "thermostat"
 }
 
-rw610_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
-if (nxp_device_type == "thermostat")
-{
+if (nxp_device_type == "thermostat") {
   app_common_folder = "${nxp_device_type}/nxp/zap"
-}
-else 
-{
+} else {
   app_common_folder = "${nxp_device_type}-app/${nxp_device_type}-common"
+}
+
+# Create here the SDK instance.
+# Particular sources/defines/includes could be added/changed depending on the target application.
+rt_sdk("sdk") {
+  defines = []
+
+  cflags = []
+  public_deps = []
+  public_configs = []
+  sources = []
+  include_dirs = []
+
+  # Indicate paths to default board files
+  include_dirs += [ "${example_platform_dir}/board/" ]
+  sources += [ "${example_platform_dir}/board/pin_mux.c" ]
+  sources += [ "${example_platform_dir}/board/hardware_init.c" ]
+  sources += [ "${example_platform_dir}/board/clock_config.c" ]
+  sources += [ "${example_platform_dir}/board/board.c" ]
+  sources += [ "${example_platform_dir}/board/peripherals.c" ]
+
+  # Indicate the path to CHIPProjectConfig.h
+  include_dirs += [ "include/config" ]
+
+  # Indicate the default path to FreeRTOSConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/freeRTOS" ]
+
+  # Indicate the default path to OpenThreadConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+}
+
+# Create the SDK driver instance.
+# Particular sources/defines/includes could be added to add other drivers not available in the default sdk driver template
+rw610_sdk_drivers("sdk_driver") {
 }
 
 rt_executable("all_cluster_app") {
   output_name = "chip-rw610-all-cluster-example"
 
-  defines = [
-    "CONFIG_RENDEZVOUS_MODE=7",
-  ]
+  defines = [ "CONFIG_RENDEZVOUS_MODE=7" ]
 
   include_dirs = [
     "../../common/main/include",
@@ -60,34 +96,25 @@ rt_executable("all_cluster_app") {
   ]
 
   sources = [
-    "../../common/main/AppMatterButtonEmpty.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppFactoryDataDefaultImpl.cpp",
+    "../../common/main/AppMatterButtonEmpty.cpp",
+    "../../common/main/AppMatterCli.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/CHIPDeviceManager.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
-    "../../common/main/AppMatterCli.cpp",
-    "../../common/main/include/CHIPDeviceManager.h",
-    "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/include/AppEvent.h",
     "../../common/main/include/AppTask.h",
+    "../../common/main/include/CHIPDeviceManager.h",
+    "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
   ]
 
-  deps = [
-    "${nxp_sdk_build_root}:nxp_sdk",
-    "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform",
-    "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/${app_common_folder}",
-    "${chip_root}/src/lib",
-    "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
-    "${chip_root}/src/platform:syscalls_stub",
-  ]
+  deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
-  if (nxp_device_type == "all-clusters")
-  {
+  if (nxp_device_type == "all-clusters") {
     defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
     sources += [
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
@@ -95,12 +122,11 @@ rt_executable("all_cluster_app") {
     ]
   }
 
-  if (chip_enable_matter_cli)
-  {
+  if (chip_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
     deps += [
-      "${chip_root}/src/lib/shell:shell",
       "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/lib/shell:shell",
     ]
   }
 
@@ -109,17 +135,9 @@ rt_executable("all_cluster_app") {
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.cpp",
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.h",
     ]
-    include_dirs += [
-      "${chip_root}/examples/platform/nxp/common",
-    ]
+    include_dirs += [ "${chip_root}/examples/platform/nxp/common" ]
   }
 
-  if (chip_enable_openthread) {
-    deps += [
-      "${openthread_root}:libopenthread-cli-ftd",
-      "${openthread_root}:libopenthread-ftd",
-    ]
-  }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
   # The would add to the build a dedicated application assert implementation.
@@ -129,35 +147,33 @@ rt_executable("all_cluster_app") {
 
   cflags = [ "-Wconversion" ]
 
-  ldscript = "${rw610_platform_dir}/app/ldscripts/RW610_flash.ld"
+  ldscript = "${example_platform_dir}/app/ldscripts/RW610_flash.ld"
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
-              "-fno-common",
-              "-Wl,--defsym=__stack_size__=2048",
-              "-ffreestanding",
-              "-fno-builtin",
-              "-mapcs",
-              "-u qspiflash_config",
-              "-u image_vector_table",
-              "-u boot_data",
-              "-u dcd_data",
-              "-Wl,-print-memory-usage",
-              "-Wl,--no-warn-rwx-segments", ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-fno-common",
+    "-Wl,--defsym=__stack_size__=2048",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-mapcs",
+    "-u qspiflash_config",
+    "-u image_vector_table",
+    "-u boot_data",
+    "-u dcd_data",
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
+  ]
 
-
-  if (chip_enable_ota_requestor)
-  {
-    if (no_mcuboot)
-    {
+  if (chip_enable_ota_requestor) {
+    if (no_mcuboot) {
       # If "no_mcuboot" is set to true, the application will be linked at the base of the flash.
-      print("Warning : The OTA Requestor is enabled without MCUBoot. This will prevent the application from applying software updates.")
-    }
-    else
-    {
-      # we need to reserve enough space for the bootloader (MCUBoot) 
-      # MCUBoot requires 0x20000 Bytes to be reserved at the base of the flash 
+      print(
+          "Warning : The OTA Requestor is enabled without MCUBoot. This will prevent the application from applying software updates.")
+    } else {
+      # we need to reserve enough space for the bootloader (MCUBoot)
+      # MCUBoot requires 0x20000 Bytes to be reserved at the base of the flash
       # Consequently, some sections will need to be shifted
       ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x20000" ]
     }
