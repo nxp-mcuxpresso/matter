@@ -29,5 +29,5 @@ default_args = {
   import("//args.gni")
 
   # Import default platform configs
-  import("${chip_root}/src/platform/nxp/rt/rw610/args.gni")
+  import("${chip_root}/src/platform/nxp/rt/rw61x/args.gni")
 }

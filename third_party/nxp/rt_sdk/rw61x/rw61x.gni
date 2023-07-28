@@ -117,7 +117,7 @@ if (is_sdk_package) {
 
 ELS_PKC_CL_PATH = "${rt_sdk_root}/components/els_pkc/"
 
-template("rw610_sdk_drivers") {
+template("rw61x_sdk_drivers") {
   # Convert the CPU1/CPU2 fw binaries into src files
   fw_bin_path = "${rt_sdk_root}/components/conn_fwloader"
   fw_args = [
@@ -146,7 +146,7 @@ template("rw610_sdk_drivers") {
       include_dirs += invoker.include_dirs
     }
 
-    _rw610_sdk_drivers_include_dirs = [
+    _rw61x_sdk_drivers_include_dirs = [
       #Drivers files
       "${DRIVER_DEVICE_FILES_PATH}",
       "${rt_core_sdk_root}/devices/${deviceBoardName}",
@@ -242,7 +242,7 @@ template("rw610_sdk_drivers") {
         # needed to compile els_pkc port for mbedtls
         "MBEDTLS_MCUX_ELS_PKC_API",
       ]
-      _rw610_sdk_drivers_include_dirs += [
+      _rw61x_sdk_drivers_include_dirs += [
         "${ELS_PKC_CL_PATH}",
         "${ELS_PKC_CL_PATH}/src/platforms/redfinchSdk_sample",
         "${ELS_PKC_CL_PATH}/src/platforms/redfinchSdk_sample/inc",
@@ -298,7 +298,7 @@ template("rw610_sdk_drivers") {
     }
 
     if (chip_enable_wifi) {
-      _rw610_sdk_drivers_include_dirs += [
+      _rw61x_sdk_drivers_include_dirs += [
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
 
         # Include lpm.h and host_sleep.h files
@@ -326,13 +326,13 @@ template("rw610_sdk_drivers") {
     }
 
     if (chip_enable_matter_cli) {
-      #When the CLI is enabled the debug console should be moved in UART0 for RW610
+      #When the CLI is enabled the debug console should be moved in UART0 for RW61x
       defines += [ "DEBUG_CONSOLE_UART_INDEX=0" ]
     }
 
     if (chip_enable_openthread) {
       if (!spinel_interface_rpmsg) {
-        _rw610_sdk_drivers_include_dirs += [
+        _rw61x_sdk_drivers_include_dirs += [
           "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/interface",
           "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG",
           "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/utils",
@@ -361,7 +361,7 @@ template("rw610_sdk_drivers") {
     ]
 
     # Now add our "system-header" include dirs
-    foreach(include_dir, _rw610_sdk_drivers_include_dirs) {
+    foreach(include_dir, _rw61x_sdk_drivers_include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
   }

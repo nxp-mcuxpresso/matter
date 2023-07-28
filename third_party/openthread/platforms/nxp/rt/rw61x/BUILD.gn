@@ -25,7 +25,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
-config("openthread_rw610_config") {
+config("openthread_rw61x_config") {
   include_dirs = [
     "${openthread_nxp_root}/src/common",
     "${openthread_nxp_root}/src/rw/rw612",
@@ -39,12 +39,12 @@ config("openthread_rw610_config") {
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
-source_set("openthread_core_config_rw610") {
-  public_configs = [ ":openthread_rw610_config" ]
+source_set("openthread_core_config_rw61x") {
+  public_configs = [ ":openthread_rw61x_config" ]
   public_deps = [ nxp_sdk_target ]
 }
 
-source_set("libopenthread-rw610") {
+source_set("libopenthread-rw61x") {
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
@@ -81,7 +81,7 @@ source_set("libopenthread-rw610") {
     "OT_PLAT_UART_INSTANCE=3",
   ]
 
-  public_configs = [ ":openthread_rw610_config" ]
+  public_configs = [ ":openthread_rw61x_config" ]
 
   deps = [
     "${nxp_sdk_build_root}:nxp_mbedtls",

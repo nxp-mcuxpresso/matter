@@ -32,7 +32,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 
 assert(current_os == "freertos")
 assert(target_os == "freertos")
-assert(nxp_platform == "rt/rw610")
+assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
   # This defines the device type as a "thermostat" by default,
@@ -79,11 +79,11 @@ rt_sdk("sdk") {
 
 # Create the SDK driver instance.
 # Particular sources/defines/includes could be added to add other drivers not available in the default sdk driver template
-rw610_sdk_drivers("sdk_driver") {
+rw61x_sdk_drivers("sdk_driver") {
 }
 
 rt_executable("all_cluster_app") {
-  output_name = "chip-rw610-all-cluster-example"
+  output_name = "chip-rw61x-all-cluster-example"
 
   defines = [ "CONFIG_RENDEZVOUS_MODE=7" ]
 
@@ -182,10 +182,10 @@ rt_executable("all_cluster_app") {
   output_dir = root_out_dir
 }
 
-group("rw610") {
+group("rw61x") {
   deps = [ ":all_cluster_app" ]
 }
 
 group("default") {
-  deps = [ ":rw610" ]
+  deps = [ ":rw61x" ]
 }
