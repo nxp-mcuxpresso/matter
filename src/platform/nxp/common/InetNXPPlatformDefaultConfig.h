@@ -29,19 +29,3 @@
 #include <stdint.h>
 
 // ==================== Platform Adaptations ====================
-
-#ifndef INET_CONFIG_ERROR_TYPE
-#define INET_CONFIG_ERROR_TYPE int32_t
-#endif // INET_CONFIG_ERROR_TYPE
-
-#ifndef INET_CONFIG_NO_ERROR
-#define INET_CONFIG_NO_ERROR 0
-#endif // INET_CONFIG_NO_ERROR
-
-#ifndef INET_CONFIG_ERROR_MIN
-#define INET_CONFIG_ERROR_MIN 1000000
-#endif // INET_CONFIG_ERROR_MIN
-
-#ifndef INET_CONFIG_ERROR_MAX
-#define INET_CONFIG_ERROR_MAX 1000999
-#endif // INET_CONFIG_ERROR_MAX
