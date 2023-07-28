@@ -56,7 +56,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     SDK. The SDK Builder UI selection should be similar with
     the one from the image below.
 
-    ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw610/doc/images/mcux-sdk-download.PNG)
+    ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw61x/doc/images/mcux-sdk-download.PNG)
 
     (Note: All SDK components should be selected. If size is an issue Azure RTOS component can be omitted.)
 
@@ -67,9 +67,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw610/
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
 ```
-(Note : The "rw610" folder is dedicated to the RW612 example.)
 
 Optional GN options that can be added when building an application:
 
@@ -114,7 +113,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Select RW612 -> Apply & Close
 ```
 
-![MCU_Set](../../../../platform/nxp/rt/rw610/doc/images/mcu-set.PNG)
+![MCU_Set](../../../../platform/nxp/rt/rw61x/doc/images/mcu-set.PNG)
 
 - Configure the toolchain editor:
 
@@ -122,7 +121,7 @@ Right click on the Project -> Properties -> C/C++ Build -> MCU Settings -> Selec
 Right click on the Project -> C/C++ Build-> Tool Chain Editor -> NXP MCU Tools -> Apply & Close
 ```
 
-![toolchain](../../../../platform/nxp/rt/rw610/doc/images/toolchain.JPG)
+![toolchain](../../../../platform/nxp/rt/rw61x/doc/images/toolchain.JPG)
 
 - Create a debug configuration :
 

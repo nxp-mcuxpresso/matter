@@ -53,12 +53,12 @@ J-Link > exec EnableEraseAllFlashBanks
 J-Link > erase 0x8000000, 0x88a0000
 ```
 - Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK previously downloaded.
-![mcuboot_demo](../../../../platform/nxp/rt/rw610/doc/images/mcuboot_demo.PNG)
+![mcuboot_demo](../../../../platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
 - Before building the demo example, it should be specified that the application to be run by the bootloader is monolithic. As a result, only one image will be upgraded by the bootloader. This can be done by defining `MONOLITHIC_APP` as 1 in the settings of the `mcuboot_opensource` project :
 ```
 Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "MONOLITHIC_APP=1" in the Defined Symbols
 ```
-![rw610_mcuboot_monolithic](../../../../platform/nxp/rt/rw610/doc/images/mcuboot_monolithic_app.PNG)
+![rw610_mcuboot_monolithic](../../../../platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
 - Build the demo example project and program it to the target board.
 - To run the flashed demo, either press the reset button of the device or use the debugger IDE of MCUXpresso. If it runs successfully, the following logs will be displayed on the terminal :
 
@@ -86,9 +86,9 @@ The application can be generated using the instructions from the [README.md 'Bui
 
 [readme_building_section]: README.md#building
 
-The resulting executable file found in out/debug/chip-rw610-all-cluster-example needs to be converted into raw binary format as shown below.
+The resulting executable file found in out/debug/chip-rw61x-all-cluster-example needs to be converted into raw binary format as shown below.
 ```
-arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-rw610-all-cluster-example chip-rw610-all-cluster-example.bin
+arm-none-eabi-objcopy -R .flash_config -R .NVM -O binary chip-rw61x-all-cluster-example chip-rw61x-all-cluster-example.bin
 ```
 To sign the image and wrap the raw binary of the application with the header and trailer, "`imgtool`" is provided in the SDK and can be found in "`/middleware/mcuboot_opensource/scripts/`".
 
@@ -97,7 +97,7 @@ The following commands can be run (make sure to replace the /path/to/file/binary
 ```
 user@ubuntu: cd ~/Desktop/SDK_RW612/middleware/mcuboot_opensource/scripts
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610/out/debug/chip-rw610-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example_SIGNED.bin
 ```
 Notes : 
 - If internal SDK is used instead, the key can be found in : "`~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`".
@@ -121,7 +121,7 @@ The resulting output is the signed binary of the application version "1.0".
 
 JLink can be used to flash the application at the address 0x8020000, using the command :
 ```
-J-Link > loadbin chip-rw610-all-cluster-example_SIGNED.bin 0x8020000
+J-Link > loadbin chip-rw61x-all-cluster-example_SIGNED.bin 0x8020000
 ```
 
 The bootloader should then be able to jump directly to the start of the application and run it.
@@ -133,7 +133,7 @@ To generate the OTA update image the same procedure can be followed from the [Ge
 When the signed binary of the update is generated, the file should be converted into OTA format. To do so, the ota_image_tool is provided in the repo and can be used to convert a binary file into an .ota file. 
 
 ```
-user@ubuntu:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 chip-rw610-all-cluster-example_SIGNED.bin chip-rw610-all-cluster-example.ota
+user@ubuntu:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 2 -vs "2.0" -da sha256 chip-rw61x-all-cluster-example_SIGNED.bin chip-rw61x-all-cluster-example.ota
 ```
 The generated OTA file can be used to perform the OTA Software Update. The instructions below describe the procedure step-by-step.
 
@@ -149,7 +149,7 @@ Before starting the OTA process, the Linux OTA Provider application can be built
 user@ubuntu:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 
 user@ubuntu:~/connectedhomeip$ : rm -rf /tmp/chip_*
-user@ubuntu:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-rw610-all-cluster-example.ota
+user@ubuntu:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-rw61x-all-cluster-example.ota
 ```
 The OTA Provider should first be provisioned with chip-tool by assigning it the node id 1, and then granted the ACL entries :
 ```

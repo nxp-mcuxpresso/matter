@@ -16,11 +16,11 @@ First instructions from [README.md 'Building section'][readme_building_section] 
 - Build Matter-over-Wifi configuration with BLE commissioning (ble-wifi) :
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true is_sdk_package=true" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
-The resulting output file can be found in out/debug/chip-rw610-all-cluster-example.
+The resulting output file can be found in out/debug/chip-rw61x-all-cluster-example.
 
 <a name="flashdebug"></a>
 

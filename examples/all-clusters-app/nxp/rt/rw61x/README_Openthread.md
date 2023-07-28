@@ -19,11 +19,11 @@ First instructions from [README.md 'Building section'][readme_building_section] 
 -   Build the Openthread configuration with BLE commissioning.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
 ```
 
-The resulting output file can be found in out/debug/chip-rw610-all-cluster-example.
+The resulting output file can be found in out/debug/chip-rw61x-all-cluster-example.
 
 ## Flash Binaries
 ### Flashing and debugging RW612
