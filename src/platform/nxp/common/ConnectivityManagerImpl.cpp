@@ -129,11 +129,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         }
     }
 #endif
-
-    //Process Border router events
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_ENABLE_WPA
-    HandleBrEvents();
-#endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -323,6 +318,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     const ip6_addr_t *addr6;
     CHIP_ERROR err;
     ChipDeviceEvent event;
+#if CHIP_ENABLE_OPENTHREAD
+    otIp6Address newIpAddress;
+#endif
 
     // If the WiFi station is currently in the connected state...
     if (_IsWiFiStationConnected())
@@ -359,6 +357,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 {
                     haveIPv6Conn = true;
                     addr6 = netif_ip6_addr(netif, i);
+#if CHIP_ENABLE_OPENTHREAD 
+                    // We are using ot mDNS sever and need to add IP address to server list
+                    memcpy(&newIpAddress.mFields.m32, addr6->addr, sizeof(Inet::IPAddress));
+                    otMdnsServerAddAddress(ThreadStackMgrImpl().OTInstance(), &newIpAddress);
+#endif                    
                     break;
                 }
             }
@@ -378,8 +381,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv4Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
+
+#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS sever 
             /* (Re-)start the DNSSD server */
             chip::app::DnssdServer::Instance().StartServer();
+#endif            
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -395,8 +401,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
+        
+#if CHIP_ENABLE_OPENTHREAD
+            //Start the Border Router services including MDNS Server
+            StartBrServices();
+#else // No need to do this for OT mDNS sever             
             /* (Re-)start the DNSSD server */
             chip::app::DnssdServer::Instance().StartServer();
+#endif            
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -444,7 +456,7 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     }
 }
 #if CHIP_ENABLE_OPENTHREAD
-void ConnectivityManagerImpl::HandleBrEvents()
+void ConnectivityManagerImpl::StartBrServices()
 {
     if (mBorderRouterInit == false)
     {
@@ -473,7 +485,6 @@ void ConnectivityManagerImpl::HandleBrEvents()
             otBackboneRouterSetEnabled(thrInstancePtr, true);
         }
     }
-
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

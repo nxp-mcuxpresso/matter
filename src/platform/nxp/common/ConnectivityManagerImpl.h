@@ -141,7 +141,7 @@ private:
     void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
-    void HandleBrEvents(void);
+    void StartBrServices(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
