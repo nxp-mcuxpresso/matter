@@ -306,7 +306,7 @@ template("rw61x_sdk_drivers") {
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
 
         # Include lpm.h and host_sleep.h files
-        "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/wifi_cli",
+        "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/common/lpm",
 
         # wifi config file path
         "${WIFI_BT_TEMPLATE_PATH}",
