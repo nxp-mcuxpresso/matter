@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+ 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
+ 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 /*! App to Host message queue for the Host Task */
@@ -36,7 +36,7 @@ namespace Internal {
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-BLEManagerCommon * BLEManagerImpl::GetImplInstance()
+BLEManagerCommon* BLEManagerImpl::GetImplInstance()
 {
     return &BLEManagerImpl::sInstance;
 }
@@ -51,7 +51,7 @@ CHIP_ERROR BLEManagerImpl::InitHostController(ble_generic_cb_fp cb_fp)
     RNG_SetPseudoRandomNoSeed(NULL);
 
     /* Has to be called after RNG_Init(), once seed is generated. */
-    (void) Controller_SetRandomSeed();
+    (void)Controller_SetRandomSeed();
 
     /* Create BLE Host Task */
     VerifyOrExit(BLEManagerImpl::blekw_host_init() == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
@@ -64,7 +64,7 @@ CHIP_ERROR BLEManagerImpl::InitHostController(ble_generic_cb_fp cb_fp)
     /* BLE Host Stack Init */
     VerifyOrExit(Ble_HostInitialize(cb_fp, Hcit_SendPacket) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
-    /* configure tx power to use in NBU specific to BLE */
+    /* configure tx power to use in NBU specfic to BLE */
     Controller_SetTxPowerLevelDbm(mAdvertisingDefaultTxPower_c, gAdvTxChannel_c);
     Controller_SetTxPowerLevelDbm(mConnectionDefaultTxPower_c, gConnTxChannel_c);
     Controller_ConfigureInvalidPduHandling(gLlInvalidPduHandlingType_c);
@@ -81,7 +81,7 @@ void BLEManagerImpl::Host_Task(osaTaskParam_t argument)
 CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
 {
     /* Initialization of task related */
-    if (KOSA_StatusSuccess != OSA_EventCreate((osa_event_handle_t) gHost_TaskEvent, TRUE))
+    if (KOSA_StatusSuccess != OSA_EventCreate((osa_event_handle_t)gHost_TaskEvent, TRUE))
     {
         return CHIP_ERROR_NO_MEMORY;
     }

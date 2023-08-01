@@ -22,6 +22,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/BufferReader.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 
@@ -51,9 +52,9 @@ void OTAImageProcessorImpl::Clear()
 {
     mHeaderParser.Clear();
     mAccumulator.Clear();
-    mParams.totalFileBytes  = 0;
+    mParams.totalFileBytes = 0;
     mParams.downloadedBytes = 0;
-    mCurrentProcessor       = nullptr;
+    mCurrentProcessor = nullptr;
 
     ReleaseBlock();
 }
@@ -104,9 +105,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
-    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor != nullptr,
+            ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
-    VerifyOrReturn(imageProcessor->mDownloader != nullptr, ChipLogError(SoftwareUpdate, "mDownloader is null"));
+    VerifyOrReturn(imageProcessor->mDownloader != nullptr,
+            ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     GetRequestorInstance()->GetProviderLocation(imageProcessor->mBackupProviderLocation);
 
@@ -136,7 +139,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
         if (!mCurrentProcessor)
         {
             ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-            ByteSpan tlvHeader{ mAccumulator.data(), sizeof(OTATlvHeader) };
+            ByteSpan tlvHeader{mAccumulator.data(), sizeof(OTATlvHeader)};
             ReturnErrorOnFailure(SelectProcessor(tlvHeader));
             ReturnErrorOnFailure(mCurrentProcessor->Init());
         }
@@ -169,11 +172,11 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
     auto pair = mProcessorMap.find(header.tag);
     if (pair == mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %lu", header.tag);
+        ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %" PRIu32, header.tag);
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
-    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -186,7 +189,7 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
-        ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", tag);
+        ChipLogError(SoftwareUpdate, "A processor for tag %" PRIu32 " is already registered.", tag);
         return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
@@ -212,9 +215,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
-    VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+    VerifyOrReturn(imageProcessor != nullptr,
+            ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
-    VerifyOrReturn(imageProcessor->mDownloader != nullptr, ChipLogError(SoftwareUpdate, "mDownloader is null"));
+    VerifyOrReturn(imageProcessor->mDownloader != nullptr,
+            ChipLogError(SoftwareUpdate, "mDownloader is null"));
 
     CHIP_ERROR status;
     auto block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
@@ -254,14 +259,14 @@ void OTAImageProcessorImpl::AbortAllProcessors()
 {
     ChipLogError(SoftwareUpdate, "All selected processors will call abort action");
 
-    for (auto const & pair : mProcessorMap)
+    for (auto const& pair : mProcessorMap)
     {
         if (pair.second->WasSelected())
         {
             pair.second->AbortAction();
             pair.second->Clear();
             pair.second->SetWasSelected(false);
-        }
+         }
     }
 }
 
@@ -288,8 +293,9 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
     if (currentVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current sw version %lu is different than the expected sw version = %lu", currentVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate,
+            "Current sw version %" PRIu32 " is different than the expected sw version = %" PRIu32,
+            currentVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -298,7 +304,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (block.empty())
+    if (!IsSpanUsable(block))
     {
         return CHIP_NO_ERROR;
     }
@@ -339,21 +345,21 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         return;
     }
 
-    for (auto const & pair : imageProcessor->mProcessorMap)
+    for (auto const& pair : imageProcessor->mProcessorMap)
     {
         if (pair.second->WasSelected())
         {
             error = pair.second->ApplyAction();
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
+                ChipLogError(SoftwareUpdate, "Apply action for tag %" PRIu8 " processor failed.", (uint8_t)pair.first);
                 // Revert all previously applied actions if current apply action fails.
                 // Reset image processor and requestor states.
                 imageProcessor->AbortAllProcessors();
@@ -365,7 +371,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         }
     }
 
-    for (auto const & pair : imageProcessor->mProcessorMap)
+    for (auto const& pair : imageProcessor->mProcessorMap)
     {
         pair.second->Clear();
         pair.second->SetWasSelected(false);
@@ -396,17 +402,18 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::FetchNextData(uint32_t context)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     auto * imageProcessor = &OTAImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
-        if (imageProcessor->mDownloader)
-        {
-            imageProcessor->mDownloader->FetchNextData();
+            if (imageProcessor->mDownloader)
+            {
+                imageProcessor->mDownloader->FetchNextData();
+            }
         }
-    });
+    );
 }
 
-OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+OTAImageProcessorImpl& OTAImageProcessorImpl::GetDefaultInstance()
 {
     return gImageProcessor;
 }

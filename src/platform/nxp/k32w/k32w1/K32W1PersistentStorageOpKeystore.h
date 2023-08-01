@@ -41,6 +41,7 @@ typedef Crypto::SensitiveDataBuffer<SSS_KEY_PAIR_BLOB_SIZE> P256SerializedKeypai
 class P256KeypairSSS : public Crypto::P256Keypair
 {
 public:
+
     P256KeypairSSS() {}
     ~P256KeypairSSS() override;
 
@@ -71,7 +72,7 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Crypto::P256ECDSASignature & out_signature) const override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Crypto::P256ECDSASignature & out_signature) const override ;
 
     const Crypto::P256PublicKey & Pubkey() const override { return mPublicKey; }
 
@@ -82,6 +83,7 @@ private:
     Crypto::P256PublicKey mPublicKey;
     mutable sss_sscp_object_t mKeyObj;
     bool mInitialized = false;
+
 };
 
 /**
@@ -99,7 +101,7 @@ public:
 
     // Non-copyable
     K32W1PersistentStorageOpKeystore(K32W1PersistentStorageOpKeystore const &) = delete;
-    void operator=(K32W1PersistentStorageOpKeystore const &)                   = delete;
+    void operator=(K32W1PersistentStorageOpKeystore const &) = delete;
 
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.
@@ -165,13 +167,13 @@ protected:
     PersistentStorageDelegate * mStorage = nullptr;
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a pending keypair override for a given fabric.
-    FabricIndex mPendingFabricIndex  = kUndefinedFabricIndex;
-    P256KeypairSSS * mPendingKeypair = nullptr;
-    bool mIsPendingKeypairActive     = false;
+    FabricIndex mPendingFabricIndex       = kUndefinedFabricIndex;
+    P256KeypairSSS * mPendingKeypair      =  nullptr;
+    bool mIsPendingKeypairActive          = false;
 
     // Optimize loading the keyblob from storage all the time
-    mutable P256KeypairSSS * mCachedKeypair = nullptr;
-    mutable FabricIndex mCachedFabricIndex  = kUndefinedFabricIndex;
+    mutable P256KeypairSSS *mCachedKeypair = nullptr;
+    mutable FabricIndex mCachedFabricIndex = kUndefinedFabricIndex;
 
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
     // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.

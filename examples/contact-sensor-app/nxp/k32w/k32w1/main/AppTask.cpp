@@ -31,8 +31,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
@@ -48,11 +48,11 @@
 
 #include "K32W1PersistentStorageOpKeystore.h"
 
-#include "LEDWidget.h"
-#include "app.h"
-#include "app_config.h"
 #include "fsl_component_button.h"
+#include "app.h"
+#include "LEDWidget.h"
 #include "fwk_platform.h"
+#include "app_config.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -74,8 +74,8 @@ static LEDWidget sStatusLED;
 static LEDWidget sContactSensorLED;
 #endif
 
-static bool sIsThreadProvisioned = false;
-static bool sHaveBLEConnections  = false;
+static bool sIsThreadProvisioned        = false;
+static bool sHaveBLEConnections         = false;
 
 static uint32_t eventMask = 0;
 
@@ -154,9 +154,9 @@ CHIP_ERROR AppTask::Init()
 
     UpdateDeviceState();
 
-    /* intialize the Keyboard and button press callback */
-    BUTTON_InstallCallback((button_handle_t) g_buttonHandle[0], KBD_Callback, (void *) BLE_BUTTON);
-    BUTTON_InstallCallback((button_handle_t) g_buttonHandle[1], KBD_Callback, (void *) CONTACT_SENSOR_BUTTON);
+    /* intialize the Keyboard and button press calback */
+    BUTTON_InstallCallback((button_handle_t)g_buttonHandle[0], KBD_Callback, (void*)BLE_BUTTON);
+    BUTTON_InstallCallback((button_handle_t)g_buttonHandle[1], KBD_Callback, (void*)CONTACT_SENSOR_BUTTON);
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -212,7 +212,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::K32W1PersistentStorageOpKeystore sK32W1PersistentStorageOpKeystore;
     VerifyOrDie((sK32W1PersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sK32W1PersistentStorageOpKeystore;
-#endif
+#endif    
 
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
@@ -226,7 +226,10 @@ void AppTask::InitServer(intptr_t arg)
 void AppTask::PrintOnboardingInfo()
 {
     chip::PayloadContents payload;
-    CHIP_ERROR err = GetPayloadContents(payload, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    CHIP_ERROR err = GetPayloadContents(
+        payload,
+        chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)
+    );
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -377,55 +380,56 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     sAppTask.PostEvent(&button_event);
 }
 
-button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam)
+button_status_t AppTask::KBD_Callback(void *buttonHandle, button_callback_message_t *message, void *callbackParam)
 {
-    uint32_t pinNb = (uint32_t) callbackParam;
+    uint32_t pinNb = (uint32_t)callbackParam;
     switch (message->event)
     {
-    case kBUTTON_EventOneClick:
-    case kBUTTON_EventShortPress:
-        switch (pinNb)
-        {
-        case BLE_BUTTON:
-            K32W_LOG("pb1 short press");
-            if (sAppTask.mResetTimerActive)
+        case kBUTTON_EventOneClick:
+        case kBUTTON_EventShortPress:
+            switch (pinNb)
             {
-                ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+                case BLE_BUTTON:
+                    K32W_LOG("pb1 short press");
+                    if (sAppTask.mResetTimerActive)
+                    {
+                        ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+                    }
+                    else
+                    {
+                        ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+                    }
+                    break;
+
+                case CONTACT_SENSOR_BUTTON:
+                    K32W_LOG("pb2 short press");
+                    ButtonEventHandler(CONTACT_SENSOR_BUTTON, CONTACT_SENSOR_BUTTON_PUSH);
+                    break;
             }
-            else
+            break;
+
+        case kBUTTON_EventLongPress:
+            switch (pinNb)
             {
-                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+                case BLE_BUTTON:
+                    K32W_LOG("pb1 long press");
+                    ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+                    break;
+
+                case CONTACT_SENSOR_BUTTON:
+                    K32W_LOG("pb2 long press");
+                    ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
+                    break;
             }
             break;
 
-        case CONTACT_SENSOR_BUTTON:
-            K32W_LOG("pb2 short press");
-            ButtonEventHandler(CONTACT_SENSOR_BUTTON, CONTACT_SENSOR_BUTTON_PUSH);
+        default:
+            /* No action required */
             break;
-        }
-        break;
-
-    case kBUTTON_EventLongPress:
-        switch (pinNb)
-        {
-        case BLE_BUTTON:
-            K32W_LOG("pb1 long press");
-            ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
-            break;
-
-        case CONTACT_SENSOR_BUTTON:
-            K32W_LOG("pb2 long press");
-            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
-            break;
-        }
-        break;
-
-    default:
-        /* No action required */
-        break;
     }
     return kStatus_BUTTON_Success;
 }
+
 
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
@@ -685,7 +689,7 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     sAppTask.mFunction = Function::kNoneSelected;
 }
 
-void AppTask::OnIdentifyStart(Identify * identify)
+void AppTask::OnIdentifyStart(Identify* identify)
 {
     if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
@@ -705,7 +709,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
     }
 }
 
-void AppTask::OnIdentifyStop(Identify * identify)
+void AppTask::OnIdentifyStop(Identify* identify)
 {
     if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
@@ -757,7 +761,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
 #endif
 
-        if (aEvent->Handler)
+    if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
@@ -778,7 +782,8 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     // write the new on/off value
     EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-
+    /*EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);*/
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
@@ -797,14 +802,15 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* get onoff attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-
+    /*(void) emberAfReadAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue,
+                                1);*/
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);
 #endif
 }
 
-extern "C" void OTAIdleActivities(void)
+extern "C" void OTAIdleActivities( void )
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();

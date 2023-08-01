@@ -33,9 +33,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 
+#include "openthread/platform/logging.h"
 #include "FreeRtosHooks.h"
 #include "app_config.h"
-#include "openthread/platform/logging.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -44,9 +44,11 @@ using namespace ::chip::Logging;
 
 #include <AppTask.h>
 
+
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
+
 
 extern "C" void main_task(void const * argument)
 {
@@ -66,7 +68,7 @@ extern "C" void main_task(void const * argument)
     {
         return;
     }
-
+    
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
@@ -83,7 +85,7 @@ extern "C" void main_task(void const * argument)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-
+    
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
