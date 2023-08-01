@@ -36,18 +36,6 @@ client cluster Identify = 3 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct IdentifyRequest {
-    INT16U identifyTime = 0;
-  }
-
-  request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier = 0;
-    IdentifyEffectVariant effectVariant = 1;
-  }
-
-  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 server cluster Identify = 3 {
@@ -2061,18 +2049,7 @@ endpoint 1 {
 }
 endpoint 2 {
   device type genericswitch = 259, version 1;
-  binding cluster Identify;
   binding cluster OnOff;
-
-  server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
 
   server cluster Groups {
     ram      attribute nameSupport;
