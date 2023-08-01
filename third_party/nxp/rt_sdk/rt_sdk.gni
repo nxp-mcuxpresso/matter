@@ -275,6 +275,7 @@ template("rt_sdk") {
         "${rt_core_sdk_root}/components/messaging",
         "${rt_core_sdk_root}/components/mem_manager",
         "${rt_core_sdk_root}/components/flash/mflash",
+        "${rt_core_sdk_root}/components/time_stamp",
 #Framework files
         "${rt_sdk_root}/middleware/wireless/framework/FunctionLib",
         "${rt_sdk_root}/middleware/wireless/framework/Common",
