@@ -26,6 +26,6 @@ manifest:
         - lwip
         - littlefs
   - name: framework
-    url: ssh://git@bitbucket.sw.nxp.com/connint/connectivity-framework.git
-    revision: master
+    url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
+    revision: ac523d9
     path: middleware/wireless/framework  
