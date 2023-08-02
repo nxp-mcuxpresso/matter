@@ -27,5 +27,5 @@ manifest:
         - littlefs
   - name: framework
     url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
-    revision: master
+    revision: ac523d9
     path: middleware/wireless/framework  
