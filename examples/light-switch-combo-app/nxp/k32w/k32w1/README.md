@@ -1,6 +1,6 @@
 <a name="matter-k32w1-light-switch-combo-example-application"></a>
 
-# Matter K32W1 Light swithc combo Example Application
+# Matter K32W1 Light switch combo Example Application
 
 Matter K32W1 Light Switch Combo example provides a baseline demonstration of a dual-endpoint application. Endpoint =1 is used for the  Light Device (bulb) and Endpoint = 2 is for the Light-Switch device . The light bulb is simulated using the onboard RGB LED. It uses buttons to test turn on/turn off of the local light bulb or the binded lights. You can use this example as a reference for creating your own application.
 
@@ -15,7 +15,7 @@ network.
 
 <hr>
 
-- [Matter K32W1 Light swithc combo Example Application](#matter-k32w1-light-swithc-combo-example-application)
+- [Matter K32W1 Light switch combo Example application](#matter-k32w1-light-switch-combo-example-application)
   - [Introduction](#introduction)
     - [Bluetooth LE Advertising](#bluetooth-le-advertising)
     - [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
@@ -105,7 +105,7 @@ NOTE:
 **RGB LED** shows the state of the simulated light bulb. When the LED is lit the
 light bulb is on; when not lit, the light bulb is off.
 
-**Button SW2** can be used to start BLE adevertising. A SHORT press of the buttton 
+**Button SW2** can be used to start BLE advertising. A SHORT press of the button 
 will enable Bluetooth LE advertising for a predefined period of time. A LONG Press
 Button SW2 initiates a factory reset. After an initial period of 3 seconds, LED 2
 and RGB LED will flash in unison to signal the pending reset. After 6 seconds will
@@ -113,7 +113,7 @@ cause the device to reset its persistent configuration and initiate a reboot.
 The reset action can be cancelled by press SW2 button at any point before the 6
 second limit.
 
-**Button SW3** can be used to toggle a binded light device or to change the state of the simulated light bulb. Short press toogles the light corresponded to remote light. Long press can be used to mimic a user manually operating a switch. The button behaves as a toggle, swapping the state every time it is pressed.
+**Button SW3** can be used to toggle a binded light device or to change the state of the simulated light bulb. Short press toggles the light corresponding to the first entry in the device's binding table. Long press can be used to toggle the state of the local simulated light on endpoint 1.
 
 <a name="building"></a>
 
@@ -259,7 +259,7 @@ In OTAP application
 
 ### Convert sb3 into ota file
 
-.sb3 file should be packed in a Matter specific header (e.g.: using the following Python script availabe in the Matter repo):
+.sb3 file should be packed in a Matter specific header (e.g.: using the following Python script available in the Matter repo):
 ```
 $ ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
 ```
@@ -292,11 +292,11 @@ The concept for OTA is the next one:
     the _announce-ota-provider_ command - basically, the OTA Requestor is
     informed of the node id of the OTA Provider Application.
 
-_Computer #1_ can be any system running an Ubuntu distribution. We recommand
+_Computer #1_ can be any system running an Ubuntu distribution. We recommend
 using CSA official instructions from
 [here](https://groups.csa-iot.org/wg/matter-csg/document/28566), where RPi 4 are
 proposed. Also, CSA official instructions document point to the OS/Docker images that
-should be used on the RPis. For compatibility reasons, we recommand compiling
+should be used on the RPis. For compatibility reasons, we recommend compiling
 chip-tool and OTA Provider applications with the same commit id that was used
 for compiling the Lighting Application. Also, please note that there is a single
 controller (chip-tool) running on Computer #1 which is used for commissioning
@@ -393,9 +393,9 @@ $./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authM
  ```
 Write a binding table entry for the remote light on the light switch:
  ```
-$./chip-tool chip-tool binding write binding '[{"fabricIndex": 1, "node": <First Light NodeId>, "endpoint": <EndpointLight>, "cluster": 6}]' <Switch NodeID> 2
+$./chip-tool binding write binding '[{"fabricIndex": 1, "node": <First Light NodeId>, "endpoint": <EndpointLight>, "cluster": 6}]' <Switch NodeID> 2
  ```
 
 After this command the pairing should be done automatically without any further user interactions.
 
-Press SW3 to control the remte node from the light switch. 
+Press SW3 to control the remote node from the light switch. 
