@@ -322,6 +322,7 @@ template("k32w0_sdk") {
       "gAppUseBonding_d=0",
       "gAppUsePairing_d=0",
       "gAppUsePrivacy_d=0",
+      "gController_ReducedRxThoughput=1",
       "gPasskeyValue_c=999999",
       "gSupportBle=1",
       "SUPPORT_FOR_BLE=1",
