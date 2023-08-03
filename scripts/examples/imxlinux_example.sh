@@ -18,19 +18,21 @@
 helpFunction()
 {
     cat << EOF
-Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty]
+Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty] [-m|--imx_ele]
     -s, --src       Source folder
     -o, --out       Output folder
     -d, --debug     Debug build (optional)
     -n, --no-init   No init mode (optional)
     -t, --trusty    Build with Trusty OS backed security enhancement (optional)
+    -m, --imx_ele   Build with IMX ELE (EdgeLock Enclave) based security enhancement (optional)
 EOF
 exit 1
 }
 
 trusty=0
+imx_ele=0
 release_build=true
-PARSED_OPTIONS="$(getopt -o s:o:tdn --long src:,out:,trusty,debug,no-init -- "$@")"
+PARSED_OPTIONS="$(getopt -o s:o:tdmn --long src:,out:,trusty,imx_ele,debug,no-init -- "$@")"
 if [ $? -ne 0 ];
 then
   helpFunction
@@ -41,6 +43,7 @@ while true; do
         -s|--src) src="$2"; shift 2 ;;
         -o|--out) out="$2"; shift 2 ;;
         -t|--trusty) trusty=1; shift ;;
+        -m|--imx_ele) imx_ele=1; shift ;;
         -d|--debug) release_build=false; shift ;;
         -n|--no-init) no_init=1; shift ;;
         --) shift; break ;;
@@ -154,6 +157,7 @@ if [ "$chip_with_web" = 1 ]; then
 fi
 gn gen $executable_python --check --fail-on-unused-args --root="$src" "$out" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
 chip_with_trusty_os=$trusty
+chip_with_imx_ele=$imx_ele
 build_without_pw=$without_pw
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
