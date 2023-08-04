@@ -24,3 +24,4 @@ chip_enable_ble = true
 
 chip_enable_icd_server = true
 chip_persist_subscriptions = true
+chip_subscription_timeout_resumption = true
