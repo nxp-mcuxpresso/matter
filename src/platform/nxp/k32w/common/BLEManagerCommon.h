@@ -222,7 +222,8 @@ protected:
 
 public:
     virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
-    virtual BLEManagerCommon * GetImplInstance()                   = 0;
+    virtual BLEManagerCommon* GetImplInstance() = 0;
+    virtual CHIP_ERROR ResetController() { return CHIP_NO_ERROR; }
     void DoBleProcessing(void);
 };
 
