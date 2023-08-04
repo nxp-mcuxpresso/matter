@@ -141,17 +141,12 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\" chip_enable_icd_subscription_handle=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\""
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
-
-`chip_enable_icd_subscription_handle` can be set to 1: it will enable platform
-specific implementation that handles ICD subscription requests such that it selects
-subscription report interval value considering maximum interval preferred by the
-publisher.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` - `see the files prefixed with chip-k32w1-contact-example`.
 

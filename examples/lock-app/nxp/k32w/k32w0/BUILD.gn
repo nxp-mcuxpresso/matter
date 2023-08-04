@@ -57,12 +57,6 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/common",
   ]
 
-  if (chip_enable_icd_subscription_handle == 1) {
-    include_dirs += [
-      "${chip_root}/examples/platform/nxp/common/icd/",
-    ]
-  }
-
   defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
@@ -91,13 +85,6 @@ k32w0_executable("lock_app") {
     "main/include/BoltLockManager.h",
     "main/main.cpp",
   ]
-
-  if (chip_enable_icd_subscription_handle == 1) {
-    sources += [
-      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.cpp",
-      "${chip_root}/examples/platform/nxp/common/icd/ICDSubscriptionCallback.h",
-    ]
-  }
 
   if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
     sources += [

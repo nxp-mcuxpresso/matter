@@ -35,7 +35,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
-#include <app/InteractionModelEngine.h>
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -45,10 +44,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
-#endif
-
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDSubscriptionCallback.h"
 #endif
 
 #include "K32W1PersistentStorageOpKeystore.h"
@@ -67,10 +62,6 @@
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static QueueHandle_t sAppEventQueue;
-
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-static ICDSubscriptionCallback mICDSubscriptionHandler;
-#endif
 
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
 /*
@@ -147,11 +138,6 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-    // Register ICD subscription callback to match subscription max intervals to its idle time interval
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
-#endif
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();

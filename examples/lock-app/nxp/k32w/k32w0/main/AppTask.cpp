@@ -36,10 +36,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/InteractionModelEngine.h>
 
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDSubscriptionCallback.h"
-#endif
-
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -57,10 +53,6 @@ constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
 constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
-
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-static ICDSubscriptionCallback mICDSubscriptionHandler;
-#endif
 
 static QueueHandle_t sAppEventQueue;
 
@@ -121,11 +113,6 @@ CHIP_ERROR AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 #endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-
-#ifdef CHIP_ICD_SUBSCRIPTION_HANDLING
-    // Register ICD subscription callback to match subscription max intervals to its idle time interval
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&mICDSubscriptionHandler);
-#endif
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();

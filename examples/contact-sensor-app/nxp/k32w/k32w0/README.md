@@ -203,7 +203,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_enable_icd_subscription_handle=1 chip_pw_tokenizer_logging=true"
+    user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
     user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
     ```
 
@@ -224,11 +224,6 @@ to zero. The argument chip_with_OM15082 is set to zero by default.
 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
-
-`chip_enable_icd_subscription_handle` can be set to 1: it will enable platform
-specific implementation that handles ICD subscription requests such that it selects
-subscription report interval value considering maximum interval preferred by the
-publisher.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
