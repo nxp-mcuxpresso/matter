@@ -47,11 +47,15 @@ declare_args() {
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
-  # icd configuration flags
-  chip_enable_icd_subscription_handle = 0
-  chip_ot_idle_interval_ms = 1000  # 1s Idle Intervals
-  chip_ot_active_interval_ms = 100  # 100ms Active Intervals
-  chip_active_mode_threshold = 500  # 500ms Active mode threshold
+
+  #ICD Matter Configuration flags
+  chip_ot_idle_interval_ms = 2000   # 2s Idle Intervals
+  chip_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+  nxp_idle_mode_interval_ms = 600000        # 10min Idle Mode Interval
+  nxp_active_mode_interval_ms = 10000       # 10s Active Mode Interval
+  nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -338,10 +342,16 @@ template("k32w0_sdk") {
       "gSecLibUseSha256Alt_d=1",
       "gOTA_UseSecLibAes=1",
       "gResetSystemReset_d=1",
+
       #MATTER-1308: move these platform specific defines to args.gni
       "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
       "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
-      "NXP_ACTIVE_MODE_THRESHOLD=${chip_active_mode_threshold}",
+
+       "NXP_ICD_ENABLED=1",
+       "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
+       "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
+       "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_ms}",
+       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
     # If OTA default processors are enabled, then OTA custom entry structure
@@ -431,12 +441,6 @@ template("k32w0_sdk") {
 
     if (chip_with_ot_cli == 1) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
-    }
-
-    if (chip_enable_icd_subscription_handle == 1) {
-      defines += [
-        "CHIP_ICD_SUBSCRIPTION_HANDLING",
-      ]
     }
 
     if (chip_with_low_power == 1) {
