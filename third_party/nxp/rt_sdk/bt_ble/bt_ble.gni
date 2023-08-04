@@ -145,8 +145,6 @@ template("bt_ble_target") {
       #edgefast_bluetooth
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/littlefs_pl.c",
 
-      # Adding rand32 file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/rand32.cpp",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/bt_db_gen.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_addr.c",
