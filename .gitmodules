@@ -62,8 +62,7 @@
 	platforms = k32w
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
-	url = https://github.com/NXP/ot-nxp.git
-	platforms = k32w
+	url = ../ot-nxp.git
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git
