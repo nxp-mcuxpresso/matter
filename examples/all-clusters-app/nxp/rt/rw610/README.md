@@ -66,6 +66,14 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
+```
+> Note : When using the SDK version 2.13.1, in order to build the application for a specific device revision such as A0, the patch_rw61x_sdk.sh script must be run before building the all-clusters application.
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/sdk_fixes/
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/sdk_fixes$ ./patch_rw61x_sdk.sh
+```
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw610/
 ```
