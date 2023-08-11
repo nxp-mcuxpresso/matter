@@ -216,9 +216,9 @@ will be imported in the `SSS` at initialization, by the factory data provider in
 
 The conversion process shall happen at manufacturing time:
 -   Write factory data binary.
--   Build the application with arg `chip_convert_dac_private_key=1` set.
+-   Build the application with `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
 -   Write the application to the board and let it run.
--   Build the application without `chip_convert_dac_private_key` arg.
+-   Build the application with `chip_with_factory_data=1`, but without `chip_convert_dac_private_key` arg.
 -   Write the application to the board.
 
 If you are using Jlink, you can see a conversion script example in:
