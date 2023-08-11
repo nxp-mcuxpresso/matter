@@ -1,0 +1,27 @@
+diff --git a/components/conn_fwloader/script/fw_bin2c_conv.py b/components/conn_fwloader/script/fw_bin2c_conv.py
+index 5da35141..d96a9ced 100644
+--- a/components/conn_fwloader/script/fw_bin2c_conv.py
++++ b/components/conn_fwloader/script/fw_bin2c_conv.py
+@@ -123,7 +123,7 @@ def main():
+             #generate_sb_src(args.in_path, 'A2', args.verbose) # no A2 signed binaries provided yet
+         else:
+             if args.rev == 'A0' or args.rev == 'A1' or args.rev == 'A2':
+-                generate_sb_src(args.in_path, args.rev)
++                generate_sb_src(args.in_path, args.rev, args.verbose)
+     elif args.type == 'raw':
+         if args.rev == 'all':
+             generate_raw_src(args.in_path, 'A0', args.verbose)
+@@ -131,7 +131,7 @@ def main():
+             generate_raw_src(args.in_path, 'A2', args.verbose)
+         else:
+             if args.rev == 'A0' or args.rev == 'A1' or args.rev == 'A2':
+-                generate_raw_src(args.in_path, args.rev)
++                generate_raw_src(args.in_path, args.rev, args.verbose)
+             else:
+                 print("error wrong chip revision argument must be in A0, A1, A2, or all")
+     else:
+@@ -142,4 +142,3 @@ if __name__ == '__main__':
+     main()
+ 
+ 
+-
