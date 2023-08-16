@@ -28,6 +28,7 @@ declare_args() {
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
   use_smu2_static = false
   use_smu2_dynamic = false
+  use_hw_sha256 = false
 
   # icd configuration flags
   chip_enable_icd_subscription_handle = false
@@ -324,6 +325,12 @@ template("k32w1_sdk") {
       ]
     }
 
+    if (use_hw_sha256) {
+      defines += [
+        "USE_HW_SHA256",
+      ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
@@ -476,6 +483,17 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ot.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ota.c",
       "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/PhyTime.c",
+
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sscp_mu.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_mgmt.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_sscp.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_init.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_sha256.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_hmac_sha256.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ecdh.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes_cmac.c",
+
       "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/SerialDevice/ASP.c",
       "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/SerialDevice/Phy.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/croutine.c",
