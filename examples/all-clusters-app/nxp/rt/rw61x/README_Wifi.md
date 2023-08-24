@@ -1,8 +1,8 @@
-# Matter over Wi-Fi on RW612
+# Matter over Wi-Fi on RW61x
 
 ## Hardware requirements
 
-- `RD-RW612-BGA` board
+- `RW612` or `RW610` board
 - Wi-Fi antenna (to plug in Ant1) + BLE antenna (to plug in Ant2)
 
 <a name="building"></a>

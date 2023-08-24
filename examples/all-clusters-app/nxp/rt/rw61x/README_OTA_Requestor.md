@@ -3,7 +3,7 @@
 ## Overview
 The OTA Requestor feature enables the device to be informed of, download and apply a software update from an OTA Provider.
 
-This section explains how to perform an OTA Software Update using the RW612 All-Clusters application.
+This section explains how to perform an OTA Software Update using the RW61x All-Clusters application.
 
 In general, the Over-The-Air Software Update process consists of the following steps :
 - The OTA Requestor queries an update image from the OTA Provider which responds according to its availability.
@@ -13,7 +13,7 @@ In general, the Over-The-Air Software Update process consists of the following s
 
 ### Flash Memory Layout
 
-The RW612 Flash is divided into different regions as follow :
+The RW61x Flash is divided into different regions as follow :
 - Bootloader : MCUBoot resides at the base of the flash and occupies 0x20000 (128 kB).
 - Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MB.
 - Secondary application partition : Update image received with the OTA (candidate application). The size reserved for the partition is 4.4 MB.
@@ -24,11 +24,11 @@ Notes :
 
 ### MCUBoot Bootloader
 
-MCUBoot is an open-source secure bootloader used by RW612 to apply the self-upgrade. For more details, please refer to the [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
+MCUBoot is an open-source secure bootloader used by RW61x to apply the self-upgrade. For more details, please refer to the [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
 
 In our use case, the bootloader runs the application residing in the primary partition. In order to run the OTA update image, the bootloader will swap the content of the primary and the secondary partitions. This type of upgrade is called swap-move and is the default upgrade configured by MCUBoot.
 
-## OTA Software Update process for RW612 all-clusters application
+## OTA Software Update process for RW61x all-clusters application
 
 ### Flashing the bootloader
 
@@ -142,7 +142,7 @@ The generated OTA file can be used to perform the OTA Software Update. The instr
 Setup example : 
 - [Chip-tool](../../../../../examples/chip-tool/README.md) application running on the RPi. 
 - OTA Provider application built on the same RPi (as explained below).
-- RW612 board programmed with the All-clusters application (with the instructions above).
+- RW61x board programmed with the All-clusters application (with the instructions above).
 
 Before starting the OTA process, the Linux OTA Provider application can be built on the RPi (if not already present in the pre-installed apps) :
 ```

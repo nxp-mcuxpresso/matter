@@ -1,4 +1,4 @@
-# CHIP RW612 All-clusters Application
+# CHIP RW61x All-clusters Application
 
 The all-clusters example implements a server which can be accessed by a CHIP controller and can accept basic cluster commands.
 
@@ -24,8 +24,8 @@ control.
 
 ## Introduction
 
-The RW612 all-cluster application provides a working demonstration of the
-RW612 board integration, built using the Project CHIP codebase and the NXP
+The RW61x all-cluster application provides a working demonstration of the
+RW610/RW612 board integration, built using the Project CHIP codebase and the NXP
 RW612 SDK. The example supports basic ZCL commands and acts as a thermostat device-type.
 
 The example supports:
@@ -37,8 +37,10 @@ The example supports:
 [README_Openthread.md]: README_Openthread.md
 
 The example targets the
-[`NXP RD-RW612-BGA`]
-board by default.
+[`NXP RD-RW610-BGA`] and the [`NXP RD-RW612-BGA`]
+boards, with the following configurations :
+- RW610 : Matter over Wi-Fi.
+- RW612 : Matter over Wi-Fi and Matter over Thread.
 
 
 <a name="building"></a>
@@ -74,7 +76,7 @@ Optional GN options that can be added when building an application:
 
 - To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
 - To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
-- By default, the RW612 A1 board version will be chosen. To switch to an A0 version, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
+- By default, the RW612 A1 board revision will be chosen. To switch to an A0 revision, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 - To build the application with the OTA Requestor enabled, the arguments ```chip_enable_ota_requestor=true no_mcuboot=false``` must be added to the *gn gen* command. (More information about the OTA Requestor feature in [OTA Requestor README](README_OTA_Requestor.md)))
