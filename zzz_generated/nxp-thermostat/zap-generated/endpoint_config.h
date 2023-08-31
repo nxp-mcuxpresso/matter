@@ -53,7 +53,7 @@
 #define GENERATED_DEFAULTS_COUNT (1)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 4
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 7
 #define GENERATED_MIN_MAX_DEFAULTS { \
 \
   /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
@@ -63,13 +63,16 @@
   { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x2 }, /* TemperatureUnit */ \
 \
   /* Endpoint: 1, Cluster: Thermostat (server) */ \
+  { (uint16_t)0x7D0, (uint16_t)-0x6AB3, (uint16_t)0x7FFF }, /* OccupiedHeatingSetpoint */ \
+  { (uint16_t)0x2BC, (uint16_t)-0x6AB3, (uint16_t)0x7FFF }, /* MinHeatSetpointLimit */ \
+  { (uint16_t)0xBB8, (uint16_t)-0x6AB3, (uint16_t)0x7FFF }, /* MaxHeatSetpointLimit */ \
   { (uint16_t)0x4, (uint16_t)0x0, (uint16_t)0x5 }, /* ControlSequenceOfOperation */ \
   { (uint16_t)0x1, (uint16_t)0x0, (uint16_t)0x7 } /* SystemMode */ \
 }
 
 
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 112
+#define GENERATED_ATTRIBUTE_COUNT 118
 #define GENERATED_ATTRIBUTES { \
 \
   /* Endpoint: 0, Cluster: Descriptor (server) */ \
@@ -213,10 +216,16 @@
 \
   /* Endpoint: 1, Cluster: Thermostat (server) */ \
   { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LocalTemperature */  \
-  { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x0000001B, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* ControlSequenceOfOperation */  \
-  { ZAP_MIN_MAX_DEFAULTS_INDEX(3), 0x0000001C, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* SystemMode */  \
-  { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */  \
-  { ZAP_SIMPLE_DEFAULT(5), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 }, /* ClusterRevision */  \
+  { ZAP_SIMPLE_DEFAULT(700), 0x00000003, 2, ZAP_TYPE(INT16S), 0 }, /* AbsMinHeatSetpointLimit */  \
+  { ZAP_SIMPLE_DEFAULT(3000), 0x00000004, 2, ZAP_TYPE(INT16S), 0 }, /* AbsMaxHeatSetpointLimit */  \
+  { ZAP_EMPTY_DEFAULT(), 0x00000008, 1, ZAP_TYPE(INT8U), 0 }, /* PIHeatingDemand */  \
+  { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x00000012, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OccupiedHeatingSetpoint */  \
+  { ZAP_MIN_MAX_DEFAULTS_INDEX(3), 0x00000015, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* MinHeatSetpointLimit */  \
+  { ZAP_MIN_MAX_DEFAULTS_INDEX(4), 0x00000016, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* MaxHeatSetpointLimit */  \
+  { ZAP_MIN_MAX_DEFAULTS_INDEX(5), 0x0000001B, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* ControlSequenceOfOperation */  \
+  { ZAP_MIN_MAX_DEFAULTS_INDEX(6), 0x0000001C, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* SystemMode */  \
+  { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */  \
+  { ZAP_SIMPLE_DEFAULT(6), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 }, /* ClusterRevision */  \
 }
 
 
@@ -568,8 +577,8 @@ const EmberAfGenericClusterFunction chipFuncArrayThermostatServer[] = {\
       /* Endpoint: 1, Cluster: Thermostat (server) */ \
       .clusterId = 0x00000201, \
       .attributes = ZAP_ATTRIBUTE_INDEX(107), \
-      .attributeCount = 5, \
-      .clusterSize = 10, \
+      .attributeCount = 11, \
+      .clusterSize = 21, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayThermostatServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ), \
@@ -586,7 +595,7 @@ const EmberAfGenericClusterFunction chipFuncArrayThermostatServer[] = {\
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES { \
   { ZAP_CLUSTER_INDEX(0), 13, 201 }, \
-  { ZAP_CLUSTER_INDEX(13), 4, 32 }, \
+  { ZAP_CLUSTER_INDEX(13), 4, 43 }, \
 }
 
 
@@ -601,7 +610,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (233)
+#define ATTRIBUTE_MAX_SIZE (244)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
