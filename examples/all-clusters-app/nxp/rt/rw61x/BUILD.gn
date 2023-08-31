@@ -119,6 +119,7 @@ rt_executable("all_cluster_app") {
     sources += [
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
       "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
     ]
   }
 
