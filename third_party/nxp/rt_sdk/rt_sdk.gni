@@ -453,6 +453,7 @@ template("rt_sdk") {
       defines += [
         "WIFI_IW612_BOARD_RD_USD",
         "SDIO_ENABLED",
+        "SD9177",
       ]
     }
 
