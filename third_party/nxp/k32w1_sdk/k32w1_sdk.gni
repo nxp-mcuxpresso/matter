@@ -21,7 +21,8 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/nxp/k32w/k32w1/args.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 declare_args() {
   # Location of the k32w1 SDK.
@@ -197,7 +198,6 @@ template("k32w1_sdk") {
       "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
       "SERIAL_USE_CONFIGURE_STRUCTURE=1",
       "SDK_COMPONENT_INTEGRATION=1",
-      "SERIAL_PORT_TYPE_UART=1",
       "gSerialManagerMaxInterfaces_c=1",
       "SDK_OS_FREE_RTOS",
       "gAppHighSystemClockFrequency_d=1",
@@ -260,6 +260,16 @@ template("k32w1_sdk") {
       "gAdvertisingPowerLeveldBm_c=0",
       "gConnectPowerLeveldBm_c=0",
     ]
+
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "SERIAL_PORT_TYPE_UART_DMA=1"
+      ]
+    } else {
+      defines += [
+        "SERIAL_PORT_TYPE_UART=1"
+      ]
+    }
 
     if (chip_with_low_power == 1 && chip_logging == true) {
       print(
@@ -378,26 +388,33 @@ template("k32w1_sdk") {
 
     if (sdk_release == 1) {
       sources += [
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
+        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_flash.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ltc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_snt.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_spc.c",
         "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_wuu.c",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
         "${k32w1_sdk_root}/devices/K32W1480/utilities/fsl_assert.c",
+        "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
         "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
-        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
       ]
+
+      if (chip_enable_pw_rpc) {
+        sources += [
+          "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_edma.c",
+          "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart_edma.c"
+        ]
+      }
     } else {
       sources += [
         "${k32w1_sdk_root}/devices/KW45B41Z83/drivers/fsl_clock.c",
@@ -420,6 +437,13 @@ template("k32w1_sdk") {
         "${k32w1_sdk_root}/platform/utilities/debug_console/fsl_debug_console.c",
         "${k32w1_sdk_root}/platform/utilities/str/fsl_str.c",
       ]
+
+      if (chip_enable_pw_rpc) {
+        sources += [
+          "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_edma.c",
+          "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_lpuart_edma.c"
+        ]
+      }
     }
 
     sources += [
