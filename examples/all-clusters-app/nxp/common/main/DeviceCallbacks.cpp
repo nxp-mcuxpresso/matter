@@ -38,12 +38,35 @@
 #include "OTARequestorInitiator.h"
 #endif
 
+using namespace chip::app;
+void OnTriggerEffect(::Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
 Identify gIdentify0 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+    OnTriggerEffect,
 };
 
 Identify gIdentify1 = {
@@ -51,7 +74,7 @@ Identify gIdentify1 = {
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
     chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyTriggerEffect"); },
+    OnTriggerEffect,
 };
 
 using namespace ::chip;
