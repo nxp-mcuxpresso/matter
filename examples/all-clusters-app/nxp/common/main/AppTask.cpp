@@ -46,6 +46,8 @@
 #include "AppMatterButton.h"
 #include "AppFactoryData.h"
 #include "laundry-washer-controls-delegate-impl.h"
+#include "static-supported-temperature-levels.h"
+
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OTARequestorInitiator.h"
@@ -82,6 +84,8 @@ using namespace ::chip::app::Clusters;
 
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
@@ -290,6 +294,8 @@ CHIP_ERROR AppTask::Init()
 #if TCP_DOWNLOAD
     EnableTcpDownloadComponent();
 #endif
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
 exit:
     return err;
