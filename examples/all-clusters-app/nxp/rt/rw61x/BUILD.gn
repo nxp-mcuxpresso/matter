@@ -121,6 +121,7 @@ rt_executable("all_cluster_app") {
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     ]
   }
 
