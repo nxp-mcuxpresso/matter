@@ -27,6 +27,9 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <laundry-washer-mode.h>
 
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -119,6 +122,11 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 {
     ChipLogProgress(DeviceLayer, "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
+    switch (clusterId) {
+	    case Clusters::OnOff::Id:
+            OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
+            break;
+    }
 }
 
 void DeviceCallbacks::OnWiFiConnectivityChange(const ChipDeviceEvent * event)
@@ -174,6 +182,22 @@ void DeviceCallbacks::OnInterfaceIpAddressChanged(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "Interface IPv6 address lost");
         break;
     }
+}
+
+using namespace chip::app::Clusters;
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value)
+{
+    switch (attributeId) {
+    case Clusters::OnOff::Attributes::OnOff::Id:
+        if (*value == true) {
+            // Update the current mode to OnMode after device is on
+	    ModeBase::Instance * modeInstance = LaundryWasherMode::Instance();
+	    DataModel::Nullable<uint8_t> mode = modeInstance->GetOnMode();
+	    modeInstance->UpdateCurrentMode(mode.Value());
+        }
+        break;
+    }
+
 }
 
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
