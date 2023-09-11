@@ -45,6 +45,7 @@
 #include "AppMatterCli.h"
 #include "AppMatterButton.h"
 #include "AppFactoryData.h"
+#include "laundry-washer-controls-delegate-impl.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OTARequestorInitiator.h"
@@ -478,4 +479,10 @@ void AppTask::SwitchCommissioningStateHandler(void)
 void AppTask::FactoryResetHandler(void)
 {
     ConfigurationMgr().InitiateFactoryReset();
+}
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
