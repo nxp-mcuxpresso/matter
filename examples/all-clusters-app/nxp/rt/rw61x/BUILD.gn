@@ -43,10 +43,12 @@ declare_args() {
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
-if (nxp_device_type == "thermostat") {
-  app_common_folder = "${nxp_device_type}/nxp/zap"
-} else {
+if (nxp_device_type == "all-clusters") {
   app_common_folder = "${nxp_device_type}-app/${nxp_device_type}-common"
+} 
+else {
+  # Use NXP custom zap files for thermostat & laundry-washer device-types
+  app_common_folder = "${nxp_device_type}/nxp/zap"
 }
 
 # Create here the SDK instance.
