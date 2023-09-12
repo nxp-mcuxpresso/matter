@@ -83,7 +83,7 @@ rw61x_sdk_drivers("sdk_driver") {
 }
 
 rt_executable("all_cluster_app") {
-  output_name = "chip-rw61x-${nxp_device_type}-example"
+  output_name = "chip-rw61x-all-cluster-example"
 
   defines = [ "CONFIG_RENDEZVOUS_MODE=7" ]
 
