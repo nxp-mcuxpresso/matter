@@ -35,9 +35,10 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
-  # This defines the device type as a "thermostat" by default,
+  # This defines the device type as a "laundry-washer" by default,
   # use "all-clusters" in order to build the all-clusters-app
-  nxp_device_type = "thermostat"
+  # use "thermostat" in order to build as a thermostat device type
+  nxp_device_type = "laundry-washer-app"
 }
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
