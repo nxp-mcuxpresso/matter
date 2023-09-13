@@ -73,6 +73,12 @@ void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOpera
 
 void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
 {
+    uint8_t opState = GetInstance()->GetCurrentOperationalState();
+    if (opState == to_underlying(OperationalStateEnum::kError))
+    {
+        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
