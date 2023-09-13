@@ -1622,10 +1622,6 @@ server cluster TemperatureControl = 86 {
     kTemperatureStep = 0x4;
   }
 
-  readonly attribute temperature temperatureSetpoint = 0;
-  readonly attribute temperature minTemperature = 1;
-  readonly attribute temperature maxTemperature = 2;
-  readonly attribute temperature step = 3;
   readonly attribute int8u selectedTemperatureLevel = 4;
   readonly attribute char_string supportedTemperatureLevels[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2017,10 +2013,6 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint;
-    ram      attribute minTemperature;
-    ram      attribute maxTemperature;
-    ram      attribute step;
     ram      attribute selectedTemperatureLevel;
     callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
