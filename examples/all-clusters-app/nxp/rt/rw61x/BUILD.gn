@@ -119,7 +119,9 @@ rt_executable("all_cluster_app") {
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
   if (nxp_device_type != "thermostat") {
-    defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+    if (nxp_device_type == "all-clusters") {
+      defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+    }
     sources += [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
