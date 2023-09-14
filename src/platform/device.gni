@@ -257,5 +257,6 @@ assert(
         chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
         chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
         chip_device_platform == "SiWx917" ||
-        chip_device_platform == "openiotsdk" || chip_device_platform == "asr",
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
+        chip_device_platform == "stm32",
     "Please select a valid value for chip_device_platform")
