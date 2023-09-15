@@ -187,6 +187,11 @@ void DeviceCallbacks::OnInterfaceIpAddressChanged(const ChipDeviceEvent * event)
 using namespace chip::app::Clusters;
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value)
 {
+#if 0
+    /*
+     * This implementation is try to implementation the handler for TC-LWM-3.1
+     * Since this case is removed in SVE and there is a side-effect in TC-OO-2.4, remove it temporally
+    */
     switch (attributeId) {
     case Clusters::OnOff::Attributes::OnOff::Id:
         if (*value == true) {
@@ -200,7 +205,7 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpoi
         }
         break;
     }
-
+#endif //
 }
 
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
