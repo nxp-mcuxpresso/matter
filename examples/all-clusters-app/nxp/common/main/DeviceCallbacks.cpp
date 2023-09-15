@@ -193,7 +193,10 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpoi
             // Update the current mode to OnMode after device is on
 	    ModeBase::Instance * modeInstance = LaundryWasherMode::Instance();
 	    DataModel::Nullable<uint8_t> mode = modeInstance->GetOnMode();
-	    modeInstance->UpdateCurrentMode(mode.Value());
+	    if (mode.IsNull() == false)
+            {
+	        modeInstance->UpdateCurrentMode(mode.Value());
+	    }
         }
         break;
     }
