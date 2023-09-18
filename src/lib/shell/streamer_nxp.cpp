@@ -101,7 +101,7 @@ static volatile int txCount = 0;
 static bool readDone = true;
 
 static streamer_serial_port_uart_config_t uartConfig = {
-    .clockRate    = BOARD_APP_UART_CLK_FREQ,
+    .clockRate    = 0,
     .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
     .parityMode   = kSerialManager_UartParityDisabled,
     .stopBitCount = kSerialManager_UartOneStopBit,
@@ -146,6 +146,8 @@ int streamer_nxp_init(streamer_t * streamer)
     /* attach FRG3 clock to FLEXCOMM3 */
     BOARD_CLIAttachClk();
 #endif
+
+    uartConfig.clockRate = BOARD_APP_UART_CLK_FREQ;
 
 #if STREAMER_UART_USE_DMA
     dma_channel_mux_configure_t dma_channel_mux;
