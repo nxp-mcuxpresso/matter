@@ -68,7 +68,7 @@ Identify gIdentify0 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
     OnTriggerEffect,
 };
 
@@ -76,7 +76,7 @@ Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
     OnTriggerEffect,
 };
 
