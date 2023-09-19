@@ -33,18 +33,6 @@ server cluster Identify = 3 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct IdentifyRequest {
-    int16u identifyTime = 0;
-  }
-
-  request struct TriggerEffectRequest {
-    EffectIdentifierEnum effectIdentifier = 0;
-    EffectVariantEnum effectVariant = 1;
-  }
-
-  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 /** Attributes and commands for group configuration and manipulation. */
@@ -1457,6 +1445,51 @@ server cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+server cluster IcdManagement = 70 {
+  bitmap Feature : bitmap32 {
+    kCheckInProtocolSupport = 0x1;
+    kUserActiveModeTrigger = 0x2;
+    kLongIdleTimeSupport = 0x4;
+  }
+
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
+    kPowerCycle = 0x1;
+    kSettingsMenu = 0x2;
+    kCustomInstruction = 0x4;
+    kDeviceManual = 0x8;
+    kActuateSensor = 0x10;
+    kActuateSensorSeconds = 0x20;
+    kActuateSensorTimes = 0x40;
+    kActuateSensorLightsBlink = 0x80;
+    kResetButton = 0x100;
+    kResetButtonLightsBlink = 0x200;
+    kResetButtonSeconds = 0x400;
+    kResetButtonTimes = 0x800;
+    kSetupButton = 0x1000;
+    kSetupButtonSeconds = 0x2000;
+    kSetupButtonLightsBlink = 0x4000;
+    kSetupButtonTimes = 0x8000;
+    kAppDefinedButton = 0x10000;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeDuration = 0;
+  readonly attribute int32u activeModeDuration = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : enum8 {
@@ -1603,6 +1636,24 @@ endpoint 0 {
     handle command CommissioningComplete;
     handle command CommissioningCompleteResponse;
   }
+
+  server cluster IcdManagement {
+    callback attribute idleModeDuration default = 1;
+    callback attribute activeModeDuration default = 300;
+    callback attribute activeModeThreshold default = 300;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0000;
+    ram      attribute clusterRevision default = 1;
+
+    handle command RegisterClientResponse;
+  }
+}
+endpoint 1 {
+  device type ma_contactsensor = 21, version 1;
+
 
   server cluster NetworkCommissioning {
     ram      attribute maxNetworks;
@@ -1833,53 +1884,6 @@ endpoint 0 {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
-  }
-}
-endpoint 1 {
-  device type ma_contactsensor = 21, version 1;
-
-
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command Identify;
-    handle command TriggerEffect;
-  }
-
-  server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
-  }
-
-  server cluster BooleanState {
-    emits event StateChange;
-    ram      attribute stateValue default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
   }
 }
 
