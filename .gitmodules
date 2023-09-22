@@ -302,5 +302,5 @@
 	url = https://github.com/nxp-imx/libtrustymatter
 [submodule "repo"]
 	path = third_party/imx-secure-enclave/repo
-	url = ssh://git@bitbucket.sw.nxp.com/lfac/secure_enclave.git
+	url = https://github.com/nxp-imx/imx-secure-enclave.git
 	branch = lf-6.1.36_2.1.0
