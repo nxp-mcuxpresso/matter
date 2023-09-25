@@ -47,6 +47,8 @@
 #include "AppFactoryData.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "static-supported-temperature-levels.h"
+#include <app/InteractionModelEngine.h>
+#include "ICDUtil.h"
 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -294,6 +296,7 @@ CHIP_ERROR AppTask::Init()
 #if TCP_DOWNLOAD
     EnableTcpDownloadComponent();
 #endif
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
