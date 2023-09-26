@@ -335,7 +335,71 @@
             </md-list>
         </div>
 
-        <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[3].show">
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[3].show">
+          <h4>Subscribe</h4>
+            <md-content layout-padding flex="100">
+              <form name="subscribeForm">
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Min Interval</label>
+                    <input required md-minlength="1" name="minInterval" ng-model="subscribe.minInterval">
+                    <div ng-messages="subscribeForm.minInterval.$error">
+                      <div ng-message="required">This value is the user-defined min interval of subscribe.</div>
+                      <div ng-message="md-minlength">The Min Interval is a decimal number.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Max Interval</label>
+                    <input required md-minlength="1" name="maxInterval" ng-model="subscribe.maxInterval">
+                    <div ng-messages="subscribeForm.maxInterval.$error">
+                      <div ng-message="required">This value is the user-defined max interval of subscribe.</div>
+                      <div ng-message="md-minlength">The Max Interval is a decimal number.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required md-minlength="1" name="nodeId" ng-model="subscribe.nodeId">
+                    <div ng-messages="subscribeForm.nodeId.$error">
+                      <div ng-message="required">This value is the user-defined ID of the commissioned node.</div>
+                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>EndPoint ID</label>
+                    <input required name="endPointId" type="number" min="1" max="240" ng-model="subscribe.endPointId">
+                    <div ng-messages="subscribeForm.endPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 240.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="subscribeButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="triggerSubscribe($event)">Subscribe</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
+
+            <h4>Subscribe Status</h4>
+            <md-list class="md-dense" flex=100>
+              <md-list-item class="md-3-line" ng-repeat="item in subscribeStatus">
+                <img ng-src="{{item.icon}}" class="md-avatar" alt="" />
+                  <div class="md-list-item-text" layout="column">
+                      <h4><div style="white-space:pre-wrap">{{ item.status }}</div></h4>
+                  </div>
+                <md-divider></md-divider>
+              </md-list-item>
+            </md-list>
+        </div>
+
+        <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[4].show">
           <!-- Status content -->
           <h4>Get Status</h4>
         </div>
