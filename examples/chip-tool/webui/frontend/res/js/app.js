@@ -93,6 +93,11 @@
                 show: false,
             },
             {
+                title: 'Subscribe',
+                icon: 'add_circle_outline',
+                show: false,
+            },
+            {
                 title: 'Status',
                 icon: 'info_outline',
                 show: false,
@@ -122,15 +127,24 @@
             type_ble_thread: 'ble-thread',
         };
 
+        $scope.subscribe = {
+            subscribe_cluster : "onoff subscribe on-off",
+            minInterval: '10',
+            maxInterval: '50',
+            nodeId: '1',
+            endPointId: 1,
+        };
+
         $scope.headerTitle = 'Home';
         $scope.status = [];
         $scope.reports = [];
+        $scope.subscribeStatus = [];
 
         $scope.isLoading = false;
 
         $scope.showPanels = function(index) {
             $scope.headerTitle = $scope.menu[index].title;
-            for (var i = 0; i < 4; i++) {
+            for (var i = 0; i < 5; i++) {
                 /* set i as the number of menu*/
                 $scope.menu[i].show = false;
             }
@@ -409,6 +423,35 @@
                     $scope.showAlert(event, 'read', 'failed');
                 }
             });
+        };
+
+        $scope.wsServerPort = '9002';
+        $scope.triggerSubscribe = function(ev){
+            var ws = new WebSocket("ws://" + window.location.hostname + ":" + $scope.wsServerPort);
+            console.log("New WebSocket connected.");
+            $scope.showLoadingSpinner = true;
+            ws.onopen = function(ev) {
+                var msg = $scope.subscribe.subscribe_cluster + ' ' + $scope.subscribe.minInterval + ' ' + $scope.subscribe.maxInterval + ' ' + $scope.subscribe.nodeId + ' ' + $scope.subscribe.endPointId;
+                ws.send(msg);
+                $scope.showLoadingSpinner = false;
+            };
+            ws.onerror = function(ev) {
+                console.log("WebSocket error!");
+            };
+            ws.onmessage = function(ev) {
+                $scope.$apply(function() {
+                    var statusStr = ev.data;
+                    $scope.subscribeStatus.reverse();
+                    $scope.subscribeStatus.push({
+                        status: statusStr,
+                        icon: 'res/img/icon-info.png',
+                    });
+                    $scope.subscribeStatus.reverse();
+                })
+            }
+            ws.onclose = function(ev) {
+                console.log("WebSocket connection closed.");
+            };
         };
 
         $scope.restServerPort = '8889';
