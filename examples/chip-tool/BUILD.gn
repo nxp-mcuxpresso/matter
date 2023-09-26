@@ -151,11 +151,16 @@ group("default") {
 
 if (chip_with_web == 1) {
   executable("chip-tool-web") {
-    include_dirs = [ "webui/simpleweb" ]
+    include_dirs = [
+      "webui/simpleweb",
+      "webui/websocketpp",
+    ]
     sources = [
       "webui/chip_tool_web.cpp",
       "webui/simpleweb/client_http.hpp",
       "webui/simpleweb/server_http.hpp",
+      "webui/websocketpp/config/asio_no_tls.hpp",
+      "webui/websocketpp/server.hpp",
     ]
 
     deps = [ ":chip-tool-utils" ]
