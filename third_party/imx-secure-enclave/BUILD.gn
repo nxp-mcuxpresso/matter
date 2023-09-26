@@ -47,6 +47,7 @@ config("libele_config") {
     "MT_SAB_CIPHER=${FMW}",
     "MT_SAB_SESSION=${FMW}",
     "MT_SAB_KEY_STORE=${FMW}",
+    "MT_SAB_KEY_STORE_REPROV_EN=${FMW}",
     "MT_SAB_KEY_MANAGEMENT=${FMW}",
     "MT_SAB_MAC=${FMW}",
     "MT_SAB_RNG=${FMW}",
