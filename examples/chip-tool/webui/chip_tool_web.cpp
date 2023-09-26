@@ -16,6 +16,9 @@
 #include "server_http.hpp"
 #include <future>
 
+#include "config/asio_no_tls.hpp"
+#include "server.hpp"
+
 // Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
 #include <boost/property_tree/json_parser.hpp>
@@ -59,12 +62,24 @@ using namespace std;
 using namespace boost::property_tree;
 // Define a global mutex
 std::mutex g_mutex;
+std::mutex sq_mutex;
 
 #define RESPONSE_SUCCESS "successful"
 #define RESPONSE_FAILURE "failed"
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+
+//typedef websocketpp::server<websocketpp::config::asio> WsServer;
+using WsServer = websocketpp::server<websocketpp::config::asio>;
+
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
+
+// pull out the type of messages sent by our config
+typedef WsServer::message_ptr message_ptr;
+//using namespace WsServer::message_ptr;
 
 // Added for the default_resource example
 void default_resource_send(const HttpServer & server, const shared_ptr<HttpServer::Response> & response,
@@ -159,6 +174,49 @@ void enableFifo()
             break;
         }
     }
+}
+
+void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
+{
+    string report_text;
+    while (true)
+    {
+        std::lock_guard<std::mutex> lock(sq_mutex);
+        if (!SubscribeBuffers::IsQueueEmpty())
+        {
+            //std::lock_guard<std::mutex> lock(sq_mutex);
+            ChipReport r = SubscribeBuffers::DequeueReport();
+            stringstream report_ss;
+            report_ss << "Subscribe Report from " << r.nodeid << ": " << r.endpoint << ". "
+                      << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
+            report_text = report_ss.str();
+            try
+            {
+                s->send(hdl, report_text, msg->get_opcode());
+                ChipLogError(NotSpecified, "WebSocket server send subscribe report msg: %s", report_text.c_str());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
+            }
+        }
+        sleep(1);
+    }
+}
+
+// Define a callback to handle incoming messages
+void on_message(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
+{
+    ChipLogError(NotSpecified, "WebSocket server receive msg: %s", msg->get_payload());
+    std::string command;
+    command = msg->get_payload();
+    if (chipToolInteractiveCommand(command.c_str())) {
+        ChipLogError(NotSpecified, "subscribe cmd: %s execute failed!", command.c_str());
+    } else {
+        ChipLogError(NotSpecified, "subscribe cmd: %s execute successfully!", command.c_str());
+    }
+    std::thread generator(generateMessages, s, hdl, msg);
+    generator.detach();
 }
 
 int main()
@@ -574,6 +632,39 @@ int main()
     //     });
     //     client.io_service->run();
     // }
+
+    // Create a websocket server endpoint
+    WsServer wsserver;
+
+    try {
+        // Set logging settings
+        wsserver.set_access_channels(websocketpp::log::alevel::all);
+        wsserver.clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+        // Initialize Asio
+        wsserver.init_asio();
+
+        // Register our message handler
+        wsserver.set_message_handler(bind(&on_message,&wsserver,::_1,::_2));
+
+        // Listen on port 9002
+        wsserver.listen(9002);
+
+        // Start the server accept loop
+        wsserver.start_accept();
+
+        // Start the ASIO io_service run loop
+        wsserver.run();
+
+    }
+    catch (websocketpp::exception const & e)
+    {
+        ChipLogError(NotSpecified, "WebSocket connection disconnected because: %s", e.what());
+    }
+    catch (...)
+    {
+        ChipLogError(NotSpecified, "WebSocket connection disconnected because other exception");
+    }
 
     server_thread.join();
     t.join(); // Wait for the child thread to end

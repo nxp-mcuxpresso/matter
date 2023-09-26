@@ -62,6 +62,34 @@ private:
 };
 
 std::queue<ChipReport> ReportBuffers::m_queue;
+
+class SubscribeBuffers
+{
+public:
+    static void AddReport(const ChipReport & report) { m_queue.push(report); }
+
+    static ChipReport DequeueReport()
+    {
+        auto report = m_queue.front();
+        m_queue.pop();
+        return report;
+    }
+
+    static void ResetQueue()
+    {
+        while (!m_queue.empty())
+        {
+            m_queue.pop();
+        }
+    }
+
+    static bool IsQueueEmpty() { return m_queue.empty(); }
+
+private:
+    static std::queue<ChipReport> m_queue;
+};
+
+std::queue<ChipReport> SubscribeBuffers::m_queue;
 #endif
 
 class ReportCommand : public InteractionModelReports, public ModelCommand, public chip::app::ReadClient::Callback
@@ -96,6 +124,10 @@ private:
     }
 #endif
 public:
+    struct ChipReport SetGenerateReport(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data, NodeId nodeid)
+    {
+        return GenerateReport(path, data, nodeid);
+    }
     ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig, /* supportsMultipleEndpoints = */ true)
     {}
@@ -255,6 +287,39 @@ protected:
 
 class SubscribeCommand : public ReportCommand
 {
+
+#if CHIP_WITH_WEBUI
+public:
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
+                         const chip::app::StatusIB & status, NodeId peerId) override
+    {
+        ChipLogError(chipTool, "onAttributeData getnodeid %llu", peerId);
+        CHIP_ERROR error = status.ToChipError();
+        if (CHIP_NO_ERROR != error)
+        {
+            ChipLogError(chipTool, "OnOff subscribe Response Failure: %s", chip::ErrorStr(error));
+            mError = error;
+            return;
+        }
+
+        if (data == nullptr)
+        {
+            ChipLogError(chipTool, "OnOff subscribe Response Failure: No Data");
+            mError = CHIP_ERROR_INTERNAL;
+            return;
+        }
+
+        error = DataModelLogger::LogAttribute(path, data);
+        if (CHIP_NO_ERROR != error)
+        {
+            ChipLogError(chipTool, "Response Failure: Can not decode Data");
+            mError = error;
+            return;
+        }
+        SubscribeBuffers::AddReport(SetGenerateReport(path, data, peerId));
+    }
+#endif
+
 protected:
     SubscribeCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         ReportCommand(commandName, credsIssuerConfig)
@@ -269,7 +334,6 @@ protected:
     void OnDone(chip::app::ReadClient * aReadClient) override
     {
         InteractionModelReports::CleanupReadClient(aReadClient);
-
         if (!mSubscriptionEstablished)
         {
             SetCommandExitStatus(mError);
@@ -291,6 +355,7 @@ protected:
 
 private:
     bool mSubscriptionEstablished = false;
+
 };
 
 class ReadAttribute : public ReadCommand
