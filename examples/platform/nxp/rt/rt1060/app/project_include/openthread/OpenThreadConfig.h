@@ -39,6 +39,11 @@
 // Use smaller maximum interval to speed up reattaching.
 #define OPENTHREAD_CONFIG_MLE_ATTACH_BACKOFF_MAXIMUM_INTERVAL (60 * 10 * 1000) // default 1200000 ms
 
+// Keep compatibility with old OT CLI commands for creating and starting a Thread network
+#ifndef OPENTHREAD_CONFIG_OPERATIONAL_DATASET_AUTO_INIT
+#define OPENTHREAD_CONFIG_OPERATIONAL_DATASET_AUTO_INIT 1
+#endif
+
 // disable unused features
 #define OPENTHREAD_CONFIG_COAP_API_ENABLE 0
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 0
