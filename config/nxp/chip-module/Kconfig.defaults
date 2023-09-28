@@ -20,6 +20,19 @@
 
 if CHIP
 
+if CHIP_FACTORY_DATA
+
+config CHIP_DEVICE_VENDOR_ID
+	default 4151 # 0x1037
+
+config CHIP_DEVICE_MANUFACTURING_DATE
+	default "2023-01-01"
+
+config CHIP_DEVICE_PRODUCT_ID
+    default 41510 if SOC_SERIES_RW6XX
+
+endif # CHIP_FACTORY_DATA
+
 config LOG
     default y
 

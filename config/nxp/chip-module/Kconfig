@@ -54,13 +54,12 @@ config CHIP_MALLOC_SYS_HEAP
 
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
-	select ZCBOR
-	imply FPROTECT
 	help
 	  Enables the default NXP factory data provider implementation that
-	  supports reading the factory data encoded in the CBOR format from the
-	  flash memory partition. This option requires the factory_data partition in
-	  Partition Manager configuration file (pm_static.yml).
+	  supports reading the factory data encoded in the KLV format from the
+	  flash memory partition. This option requires a fixed partition named
+	  "factory_partition" declared on the device tree. Factory data partition
+	  can be generated during build process, see CHIP_FACTORY_DATA_BUILD Kconfig.
 
 config CHIP_FACTORY_DATA_CUSTOM_BACKEND
 	bool "Custom factory data provider"
@@ -73,11 +72,11 @@ config CHIP_FACTORY_DATA_CUSTOM_BACKEND
 config CHIP_FACTORY_DATA_BUILD
 	bool "Generate factory data contents"
 	default n
+	imply CHIP_FACTORY_DATA
 	help
 	  Enables generation of the factory data contents during the building. This
-	  option requires the factory_data partition in Partition Manager
-	  configuration file (pm_static.yml). As a result, a new output file is
-	  created (factory_data.hex).
+	  option requires a fixed partition named "factory_partition" declared on the
+	  device tree.
 
 config CHIP_FACTORY_DATA_VERSION
 	int
@@ -95,32 +94,9 @@ config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 	help
 	  Maximum acceptable length of rotating device ID unique ID in bytes.
 
-config CHIP_FACTORY_DATA_WRITE_PROTECT
-	bool "Enable Factory Data write protection"
-	select FPROTECT
-	depends on CHIP_FACTORY_DATA
-	default y if CHIP_FACTORY_DATA
-	help
-		Enables the write protection of the Factory Data partition in the flash memory.
-		This is a recommended feature, but it requires the Settings partition size to be
-		a multiple of FPROTECT_BLOCK_SIZE and the Factory Data partition to be placed
-		right after the application partition in the address space (the Factory Data
-		partition offset must be equal to the last address of the application partition).
-		The second requirement is valid only when the FPROTECT_BLOCK_SIZE is bigger than
-		the flash memory page size.
-
 if CHIP_FACTORY_DATA_BUILD
 
 # Factory data definitions
-config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
-	bool "Merge generated factory data with merged.hex output build file"
-	default y
-	help
-	  Enables merging the generated factory data with the merged.hex output
-	  build file. As a result, the merged.hex build output file, which is used
-	  when flashing the firmware using the west tool, includes the factory data
-	  as well.
-
 config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
 	bool "Generate onboarding codes during the generation of a factory data set"
 	help
@@ -156,6 +132,11 @@ choice CHIP_FACTORY_DATA_CERT_SOURCE
 endchoice
 
 if CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+config CHIP_FACTORY_DATA_USER_CERTS_CD_CERT
+	string "Path to the CD certificate (DER format)"
+	help
+	  Provides the absolute path to the CD certificate file in the DER format.
 
 config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
 	string "Path to the DAC certificate (DER format)"

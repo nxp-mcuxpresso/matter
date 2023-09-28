@@ -30,7 +30,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 # include(../../zephyr/ota-image.cmake) # TODO
 include(../../zephyr/zephyr-util.cmake)
-# include(generate_factory_data.cmake)
+include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
@@ -221,8 +221,8 @@ endif()
 # Define 'factory_data' target for generating a factory data partition
 # ==============================================================================
 
-# if (CONFIG_CHIP_FACTORY_DATA_BUILD)
-#    nxp_generate_factory_data()
-# endif()
+if (CONFIG_CHIP_FACTORY_DATA_BUILD)
+    nxp_generate_factory_data()
+endif()
 
 endif() # CONFIG_CHIP
