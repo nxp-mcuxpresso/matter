@@ -38,6 +38,12 @@
 #include <platform/nxp/zephyr/wifi/NxpWifiDriver.h>
 #endif
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#else
+#include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
+#endif
+
 // #if CONFIG_CHIP_OTA_REQUESTOR
 // #include "OTAUtil.h"
 // #endif
@@ -63,6 +69,14 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 // If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
+#if CONFIG_CHIP_FACTORY_DATA
+/*
+* Test key used to encrypt factory data before storing it to the flash.
+*/
+static const uint8_t aes128TestKey[] __attribute__((aligned)) = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+                                                                0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+#endif /* CONFIG_CHIP_FACTORY_DATA */
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -119,15 +133,22 @@ CHIP_ERROR AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-    // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
-    // no supported
-    assert(0);
+    FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
+    FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+    ReturnErrorOnFailure(FactoryDataPrvdImpl().Init());
+    if (err == CHIP_NO_ERROR)
+    {
+        SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
+        SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
+        SetCommissionableDataProvider(&FactoryDataPrvd());
+    }
 #else
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
+    // Initialize CHIP server
     static CommonCaseDeviceServerInitParams initParams;
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -162,6 +183,8 @@ CHIP_ERROR AppTask::StartApp()
     ReturnErrorOnFailure(Init());
 
     AppEvent event{};
+
+    ChipLogProgress(DeviceLayer, "Welcome to NXP All Clusters Demo App");
 
     while (true)
     {

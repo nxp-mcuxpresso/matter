@@ -48,3 +48,33 @@
 		zephyr,memory-region-mpu = "RAM";
 	};
 };
+
+&flexspi {
+	status = "okay";
+
+	mx25u51245g: mx25u51245g@0 {
+		status = "okay";
+
+		partitions {
+			/delete-node/ partition@680000;
+			/delete-node/ partition@a60000;
+
+			factory_partition: partition@680000 {
+				label = "factory-data";
+				reg = <0x680000 0x1000>;
+			};
+
+			slot1_partition: partition@681000 {
+				label = "image-1";
+				reg = <0x681000 0x3e0000>;
+			};
+
+
+			storage_partition: partition@a61000 {
+				label = "storage";
+				reg = <0xa61000 0x35a0000>;
+			};
+
+		};
+	};
+};

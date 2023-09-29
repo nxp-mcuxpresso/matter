@@ -21,12 +21,6 @@
 
 #include "AppEvent.h"
 
-#if CONFIG_CHIP_FACTORY_DATA
-#error "Factory Data not supported yet"
-#else
-#include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
-#endif
-
 struct k_timer;
 struct Identify;
 class AppTask
@@ -62,8 +56,4 @@ private:
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
-
-// #if CONFIG_CHIP_FACTORY_DATA
-//     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
-// #endif
 };

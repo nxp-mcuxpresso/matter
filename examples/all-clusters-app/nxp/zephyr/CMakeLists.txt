@@ -57,6 +57,10 @@ target_sources(app
         ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
 )
 
+target_compile_definitions(app PUBLIC
+    "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
+)
+
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
