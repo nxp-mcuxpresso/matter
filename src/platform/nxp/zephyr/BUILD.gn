@@ -20,6 +20,7 @@ import("${chip_root}/src/platform/nxp/zephyr/args.gni")
 assert(chip_device_platform == "nxp_zephyr")
 
 static_library("nxp_zephyr") {
+  defines = []
   sources = [
     "../common/CHIPNXPPlatformDefaultConfig.h",
     "../common/CHIPDeviceNXPPlatformDefaultConfig.h",
@@ -56,17 +57,23 @@ static_library("nxp_zephyr") {
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/CertificationDeclaration.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h",
+    "${chip_root}/src/credentials/attestation_verifier/DeviceAttestationVerifier.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_factory_data) {
-    # sources += [
-    #   "FactoryDataParser.c",
-    #   "FactoryDataParser.h",
-    #   "FactoryDataProvider.cpp",
-    #   "FactoryDataProvider.h",
-    # ]
+    sources += [
+      "../common/factory_data/FactoryDataProvider.cpp",
+      "../common/factory_data/FactoryDataProvider.h",
+      "FactoryDataProviderImpl.cpp",
+      "FactoryDataProviderImpl.h",
+    ]
+    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\"" ]
   } else {
     sources += [
       "DeviceInstanceInfoProviderImpl.cpp",
