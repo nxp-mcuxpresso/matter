@@ -491,6 +491,21 @@ SECTIONS
   } > m_data
 
   __DATA_END = __DATA_ROM + (__data_end__ - __data_start__);
+
+  /* Place holder for RAM function.
+   * By default CodeQuickAccess is placed in .data section, but if there's dedicated mem region
+   * allocated on code bus (SRAM address starts from 0x0), CodeQuickAccess can be inserted in
+   * .ram_function and the .ram_function can be located in the code bus region instead of m_data
+   * to get better performance. Remember to define __STARTUP_INITIALIZE_RAMFUNCTION macro to
+   * build startup_xx.S to ensure the RAM function copy from flash to RAM. */
+  .ram_function : AT(__DATA_END)
+  {
+    . = ALIGN(4);
+    __ram_function_start__ = .;
+    /* RAM function sections */ 
+    . = ALIGN(4);
+    __ram_function_end__ = .;
+  } > m_data
   
   text_end = ORIGIN(m_text) + LENGTH(m_text);
 
