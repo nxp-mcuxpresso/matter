@@ -85,8 +85,6 @@ Threads:
 ...
 ```
 
-<hr>
-
 ## Listing all commands
 
 To list all available commands, use the Tab key, which is normally used for the
@@ -132,7 +130,19 @@ Available commands:
   shell            :Useful, not Unix-like shell commands.
 ```
 
-<hr>
+## Using General purpose commands
+
+### `kernel` command group
+
+#### `reboot` subcommand
+
+Performs either a warm or cold reset.
+Difference between warm and cold resets may vary from a platform to another, but on default Cortex-M architectures,
+both methods are the same, so use either one if nothing is specific to your platform.
+
+```shell
+uart:~$ kernel reboot cold|warm
+```
 
 ## Using Matter-specific commands
 
