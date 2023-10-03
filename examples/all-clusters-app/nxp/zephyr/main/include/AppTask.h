@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include "AppEvent.h"
+#include "DeviceCallbacks.h"
 
 struct k_timer;
 struct Identify;
@@ -56,4 +57,5 @@ private:
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
+    DeviceCallbacks deviceCallbacks;
 };

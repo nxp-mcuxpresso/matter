@@ -19,6 +19,8 @@
 // #include "AppConfig.h"
 #include "AppEvent.h"
 #include "binding-handler.h"
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -31,7 +33,10 @@
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
 #include <static-supported-temperature-levels.h>
+#endif
 
 #ifdef CONFIG_CHIP_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -57,6 +62,7 @@ using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceManager;
 
 namespace {
 constexpr uint32_t kFactoryResetTriggerTimeout              = 3000;
@@ -90,7 +96,9 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
 
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+#endif
 
 } // namespace
 
@@ -114,6 +122,16 @@ CHIP_ERROR AppTask::Init()
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("PlatformMgr().InitChipStack() failed");
+        return err;
+    }
+
+    /*
+    * Register all application callbacks allowing to be informed of stack events
+    */
+    err = CHIPDeviceManager::GetInstance().Init(&deviceCallbacks);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "CHIPDeviceManager.Init() failed: %s", ErrorStr(err));
         return err;
     }
 
@@ -173,7 +191,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+#endif
 
     return err;
 }

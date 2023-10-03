@@ -18,3 +18,19 @@ mainmenu "Matter NXP All Clusters Example Application"
 rsource "../../../../config/nxp/chip-module/Kconfig.features"
 rsource "../../../../config/nxp/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"
+
+choice CHIP_APP_DEVICE_TYPE
+    prompt "Choose app device type"
+    default CHIP_APP_DEVICE_TYPE_THERMOSTAT
+
+    config CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
+        bool "Build as all-clusters device type."
+        help
+          Build the application as a full all-clusters application.
+
+    config CHIP_APP_DEVICE_TYPE_THERMOSTAT
+        bool "Build as a thermostat."
+        help
+          Build the application as a thermostat device.
+
+endchoice

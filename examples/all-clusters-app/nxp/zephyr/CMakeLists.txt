@@ -45,23 +45,38 @@ target_sources(app
     PRIVATE
         main/main.cpp
         main/AppTask.cpp
-        main/ZclDoorLockCallbacks.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/../common/main/CHIPDeviceManager.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/../common/main/DeviceCallbacks.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/../common/main/ZclCallbacks.cpp
         ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
 )
 
 target_compile_definitions(app PUBLIC
     "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
 )
 
-chip_configure_data_model(app
-    INCLUDE_SERVER
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
-)
+if(CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
+    )
+
+    target_sources(app
+        PRIVATE
+            ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+            ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+    )
+elseif(CONFIG_CHIP_APP_DEVICE_TYPE_THERMOSTAT)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../thermostat/nxp/zap/thermostat_matter_wifi.zap
+    )
+else()
+    message(FATAL_ERROR "CHIP_APP_DEVICE_TYPE not supported.")
+endif()
