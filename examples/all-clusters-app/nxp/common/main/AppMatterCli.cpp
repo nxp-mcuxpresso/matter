@@ -27,12 +27,17 @@
 #include <lib/shell/Engine.h>
 #include <ChipShellCollection.h>
 #include "task.h"
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
 #include <operational-state-delegate-impl.h>
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 #define MATTER_CLI_TASK_SIZE ((configSTACK_DEPTH_TYPE)2048 / sizeof(portSTACK_TYPE))
 #define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
 
+using namespace chip;
 using namespace chip::Shell;
+using namespace chip::app::Clusters;
+
 TaskHandle_t AppMatterCliTaskHandle;
 static bool isShellInitialized = false;
 #else
@@ -85,8 +90,7 @@ CHIP_ERROR cliReset(int argc, char * argv[])
     return CHIP_NO_ERROR;
 }
 
-using namespace chip;
-using namespace chip::app::Clusters;
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
 CHIP_ERROR cliOpState(int argc, char * argv[])
 {
     if ((argc != 1) && (argc != 2)) {
@@ -129,7 +133,7 @@ CHIP_ERROR cliOpState(int argc, char * argv[])
     }
     return CHIP_NO_ERROR;
 }
-
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 
 CHIP_ERROR AppMatterCli_RegisterCommands(void)
@@ -168,11 +172,13 @@ CHIP_ERROR AppMatterCli_RegisterCommands(void)
                 .cmd_name = "matterreset",
                 .cmd_help = "Reset the device",
             },
+        #ifdef DEVICE_TYPE_LAUNDRY_WASHER
             {
                 .cmd_func = cliOpState,
                 .cmd_name = "opstate",
                 .cmd_help = "Set the Operational State"
-	    },
+	        },
+        #endif /* DEVICE_TYPE_LAUNDRY_WASHER */
         };
 
         Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
