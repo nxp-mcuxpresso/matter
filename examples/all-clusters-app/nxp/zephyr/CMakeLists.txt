@@ -18,6 +18,7 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ALL_CLUSTERS_NXP_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/common REALPATH)
 
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
@@ -35,20 +36,21 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_include_directories(app
     PRIVATE
-        main/include
-        ${ALL_CLUSTERS_COMMON_DIR}/include
-        ${GEN_DIR}/app-common
-        ${GEN_DIR}/all-clusters-app
+    main/include
+    ${ALL_CLUSTERS_COMMON_DIR}/include
+    ${GEN_DIR}/app-common
+    ${GEN_DIR}/all-clusters-app
+    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/include/DeviceManager
 )
 
 target_sources(app
     PRIVATE
-        main/main.cpp
-        main/AppTask.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/../common/main/CHIPDeviceManager.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/../common/main/DeviceCallbacks.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/../common/main/ZclCallbacks.cpp
-        ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+    main/main.cpp
+    main/AppTask.cpp
+    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/CHIPDeviceManager.cpp
+    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/DeviceCallbacks.cpp
+    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/ZclCallbacks.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
 )
 
 target_compile_definitions(app PUBLIC
@@ -63,14 +65,14 @@ if(CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS)
 
     target_sources(app
         PRIVATE
-            ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
-            ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+        ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     )
 elseif(CONFIG_CHIP_APP_DEVICE_TYPE_THERMOSTAT)
     chip_configure_data_model(app

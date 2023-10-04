@@ -105,6 +105,7 @@ rt_executable("all_cluster_app") {
   defines = [ "CONFIG_RENDEZVOUS_MODE=7" ]
 
   include_dirs = [
+    "../../common/main/include/DeviceManager",
     "../../common/main/include",
     "../../common/main",
 
