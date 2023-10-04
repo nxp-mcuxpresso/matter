@@ -45,10 +45,13 @@
 #include "AppMatterCli.h"
 #include "AppMatterButton.h"
 #include "AppFactoryData.h"
-#include "laundry-washer-controls-delegate-impl.h"
-#include "static-supported-temperature-levels.h"
 #include <app/InteractionModelEngine.h>
 #include "ICDUtil.h"
+
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#include "laundry-washer-controls-delegate-impl.h"
+#include "static-supported-temperature-levels.h"
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -87,7 +90,9 @@ using namespace ::chip::app::Clusters;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
@@ -298,7 +303,9 @@ CHIP_ERROR AppTask::Init()
 #endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
 exit:
     return err;
@@ -490,8 +497,10 @@ void AppTask::FactoryResetHandler(void)
     ConfigurationMgr().InitiateFactoryReset();
 }
 
+#ifdef DEVICE_TYPE_LAUNDRY_WASHER
 using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
     LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }
+#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
