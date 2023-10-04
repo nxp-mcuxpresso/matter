@@ -169,6 +169,18 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	help
 	  Enables the generation of a random Rotating device ID unique ID.
 
+config CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY
+	string "AES128 key used to encrypt factory data."
+	default "2B7E151628AED2A6ABF7158809CF4F3C"
+	help
+	  AES128 key used to encrypt factory data.
+
+config CHIP_ENCRYPTED_FACTORY_DATA
+	bool "Encrypt factory data with AES128 ECB."
+	default y
+	help
+	  If enabled, the factory data partition will be encrypted with AES128 ECB.
+
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition

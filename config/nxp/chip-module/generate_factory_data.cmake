@@ -1,17 +1,17 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 # Generate certificates based on factory data given via Kconfigs.
@@ -25,8 +25,8 @@
 # - Chip-DAC-NXP-<VID>-<PID>-Key.der
 #
 # [Args]:
-#   script_path - a path to script that generates the certificates.
-#   output_path - a path to output directory, where generated certificates will be stored.
+# script_path - a path to script that generates the certificates.
+# output_path - a path to output directory, where generated certificates will be stored.
 function(nxp_generate_certs script_path output_path)
     if(NOT EXISTS ${CHIP_ROOT}/out/chip-cert)
         message(FATAL_ERROR "Couldn't find chip-cert in ${CHIP_ROOT}/out folder.
@@ -51,6 +51,7 @@ function(nxp_generate_certs script_path output_path)
     math(EXPR LOCAL_VID "${CONFIG_CHIP_DEVICE_VENDOR_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_VID} 2 -1 raw_vid)
     string(TOUPPER ${raw_vid} raw_vid_upper)
+
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
@@ -60,28 +61,28 @@ function(nxp_generate_certs script_path output_path)
     separate_arguments(separated_script_args NATIVE_COMMAND ${script_args})
     add_custom_command(
         OUTPUT
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
         DEPENDS ${script_path}
         COMMAND ${Python3_EXECUTABLE} ${script_path} ${separated_script_args}
         COMMENT "Generating new certificates..."
     )
     add_custom_target(chip-certificates ALL
         DEPENDS
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
-            ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
-            ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.pem
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.pem
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
+        ${output_path}/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der
+        ${output_path}/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der
     )
 endfunction()
 
@@ -93,8 +94,8 @@ endfunction()
 # - <factory_data_target>.bin a binary file containing all raw factory data in KLV format.
 #
 # [Args]:
-#   script_path - a path to script that makes a factory data .bin file from given arguments.
-#   output_path - a path to output directory, where created bin file will be stored.
+# script_path - a path to script that makes a factory data .bin file from given arguments.
+# output_path - a path to output directory, where created bin file will be stored.
 function(nxp_generate_factory_data_bin script_path output_path)
     if(NOT EXISTS ${CHIP_ROOT}/out/spake2p)
         message(FATAL_ERROR "Couldn't find spake2p in ${CHIP_ROOT}/out folder.
@@ -107,12 +108,13 @@ function(nxp_generate_factory_data_bin script_path output_path)
     math(EXPR LOCAL_VID "${CONFIG_CHIP_DEVICE_VENDOR_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_VID} 2 -1 raw_vid)
     string(TOUPPER ${raw_vid} raw_vid_upper)
+
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
     string(TOUPPER ${raw_pid} raw_pid_upper)
 
-    ## generate all script arguments
+    # generate all script arguments
     set(script_args)
     string(APPEND script_args "--it \"${CONFIG_CHIP_DEVICE_SPAKE2_IT}\"\n")
     string(APPEND script_args "--salt \"${CONFIG_CHIP_DEVICE_SPAKE2_SALT}\"\n")
@@ -163,6 +165,14 @@ function(nxp_generate_factory_data_bin script_path output_path)
     if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
         # Spake2 verifier should be provided using Kconfig
         string(APPEND script_args "--spake2p_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
+    endif()
+
+    if(CONFIG_CHIP_ENCRYPTED_FACTORY_DATA)
+        if(NOT CONFIG_CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY)
+            message(FATAL_ERROR "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY is required when using CONFIG_CHIP_ENCRYPTED_FACTORY_DATA !")
+        endif()
+
+        string(APPEND script_args "--aes128_key \"${CONFIG_CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY}\"\n")
     endif()
 
     # execute the script which can generate the factory_data.bin file
