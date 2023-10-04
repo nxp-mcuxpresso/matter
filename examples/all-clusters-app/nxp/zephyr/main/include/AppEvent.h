@@ -25,43 +25,10 @@ using EventHandler = void (*)(const AppEvent &);
 enum class AppEventType : uint8_t
 {
     None = 0,
-    Button,
-    ButtonPushed,
-    ButtonReleased,
-    Timer,
-    UpdateLedState,
-    IdentifyStart,
-    IdentifyStop,
-};
-
-enum class FunctionEvent : uint8_t
-{
-    NoneSelected   = 0,
-    SoftwareUpdate = 0,
-    FactoryReset,
-    AdvertisingStart
 };
 
 struct AppEvent
 {
-    union
-    {
-        struct
-        {
-            uint8_t PinNo;
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LockEvent;
-    };
-
     AppEventType Type{ AppEventType::None };
     EventHandler Handler;
 };

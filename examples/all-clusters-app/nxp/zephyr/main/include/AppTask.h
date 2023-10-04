@@ -22,8 +22,6 @@
 #include "AppEvent.h"
 #include "DeviceCallbacks.h"
 
-struct k_timer;
-struct Identify;
 class AppTask
 {
 public:
@@ -34,28 +32,11 @@ public:
     };
     CHIP_ERROR StartApp();
 
-    static void IdentifyStartHandler(Identify *);
-    static void IdentifyStopHandler(Identify *);
-
     static void PostEvent(const AppEvent & event);
 
 private:
-    CHIP_ERROR Init();
-
-    static void CancelTimer();
-    static void StartTimer(uint32_t timeoutInMs);
-
-    static void DispatchEvent(const AppEvent & event);
-    static void FunctionTimerEventHandler(const AppEvent & event);
-    static void FunctionHandler(const AppEvent & event);
-    static void StartBLEAdvertisementHandler(const AppEvent & event);
-    static void UpdateLedStateEventHandler(const AppEvent & event);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    static void ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged);
-    static void FunctionTimerTimeoutCallback(k_timer * timer);
-
-    FunctionEvent mFunction   = FunctionEvent::NoneSelected;
-    bool mFunctionTimerActive = false;
     DeviceCallbacks deviceCallbacks;
+
+    CHIP_ERROR Init();
+    static void DispatchEvent(const AppEvent & event);
 };
