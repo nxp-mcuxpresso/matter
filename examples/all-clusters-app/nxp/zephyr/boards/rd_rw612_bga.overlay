@@ -15,6 +15,29 @@
  *    limitations under the License.
  */
 
+/ {
+	chosen {
+		zephyr,console = &flexcomm0;
+		zephyr,shell-uart = &flexcomm3;
+	};
+};
+
+&flexcomm0 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm0_usart>;
+	pinctrl-names = "default";
+};
+
+&flexcomm3 {
+	compatible = "nxp,lpc-usart";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm3_usart>;
+	pinctrl-names = "default";
+};
+
 &sram {
 	#address-cells = <1>;
 	#size-cells = <1>;

@@ -32,9 +32,12 @@ Some Matter examples for the development kits from NXP include
 a command-line interface that allows access to application logs and
 [Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
 
-<hr>
-
 ## Accessing the CLI console
+
+Depending on the platform, the CLI console and the logs can be split on two different interfaces.
+You may refer to `docs/<board name>.md` file to check how the board is configured for this example.
+The binding `zephyr,console` is used to print the logs, while the binding `zephyr,shell-uart` is used for the CLI.
+If the logs and the CLI are split among two serial interfaces, you will have to open both ports.
 
 To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.
