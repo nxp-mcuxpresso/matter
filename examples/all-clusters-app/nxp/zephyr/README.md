@@ -1,38 +1,124 @@
-# Build NXP all-cluster-app with Zephyr
+# CHIP NXP Zephyr All-clusters Application
+
+The all-clusters example implements a server which can be accessed by a CHIP controller and can accept basic cluster commands.
+
+The example is based on [Project CHIP](https://github.com/project-chip/connectedhomeip) and the NXP Zephyr SDK,
+and provides a prototype application that demonstrates device commissioning and different cluster control.
+
+<hr>
+
+-   [Introduction](#intro)
+-   [Building](#building)
+-   [Flashing and debugging](#flashdebug)
+-   [Manufacturing data](#manufacturing)
+-   [Testing the example](#testing-the-example)
+-   [Using Matter CLI in NXP Zephyr examples](#matter-cli)
+
+<hr>
+
+<a name="intro"></a>
+
+## Introduction
+
+The Zephyr all-clusters application provides a working demonstration of supported board integration from Zephyr,
+built using the Project CHIP codebase and the NXP/Zephyr SDK.
+The example supports basic ZCL commands and acts as a laundry washer device-type.
+
+The example supports:
+- Matter over Wi-Fi
+
+The example targets the following Zephyr boards:
+- `rd_rw612_bga`
+
+<a name="building"></a>
+
+## Building
+
+In order to build the Project CHIP example, we recommend using a Linux
+distribution (the demo-application was compiled on Ubuntu 20.04).
 
 Prerequisites:
-- Zephyr environment fully setup: https://docs.zephyrproject.org/latest/develop/getting_started/index.html
+- Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md) to setup the Matter environment
+- Follow instruction from [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html) to setup a Zephyr workspace
 
-Note: currently, Zephyr support in internal only, please use internal Zephyr repo: https://bitbucket.sw.nxp.com/projects/MCUCORE/repos/zephyr/browse
+>**Note**: Currently, supported NXP platforms in Zephyr targetting Matter are not available in the official Zephyr repo,
+> you'll have to use a private github repo. Reach to your NXP contact for more details.
 
-branch: feature/rw61x_v3.4.0
+Steps to build the example, targetting `rd_rw612_bga` board:
 
-Steps to build the example:
+1. Activate your Matter env:
+```shell
+source <path to CHIP workspace>/scripts/activate.sh
+```
+2. Source zephyr-env.sh:
+```shell
+source <path to zephyr repo>/zephyr-env.sh
+```
+3. Run west build command:
+```shell
+west build -b rd_rw612_bga -p  <path to this folder>
+```
 
-1. Source zephyr-env.sh:
-    ```bash
-    source <path to zephyr repo>/zephyr-env.sh
-    ```
-2. Source your zephyr venv:
-    ```bash
-    source <path to zephyr workspace>/.venv/bin/activate
-    ```
-3. Source your CHIP env:
-    ```bash
-    source <path to CHIP workspace>/scripts/activate.sh
-    ```
-4. Run west build command:
-    ```bash
-    west build -b rd_rw612_bga -p always
-    ```
+By default, a folder `build` will be created in the same folder you run the command from.
+The binaries will be created in `build/zephyr` with the name `zephyr.elf` and `zephyr.bin`.
 
-# Using CLI in NXP Zephyr examples
+You can get more details on `west build` with [Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
+
+<a name="flashdebug"></a>
+
+## Flashing and debugging
+
+### Flashing without debugging
+
+`west` can be used to flash a target, as an example for `rd_rw612_bga` board:
+```shell
+west flash -i <J-Link serial number>
+```
+
+You can get more details on `west flash` with [Zephyr's flashing guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#flashing-west-flash)
+
+>**Note**: `west flash` will not start a debug session, it will only flash and reset the device
+
+### Flash and debug
+
+To debug a Matter with Zephyr application, you could use several methods:
+- [MCUXpresso IDE (version >= 11.6.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
+- `VS Code` paired with [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension
+- `west flash` [Zephyr's debugging guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#id29)
+
+This guide will cover the VS Code use case.
+
+>**Note**: As the build provides an elf file, any compatible debugging tool can be used.
+
+#### Debugging with VS Code
+
+TODO
+
+<a name="manufacturing"></a>
+
+## Manufacturing data
+
+See [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp_manufacturing_flow.md)
+
+>**Note**: The all cluster app demonstrates the usage of encrypted Matter manufacturing data storage.
+> Matter manufacturing data should be encrypted using an AES 128 software key before flashing them to the device flash.
+
+<a name="testing-the-example"></a>
+
+## Testing the example
+
+To know how to commission a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'](../../../chip-tool/README.md#commission-a-device-over-ble).
+
+Please refer to boards specific documents in `docs` folder to learn how the example is configured for each supported board:
+- [rd_rw612_bga](docs/rd_rw612_bga.md)
+
+<a name="matter-cli"></a>
+
+## Using Matter CLI in NXP Zephyr examples
 
 Some Matter examples for the development kits from NXP include
 a command-line interface that allows access to application logs and
 [Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
-
-## Accessing the CLI console
 
 Depending on the platform, the CLI console and the logs can be split on two different interfaces.
 You may refer to `docs/<board name>.md` file to check how the board is configured for this example.
