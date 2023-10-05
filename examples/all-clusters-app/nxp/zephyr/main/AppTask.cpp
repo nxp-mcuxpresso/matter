@@ -21,6 +21,7 @@
 #include "binding-handler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include "ICDUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -30,12 +31,17 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/util/attribute-storage.h>
+#include <app/InteractionModelEngine.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS || CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 #include <static-supported-temperature-levels.h>
+#endif
+
+#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+#include "laundry-washer-controls-delegate-impl.h"
 #endif
 
 #ifdef CONFIG_CHIP_WIFI
@@ -102,7 +108,7 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS || CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 #endif
 
@@ -194,7 +200,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
-#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
+
+#if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS || CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 #endif
 
@@ -237,3 +245,13 @@ void AppTask::DispatchEvent(const AppEvent & event)
         LOG_INF("Event received with no handler. Dropping event.");
     }
 }
+
+#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+
+}
+#endif

@@ -21,7 +21,7 @@ source "Kconfig.zephyr"
 
 choice CHIP_APP_DEVICE_TYPE
     prompt "Choose app device type"
-    default CHIP_APP_DEVICE_TYPE_THERMOSTAT
+    default CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 
     config CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS
         bool "Build as all-clusters device type."
@@ -32,5 +32,10 @@ choice CHIP_APP_DEVICE_TYPE
         bool "Build as a thermostat."
         help
           Build the application as a thermostat device.
+
+    config CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+        bool "Build as a laundry washer."
+        help
+          Build the application as a laundry washer device.
 
 endchoice
