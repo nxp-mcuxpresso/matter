@@ -23,26 +23,28 @@
 #include "AppTask.h"
 #include <app/server/Server.h>
 
-#ifdef ENABLE_CHIP_SHELL
-#include <lib/shell/Engine.h>
-#include <ChipShellCollection.h>
-#include "task.h"
 #ifdef DEVICE_TYPE_LAUNDRY_WASHER
 #include <operational-state-delegate-impl.h>
 #endif /* DEVICE_TYPE_LAUNDRY_WASHER */
 
+#ifdef ENABLE_CHIP_SHELL
+#include <lib/shell/Engine.h>
+#include <ChipShellCollection.h>
+#include "task.h"
+
 #define MATTER_CLI_TASK_SIZE ((configSTACK_DEPTH_TYPE)2048 / sizeof(portSTACK_TYPE))
 #define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
 
-using namespace chip;
 using namespace chip::Shell;
-using namespace chip::app::Clusters;
 
 TaskHandle_t AppMatterCliTaskHandle;
 static bool isShellInitialized = false;
 #else
 #define MATTER_CLI_LOG(...)
 #endif /* ENABLE_CHIP_SHELL */
+
+using namespace chip;
+using namespace chip::app::Clusters;
 
 void AppMatterCliTask(void * args)
 {
