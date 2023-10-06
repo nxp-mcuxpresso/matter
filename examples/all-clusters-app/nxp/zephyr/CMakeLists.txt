@@ -36,11 +36,10 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_include_directories(app
     PRIVATE
-    main/include
+    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/include
     ${ALL_CLUSTERS_COMMON_DIR}/include
     ${GEN_DIR}/app-common
     ${GEN_DIR}/all-clusters-app
-    ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/include/DeviceManager
 )
 
 target_sources(app
