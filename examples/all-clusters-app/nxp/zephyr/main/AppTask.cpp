@@ -42,10 +42,6 @@
 #include <static-supported-temperature-levels.h>
 #endif
 
-#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
-#include "laundry-washer-controls-delegate-impl.h"
-#endif
-
 #ifdef CONFIG_CHIP_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/nxp/zephyr/wifi/NxpWifiDriver.h>
@@ -245,12 +241,3 @@ void AppTask::DispatchEvent(const AppEvent & event)
         LOG_INF("Event received with no handler. Dropping event.");
     }
 }
-
-#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
-using namespace chip::app::Clusters::LaundryWasherControls;
-void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
-{
-
-    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
-}
-#endif
