@@ -1,0 +1,74 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+
+assert(chip_build_tools)
+
+executable("imx-chip-bridge-app") {
+  sources = [
+    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
+    "main/src/Device.cpp",
+
+    # Matter Bridge
+    "main/src/Bridge.cpp",
+    "main/src/BridgeMgr.cpp",
+    "main/src/BridgeActions.cpp",
+    "main/src/bridged-actions-stub.cpp",
+
+
+    #Zigbee Control Bridge
+    "main/libzcb/IotCommon/dump.c",
+    "main/libzcb/IotCommon/fileCreate.c",
+    "main/libzcb/IotCommon/iotSemaphore.c",
+    "main/libzcb/IotCommon/iotSleep.c",
+    "main/libzcb/IotCommon/newDb.c",
+    "main/libzcb/IotCommon/newLog.c",
+    "main/libzcb/IotCommon/nibbles.c",
+    "main/libzcb/IotCommon/parsing.c",
+    "main/libzcb/IotCommon/systemtable.c",
+    "main/libzcb/ZCB/cmd.c",
+    "main/libzcb/ZCB/Serial.c",
+    "main/libzcb/ZCB/SerialLink.c",
+    "main/libzcb/ZCB/Utils.c",
+    "main/libzcb/ZCB/zcb.c",
+    "main/libzcb/ZCB/zcb_main.c",
+    "main/libzcb/ZCB/ZigbeeDevices.c",
+
+
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/bridge-app/bridge-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  include_dirs = [
+    "main/include",
+    "main/libzcb/IotCommon",
+    "main/libzcb/ZCB",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":imx-chip-bridge-app" ]
+}
