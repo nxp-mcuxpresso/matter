@@ -11,7 +11,7 @@ manifest:
     remote: nxpmicro
   projects:
   - name: mcux-sdk
-    revision: df3766a7a8289510a6e30ac2f6d1760131a38e8f
+    revision: 173fe5ba170474f02164e210f285dbe8f164e7a7
     path: core
     import:
       name-allowlist:
