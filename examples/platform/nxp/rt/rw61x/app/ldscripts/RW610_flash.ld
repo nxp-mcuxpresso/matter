@@ -78,12 +78,12 @@ _stated_  |     m_text    |                   '  fw_storage '   ACTIVE_APP (slot
     - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
           +               +
           +               + 
-    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
-    4k    |  FactoryData  |
     - - - +---------------+ - - - - - - - - - - - - - - - - - - - - 
           |               | NV_STORAGE_START_ADDRESS
           |   NVM_region  | 
           |               | NV_STORAGE_END_ADDRESS
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+    4k    |  FactoryData  |
     - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
              0x0C00_0000    FLASH_END
 
@@ -174,19 +174,19 @@ FW_UPDATE_STORAGE_END               = FW_UPDATE_STORAGE_START + FW_UPDATE_STORAG
 
 fw_top                              = FW_UPDATE_STORAGE_END + 1;
 
+/*** FactoryData space 1 sector is reserved ***/
+__FACTORY_DATA_SIZE                 = m_sector_size;
+__FACTORY_DATA_END                  = m_flash_end;
+__FACTORY_DATA_START                = __FACTORY_DATA_END - __FACTORY_DATA_SIZE + 1;
+__FACTORY_DATA_START_OFFSET         = __FACTORY_DATA_START - m_flash_start;
+
 /* FileSystem Configuration */
-NV_STORAGE_END_ADDRESS              = m_flash_end;
+NV_STORAGE_END_ADDRESS              = __FACTORY_DATA_START - 1;
 NV_STORAGE_MAX_SECTORS              = DEFINED(gNVMSectorCountLink_d) ? gNVMSectorCountLink_d : 16;
 NV_STORAGE_SECTOR_SIZE              = m_sector_size;
 NV_STORAGE_SIZE                     = NV_STORAGE_SECTOR_SIZE * NV_STORAGE_MAX_SECTORS;
 NV_STORAGE_START_ADDRESS            = NV_STORAGE_END_ADDRESS - NV_STORAGE_SIZE + 1;
 NV_STORAGE_START_ADDRESS_OFFSET     = NV_STORAGE_START_ADDRESS - m_flash_start;
-
-/*** FactoryData space 1 sector is reserved ***/
-__FACTORY_DATA_SIZE                 = m_sector_size;
-__FACTORY_DATA_END                  = NV_STORAGE_START_ADDRESS -1;
-__FACTORY_DATA_START                = __FACTORY_DATA_END - __FACTORY_DATA_SIZE + 1;
-__FACTORY_DATA_START_OFFSET         = __FACTORY_DATA_START - m_flash_start;
 
 /* -------------------------------------------------------------------------- */
 /*                                    RAM                                     */
