@@ -462,6 +462,41 @@ int main()
             response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
         }
     };
+    server.resource["^/multiadmin$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            auto nodeId  = root.get<string>("nodeId");
+            auto option = root.get<string>("option");
+            auto windowTimeout = root.get<int>("windowTimeout");
+            auto iteration  = root.get<string>("iteration");
+            auto discriminator  = root.get<string>("discriminator");
+            ChipLogError(NotSpecified, "Received POST request to open commissioning window");
+            std::string command;
+            command = "pairing open-commissioning-window " + nodeId + " " + option + " " + std::to_string(windowTimeout) + " " + iteration + " " + discriminator;
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                root.put("result", RESPONSE_SUCCESS);
+            }
+
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception &e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
 
     // Get example simulating heavy work in a separate thread
     server.resource["^/work$"]["GET"] = [&server](shared_ptr<HttpServer::Response> response,

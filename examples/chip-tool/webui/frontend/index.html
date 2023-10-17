@@ -336,6 +336,40 @@
         </div>
 
         <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[3].show">
+          <h4>MultiAdmin</h4>
+            <md-content layout-padding flex="100">
+              <form name="multiadminForm">
+                <div layout="row">
+
+                  <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required md-minlength="1" name="nodeId" ng-model="multiadmin.nodeId">
+                    <div ng-messages="multiadminForm.nodeId.$error">
+                      <div ng-message="required">This value is the user-defined ID of the commissioned node.</div>
+                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Window Timeout</label>
+                    <input required name="windowTimeout" type="number" min="180" max="900" ng-model="multiadmin.windowTimeout">
+                    <div ng-messages="multiadminForm.windowTimeout.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The window timeout must be between 180 and 900.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="openBCMButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="openBCM($event)">Open Commissioning Window with BCM</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
+        </div>
+
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[4].show">
           <h4>Subscribe</h4>
             <md-content layout-padding flex="100">
               <form name="subscribeForm">
@@ -399,7 +433,7 @@
             </md-list>
         </div>
 
-        <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[4].show">
+        <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[5].show">
           <!-- Status content -->
           <h4>Get Status</h4>
         </div>

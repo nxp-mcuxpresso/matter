@@ -93,6 +93,11 @@
                 show: false,
             },
             {
+                title: 'MultiAdmin',
+                icon: 'add_circle_outline',
+                show: false,
+            },
+            {
                 title: 'Subscribe',
                 icon: 'add_circle_outline',
                 show: false,
@@ -127,6 +132,15 @@
             type_ble_thread: 'ble-thread',
         };
 
+        // Basic Commissioning Method
+        $scope.multiadmin = {
+            nodeId: '1',
+            option: '0',
+            windowTimeout: 300,
+            iteration: '1000',
+            discriminator: '3840',
+        };
+
         $scope.subscribe = {
             subscribe_cluster : "onoff subscribe on-off",
             minInterval: '10',
@@ -144,7 +158,7 @@
 
         $scope.showPanels = function(index) {
             $scope.headerTitle = $scope.menu[index].title;
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 6; i++) {
                 /* set i as the number of menu*/
                 $scope.menu[i].show = false;
             }
@@ -422,6 +436,32 @@
                     $scope.showLoadingSpinner = false;
                     $scope.showAlert(event, 'read', 'failed');
                 }
+            });
+        };
+
+        $scope.openBCM = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var data = {
+                nodeId: $scope.multiadmin.nodeId,
+                option: $scope.multiadmin.option,
+                windowTimeout: $scope.multiadmin.windowTimeout,
+                iteration: $scope.multiadmin.iteration,
+                discriminator: $scope.multiadmin.discriminator,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'multiadmin',
+                data: data,
+            });
+
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'Open Commissioning Window with BCM', 'success');
+                } else {
+                    $scope.showAlert(event, 'Open Commissioning Window with BCM', 'failed');
+                }
+                ev.target.disabled = false;
             });
         };
 
