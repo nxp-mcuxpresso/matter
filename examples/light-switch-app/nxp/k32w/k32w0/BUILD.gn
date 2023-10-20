@@ -86,8 +86,10 @@ k32w0_executable("light_switch_app") {
     "main/ZclCallbacks.cpp",
     "main/include/AppEvent.h",
     "main/include/AppTask.h",
-    "main/include/binding-handler.h",
-    "main/binding-handler.cpp",
+    "main/include/BindingHandler.h",
+    "main/include/LightSwitchMgr.h",
+    "main/BindingHandler.cpp",
+    "main/LightSwitchMgr.cpp",
     "main/main.cpp",
   ]
 

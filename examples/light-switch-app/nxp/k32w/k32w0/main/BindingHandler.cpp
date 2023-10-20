@@ -15,26 +15,25 @@
  *    limitations under the License.
  */
 
-#include "binding-handler.h"
+#include "BindingHandler.h"
+#include "app_config.h"
+
+#include "app/CommandSender.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
-#include "controller/ReadInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
 #include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
-#include "app_config.h"
-
 
 using namespace chip;
 using namespace chip::app;
 
 namespace {
 
-
-void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device)
+void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
+                                       Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle)
 {
-
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "OnOff command succeeds");
     };
@@ -47,24 +46,20 @@ void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTa
     {
     case Clusters::OnOff::Commands::Toggle::Id:
         Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         toggleCommand, onSuccess, onFailure);
+        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::On::Id:
         Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onCommand, onSuccess, onFailure);
+        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
         break;
 
     case Clusters::OnOff::Commands::Off::Id:
         Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offCommand, onSuccess, onFailure);
+        Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
         break;
     }
 }
-
 
 void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding)
 {
@@ -90,28 +85,36 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTabl
     }
 }
 
-void SwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
-   VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
-   BindingCommandData * data = static_cast<BindingCommandData *>(context);
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-   if (data->isGroup)
-   {
-
-   }
-   else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
-   {
-
-        ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
-
+    if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
+    {
+        switch (data->clusterId)
+        {
+        case Clusters::OnOff::Id:
+            ProcessOnOffGroupBindingCommand(data->commandId, binding);
+            break;
+        }
+    }
+    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    {
+        switch (data->clusterId)
+        {
+        case Clusters::OnOff::Id:
+            VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
+            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device->GetExchangeManager(),
+                                              peer_device->GetSecureSession().Value());
+            break;
+        }
     }
 }
 
-
-void SwitchContextReleaseHandler(void * context)
+void LightSwitchContextReleaseHandler(void * context)
 {
-    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "SwitchContextReleaseHandler: context is null"));
-
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "LightSwitchContextReleaseHandler: context is null"));
     Platform::Delete(static_cast<BindingCommandData *>(context));
 }
 
@@ -154,22 +157,15 @@ void PrintBindingTable()
 
 void InitBindingHandlerInternal(intptr_t arg)
 {
-    K32W_LOG("Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
-    if (CHIP_NO_ERROR !=
-        chip::BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
-    {
-        K32W_LOG("BindingHandler::InitInternal failed");
-    }
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(SwitchChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(SwitchContextReleaseHandler);
+    chip::BindingManager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     PrintBindingTable();
 }
 
-
 } // namespace
-
 
 /********************************************************
  * Switch functions
@@ -189,10 +185,15 @@ void BindingWorkerFunction(intptr_t context)
 
     EmberBindingTableEntry * entry = reinterpret_cast<EmberBindingTableEntry *>(context);
     AddBindingEntry(*entry);
+
+    Platform::Delete(entry);
 }
 
 CHIP_ERROR InitBindingHandler()
 {
+    // The initialization of binding manager will try establishing connection with unicast peers
+    // so it requires the Server instance to be correctly initialized. Post the init function to
+    // the event queue so that everything is ready when initialization is conducted.
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
     return CHIP_NO_ERROR;
 }

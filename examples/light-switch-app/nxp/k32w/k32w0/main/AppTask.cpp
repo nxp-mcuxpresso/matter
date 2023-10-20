@@ -21,7 +21,6 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/support/ErrorStr.h>
-#include "binding-handler.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -53,6 +52,7 @@
 #include "LEDWidget.h"
 #include "PWR_Interface.h"
 #include "app_config.h"
+#include "LightSwitchMgr.h"
 
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -66,8 +66,6 @@
 #define FACTORY_RESET_BUTTON_PRESS_TIMEOUT 5  //s
 
 
-static bool sWasDimmerTriggered = false;
-static bool sFirstDimmerOn = false;
 static uint8_t sFactoryResetButtonPressTimeout = 0;
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -122,6 +120,13 @@ static BDXDownloader gDownloader;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
+
+namespace {
+
+constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
+constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
+
+} // namespace
 
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
@@ -255,11 +260,10 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
-    // Configure Bindings - TODO ERROR PROCESSING
-    err = InitBindingHandler();
+    err = LightSwitchMgr::GetInstance().Init(kLightSwitchEndpoint, kGenericSwitchEndpoint);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer,"InitBindingHandler() failed");
+        K32W_LOG("LightSwitchMgr Init failed!");
         assert(err == CHIP_NO_ERROR);
     }
 
@@ -433,14 +437,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     }
     else if (pin_no == LIGHT_SWITCH_BUTTON)
     {
-        if(button_action == LIGHT_SWITCH_ONOFF_BUTTON_PUSH)
-        {
-            button_event.Handler = SwitchActionEventHandler;
-        }
-        else if (button_action == LIGHT_SWITCH_DIMMER_BUTTON_PUSH)
-        {
-            button_event.Handler = DimmerActionEventHandler;
-        }
+        button_event.Handler = SwitchActionEventHandler;
     }
     else if (pin_no == OTA_BUTTON)
     {
@@ -499,19 +496,14 @@ void AppTask::HandleKeyboard(void)
             }
             sFactoryResetButtonPressTimeout = 0;
             break;
-        case gKBD_EventHoldPB2_c:
-            sWasDimmerTriggered = true;
-            K32W_LOG("pb2 holding");
-            ButtonEventHandler(LIGHT_SWITCH_BUTTON, LIGHT_SWITCH_DIMMER_BUTTON_PUSH);
+        case gKBD_EventPressPB2_c:
+            K32W_LOG("pb2 press");
+            ButtonEventHandler(LIGHT_SWITCH_BUTTON, LIGHT_SWITCH_ONOFF_BUTTON_PUSH);
             break;
+
         case gKBD_EventReleasePB2_c:
             K32W_LOG("pb2 release");
-            if(!sWasDimmerTriggered)
-            {
-                ButtonEventHandler(LIGHT_SWITCH_BUTTON, LIGHT_SWITCH_ONOFF_BUTTON_PUSH);
-            }
-            sWasDimmerTriggered = false;
-            sFirstDimmerOn = false;
+            ButtonEventHandler(LIGHT_SWITCH_BUTTON, LIGHT_SWITCH_ONOFF_BUTTON_RELEASE);
             break;
         case gKBD_EventReleasePB3_c:
             ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
@@ -521,7 +513,6 @@ void AppTask::HandleKeyboard(void)
             break;
 
         case gKBD_EventHoldPB1_c:
-
             sFactoryResetButtonPressTimeout++;
             K32W_LOG("sFactoryResetButtonPressTimeout:%d", sFactoryResetButtonPressTimeout);
             if(sFactoryResetButtonPressTimeout >= FACTORY_RESET_BUTTON_PRESS_TIMEOUT)
@@ -619,13 +610,21 @@ void AppTask::ResetActionEventHandler(void * aGenericEvent)
 
 void AppTask::SwitchActionEventHandler(void * aGenericEvent)
 {
+    static bool mCurrentButtonState = false;
     AppEvent * aEvent                   = (AppEvent *) aGenericEvent;
-    if (aEvent->Type == AppEvent::kEventType_Button)
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
+    if (aEvent->ButtonEvent.Action == LIGHT_SWITCH_ONOFF_BUTTON_PUSH)
     {
-        BindingCommandData * data = Platform::New<BindingCommandData>();
-        data->clusterId           = chip::app::Clusters::OnOff::Id;
-        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
-        SwitchWorkerFunction(reinterpret_cast<intptr_t>(data));
+        mCurrentButtonState = !mCurrentButtonState;
+        LightSwitchMgr::LightSwitchAction action =
+            mCurrentButtonState ? LightSwitchMgr::LightSwitchAction::On : LightSwitchMgr::LightSwitchAction::Off;
+
+        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(action);
+        LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();
+    }
+    else if (aEvent->ButtonEvent.Action == LIGHT_SWITCH_ONOFF_BUTTON_RELEASE)
+    {
+        LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
     }
 }
 
