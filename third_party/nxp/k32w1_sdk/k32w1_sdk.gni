@@ -113,8 +113,6 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/wireless/framework/RNG",
       "${k32w1_sdk_root}/middleware/wireless/framework/Sensors",
       "${k32w1_sdk_root}/middleware/wireless/framework/LowPower",
-      "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source",
-      "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Interface",
       "${k32w1_sdk_root}/middleware/wireless/framework/ModuleInfo",
       "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Interface",
       "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source",
@@ -159,6 +157,13 @@ template("k32w1_sdk") {
 
       "${chip_root}/src/platform/nxp/k32w/k32w1",
     ]
+
+    if (chip_key_storage == "fwk_nvm") {
+        _sdk_include_dirs += [
+          "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source",
+          "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Interface"
+        ]
+    }
 
     if (sdk_release == 1) {
       _sdk_include_dirs += [
@@ -254,7 +259,6 @@ template("k32w1_sdk") {
       "gBleSetMacAddrFromVendorCommand_d=1",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
-      "CHIP_PLAT_NVM_SUPPORT=1",
       "mAdvertisingDefaultTxPower_c=0",  # default advertising TX power
       "mConnectionDefaultTxPower_c=0",  # default connection TX power
       "BLE_HIGH_TX_POWER=0",  # when enabled overwrite default tx power with
@@ -501,7 +505,6 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/wireless/framework/HWParameter/HWParameter.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR_systicks.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
       "${k32w1_sdk_root}/middleware/wireless/framework/RNG/RNG.c",
@@ -552,6 +555,12 @@ template("k32w1_sdk") {
 
     if (chip_with_low_power == 1) {
       sources += []
+    }
+
+    if (chip_key_storage == "fwk_nvm") {
+      sources += [
+        "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c"
+      ]
     }
 
     if (!defined(public_deps)) {

@@ -46,18 +46,27 @@ static_library("nxp_platform") {
     "DefaultTestEventTriggerDelegate.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "K32W1Config.cpp",
-    "K32W1Config.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "ble_function_mux.c",
-    "ram_storage.c",
-    "ram_storage.h",
+    "ble_function_mux.c"
   ]
+
+  if (chip_key_storage == "fwk_nvm") {
+    defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
+
+    sources += [
+      "K32W1Config.cpp",
+      "K32W1Config.h",
+      "ram_storage.c",
+      "ram_storage.h"
+    ]
+  } else if (chip_key_storage == "littlefs") {
+    defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
+  }
 
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
@@ -109,7 +118,7 @@ static_library("nxp_platform") {
     ]
 
     if (chip_convert_dac_private_key == 1) {
-      defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+      defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
     }
   }
 

@@ -23,6 +23,9 @@ declare_args() {
   sdk_release = 1
   chip_ot_commit = "d4155e4e5f2a74cc50a545aa3dfb78f558dc117b"
   chip_ot_nxp_commit = "178ac9ade856fb31cbd5b8aa989dec2b6251e37d"
+  # The key storage solution. Developers can select between "littlefs" and the
+  # older "fwk_nvm".
+  chip_key_storage = "fwk_nvm"
 }
 
 nxp_platform = "k32w/k32w1"
