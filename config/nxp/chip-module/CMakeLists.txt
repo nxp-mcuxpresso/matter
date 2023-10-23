@@ -122,6 +122,7 @@ matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
 matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
 matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_CHIP_WIFI)
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
+matter_add_gn_arg_bool  ("enable_eventlist_attribute"             TRUE)
 
 if(CONFIG_DEBUG)
     matter_add_gn_arg_bool("optimize_debug" true)
