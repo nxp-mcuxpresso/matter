@@ -49,8 +49,8 @@ public:
     // the implementation methods provided by this class.
     friend BLEManager;
 
-    CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) override;
-    BLEManagerCommon * GetImplInstance() override;
+    CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) override;
+    BLEManagerCommon* GetImplInstance() override;
 
 private:
     static BLEManagerImpl sInstance;
