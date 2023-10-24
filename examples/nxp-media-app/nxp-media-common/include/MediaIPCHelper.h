@@ -1,20 +1,29 @@
 #ifndef MEDIA_IPC_HELPER_H
 #define MEDIA_IPC_HELPER_H
 
+#include <stdlib.h>
+#include <cstdint>
+#include <string>
+#include <app/clusters/media-playback-server/media-playback-server.h>
+
+using namespace chip::app::Clusters::MediaPlayback;
+
 class MediaIPCHelper {
 public:
-  static MediaIPCHelper* GetInstance();
-
-  int Init();
-
-  int Notify(char* str);
-
-  int GetACK();
-
-  void Release();
+    static MediaIPCHelper* GetInstance();
+    int Init();
+    int Notify(char* str);
+    int GetACK();
+    void Release();
+    uint64_t GetDuration();
+    uint64_t GetPosition();
+    PlaybackStateEnum GetCurrentStatus();
+    float GetPlaybackSpeed();
 
 private:
-  MediaIPCHelper();
+    MediaIPCHelper();
+    std::string Query(char *str);
+    uint64_t GPlayTimeDivide = 1000000; //GPlay use ns instead of ms
 };
 
 static MediaIPCHelper* gMediaIPCHelper = MediaIPCHelper::GetInstance();
