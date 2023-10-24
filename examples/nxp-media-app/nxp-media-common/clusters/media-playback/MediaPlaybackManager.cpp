@@ -28,45 +28,57 @@ using chip::CharSpan;
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
+    mCurrentState = gMediaIPCHelper->GetCurrentStatus();
     return mCurrentState;
 }
 
 uint64_t MediaPlaybackManager::HandleGetStartTime()
 {
-    return mStartTime;
+    return 0;
 }
 
 uint64_t MediaPlaybackManager::HandleGetDuration()
 {
+    mDuration = gMediaIPCHelper->GetDuration();
     return mDuration;
 }
 
 CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
+    auto position = gMediaIPCHelper->GetPosition();
+    mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     return aEncoder.Encode(mPlaybackPosition);
 }
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
+    mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
     return mPlaybackSpeed;
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
 {
-    return mStartTime;
+    return 0;
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 {
+    mDuration = gMediaIPCHelper->GetDuration();
     return mDuration;
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = 1;
-    gMediaIPCHelper->Notify("p");
+    gMediaIPCHelper->Notify("c 1");
+    mCurrentState = gMediaIPCHelper->GetCurrentStatus();
+
+    //If paused, then resume, else play from very begining
+    if (mCurrentState == PlaybackStateEnum::kPaused)
+        gMediaIPCHelper->Notify("a");
+    else
+        gMediaIPCHelper->Notify("p");
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -77,8 +89,8 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState  = PlaybackStateEnum::kPaused;
     mPlaybackSpeed = 0;
+    gMediaIPCHelper->Notify("c 1");
     gMediaIPCHelper->Notify("a");
 
     Commands::PlaybackResponse::Type response;
@@ -90,8 +102,8 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState     = PlaybackStateEnum::kNotPlaying;
     mPlaybackSpeed    = 0;
+    gMediaIPCHelper->Notify("c 1");
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     gMediaIPCHelper->Notify("s");
 
@@ -104,7 +116,9 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
+    char buf[10] = {0};
+    mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
+    if (mPlaybackSpeed >= kPlaybackMaxForwardSpeed)
     {
         // if already at max speed, return error
         Commands::PlaybackResponse::Type response;
@@ -114,13 +128,14 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
         return;
     }
 
-    mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
     if (mPlaybackSpeed > kPlaybackMaxForwardSpeed)
     {
         // don't exceed max speed
         mPlaybackSpeed = kPlaybackMaxForwardSpeed;
     }
+    sprintf(buf, "c %1.2f", mPlaybackSpeed);
+    gMediaIPCHelper->Notify(buf);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -131,8 +146,8 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState     = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed    = 1;
+    gMediaIPCHelper->Notify("<");
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
     Commands::PlaybackResponse::Type response;
@@ -144,7 +159,9 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
+    char buf[10] = {0};
+    mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
+    if (mPlaybackSpeed <= kPlaybackMaxRewindSpeed)
     {
         // if already at max speed in reverse, return error
         Commands::PlaybackResponse::Type response;
@@ -154,13 +171,14 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
         return;
     }
 
-    mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
     if (mPlaybackSpeed < kPlaybackMaxRewindSpeed)
     {
         // don't exceed max rewind speed
         mPlaybackSpeed = kPlaybackMaxRewindSpeed;
     }
+    sprintf(buf, "c %1.2f", mPlaybackSpeed);
+    gMediaIPCHelper->Notify(buf);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -172,10 +190,17 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
                                               const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
+    auto position = gMediaIPCHelper->GetPosition();
+    mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     uint64_t newPosition = (mPlaybackPosition.position.Value() > deltaPositionMilliseconds
                                 ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
                                 : 0);
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+    uint64_t positionSeconds = newPosition/1000;
+    char buf[80] = {0};
+
+    sprintf(buf, "e 0 t%ld", positionSeconds);
+    gMediaIPCHelper->Notify(buf);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -187,9 +212,17 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
                                              const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
+    auto position = gMediaIPCHelper->GetPosition();
+    mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
-    newPosition          = newPosition > mDuration ? mDuration : newPosition;
+    auto duration = gMediaIPCHelper->GetDuration();
+    newPosition          = newPosition > duration ? duration : newPosition;
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+
+    uint64_t positionSeconds = newPosition/1000;
+    char buf[80] = {0};
+    sprintf(buf, "e 0 t%ld", positionSeconds);
+    gMediaIPCHelper->Notify(buf);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -200,7 +233,9 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                       const uint64_t & positionMilliseconds)
 {
+    ChipLogError(NotSpecified,"sendrolon HandleSeek positionMilliseconds=%ld", positionMilliseconds);
     // TODO: Insert code here
+    mDuration = gMediaIPCHelper->GetDuration();
     if (positionMilliseconds > mDuration)
     {
         Commands::PlaybackResponse::Type response;
@@ -211,6 +246,11 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
     else
     {
         mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds) };
+        uint64_t positionSeconds = positionMilliseconds/1000;
+        char buf[80] = {0};
+
+        sprintf(buf, "e 0 t%ld", positionSeconds);
+        gMediaIPCHelper->Notify(buf);
 
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -222,8 +262,8 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
-    mCurrentState     = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed    = 1;
+    gMediaIPCHelper->Notify("c 1");
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
     gMediaIPCHelper->Notify(">");
@@ -238,7 +278,8 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 {
     // TODO: Insert code here
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
-    gMediaIPCHelper->Notify("e 0 t0");
+    gMediaIPCHelper->Notify("s");
+    gMediaIPCHelper->Notify("p");
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
