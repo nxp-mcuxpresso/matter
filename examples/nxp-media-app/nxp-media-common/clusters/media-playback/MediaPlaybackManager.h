@@ -64,8 +64,8 @@ protected:
     // Magic number for testing.
     uint64_t mDuration = 80000;
 
-    static const int kPlaybackMaxForwardSpeed = 10;
-    static const int kPlaybackMaxRewindSpeed  = -10;
+    static constexpr float kPlaybackMaxForwardSpeed = 10;
+    static constexpr float kPlaybackMaxRewindSpeed  = -10;
 
 private:
     // TODO: set this based upon meta data from app
