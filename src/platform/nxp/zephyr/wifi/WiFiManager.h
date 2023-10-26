@@ -239,6 +239,7 @@ private:
     ScanResultCallback mScanResultCallback{ nullptr };
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};
+    WiFiNetwork mNetworkToScan{};
     bool mInternalScan{ false };
     uint8_t mRouterSolicitationCounter = 0;
     bool mSsidFound{ false };

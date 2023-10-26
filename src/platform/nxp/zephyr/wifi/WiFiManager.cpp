@@ -210,6 +210,16 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     // TODO Workaround for recovery mechanism to wait before the next scan request until the WiFi supplicant is not busy.
     static bool workaroundDone;
 
+    /* If the ssid is not null, it means the scan must target a specific SSID, and only include this one in the scan
+     * result. To do so, we save the requested ssid and we will filter the scan results accordingly in the scan done
+     * handler. */
+    if ((ssid.size() > 0) && (!mInternalScan))
+    {
+        mNetworkToScan.Erase();
+        memcpy(mNetworkToScan.ssid, ssid.data(), ssid.size());
+        mNetworkToScan.ssidLen = ssid.size();
+    }
+
     int ret = net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0);
 
     if (ret)
@@ -380,7 +390,16 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data)
 
     if (Instance().mScanResultCallback && !Instance().mInternalScan)
     {
-        Instance().mScanResultCallback(ToScanResponse(scanResult));
+        /* Here we need to check if the scan is targeting a specific network and filter the scan result accordingly,
+         * to make sure only the targeted SSID is reported */
+        if (Instance().mNetworkToScan.GetSsidSpan().size() == 0)
+        {
+            Instance().mScanResultCallback(ToScanResponse(scanResult));
+        }
+        else if (Instance().mNetworkToScan.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)))
+        {
+            Instance().mScanResultCallback(ToScanResponse(scanResult));
+        }
     }
 }
 
@@ -391,6 +410,12 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
         uint8_t * rawData               = safePtr.get();
         const wifi_status * status      = reinterpret_cast<const wifi_status *>(rawData);
         WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
+
+        /* Reset the specific network to scan */
+        if(Instance().mNetworkToScan.GetSsidSpan().size() > 0)
+        {
+            Instance().mNetworkToScan.Erase();
+        }
 
         if (requestStatus == WiFiRequestStatus::FAILURE)
         {
