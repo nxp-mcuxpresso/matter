@@ -57,20 +57,22 @@ The example targets the [NXP MIMXRT1170-EVKB](https://www.nxp.com/part/MIMXRT117
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
-- Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md) to setup the environement to be able to build Matter.
+-   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
+    to setup the environment to be able to build Matter.
 
--   Download the [IMXRT1170 SDK](https://mcuxpresso.nxp.com/).
-  Creating an nxp.com account is required before being able to download the
-  SDK. Once the account is created, login and follow the steps for downloading
-  SDK. The SDK Builder UI selection should be similar with the one from the image below with the **FreeRTOS component**, the **BT/BLE component** and the **ARM GCC Toolchain** selected.
+-   Download [RT1170+IW61X SDK v2.13.3](https://mcuxpresso.nxp.com/en/select).
+    Creating an nxp.com account is required before being able to download the
+    SDK. Once the account is created, login and follow the steps for downloading
+    SDK. The SDK Builder UI selection should be similar with the one from the
+    image below. In case you do not have access to the SDK, please ask your NXP
+    representative.
 
 ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rt1170/doc/images/mcux-sdk-download.png)
 
-Please refer to release notes for getting the latest released SDK.
+    (Note: All SDK components should be selected. If size is an issue Azure RTOS
+    component can be omitted.)
 
-Note: if the IWX12 transceiver is chosen a dedicated SDK with this support should be chosen.
-
--   Start building the application
+-   Start building the application.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/path/to/previously/downloaded/SDK
