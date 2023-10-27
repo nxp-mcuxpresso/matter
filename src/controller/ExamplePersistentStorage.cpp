@@ -293,6 +293,29 @@ CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId value)
     return SyncSetKeyValue(kLocalNodeIdKey, &nodeId, sizeof(nodeId));
 }
 
+#if CHIP_WITH_WEBUI
+NodeId PersistentStorage::GetLocalKeyNodeId(const char * key)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint64_t nodeId;
+    uint16_t size = static_cast<uint16_t>(sizeof(nodeId));
+    err           = SyncGetKeyValue(key, &nodeId, size);
+    if (err == CHIP_NO_ERROR)
+    {
+        return static_cast<NodeId>(Encoding::LittleEndian::HostSwap64(nodeId));
+    }
+
+    return kTestControllerNodeId;
+}
+
+CHIP_ERROR PersistentStorage::SetLocalKeyNodeId(const char * key, NodeId value)
+{
+    uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
+    return SyncSetKeyValue(key, &nodeId, sizeof(nodeId));
+}
+#endif
+
 CATValues PersistentStorage::GetCommissionerCATs()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
