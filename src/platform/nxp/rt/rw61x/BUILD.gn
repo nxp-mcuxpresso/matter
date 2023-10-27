@@ -36,6 +36,11 @@ config("nxp_platform_config") {
     defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
     defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
   }
+  if (chip_enable_wifi && chip_enable_openthread)
+  {
+    # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
+    defines += [ "_NO_NETWORK_COMMISSIONING_DRIVER_" ]
+  }
 }
 
 static_library("nxp_platform") {
@@ -118,11 +123,16 @@ static_library("nxp_platform") {
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
     if (chip_mdns == "platform") {
+      if (chip_enable_wifi) {
+        sources += [ "../../common/DnssdImpl.cpp" ]
+      }
+      else {
       sources += [
         "../../../OpenThread/DnssdImpl.cpp",
         "../../../OpenThread/OpenThreadDnssdImpl.cpp",
         "../../../OpenThread/OpenThreadDnssdImpl.h",
       ]
+      }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }

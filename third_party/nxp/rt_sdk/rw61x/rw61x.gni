@@ -233,6 +233,7 @@ template("rw61x_sdk_drivers") {
       "gPlatformMonolithicApp_d=1",
     ]
 
+
     if (board_version != "A1") {
       defines += [ "RW610_A1=0" ]
     }
