@@ -57,6 +57,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/cluster/Commands.h>
 
+#include <controller/ExamplePersistentStorage.h>
+
 using namespace std;
 // Added for the json-example:
 using namespace boost::property_tree;
@@ -88,6 +90,7 @@ void default_resource_send(const HttpServer & server, const shared_ptr<HttpServe
 Commands commands;
 bool inited = false;
 ExampleCredentialIssuerCommands credIssuerCommands;
+PersistentStorage webCommissionerStorage;
 int chipToolInit()
 {
     if (inited)
@@ -176,9 +179,39 @@ void enableFifo()
     }
 }
 
+ptree getStorageKeyNodeID()
+{
+    ptree storageNodes;
+    const char * storageWebDirectory = webCommissionerStorage.GetDirectory();
+    std::string storageWebFile = std::string(storageWebDirectory) + "/chip_tool_config.web.ini";
+    std::ifstream ifs(storageWebFile, std::ios::in);
+    if (!ifs.is_open())
+    {
+        ChipLogError(NotSpecified, "Failed to open storage file chip_tool_config.web.ini.");
+        return ptree();
+    }
+    std::string line;
+    std::getline(ifs, line);
+    while(std::getline(ifs, line))
+    {
+        size_t equalsPos = line.find('=');
+        if (equalsPos != std::string::npos)
+        {
+            std::string storageNodeAlias = line.substr(0, equalsPos);
+            chip::NodeId storageNodeId =  webCommissionerStorage.GetLocalKeyNodeId(storageNodeAlias.c_str());
+            storageNodes.put(storageNodeAlias.c_str(), static_cast<int>(storageNodeId));
+        }
+    }
+    ifs.close();
+
+    ChipLogError(NotSpecified, "Get web local storage node alias and nodeID successfully.");
+    return storageNodes;
+}
+
 void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
 {
     string report_text;
+    ptree storageNodes = getStorageKeyNodeID();
     while (true)
     {
         std::lock_guard<std::mutex> lock(sq_mutex);
@@ -187,7 +220,16 @@ void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr 
             //std::lock_guard<std::mutex> lock(sq_mutex);
             ChipReport r = SubscribeBuffers::DequeueReport();
             stringstream report_ss;
-            report_ss << "Subscribe Report from " << r.nodeid << ": " << r.endpoint << ". "
+            string nodeAlias;
+            for (const auto& pair : storageNodes)
+            {
+                if (pair.second.get_value<int>() == r.nodeid)
+                {
+                    nodeAlias = pair.first;
+                    break;
+                }
+            }
+            report_ss << "Subscribe Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
                       << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
             report_text = report_ss.str();
             try
@@ -225,6 +267,7 @@ int main()
     // Unless you do more heavy non-threaded processing in the resources,
     // 1 thread is usually faster than several threads
     chipToolInit();
+    webCommissionerStorage.Init("web");
     HttpServer server;
     server.config.port = 8889;
     // Initialize and execute a child thread
@@ -308,34 +351,43 @@ int main()
             auto nodeId  = root.get<string>("nodeId");
             auto pinCode = root.get<string>("pinCode");
             auto type  = root.get<string>("type");
-            ChipLogError(NotSpecified, "Received POST request for pairing with Node ID: %s, PIN Code: %s, Type: %s",
-            nodeId.c_str(), pinCode.c_str(), type.c_str());
-            std::string command;
-            if (type == "onnetwork") {
-                command = "pairing onnetwork " + nodeId + " " + pinCode;
-            } else if (type == "ble-wifi") {
-                auto ssId = root.get<string>("ssId");
-                auto password = root.get<string>("password");
-                auto discriminator = root.get<string>("discriminator");
-                command = "pairing ble-wifi " + nodeId + " " + ssId + " " + password + " " + pinCode + " " + discriminator;
-            } else if (type == "ble-thread") {
-                auto dataset = root.get<string>("dataset");
-                auto discriminator = root.get<string>("discriminator");
-                command = "pairing ble-thread " + nodeId + " hex:" + dataset + " " + pinCode + " " + discriminator;
-            }
-            // Get the time before executing the command
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
+            auto nodeAlias = root.get<string>("nodeAlias");
+            if(webCommissionerStorage.SyncDoesKeyExist(nodeAlias.c_str())){
                 root.put("result", RESPONSE_FAILURE);
+                root.put("cause", "repeat nodeAlias");
             } else {
-                root.put("result", RESPONSE_SUCCESS);
-            }
-            // Get the end time of the command and calculate the difference with the start time (in seconds)
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            // Set the value in root according to the timeout: 60s
-            if (elapsed_seconds > 60) {
-                root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Received POST request for pairing with Node ID: %s, PIN Code: %s, Type: %s",
+                nodeId.c_str(), pinCode.c_str(), type.c_str());
+                std::string command;
+                if (type == "onnetwork") {
+                    command = "pairing onnetwork " + nodeId + " " + pinCode;
+                } else if (type == "ble-wifi") {
+                    auto ssId = root.get<string>("ssId");
+                    auto password = root.get<string>("password");
+                    auto discriminator = root.get<string>("discriminator");
+                    command = "pairing ble-wifi " + nodeId + " " + ssId + " " + password + " " + pinCode + " " + discriminator;
+                } else if (type == "ble-thread") {
+                    auto dataset = root.get<string>("dataset");
+                    auto discriminator = root.get<string>("discriminator");
+                    command = "pairing ble-thread " + nodeId + " hex:" + dataset + " " + pinCode + " " + discriminator;
+                }
+                // Get the time before executing the command
+                auto start_time = std::chrono::steady_clock::now();
+                if (chipToolInteractiveCommand(command.c_str())) {
+                    root.put("result", RESPONSE_FAILURE);
+                } else {
+                    root.put("result", RESPONSE_SUCCESS);
+                    chip::NodeId nodeIdStorage = std::stoul(nodeId);
+                    const char * nodeAliasStorage = nodeAlias.c_str();
+                    webCommissionerStorage.SetLocalKeyNodeId(nodeAliasStorage, nodeIdStorage);
+                }
+                // Get the end time of the command and calculate the difference with the start time (in seconds)
+                auto end_time = std::chrono::steady_clock::now();
+                auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+                // Set the value in root according to the timeout: 60s
+                if (elapsed_seconds > 60) {
+                    root.put("result", RESPONSE_FAILURE);
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -393,7 +445,17 @@ int main()
             {
                 ChipReport r = ReportBuffers::DequeueReport();
                 stringstream report_ss;
-                report_ss << "Report from " << r.nodeid << ": " << r.endpoint << ". "
+                ptree storageNodes = getStorageKeyNodeID();
+                string nodeAlias;
+                for (const auto& pair : storageNodes)
+                {
+                    if (pair.second.get_value<int>() == r.nodeid)
+                    {
+                        nodeAlias = pair.first;
+                        break;
+                    }
+                }
+                report_ss << "Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
                                 << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
                 report_text = report_ss.str();
                 root.put("result", RESPONSE_SUCCESS);
@@ -483,6 +545,71 @@ int main()
                 root.put("result", RESPONSE_SUCCESS);
             }
 
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception &e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
+    server.resource["^/get_status$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            ptree storageNodes;
+            ChipLogError(NotSpecified, "Received GET request for get status");
+            auto start_time = std::chrono::steady_clock::now();
+            try{
+                storageNodes = getStorageKeyNodeID();
+                root.put("result", RESPONSE_SUCCESS);
+                root.add_child("status", storageNodes);
+            } catch (const exception & e)
+            {
+                ChipLogError(NotSpecified, "GET request for get status failed");
+                root.put("result", RESPONSE_FAILURE);
+            }
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception & e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
+    server.resource["^/delete_storageNode$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            auto nodeAlias  = root.get<string>("nodeAlias");
+            ChipLogError(NotSpecified, "Received POST request to delete storage node with node alias: %s", nodeAlias.c_str());
+            auto start_time = std::chrono::steady_clock::now();
+            try
+            {
+                webCommissionerStorage.SyncDeleteKeyValue(nodeAlias.c_str());
+                root.put("result", RESPONSE_SUCCESS);
+            } catch (const exception & e)
+            {
+                ChipLogError(NotSpecified, "Delete storage node with nodeAlias: %s failed", nodeAlias.c_str());
+                root.put("result", RESPONSE_FAILURE);
+            }
             auto end_time = std::chrono::steady_clock::now();
             auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
             if (elapsed_seconds > 60) {
