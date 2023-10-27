@@ -124,14 +124,14 @@ private:
     }
 #endif
 public:
-    struct ChipReport SetGenerateReport(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data, NodeId nodeid)
-    {
-        return GenerateReport(path, data, nodeid);
-    }
     ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         InteractionModelReports(this), ModelCommand(commandName, credsIssuerConfig, /* supportsMultipleEndpoints = */ true)
     {}
     #if CHIP_WITH_WEBUI
+    struct ChipReport SetGenerateReport(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data, NodeId nodeid)
+    {
+        return GenerateReport(path, data, nodeid);
+    }
     NodeId mPeerNodeId;
     void SetPeerNodeId(NodeId nodeId) override
     {
