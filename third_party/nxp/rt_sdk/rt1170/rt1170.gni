@@ -201,6 +201,7 @@ template("rt1170_sdk_drivers") {
       ]
     }
 
+
     if (chip_enable_matter_cli) {
       #When the CLI is enabled the debug console should be moved in UART2 for RT1170
       defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]

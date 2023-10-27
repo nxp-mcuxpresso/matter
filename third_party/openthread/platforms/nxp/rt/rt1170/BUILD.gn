@@ -27,12 +27,27 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_rt1170_config") {
   include_dirs = [
     "${openthread_nxp_root}/src/common",
+    "${openthread_nxp_root}/src/common/br",
     "${openthread_nxp_root}/src/imx_rt/rt1170",
     "${openthread_nxp_root}/third_party/mbedtls/configs",
     "${openthread_root}/third_party/mbedtls",
     "${openthread_root}/examples/platforms",
   ]
   defines = [ "OT_PLAT_SPINEL_OVER_SPI" ]
+  
+  if (chip_enable_wifi && chip_enable_openthread) {
+    defines = [
+      "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
+      "OPENTHREAD_CONFIG_MDNS_SERVER_ENABLE=1",
+      "OPENTHREAD_CONFIG_PLATFORM_UDP_ENABLE=1",
+      "OPENTHREAD_CONFIG_BACKBONE_ROUTER_ENABLE=1",
+      "OPENTHREAD_CONFIG_MAX_STATECHANGE_HANDLERS=3",
+      "OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE=1",
+      "OPENTHREAD_CONFIG_BORDER_AGENT_ID_ENABLE=1",
+    ]
+  }
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
@@ -51,6 +66,14 @@ source_set("libopenthread-rt1170") {
     "${openthread_nxp_root}/src/common/spinel/system.c",
     "${openthread_root}/src/lib/hdlc/hdlc.cpp",
   ]
+
+  if (chip_enable_wifi && chip_enable_openthread) {
+    sources += [
+    "${openthread_nxp_root}/src/common/br/infra_if.c",
+    "${openthread_nxp_root}/src/common/br/udp_plat.c",
+    "${openthread_nxp_root}/src/common/br/border_agent.c",
+    ]
+  }
 
   if (rt_nvm_component == "nvm_fwk") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
