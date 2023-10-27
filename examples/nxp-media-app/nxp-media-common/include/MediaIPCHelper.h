@@ -8,6 +8,11 @@
 
 using namespace chip::app::Clusters::MediaPlayback;
 
+enum class ServiceActiveState {
+    Active,
+    Inactive,
+    Unknown
+};
 class MediaIPCHelper {
 public:
     static MediaIPCHelper* GetInstance();
@@ -19,6 +24,10 @@ public:
     uint64_t GetPosition();
     PlaybackStateEnum GetCurrentStatus();
     float GetPlaybackSpeed();
+
+    int StartPlayer();
+    int StopPlayer();
+    ServiceActiveState PlayerStatus();
 
 private:
     MediaIPCHelper();
