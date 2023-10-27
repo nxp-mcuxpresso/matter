@@ -16,13 +16,17 @@
  *    limitations under the License.
  */
 
+#include <protocols/interaction_model/StatusCode.h>
 #include "ApplicationLauncherManager.h"
+#include "MediaIPCHelper.h"
+#include <protocols/interaction_model/Constants.h>
 
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 using namespace chip::Uint8;
+using chip::Protocols::InteractionModel::Status;
 
 CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncoder & aEncoder)
 {
@@ -39,9 +43,13 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
 void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                                  const ApplicationType & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp application.catalogVendorID=%u, applicationID=%u", application.catalogVendorID, application.applicationID);
 
     // TODO: Insert code here
+    if (gMediaIPCHelper->StartPlayer()) {
+        helper.Failure(Status::Failure);
+        return;
+    }
     LauncherResponseType response;
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
@@ -55,6 +63,10 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
     // TODO: Insert code here
+    if (gMediaIPCHelper->StopPlayer()) {
+        helper.Failure(Status::Failure);
+        return;
+    }
     LauncherResponseType response;
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));

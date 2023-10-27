@@ -14,6 +14,34 @@
 using namespace std;
 using namespace chip::app::Clusters::MediaPlayback;
 
+int MediaIPCHelper::StartPlayer() {
+    int ret = system("systemctl start gplay_matter");
+    if (ret != 0) {
+        ChipLogError(NotSpecified,"gplay_matter start failed: %d", ret);
+    }
+    return ret;
+}
+
+int MediaIPCHelper::StopPlayer() {
+    int ret = system("systemctl stop gplay_matter");
+    if (ret != 0) {
+        ChipLogError(NotSpecified,"gplay_matter stop failed: %d", ret);
+    }
+    return ret;
+}
+
+ServiceActiveState MediaIPCHelper::PlayerStatus() {
+    int ret = system("systemctl is-active gplay_matter");
+    if (ret == 0) {
+        return ServiceActiveState::Active;
+    } else if (ret == 3) {
+        return ServiceActiveState::Inactive;
+    } else {
+        ChipLogError(NotSpecified,"gplay_matter is-active failed: %d", ret);
+        return ServiceActiveState::Unknown;
+    }
+}
+
 MediaIPCHelper* MediaIPCHelper::GetInstance() {
     static MediaIPCHelper instance;
     return &instance;
