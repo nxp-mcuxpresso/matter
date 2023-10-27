@@ -103,7 +103,7 @@
                 show: false,
             },
             {
-                title: 'Status',
+                title: 'GetStatus',
                 icon: 'info_outline',
                 show: false,
             },
@@ -122,6 +122,7 @@
 
         $scope.pairing = {
             nodeId: '1',
+            nodeAlias: 'Light1',
             pinCode: '20202021',
             ssId: 'xyz',
             password: 'secret',
@@ -149,10 +150,18 @@
             endPointId: 1,
         };
 
+        $scope.storageStatus = {
+            icon: 'res/img/icon-info.png',
+            status: {},
+        };
+
         $scope.headerTitle = 'Home';
         $scope.status = [];
         $scope.reports = [];
         $scope.subscribeStatus = [];
+
+        $scope.selectedNodeAlias = '';
+        $scope.selectedNodeId = '';
 
         $scope.isLoading = false;
 
@@ -164,6 +173,20 @@
             }
 
             $scope.menu[index].show = true;
+
+            if (index > 1 && index < 6) {
+                var httpGetStatusReq = $http({
+                    method: 'GET',
+                    url: 'get_status',
+                });
+                httpGetStatusReq.then(function successCallback(response) {
+                    $scope.showLoadingSpinner = false;
+                    console.log(response);
+                    if (response.data.result == "successful") {
+                        $scope.storageStatus.status = response.data.status;
+                    }
+                });
+            }
         };
 
         $scope.showsubPanels = function(index) {
@@ -188,6 +211,19 @@
             );
         };
 
+        $scope.showFailCauseAlert = function(ev, operation, result) {
+            $mdDialog.show(
+                $mdDialog.alert()
+                .parent(angular.element(document.querySelector('#popupContainer')))
+                .clickOutsideToClose(true)
+                .title('Information')
+                .textContent(operation + ' operation is ' + result)
+                .ariaLabel('Alert Dialog Demo')
+                .ok('Okay')
+                .targetEvent(ev)
+            );
+        };
+
         $scope.onNetwork = function(ev) {
             var confirm = $mdDialog.confirm()
                 .title('Are you sure you want to pairing a device over IP?')
@@ -200,6 +236,7 @@
                 $scope.showLoadingSpinner = true;
                 var data = {
                     nodeId: $scope.pairing.nodeId,
+                    nodeAlias: $scope.pairing.nodeAlias,
                     pinCode: $scope.pairing.pinCode,
                     type: $scope.pairing.type_onnetwork,
                 };
@@ -214,7 +251,11 @@
                     if (response.data.result == "successful") {
                         $scope.showAlert(event, 'Onnetwork', 'success');
                     } else {
-                        $scope.showAlert(event, 'Onnetwork', 'failed');
+                        if (response.data.cause == "repeat nodeAlias"){
+                            $scope.showAlert(event, 'Onnetwork', 'failed because this nodeAlias already exists, please rename the nodeAlias!');
+                        } else {
+                            $scope.showAlert(event, 'Onnetwork', 'failed');
+                        }
                     }
                     ev.target.disabled = false;
                 });
@@ -233,6 +274,7 @@
                 $scope.showLoadingSpinner = true;
                 var data = {
                     nodeId: $scope.pairing.nodeId,
+                    nodeAlias: $scope.pairing.nodeAlias,
                     ssId: $scope.pairing.ssId,
                     password: $scope.pairing.password,
                     pinCode: $scope.pairing.pinCode,
@@ -250,7 +292,11 @@
                     if (response.data.result == "successful") {
                         $scope.showAlert(event, 'ble-wifi', 'success');
                     } else {
-                        $scope.showAlert(event, 'ble-wifi', 'failed');
+                        if (response.data.cause == "repeat nodeAlias"){
+                            $scope.showAlert(event, 'ble-wifi', 'failed because this nodeAlias already exists, please rename the nodeAlias!');
+                        } else {
+                            $scope.showAlert(event, 'ble-wifi', 'failed');
+                        }
                     }
                     ev.target.disabled = false;
                 });
@@ -298,6 +344,7 @@
                 $scope.showLoadingSpinner = true;
                 var data = {
                     nodeId: $scope.pairing.nodeId,
+                    nodeAlias: $scope.pairing.nodeAlias,
                     dataset: $scope.pairing.dataset,
                     pinCode: $scope.pairing.pinCode,
                     discriminator: $scope.pairing.discriminator,
@@ -314,7 +361,11 @@
                     if (response.data.result == "successful") {
                         $scope.showAlert(event, 'ble-thread', 'success');
                     } else {
-                        $scope.showAlert(event, 'ble-thread', 'failed');
+                        if (response.data.cause == "repeat nodeAlias"){
+                            $scope.showAlert(event, 'ble-thread', 'failed because this nodeAlias already exists, please rename the nodeAlias!');
+                        } else {
+                            $scope.showAlert(event, 'ble-thread', 'failed');
+                        }
                     }
                     ev.target.disabled = false;
                 });
@@ -324,7 +375,7 @@
         $scope.turnOnLight = function(ev) {
             $scope.showLoadingSpinner = true;
             var data = {
-                nodeId: $scope.onoff.nodeId,
+                nodeId: $scope.selectedNodeId,
                 endPointId: $scope.onoff.endPointId,
                 type: $scope.onoff.type_on,
             };
@@ -348,7 +399,7 @@
         $scope.toggleLight = function(ev) {
             $scope.showLoadingSpinner = true;
             var data = {
-                nodeId: $scope.onoff.nodeId,
+                nodeId: $scope.selectedNodeId,
                 endPointId: $scope.onoff.endPointId,
                 type: $scope.onoff.type_toggle,
             };
@@ -372,7 +423,7 @@
         $scope.turnOffLight = function(ev) {
             $scope.showLoadingSpinner = true;
             var data = {
-                nodeId: $scope.onoff.nodeId,
+                nodeId: $scope.selectedNodeId,
                 endPointId: $scope.onoff.endPointId,
                 type: $scope.onoff.type_off,
             };
@@ -397,7 +448,7 @@
             $scope.showLoadingSpinner = true;
             var data = {
                 attr: $scope.onoff.attr,
-                nodeId: $scope.onoff.nodeId,
+                nodeId: $scope.selectedNodeId,
                 endPointId: $scope.onoff.endPointId,
                 type: $scope.onoff.type_read,
             };
@@ -442,7 +493,7 @@
         $scope.openBCM = function(ev) {
             $scope.showLoadingSpinner = true;
             var data = {
-                nodeId: $scope.multiadmin.nodeId,
+                nodeId: $scope.selectedNodeId,
                 option: $scope.multiadmin.option,
                 windowTimeout: $scope.multiadmin.windowTimeout,
                 iteration: $scope.multiadmin.iteration,
@@ -471,7 +522,7 @@
             console.log("New WebSocket connected.");
             $scope.showLoadingSpinner = true;
             ws.onopen = function(ev) {
-                var msg = $scope.subscribe.subscribe_cluster + ' ' + $scope.subscribe.minInterval + ' ' + $scope.subscribe.maxInterval + ' ' + $scope.subscribe.nodeId + ' ' + $scope.subscribe.endPointId;
+                var msg = $scope.subscribe.subscribe_cluster + ' ' + $scope.subscribe.minInterval + ' ' + $scope.subscribe.maxInterval + ' ' + $scope.selectedNodeId + ' ' + $scope.subscribe.endPointId;
                 ws.send(msg);
                 $scope.showLoadingSpinner = false;
             };
@@ -494,6 +545,43 @@
             };
         };
 
+        $scope.onNodeAliasChange = function() {
+            $scope.selectedNodeId = $scope.storageStatus.status[$scope.selectedNodeAlias];
+        }
+
+        $scope.deleteStorageNode = function(ev) {
+            var confirm = $mdDialog.confirm()
+                .title('This button will delete the stored provision nodeID. Before proceeding, please confirm the nodeAlias and nodeID that need to be deleted.')
+                .textContent('Are you sure you want to delete the storaged provisioned nodeid: ' + $scope.selectedNodeId +  ' with nodeAlias: ' + $scope.selectedNodeAlias)
+                .targetEvent(ev)
+                .ok('Okay')
+                .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function() {
+                $scope.showLoadingSpinner = true;
+                var data = {
+                    nodeAlias: $scope.selectedNodeAlias,
+                    nodeId: $scope.selectedNodeId,
+                }
+                var httpDeleteNodeReq = $http({
+                    method: 'POST',
+                    url: 'delete_storageNode',
+                    data: data,
+                });
+
+                httpDeleteNodeReq.then(function successCallback(response) {
+                    $scope.showLoadingSpinner = false;
+                    console.log(response);
+                    if (response.data.result == "successful") {
+                        $scope.showAlert(event, 'delete Provisioned Nodeid', 'success');
+                        $scope.storageStatus.status = response.data.status;
+                        $scope.selectedNodeId = '';
+                    } else {
+                        $scope.showAlert(event, 'delete Provisioned Nodeid', 'failed');
+                    }
+                });
+            });
+        };
         $scope.restServerPort = '8889';
         $scope.ipAddr = window.location.hostname + ':' + $scope.restServerPort;
     };

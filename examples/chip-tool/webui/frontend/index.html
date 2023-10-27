@@ -143,28 +143,40 @@
                     <label>Node ID</label>
                     <input required md-minlength="1" name="nodeId" ng-model="pairing.nodeId">
                     <div ng-messages="pairingForm.nodeId.$error">
-                    <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
-                    <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
-                  </div>
-                </md-input-container>
+                      <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
+                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                    </div>
+                  </md-input-container>
 
-                <md-input-container flex="50">
-                  <label>Pin Code</label>
-                  <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
-                  <div ng-messages="pairingForm.pinCode.$error">
-                    <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
-                    <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
-                  </div>
-                </md-input-container>
-              </div>
-              <div>
-                <md-button name="onnetworkButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="onNetwork($event)">OnNetwork</md-button>
-                <div class="loading-spinner" ng-show="showLoadingSpinner">
-                  <div class="spinner"></div>
+                  <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <input required md-minlength="1" name="nodeAlias" ng-model="pairing.nodeAlias">
+                    <div ng-messages="pairingForm.nodeAlias.$error">
+                      <div ng-message="required">This is the user-defined node alias of the node being commissioned.</div>
+                      <div ng-message="md-minlength">Node Alias is a string.</div>
+                    </div>
+                  </md-input-container>
                 </div>
-              </div>
-            </form>
-          </md-content>
+
+                <div layout="row">
+                  <md-input-container flex="100">
+                    <label>Pin Code</label>
+                    <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
+                    <div ng-messages="pairingForm.pinCode.$error">
+                      <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
+                      <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="onnetworkButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="onNetwork($event)">OnNetwork</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
         </div>
 
         <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[1].show && menu[1].subitems[1].show">
@@ -176,60 +188,70 @@
                     <label>Node ID</label>
                     <input required md-minlength="1" name="nodeId" ng-model="pairing.nodeId">
                     <div ng-messages="pairingForm.nodeId.$error">
-                    <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
-                    <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
-                  </div>
-                </md-input-container>
-
-                <md-input-container flex="50">
-                  <label>SSID</label>
-                  <input required md-minlength="1" name="ssId" ng-model="pairing.ssId">
-                  <div ng-messages="pairingForm.ssId.$error">
-                    <div ng-message="required">Wi-Fi SSID, with the form of string or hex:XXXXX.</div>
-                    <div ng-message="md-minlength">The SSID can be a string or hex data.</div>
-                  </div>
-                </md-input-container>
-              </div>
-
-              <div layout="row">
-                <md-input-container flex="50">
-                  <label>Password</label>
-                  <input required md-minlength="6" name="password" ng-model="pairing.password">
-                  <div ng-messages="pairingForm.password.$error">
-                    <div ng-message="required">Wi-Fi password, with the form of string or hex:XXXXX.</div>
-                    <div ng-message="md-minlength">Password can be a string with the length between 6-255 or a hex data.</div>
-                  </div>
-                </md-input-container>
-
-                <md-input-container flex="50">
-                  <label>Pin Code</label>
-                  <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
-                  <div ng-messages="pairingForm.pinCode.$error">
-                    <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
-                    <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
-                  </div>
-                </md-input-container>
-              </div>
-
-              <div layout="row">
-                <md-input-container flex="100">
-                  <label>Discriminator</label>
-                  <input required name="discriminator" ng-model="pairing.discriminator">
-                  <div ng-messages="pairingForm.discriminator.$error">
-                    <div ng-message="required">
-                      The discriminator is a 12-bit value used by matter to discern between multiple commissionable device advertisements authenticate the device. You can find the value in the logging terminal of the device when the device boots up.
+                      <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
+                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
                     </div>
-                  </div>
-                </md-input-container>
-              </div>
-              <div>
-                <md-button name="bleWifiButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="bleWifi($event)">Ble-wifi</md-button>
-                <div class="loading-spinner" ng-show="showLoadingSpinner">
-                  <div class="spinner"></div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <input required md-minlength="1" name="nodeAlias" ng-model="pairing.nodeAlias">
+                    <div ng-messages="pairingForm.nodeAlias.$error">
+                      <div ng-message="required">This is the user-defined node alias of the node being commissioned.</div>
+                      <div ng-message="md-minlength">Node Alias is a string.</div>
+                    </div>
+                  </md-input-container>
                 </div>
-              </div>
-            </form>
-          </md-content>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>SSID</label>
+                    <input required md-minlength="1" name="ssId" ng-model="pairing.ssId">
+                    <div ng-messages="pairingForm.ssId.$error">
+                      <div ng-message="required">Wi-Fi SSID, with the form of string or hex:XXXXX.</div>
+                      <div ng-message="md-minlength">The SSID can be a string or hex data.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Password</label>
+                    <input required md-minlength="6" name="password" ng-model="pairing.password">
+                    <div ng-messages="pairingForm.password.$error">
+                      <div ng-message="required">Wi-Fi password, with the form of string or hex:XXXXX.</div>
+                      <div ng-message="md-minlength">Password can be a string with the length between 6-255 or a hex data.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Pin Code</label>
+                    <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
+                    <div ng-messages="pairingForm.pinCode.$error">
+                      <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
+                      <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Discriminator</label>
+                    <input required name="discriminator" ng-model="pairing.discriminator">
+                    <div ng-messages="pairingForm.discriminator.$error">
+                      <div ng-message="required">
+                        The discriminator is a 12-bit value used by matter to discern between multiple commissionable device advertisements authenticate the device. You can find the value in the logging terminal of the device when the device boots up.
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="bleWifiButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="bleWifi($event)">Ble-wifi</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
         </div>
 
         <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[1].show && menu[1].subitems[2].show">
@@ -241,50 +263,62 @@
                     <label>Node ID</label>
                     <input required md-minlength="1" name="nodeId" ng-model="pairing.nodeId">
                     <div ng-messages="pairingForm.nodeId.$error">
-                    <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
-                    <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
-                  </div>
-                </md-input-container>
+                     <div ng-message="required">This is the user-defined ID of the node being commissioned.</div>
+                     <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                   </div>
+                  </md-input-container>
 
-                <md-input-container flex="50">
-                  <label>Dataset</label>
-                  <input required md-minlength="1" name="dataset" ng-model="pairing.dataset">
-                  <div ng-messages="pairingForm.dataset.$error">
-                    <div ng-message="required">This is the current Active Operational Dataset which can be fetched and stored from the otbr.</div>
-                    <div ng-message="md-minlength">Dataset can be obtained with the button 'Get-Dataset'.</div>
-                  </div>
-                </md-input-container>
-              </div>
-
-              <div layout="row">
-                <md-input-container flex="50">
-                  <label>Pin Code</label>
-                  <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
-                  <div ng-messages="pairingForm.pinCode.$error">
-                    <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
-                    <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
-                  </div>
-                </md-input-container>
-
-                <md-input-container flex="50">
-                  <label>Discriminator</label>
-                  <input required name="discriminator" ng-model="pairing.discriminator">
-                  <div ng-messages="pairingForm.discriminator.$error">
-                    <div ng-message="required">
-                      The discriminator is a 12-bit value used by matter to discern between multiple commissionable device advertisements authenticate the device. You can find the value in the logging terminal of the device when the device boots up.
+                  <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <input required md-minlength="1" name="nodeAlias" ng-model="pairing.nodeAlias">
+                    <div ng-messages="pairingForm.nodeAlias.$error">
+                      <div ng-message="required">This is the user-defined node alias of the node being commissioned.</div>
+                      <div ng-message="md-minlength">Node Alias is a string.</div>
                     </div>
-                  </div>
-                </md-input-container>
-              </div>
-              <div>
-                <md-button name="getDatasetButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="getDataset($event)">Get-Dataset</md-button>
-                <md-button name="bleThreadButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="bleThread($event)">Ble-thread</md-button>
-                <div class="loading-spinner" ng-show="showLoadingSpinner">
-                  <div class="spinner"></div>
+                  </md-input-container>
                 </div>
-              </div>
-            </form>
-          </md-content>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Pin Code</label>
+                    <input required md-maxlength="8" name="pinCode" ng-model="pairing.pinCode">
+                    <div ng-messages="pairingForm.pinCode.$error">
+                      <div ng-message="required">This value can be found in the logging terminal of the device (such as UART) during boots-up.</div>
+                      <div ng-message="md-maxlength">The Pin Code is a number with the length of 8 used by matter to authenticate the device.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Discriminator</label>
+                    <input required name="discriminator" ng-model="pairing.discriminator">
+                    <div ng-messages="pairingForm.discriminator.$error">
+                      <div ng-message="required">
+                        The discriminator is a 12-bit value used by matter to discern between multiple commissionable device advertisements authenticate the device. You can find the value in the logging terminal of the device when the device boots up.
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="100">
+                    <label>Dataset</label>
+                    <input required md-minlength="1" name="dataset" ng-model="pairing.dataset">
+                    <div ng-messages="pairingForm.dataset.$error">
+                      <div ng-message="required">This is the current Active Operational Dataset which can be fetched and stored from the otbr.</div>
+                      <div ng-message="md-minlength">Dataset can be obtained with the button 'Get-Dataset'.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="getDatasetButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="getDataset($event)">Get-Dataset</md-button>
+                  <md-button name="bleThreadButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="bleThread($event)">Ble-thread</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
         </div>
 
         <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[2].show">
@@ -292,17 +326,27 @@
             <md-content layout-padding flex="100">
               <form name="onoffForm">
                 <div layout="row">
-
                   <md-input-container flex="50">
-                    <label>Node ID</label>
-                    <input required md-minlength="1" name="nodeId" ng-model="onoff.nodeId">
-                    <div ng-messages="onoffForm.nodeId.$error">
-                      <div ng-message="required">This value is the user-defined ID of the commissioned node.</div>
-                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                    <label>Node Alias</label>
+                    <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="onoffForm.nodeAlias.$error">
+                      <div ng-message="required">This value is the user-defined Node Alias of the commissioned node.</div>
                     </div>
                   </md-input-container>
 
                   <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required name="nodeId" ng-model="selectedNodeId">
+                    <div ng-messages="onoffForm.nodeId.$error">
+                      <div ng-message="required">This value is the user-defined Node ID of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="100">
                     <label>EndPoint ID</label>
                     <input required name="endPointId" type="number" min="1" max="240" ng-model="onoff.endPointId">
                     <div ng-messages="onoffForm.endPointId.$error">
@@ -340,17 +384,27 @@
             <md-content layout-padding flex="100">
               <form name="multiadminForm">
                 <div layout="row">
-
                   <md-input-container flex="50">
-                    <label>Node ID</label>
-                    <input required md-minlength="1" name="nodeId" ng-model="multiadmin.nodeId">
-                    <div ng-messages="multiadminForm.nodeId.$error">
-                      <div ng-message="required">This value is the user-defined ID of the commissioned node.</div>
-                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
+                    <label>Node Alias</label>
+                    <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="multiadminForm.nodeAlias.$error">
+                      <div ng-message="required">This value is the user-defined Node Alias of the commissioned node.</div>
                     </div>
                   </md-input-container>
 
                   <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required name="nodeId" ng-model="selectedNodeId">
+                    <div ng-messages="multiadminForm.nodeId.$error">
+                      <div ng-message="required">This value is the user-defined Node ID of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="100">
                     <label>Window Timeout</label>
                     <input required name="windowTimeout" type="number" min="180" max="900" ng-model="multiadmin.windowTimeout">
                     <div ng-messages="multiadminForm.windowTimeout.$error">
@@ -375,6 +429,34 @@
               <form name="subscribeForm">
                 <div layout="row">
                   <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="subscribeForm.nodeAlias.$error">
+                      <div ng-message="required">This value is the user-defined Node Alias of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required name="nodeId" ng-model="selectedNodeId">
+                    <div ng-messages="subscribeForm.nodeId.$error">
+                      <div ng-message="required">This value is the user-defined Node ID of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>EndPoint ID</label>
+                    <input required name="endPointId" type="number" min="1" max="240" ng-model="subscribe.endPointId">
+                    <div ng-messages="subscribeForm.endPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 240.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
                     <label>Min Interval</label>
                     <input required md-minlength="1" name="minInterval" ng-model="subscribe.minInterval">
                     <div ng-messages="subscribeForm.minInterval.$error">
@@ -382,32 +464,15 @@
                       <div ng-message="md-minlength">The Min Interval is a decimal number.</div>
                     </div>
                   </md-input-container>
+                </div>
 
-                  <md-input-container flex="50">
+                <div layout="row">
+                  <md-input-container flex="100">
                     <label>Max Interval</label>
                     <input required md-minlength="1" name="maxInterval" ng-model="subscribe.maxInterval">
                     <div ng-messages="subscribeForm.maxInterval.$error">
                       <div ng-message="required">This value is the user-defined max interval of subscribe.</div>
                       <div ng-message="md-minlength">The Max Interval is a decimal number.</div>
-                    </div>
-                  </md-input-container>
-                </div>
-
-                <div layout="row">
-                  <md-input-container flex="50">
-                    <label>Node ID</label>
-                    <input required md-minlength="1" name="nodeId" ng-model="subscribe.nodeId">
-                    <div ng-messages="subscribeForm.nodeId.$error">
-                      <div ng-message="required">This value is the user-defined ID of the commissioned node.</div>
-                      <div ng-message="md-minlength">The Node ID can be a decimal number or a 0x-prefixed hex number.</div>
-                    </div>
-                  </md-input-container>
-
-                  <md-input-container flex="50">
-                    <label>EndPoint ID</label>
-                    <input required name="endPointId" type="number" min="1" max="240" ng-model="subscribe.endPointId">
-                    <div ng-messages="subscribeForm.endPointId.$error">
-                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 240.</div>
                     </div>
                   </md-input-container>
                 </div>
@@ -433,9 +498,49 @@
             </md-list>
         </div>
 
-        <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-show="menu[5].show">
-          <!-- Status content -->
-          <h4>Get Status</h4>
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[5].show">
+          <h4>Nodes Managerment</h4>
+            <md-content layout-padding flex="100">
+              <form name="getStatusForm">
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="getStatusForm.nodeAlias.$error">
+                      <div ng-message="required">Required nodeAlias to delete.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required name="nodeId" ng-model="selectedNodeId">
+                    <div ng-messages="getStatusForm.nodeId.$error">
+                      <div ng-message="required">Required nodeId to delete.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="deleteNodeButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="deleteStorageNode($event)">Delete-StorageNode</md-button>
+                  <div class="loading-spinner" ng-show="showLoadingSpinner">
+                    <div class="spinner"></div>
+                  </div>
+                </div>
+              </form>
+            </md-content>
+
+            <h4>Provisioned Nodes</h4>
+            <md-list class="md-dense" flex=100>
+              <md-list-item class="md-3-line" ng-repeat="(nodeAlias, nodeId) in storageStatus.status">
+                <img ng-src="{{storageStatus.icon}}" class="md-avatar" alt="" />
+                <div class="md-list-item-text" layout="column">
+                  <h4>Node Alias: {{ nodeAlias }}</h4>
+                  <h4>Node ID: {{ nodeId }}</h4>
+                </div>
+              </md-list-item>
+            </md-list>
         </div>
 
       </div>

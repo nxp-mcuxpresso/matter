@@ -56,6 +56,14 @@ public:
     // Store local node id.
     CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
 
+    #if CHIP_WITH_WEBUI
+    // Return the stored local node id with key.
+    chip::NodeId GetLocalKeyNodeId(const char * key);
+
+    // Store local kay and node id.
+    CHIP_ERROR SetLocalKeyNodeId(const char * key, chip::NodeId nodeId);
+    #endif
+
     // Return the stored local device (commissioner) CASE Authenticated Tags (CATs).
     chip::CATValues GetCommissionerCATs();
 
