@@ -186,24 +186,28 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 
 ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t length)
 {
-    uint32_t intMask;
-    serial_manager_status_t status = kStatus_SerialManager_Error;
-    size_t len                     = 0;
-
-    intMask = DisableGlobalIRQ();
-    txCount++;
-    status =
-        SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle, (uint8_t *) buffer, (uint32_t) length);
-    EnableGlobalIRQ(intMask);
-    if (status == kStatus_SerialManager_Success)
+    uint32_t intMask; 
+    serial_manager_status_t status = kStatus_SerialManager_Success;
+    size_t len = 0;
+    
+    //If length is 0 there will be an assert in Serial Manager. Some OT functions output 0 bytes, for example 
+    //in SrpServer::Process<Cmd("service")> -> OutputLine(hasSubType ? "" : "(null)");
+    if (length > 0)
     {
-        len = length;
-    }
+        intMask = DisableGlobalIRQ();
+        txCount++;
+        status = SerialManager_WriteNonBlocking((serial_write_handle_t)streamerSerialWriteHandle, (uint8_t *)buffer, (uint32_t) length);
+        EnableGlobalIRQ(intMask);
+        if (status == kStatus_SerialManager_Success)
+        {
+            len = length;
+        }
 
-    /* Wait for the serial manager task to empty the TX buffer */
-    while (txCount)
-    {
-        OSA_TimeDelay(STREAMER_UART_FLUSH_DELAY_MS);
+        /* Wait for the serial manager task to empty the TX buffer */
+        while (txCount)
+        {
+            OSA_TimeDelay(STREAMER_UART_FLUSH_DELAY_MS);
+        }
     }
 
     return len;

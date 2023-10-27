@@ -124,6 +124,7 @@ private:
     ConnectivityManager::WiFiStationState mWiFiStationState;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
+    bool mBorderRouterInit = false;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     enum WiFiEventGroup{
@@ -139,6 +140,9 @@ private:
     void OnStationConnected(void);
     void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
+#if CHIP_ENABLE_OPENTHREAD
+    void StartBrServices(void);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 

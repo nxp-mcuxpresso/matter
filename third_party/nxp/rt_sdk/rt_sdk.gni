@@ -191,7 +191,6 @@ template("rt_wifi") {
     defines += [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA",
       "CONFIG_IPV6=1",  # missing in wifi_config.h
-      "CONFIG_MAX_IPV6_ADDRESSES=5",  # missing in wifi_config.h
     ]
 
     if (wifi_enable_pta) {
@@ -423,6 +422,14 @@ template("rt_sdk") {
         # No OSA main task
         "FSL_OSA_MAIN_FUNC_ENABLE=0",
       ]
+      if (chip_enable_openthread)
+      {
+        defines += ["CONFIG_MAX_IPV6_ADDRESSES=8"]
+      }
+      else
+      {
+        defines += ["CONFIG_MAX_IPV6_ADDRESSES=5"]
+      }
     }
 
     if (chip_enable_ethernet) {
