@@ -19,15 +19,28 @@
 #include "MediaIPCHelper.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace std;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::Uint8;
 using chip::CharSpan;
+using chip::Protocols::InteractionModel::Status;
+
+#define CHECKSERVICE() \
+    do { \
+        if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active) \
+        helper.Failure(Status::Failure); \
+        return; \
+    } while(0)
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
+    if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active)
+        return PlaybackStateEnum::kUnknownEnumValue;
+
     mCurrentState = gMediaIPCHelper->GetCurrentStatus();
     return mCurrentState;
 }
@@ -39,19 +52,32 @@ uint64_t MediaPlaybackManager::HandleGetStartTime()
 
 uint64_t MediaPlaybackManager::HandleGetDuration()
 {
+    if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active)
+        return 0;
+
     mDuration = gMediaIPCHelper->GetDuration();
     return mDuration;
 }
 
 CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    auto position = gMediaIPCHelper->GetPosition();
+    uint64_t position;
+    if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active) {
+        position = 0;
+    }
+    else {
+        position = gMediaIPCHelper->GetPosition();
+    }
+
     mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     return aEncoder.Encode(mPlaybackPosition);
 }
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
+    if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active)
+        return 0;
+
     mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
     return mPlaybackSpeed;
 }
@@ -63,12 +89,16 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 {
+    if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active)
+        return 0;
+
     mDuration = gMediaIPCHelper->GetDuration();
     return mDuration;
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed = 1;
     gMediaIPCHelper->Notify("c 1");
@@ -88,6 +118,7 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed = 0;
     gMediaIPCHelper->Notify("c 1");
@@ -101,6 +132,7 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 0;
     gMediaIPCHelper->Notify("c 1");
@@ -115,6 +147,7 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     char buf[10] = {0};
     mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
@@ -145,6 +178,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 1;
     gMediaIPCHelper->Notify("<");
@@ -158,6 +192,7 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     char buf[10] = {0};
     mPlaybackSpeed = gMediaIPCHelper->GetPlaybackSpeed();
@@ -187,14 +222,15 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
 }
 
 void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                              const uint64_t & deltaPositionMilliseconds)
+        const uint64_t & deltaPositionMilliseconds)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     auto position = gMediaIPCHelper->GetPosition();
     mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     uint64_t newPosition = (mPlaybackPosition.position.Value() > deltaPositionMilliseconds
-                                ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
-                                : 0);
+            ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
+            : 0);
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
     uint64_t positionSeconds = newPosition/1000;
     char buf[80] = {0};
@@ -209,8 +245,9 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 }
 
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & deltaPositionMilliseconds)
+        const uint64_t & deltaPositionMilliseconds)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     auto position = gMediaIPCHelper->GetPosition();
     mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
@@ -231,9 +268,9 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                      const uint64_t & positionMilliseconds)
+        const uint64_t & positionMilliseconds)
 {
-    ChipLogError(NotSpecified,"sendrolon HandleSeek positionMilliseconds=%ld", positionMilliseconds);
+    CHECKSERVICE();
     // TODO: Insert code here
     mDuration = gMediaIPCHelper->GetDuration();
     if (positionMilliseconds > mDuration)
@@ -261,6 +298,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 1;
     gMediaIPCHelper->Notify("c 1");
@@ -276,6 +314,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
+    CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
     gMediaIPCHelper->Notify("s");

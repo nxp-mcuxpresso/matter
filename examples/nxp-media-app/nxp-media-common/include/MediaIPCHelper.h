@@ -17,7 +17,7 @@ class MediaIPCHelper {
 public:
     static MediaIPCHelper* GetInstance();
     int Init();
-    int Notify(char* str);
+    int Notify(const char* str);
     int GetACK();
     void Release();
     uint64_t GetDuration();
@@ -31,7 +31,7 @@ public:
 
 private:
     MediaIPCHelper();
-    std::string Query(char *str);
+    std::string Query(const char *str);
     uint64_t GPlayTimeDivide = 1000000; //GPlay use ns instead of ms
 };
 
