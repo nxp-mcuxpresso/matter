@@ -56,7 +56,7 @@ int MediaIPCHelper::Init() {
     return 0;
 }
 
-int MediaIPCHelper::Notify(char* str) {
+int MediaIPCHelper::Notify(const char* str) {
     int fd = open("/tmp/fifo_nxp_media", O_WRONLY);
     write(fd, str, strlen(str)+1);
     close(fd);
@@ -75,7 +75,7 @@ uint64_t MediaIPCHelper::GetDuration() {
         return 0;
     }
 
-    ChipLogError(NotSpecified,"GetDuration parsed: %llu", duration);
+    ChipLogError(NotSpecified,"GetDuration parsed: %lu", duration);
     return duration/GPlayTimeDivide;
 
 }
@@ -91,7 +91,7 @@ uint64_t MediaIPCHelper::GetPosition() {
         return 0;
     }
 
-    ChipLogError(NotSpecified,"GetPosition parsed: %llu", position);
+    ChipLogError(NotSpecified,"GetPosition parsed: %lu", position);
     return position/GPlayTimeDivide;
 
 }
@@ -134,8 +134,10 @@ PlaybackStateEnum MediaIPCHelper::GetCurrentStatus() {
     return state;
 
 }
-std::string MediaIPCHelper::Query(char* str) {
-    Notify(str);
+std::string MediaIPCHelper::Query(const char* str) {
+    if (Notify(str)) {
+        return std::string("");
+    }
 
     int fd = open("/tmp/fifo_nxp_media_ack", O_RDONLY);
     char buf[80];
