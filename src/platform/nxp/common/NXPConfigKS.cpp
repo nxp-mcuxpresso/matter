@@ -174,7 +174,7 @@ CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, si
 {
     CHIP_ERROR err;
     ks_error_t status;
-    uint16_t sizeToRead;
+    uint32_t sizeToRead;
 
     sizeToRead = bufSize;
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
@@ -196,7 +196,7 @@ CHIP_ERROR NXPConfig::ReadConfigValueBin(const char * keyString, uint8_t * buf, 
 {
     CHIP_ERROR err;
     ks_error_t status;
-    uint16_t sizeToRead;
+    uint32_t sizeToRead;
 
     sizeToRead = bufSize;
     VerifyOrExit(keyString != NULL, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
