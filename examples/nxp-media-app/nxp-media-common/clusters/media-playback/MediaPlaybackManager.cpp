@@ -31,9 +31,10 @@ using chip::Protocols::InteractionModel::Status;
 
 #define CHECKSERVICE() \
     do { \
-        if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active) \
-        helper.Failure(Status::Failure); \
-        return; \
+        if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active) { \
+            helper.Failure(Status::Failure); \
+            return; \
+        } \
     } while(0)
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
