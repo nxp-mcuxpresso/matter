@@ -32,8 +32,8 @@ The example supports:
 
 - Matter over Wi-Fi. For that follow instructions from [README_Wifi.md][README_Wifi.md].
 - Matter over Openthread. For that follow instructions from [README_Openthread.md][README_Openthread.md].
-- Matter over Wi-Fi with Open Thead Border router support. For that follow instructions from
- [README_Border_Router.md][README_Border_Router.md]. 
+- Matter over Wi-Fi with Open Thread Border router support. For that follow instructions from
+ [README_Border_Router.md][README_Border_Router.md].
 
 [README_Wifi.md]: README_Wifi.md
 [README_Openthread.md]: README_Openthread.md
@@ -69,6 +69,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Start building the application.
 
+> **_NOTE:_** When using the SDK version 2.13.2 to build and run the OpenThread RW612 OTBR examples the LWIP component must be downloaded from the [LWIP NXP GitHub](https://github.com/nxp-mcuxpresso/lwip/tree/mcux_release_2.13.3_rw610_rfp2). Take the latest commit from the indicated branch and copy to SDK location `.../middleware/lwip` . The lwip folder in `.../middleware/` must be completely overwritten by the contents downloaded from GitHub.
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Desktop/SDK_RW612/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
@@ -78,8 +80,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/r
 Optional GN options that can be added when building an application:
 
 - To enable the [matter CLI](README.md#matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
+- To switch the device type to thermostat ```nxp_device_type=\"thermostat\"``` must be added to the *gn gen* command.
 - To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
-- By default, the RW612 A1 board revision will be chosen. To switch to an A0 revision, the argument ```board_version=\"A0\"``` must be added to the *gn gen* command.
+- By default, the RW612 A1 board revision will be chosen. To switch to an A2 revision, the argument ```board_version=\"A2\"``` must be added to the *gn gen* command.
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 - To build the application with the OTA Requestor enabled, the arguments ```chip_enable_ota_requestor=true no_mcuboot=false``` must be added to the *gn gen* command. (More information about the OTA Requestor feature in [OTA Requestor README](README_OTA_Requestor.md)))

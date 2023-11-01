@@ -38,6 +38,29 @@ To know how to flash and debug follow instructions from [README.md 'Flashing and
 
 ## Testing the example
 
+To commission the Matter application on RW612 over Wi-Fi we can either use wifi-ble or onnetwork commissioning. This is described in [Building][building_section] and below.
+
+[building_section]:#building
+
+For ble-wifi:
+
+```
+./chip-tool pairing ble-wifi 1 <ssid> <password> 20202021 3840
+
+```
+If the Matter app is built using the BLE commissioning method there is also the option to use onnetwork commissioning by using Matter CLI WIFI commands to join the WIFI network:
+
+```
+> wifi connect <wifi_ssid> <wifi_passwd>
+Done
+```
+For Wi-Fi credentials provided at compile time or set using CLI:
+
+```
+./chip-tool pairing onnetwork 1 20202021
+
+```
+
 To create or join a Thread network on the Matter Border Router we use the otcli command with the Matter CLI.
 
 To get the list of Matter CLI commands type help:
@@ -63,15 +86,34 @@ To get the list of Matter CLI commands type help:
   switch          Switch commands. Usage: switch [on|off]
 Done
 ```
-Then we configure the Thread network parameters to start/join a network:
+
+Then we configure the Thread network parameters to start/join a network. Note that setting channel, panid, and network key is not enough anymore because of an Open Thread stack update. We first need to initialize a new dataset.
 
 ```
-> otcli channel 21
-> otcli panid 21
-> otcli networkkey 00112233445566778899aabbccddeeff
-> otlci ifconfig up
-> otcli thread start
-
+> otcli dataset init new
+Done
+> otcli dataset
+Active Timestamp: 1
+Channel: 25
+Channel Mask: 0x07fff800
+Ext PAN ID: 42af793f623aab54
+Mesh Local Prefix: fd6e:c358:7078:5a8d::/64
+Network Key: f824658f79d8ca033fbb85ecc3ca91cc
+Network Name: OpenThread-b870
+PAN ID: 0xb870
+PSKc: f438a194a5e968cc43cc4b3a6f560ca4
+Security Policy: 672 onrc 0
+Done
+> otcli dataset panid 0xabcd
+Done
+> otcli dataset channel 25
+Done
+> dataset commit active
+Done
+> ifconfig up
+Done
+> thread start
+Done
 > otcli state
 leader
 Done
@@ -87,22 +129,5 @@ Then we can run the chip tool on the raspberry pi to commission a Matter over Th
 
 ```
 ./chip-tool pairing ble-thread 1 hex:<dataset> 20202021 3840
-
-```
-
-To commission the Matter application on RW612 over Wi-Fi we can use either use wifi-ble or onnetwork commissioning modes depending on how the application was built as described in the section [Building][building_section].
-
-[building_section]:#building
-
-For ble-wifi:
-
-```
-./chip-tool pairing ble-wifi 1 <ssid> <password> 20202021 3840
-
-```
-For Wi-Fi credentials provided at compile time:
-
-```
-./chip-tool pairing onnetwork 1 20202021
 
 ```
