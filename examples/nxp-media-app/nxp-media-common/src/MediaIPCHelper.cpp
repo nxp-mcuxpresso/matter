@@ -34,7 +34,7 @@ ServiceActiveState MediaIPCHelper::PlayerStatus() {
     int ret = system("systemctl is-active gplay_matter");
     if (ret == 0) {
         return ServiceActiveState::Active;
-    } else if (ret == 3) {
+    } else if (ret == 768) {
         return ServiceActiveState::Inactive;
     } else {
         ChipLogError(NotSpecified,"gplay_matter is-active failed: %d", ret);
