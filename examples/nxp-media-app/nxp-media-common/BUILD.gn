@@ -71,6 +71,7 @@ source_set("nxp-media-common-sources") {
     "include/MediaIPCHelper.h",
     "src/AppTv.cpp",
     "src/MediaIPCHelper.cpp",
+    "src/AudioOutput.cpp",
     "src/ZCLCallbacks.cpp",
   ]
 

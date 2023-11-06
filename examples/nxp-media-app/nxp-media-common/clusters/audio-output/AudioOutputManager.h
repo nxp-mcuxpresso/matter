@@ -20,6 +20,7 @@
 
 #include <app/clusters/audio-output-server/audio-output-server.h>
 #include <vector>
+#include "AudioOutput.h"
 
 using chip::app::AttributeValueEncoder;
 using AudioOutputDelegate = chip::app::Clusters::AudioOutput::Delegate;
@@ -40,5 +41,6 @@ protected:
     uint8_t mCurrentOutput;
     std::vector<OutputInfoType> mOutputs;
     // Magic numbers are here on purpose, please allocate memory
-    char mCharDataBuffer[10][32];
+    char mCharDataBuffer[10][256];
+    AudioOutput mAudioOutput;
 };
