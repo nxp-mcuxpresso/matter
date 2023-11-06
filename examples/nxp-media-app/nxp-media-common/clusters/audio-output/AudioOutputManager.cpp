@@ -25,15 +25,28 @@ using namespace chip::app::Clusters::AudioOutput;
 AudioOutputManager::AudioOutputManager()
 {
     mCurrentOutput = 1;
+    if (mAudioOutput.Init()) {
+        ChipLogError(NotSpecified, "Audio Output Device failed to Init");
+        return;
+    }
 
-    for (int i = 1; i < 4; ++i)
-    {
+    std::vector<std::string> sinks = mAudioOutput.GetSinks();
+    uint8_t index = 0;
+    for (const auto& sink : sinks) {
         OutputInfoType outputInfo;
-        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-        // note: safe only because of use of string literal
-        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
-        outputInfo.index = static_cast<uint8_t>(i);
+        if (sink.find("bt") != std::string::npos) {
+            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kBt;
+            outputInfo.name = chip::CharSpan::fromCharString("Bluetooth");
+        } else if (sink.find("wm8") != std::string::npos) {
+            outputInfo.name = chip::CharSpan::fromCharString("Audio Jack");
+            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kOther;
+        } else {
+            outputInfo.name = chip::CharSpan::fromCharString("Other");
+            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kOther;
+        }
+        outputInfo.index = static_cast<uint8_t>(index);
         mOutputs.push_back(outputInfo);
+        index++;
     }
 }
 
@@ -82,6 +95,10 @@ bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
         {
             audioOutputSelected = true;
             mCurrentOutput      = index;
+            if (mAudioOutput.Select(index)) {
+                ChipLogError(NotSpecified,"Failed to select output:%s", output.name);
+                return false;
+            }
         }
     }
 
