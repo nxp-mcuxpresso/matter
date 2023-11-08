@@ -360,7 +360,7 @@ int main()
                 nodeId.c_str(), pinCode.c_str(), type.c_str());
                 std::string command;
                 if (type == "onnetwork") {
-                    command = "pairing onnetwork " + nodeId + " " + pinCode;
+                    command = "pairing onnetwork-commissioning-mode " + nodeId + " " + pinCode;
                 } else if (type == "ble-wifi") {
                     auto ssId = root.get<string>("ssId");
                     auto password = root.get<string>("password");
