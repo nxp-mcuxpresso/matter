@@ -69,7 +69,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return CHIP_NO_ERROR;
+        return err;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -78,7 +78,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     {
         ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT,
                         err.Format());
-        return CHIP_NO_ERROR;
+        return err;
     }
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -90,7 +90,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     // Connect to saved network
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    err = ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
 
     return err;
 }
@@ -193,6 +193,8 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
+    CommitConfiguration();
+
     if (mpConnectCallback != nullptr)
     {
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
@@ -240,22 +242,22 @@ int NXPWiFiDriver::DisconnectNetwork(void)
 {
     int ret = 0;
 
-	if (ConnectivityMgrImpl().IsWiFiStationConnected())
-	{
-	    ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
+    if (ConnectivityMgrImpl().IsWiFiStationConnected())
+    {
+        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
 
-	    ret = wlan_disconnect();
+        ret = wlan_disconnect();
 
-	    if (ret != WM_SUCCESS)
-	    {
-	        ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t)ret);
-	    }
-	}
-	else
-	{
-	    ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
-	}
-    
+        if (ret != WM_SUCCESS)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
+        }
+    }
+    else
+    {
+        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
+    }
+
     return ret;
 }
 
