@@ -29,6 +29,6 @@ manifest:
     revision: ac523d9
     path: middleware/wireless/framework
   - name: lwip
-    url: ssh://git@bitbucket.sw.nxp.com/mcucore/lwip.git
+    url: https://github.com/nxp-mcuxpresso/lwip.git
     revision: e0550ec8bab
     path: middleware/lwip
