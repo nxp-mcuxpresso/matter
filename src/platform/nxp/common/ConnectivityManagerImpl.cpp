@@ -55,14 +55,13 @@ extern "C" {
 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <openthread/srp_server.h>
+
 #include <openthread/mdns_server.h>
-#include <openthread/border_routing.h>
-#include <openthread/backbone_router_ftd.h>
 
 #include "udp_plat.h"
 #include "infra_if.h"
 #include "border_agent.h"
+#include "br_rtos_manager.h"
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
@@ -502,17 +501,8 @@ void ConnectivityManagerImpl::StartBrServices()
             // Check if OT instance is init
             thrInstancePtr = ThreadStackMgrImpl().OTInstance();
 
-            UdpPlatInit(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
-            InfraIfInit(thrInstancePtr, extNetIfPtr);
-
+            BrInitServices(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
             otMdnsServerStart(thrInstancePtr);
-
-            otSrpServerSetEnabled(thrInstancePtr, true);
-            otBorderRoutingInit(thrInstancePtr, netif_get_index(extNetIfPtr), true);
-            otBorderRoutingSetEnabled(thrInstancePtr, true);
-            otBackboneRouterSetEnabled(thrInstancePtr, true);
-
-            BorderAgentInit(thrInstancePtr);
         }
     }
 }
