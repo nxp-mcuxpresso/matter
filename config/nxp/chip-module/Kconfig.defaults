@@ -202,6 +202,9 @@ config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
 	default n
 
+config HCI_NXP_ENABLE_AUTO_SLEEP
+	default n
+
 config CHIP_OTA_REQUESTOR
 	default n
 
