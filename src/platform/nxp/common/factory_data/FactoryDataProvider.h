@@ -70,6 +70,8 @@ public:
         kPartNumber,
         kProductURL,
         kProductLabel,
+        kProductFinish,
+        kProductPrimaryColor,
         kMaxId
     };
 
@@ -105,6 +107,8 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+    CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
     void FactoryDataProviderRunTests(void);
 
