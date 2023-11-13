@@ -115,23 +115,25 @@ Here is the interpretation of the **required** parameters:
 Here is the interpretation of the **optional** parameters:
 
 ```shell
---dac_key_password     -> Password to decode DAC key
---dac_key_use_sss_blob -> Used when --dac_key contains a path to an encrypted blob, instead of the
-                          actual DAC private key. The blob metadata size is 24, so the total length
-                          of the resulting value is private key length (32) + 24 = 56. False by default.
---spake2p_verifier     -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
-                          all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
-                          will not be used to generate a new verifier on the fly.
---aes128_key           -> 128 bits AES key used to encrypt the whole dataset. Please make sure
-                          that the target application/board supports this feature: it has access to
-                          the private key and implements a mechanism which can be used to decrypt
-                          the factory data information.
---date                 -> Manufacturing Date (YYYY-MM-DD format)
---part_number          -> Part number as string
---product_url          -> Product URL as string
---product_label        -> Product label as string
---serial_num           -> Serial Number
---unique_id            -> Unique id used for rotating device id generation
+--dac_key_password      -> Password to decode DAC key
+--dac_key_use_sss_blob  -> Used when --dac_key contains a path to an encrypted blob, instead of the
+                           actual DAC private key. The blob metadata size is 24, so the total length
+                           of the resulting value is private key length (32) + 24 = 56. False by default.
+--spake2p_verifier      -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
+                           all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
+                           will not be used to generate a new verifier on the fly.
+--aes128_key            -> 128 bits AES key used to encrypt the whole dataset. Please make sure
+                           that the target application/board supports this feature: it has access to
+                           the private key and implements a mechanism which can be used to decrypt
+                           the factory data information.
+--date                  -> Manufacturing Date (YYYY-MM-DD format)
+--part_number           -> Part number as string
+--product_url           -> Product URL as string
+--product_label         -> Product label as string
+--serial_num            -> Serial Number
+--unique_id             -> Unique id used for rotating device id generation
+--product_finish        -> Visible finish of the product
+--product_primary_color -> Representative color of the visible parts of the product
 ```
 
 ## 3. Write provisioning data
