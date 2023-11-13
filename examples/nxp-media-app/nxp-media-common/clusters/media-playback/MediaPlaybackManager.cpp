@@ -37,6 +37,17 @@ using chip::Protocols::InteractionModel::Status;
         } \
     } while(0)
 
+#define CHECKRESULT(val) \
+    do { \
+        if (val) { \
+            gMediaIPCHelper->StopPlayer(); \
+            gMediaIPCHelper->StartPlayer(); \
+            helper.Failure(Status::Failure); \
+            return; \
+        } \
+    } while(0)
+
+
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
     if (gMediaIPCHelper->PlayerStatus() != ServiceActiveState::Active)
@@ -102,14 +113,15 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed = 1;
-    gMediaIPCHelper->Notify("c 1");
+    CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
     mCurrentState = gMediaIPCHelper->GetCurrentStatus();
 
     //If paused, then resume, else play from very begining
-    if (mCurrentState == PlaybackStateEnum::kPaused)
-        gMediaIPCHelper->Notify("a");
-    else
-        gMediaIPCHelper->Notify("p");
+    if (mCurrentState == PlaybackStateEnum::kPaused) {
+        CHECKRESULT(gMediaIPCHelper->Notify("a"));
+    } else {
+        CHECKRESULT(gMediaIPCHelper->Notify("p"));
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -122,8 +134,8 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed = 0;
-    gMediaIPCHelper->Notify("c 1");
-    gMediaIPCHelper->Notify("a");
+    CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
+    CHECKRESULT(gMediaIPCHelper->Notify("a"));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -136,9 +148,9 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 0;
-    gMediaIPCHelper->Notify("c 1");
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
-    gMediaIPCHelper->Notify("s");
+    CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
+    CHECKRESULT(gMediaIPCHelper->Notify("s"));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -169,7 +181,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
         mPlaybackSpeed = kPlaybackMaxForwardSpeed;
     }
     sprintf(buf, "c %1.2f", mPlaybackSpeed);
-    gMediaIPCHelper->Notify(buf);
+    CHECKRESULT(gMediaIPCHelper->Notify(buf));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -182,7 +194,7 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 1;
-    gMediaIPCHelper->Notify("<");
+    CHECKRESULT(gMediaIPCHelper->Notify("<"));
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
     Commands::PlaybackResponse::Type response;
@@ -214,7 +226,7 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
         mPlaybackSpeed = kPlaybackMaxRewindSpeed;
     }
     sprintf(buf, "c %1.2f", mPlaybackSpeed);
-    gMediaIPCHelper->Notify(buf);
+    CHECKRESULT(gMediaIPCHelper->Notify(buf));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -237,7 +249,7 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
     char buf[80] = {0};
 
     sprintf(buf, "e 0 t%ld", positionSeconds);
-    gMediaIPCHelper->Notify(buf);
+    CHECKRESULT(gMediaIPCHelper->Notify(buf));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -260,7 +272,7 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
     uint64_t positionSeconds = newPosition/1000;
     char buf[80] = {0};
     sprintf(buf, "e 0 t%ld", positionSeconds);
-    gMediaIPCHelper->Notify(buf);
+    CHECKRESULT(gMediaIPCHelper->Notify(buf));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -288,7 +300,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
         char buf[80] = {0};
 
         sprintf(buf, "e 0 t%ld", positionSeconds);
-        gMediaIPCHelper->Notify(buf);
+        CHECKRESULT(gMediaIPCHelper->Notify(buf));
 
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -302,10 +314,10 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackSpeed    = 1;
-    gMediaIPCHelper->Notify("c 1");
+    CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
-    gMediaIPCHelper->Notify(">");
+    CHECKRESULT(gMediaIPCHelper->Notify(">"));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
@@ -318,8 +330,8 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
     CHECKSERVICE();
     // TODO: Insert code here
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
-    gMediaIPCHelper->Notify("s");
-    gMediaIPCHelper->Notify("p");
+    CHECKRESULT(gMediaIPCHelper->Notify("s"));
+    CHECKRESULT(gMediaIPCHelper->Notify("p"));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));

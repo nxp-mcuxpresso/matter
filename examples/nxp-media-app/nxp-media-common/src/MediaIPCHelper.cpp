@@ -6,10 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <poll.h>
+#include <mutex>
 #include <unistd.h>
 #include <cmath>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app-common/zap-generated/cluster-enums.h>
+
+#define FIFO_BUF_SZ 80
+#define ACK_TIMEOUT_MS 3000
 
 using namespace std;
 using namespace chip::app::Clusters::MediaPlayback;
@@ -57,11 +63,15 @@ int MediaIPCHelper::Init() {
 }
 
 int MediaIPCHelper::Notify(const char* str) {
+    std::lock_guard<std::mutex> lock(_mtxNotify);
     int fd = open("/tmp/fifo_nxp_media", O_WRONLY);
+    if (fd < 0) {
+        ChipLogError(NotSpecified,"failed to open input pipe");
+        return -1;
+    }
     write(fd, str, strlen(str)+1);
     close(fd);
-    GetACK();
-    return 0;
+    return GetACK();
 }
 
 uint64_t MediaIPCHelper::GetDuration() {
@@ -82,7 +92,7 @@ uint64_t MediaIPCHelper::GetDuration() {
 
 uint64_t MediaIPCHelper::GetPosition() {
 
-    std::string positionStr= Query("q p");
+    std::string positionStr = Query("q p");
     uint64_t position = 0;
 
     try {
@@ -135,30 +145,91 @@ PlaybackStateEnum MediaIPCHelper::GetCurrentStatus() {
 
 }
 std::string MediaIPCHelper::Query(const char* str) {
+    std::lock_guard<std::mutex> lock(_mtxQuery);
     if (Notify(str)) {
         return std::string("");
     }
 
-    int fd = open("/tmp/fifo_nxp_media_ack", O_RDONLY);
-    char buf[80];
-    read(fd, buf, sizeof(buf));
-    close(fd);
+    char buf[FIFO_BUF_SZ] = {0};
+    ssize_t len = 0;
+
+    int ret = 0;
+    int fd = open("/tmp/fifo_nxp_media_ack", O_RDONLY | O_NONBLOCK);
+    if (fd < 0) {
+        ChipLogError(NotSpecified, "failed to open query pipe");
+        return std::string("");
+    }
+    struct pollfd waiter = {.fd = fd, .events = POLLIN};
+    int pret = poll(&waiter, 1, ACK_TIMEOUT_MS);
+    if (pret != 1) {
+        ChipLogError(NotSpecified, "ACK pipe exception, poll result: %d", ret);
+        goto exit;
+    }
+    if (!(waiter.revents & POLLIN)) {
+        ChipLogError(NotSpecified, "polling event incorrect: %d", waiter.revents);
+        goto exit;
+    }
+    len = read(fd, buf, sizeof(buf));
+    if (len >= FIFO_BUF_SZ) {
+        ChipLogError(NotSpecified, "query size unexcepted: %u", len);
+        goto exit;
+    }
+    if (buf[len-1] != '\0') {
+        ChipLogError(NotSpecified, "unexcepted data with non-string data buf=%s buf[%d]=0x%x", buf, len-1, buf[len-1]);
+        goto exit;
+    }
     ChipLogError(NotSpecified, "Query returned: %s", buf);
 
-    std::string resp(buf);
-    return resp;
+    return std::string(buf);;
+exit:
+    close(fd);
+    ChipLogError(NotSpecified, "Query exception restart player");
+    StopPlayer();
+    StartPlayer();
+    return std::string("");
 
 }
 
 int MediaIPCHelper::GetACK() {
-    int fd = open("/tmp/fifo_nxp_media_ack", O_RDONLY);
-    char buf[80];
-    read(fd, buf, sizeof(buf));
+    int ret = 0;
+    char buf[FIFO_BUF_SZ] = {0};
+    ssize_t len = 0;
+    int fd = open("/tmp/fifo_nxp_media_ack", O_RDONLY | O_NONBLOCK);
+    if (fd < 0) {
+        ChipLogError(NotSpecified, "failed to open ACK pipe");
+        return -1;
+    }
+    struct pollfd waiter = {.fd = fd, .events = POLLIN};
+    int pret = poll(&waiter, 1, ACK_TIMEOUT_MS);
+    if (pret != 1) {
+        ChipLogError(NotSpecified, "ACK pipe exception, poll result: %d", ret);
+        ret = -1;
+        goto exit;
+    }
+    if (!(waiter.revents & POLLIN)) {
+        ChipLogError(NotSpecified, "polling event incorrect: %d", waiter.revents);
+        ret = -1;
+        goto exit;
+    }
+    len = read(fd, buf, sizeof(buf));
+    if (len >= FIFO_BUF_SZ) {
+        ChipLogError(NotSpecified, "ack size unexcepted: %u", len);
+        ret = -1;
+        goto exit;
+    }
+    if (buf[len] != '\0') {
+        ChipLogError(NotSpecified, "unexcepted data with non-string data");
+        ret = -1;
+        goto exit;
+    }
     if (strcmp(buf, "ack") != 0) {
         ChipLogError(NotSpecified, "Unexpected ACK: %s", buf);
+        ret = -1;
+        goto exit;
     }
+exit:
     close(fd);
-    return 0;
+    return ret;
 }
 
 void MediaIPCHelper::Release() {

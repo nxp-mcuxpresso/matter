@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <cstdint>
 #include <string>
+#include <mutex>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 
 using namespace chip::app::Clusters::MediaPlayback;
@@ -32,6 +33,8 @@ public:
 private:
     MediaIPCHelper();
     std::string Query(const char *str);
+    std::mutex _mtxNotify;
+    std::mutex _mtxQuery;
     uint64_t GPlayTimeDivide = 1000000; //GPlay use ns instead of ms
 };
 
