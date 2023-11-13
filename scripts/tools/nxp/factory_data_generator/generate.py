@@ -24,7 +24,7 @@ import sys
 
 from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
                     ManufacturingDate, PaiCert, PartNumber, ProductId, ProductLabel, ProductName, ProductURL, Salt, SerialNum,
-                    SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
+                    SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier, ProductFinish, ProductPrimaryColor)
 from default import InputArgument
 
 # Global variable for hash ID
@@ -227,6 +227,10 @@ def main():
                           help="[str] Serial Number")
     optional.add_argument("--unique_id", type=UniqueId,
                           help="[str] Unique identifier for the device")
+    optional.add_argument("--product_finish", type=ProductFinish, metavar=ProductFinish.VALUES,
+                          help="[str] Visible finish of the product")
+    optional.add_argument("--product_primary_color", type=ProductPrimaryColor, metavar=ProductPrimaryColor.VALUES,
+                          help="[str] Representative color of the visible parts of the product")
 
     args = parser.parse_args()
 
