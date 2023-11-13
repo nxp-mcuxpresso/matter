@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
+import("//build_overrides/k32w0_zigbee_bridge.gni")
 import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
@@ -29,25 +29,23 @@ executable("imx-chip-bridge-app") {
     "main/src/BridgeActions.cpp",
     "main/src/bridged-actions-stub.cpp",
 
-
     #Zigbee Control Bridge
-    "main/libzcb/IotCommon/dump.c",
-    "main/libzcb/IotCommon/fileCreate.c",
-    "main/libzcb/IotCommon/iotSemaphore.c",
-    "main/libzcb/IotCommon/iotSleep.c",
-    "main/libzcb/IotCommon/newDb.c",
-    "main/libzcb/IotCommon/newLog.c",
-    "main/libzcb/IotCommon/nibbles.c",
-    "main/libzcb/IotCommon/parsing.c",
-    "main/libzcb/IotCommon/systemtable.c",
-    "main/libzcb/ZCB/cmd.c",
-    "main/libzcb/ZCB/Serial.c",
-    "main/libzcb/ZCB/SerialLink.c",
-    "main/libzcb/ZCB/Utils.c",
-    "main/libzcb/ZCB/zcb.c",
-    "main/libzcb/ZCB/zcb_main.c",
-    "main/libzcb/ZCB/ZigbeeDevices.c",
-
+    #"${k32w0_zigbee_bridge_src}/IotCommon/dump.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/fileCreate.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/iotSemaphore.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/iotSleep.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/newDb.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/newLog.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/nibbles.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/parsing.c",
+    #"${k32w0_zigbee_bridge_src}/IotCommon/systemtable.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/cmd.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/Serial.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/SerialLink.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/Utils.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/zcb.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/zcb_main.c",
+    #"${k32w0_zigbee_bridge_src}/ZCB/ZigbeeDevices.c",
 
     "main.cpp",
   ]
@@ -56,14 +54,13 @@ executable("imx-chip-bridge-app") {
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
+    "${k32w0_zigbee_bridge_src}:libzcb",
   ]
-
-  cflags = [ "-Wconversion" ]
 
   include_dirs = [
     "main/include",
-    "main/libzcb/IotCommon",
-    "main/libzcb/ZCB",
+    "${k32w0_zigbee_bridge_src}/IotCommon",
+    "${k32w0_zigbee_bridge_src}/ZCB",
   ]
 
   output_dir = root_out_dir
