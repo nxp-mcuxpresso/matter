@@ -336,3 +336,7 @@
 	path = third_party/imx-secure-enclave/repo
 	url = https://github.com/nxp-imx/imx-secure-enclave.git
 	branch = lf-6.1.36_2.1.0
+[submodule "third_party/nxp/k32w0_zigbee_bridge"]
+	path = third_party/nxp/k32w0_zigbee_bridge
+	url = http://androidsource.nxp.com/project/github/k32w0x_zigbee3_controlbridge
+	branch = 2023q4
