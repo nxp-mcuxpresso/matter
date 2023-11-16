@@ -57,10 +57,7 @@ extern "C" {
 
 #include <openthread/mdns_server.h>
 
-#include "border_agent.h"
 #include "br_rtos_manager.h"
-#include "infra_if.h"
-#include "udp_plat.h"
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
@@ -492,7 +489,6 @@ void ConnectivityManagerImpl::StartBrServices()
     if (mBorderRouterInit == false)
     {
         struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
-        ;
         struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
         otInstance * thrInstancePtr;
 
