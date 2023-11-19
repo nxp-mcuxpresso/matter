@@ -22,7 +22,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
 #include <functional>
 #include <vector>
 
@@ -74,6 +73,11 @@ protected:
     chip::EndpointId mParentEndpointId;
     std::string mZone;
     ZigbeeDev_t mBridgeNode;
+
+    // Monitor Device reachable
+    pthread_t Monitor_thread;
+    pthread_mutex_t device_mutex;
+    pthread_cond_t  device_cond;
 };
 
 class DeviceOnOff : public Device
@@ -89,8 +93,8 @@ public:
     bool IsOn();
     void GetOnOff();
     void SetOnOff(bool aOn);
+    void SyncOnOff(bool aOn);
     void Toggle();
-
 
     using DeviceCallback_fn = std::function<void(DeviceOnOff *, DeviceOnOff::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB);
@@ -152,15 +156,19 @@ public:
 
     inline int16_t GetMeasuredValue() { return mMeasurement; };
     void SetMeasuredValue(int16_t measurement);
+    int StartMonitor(void);
+    int DestoryMonitor(void);
 
     using DeviceCallback_fn = std::function<void(DeviceTempSensor *, DeviceTempSensor::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB);
 
     int16_t mMin;
     int16_t mMax;
+    int timeout;
     DataVersion DataVersions[ArraySize(TEMPSENSOR_CLUSTER_LIST)];
 
 private:
+    static void* Monitor(void *context);
     void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
 
 private:

@@ -69,5 +69,4 @@ protected:
     EndpointId mFirstDynamicEndpointId;
     pthread_t ZcbMonitor_thread;
 
-    int thread_exit;
 };

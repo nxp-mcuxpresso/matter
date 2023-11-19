@@ -33,6 +33,7 @@ typedef enum {
     BRIDGE_REMOVE_DEV,
     BRIDGE_FACTORY_RESET,
     BRIDGE_WRITE_ATTRIBUTE,
+    BRIDGE_LEAVE,
 } msgType;
 
 typedef struct {
@@ -49,7 +50,6 @@ typedef struct {
     int msg_type;
     newdb_zcb_t zcb;
     void *msg_data;
-
 } ZcbMsg_t;
 
 extern ZcbMsg_t ZcbMsg;
