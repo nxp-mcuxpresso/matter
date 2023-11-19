@@ -20,6 +20,7 @@
 #include "Device.h"
 
 #include <cstdio>
+#include <time.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include "zcb.h"
@@ -32,6 +33,9 @@ Device::Device(const char * szDeviceName, std::string szLocation)
     mLocation   = szLocation;
     mReachable  = false;
     mEndpointId = 0;
+
+    device_mutex = PTHREAD_MUTEX_INITIALIZER;
+    device_cond =  PTHREAD_COND_INITIALIZER;
 }
 
 bool Device::IsReachable()
@@ -100,26 +104,68 @@ bool DeviceOnOff::IsOn()
 
 void DeviceOnOff::SetOnOff(bool aOn)
 {
+    int result;
     bool changed;
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    // timeout time is 2s
+    ts.tv_sec += 2;
 
     changed = aOn ^ mOn;
-    mOn     = aOn;
-    ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, aOn ? "ON" : "OFF");
 
     if ((changed) && (mChanged_CB))
     {
         mChanged_CB(this, kChanged_OnOff);
-        eOnOff(uint16_t(this->GetZigbeeSaddr()), aOn);
+        if(eOnOff(uint16_t(this->GetZigbeeSaddr()), aOn) != 0)
+        {
+            ChipLogProgress(DeviceLayer, "Send Device[%s]: %s cmd Failed", mName, aOn ? "ON" : "OFF");
+            mOn = !mOn;
+            goto done;
+        }
+
+        pthread_mutex_lock(&device_mutex);
+        while(mOn != aOn) {
+            result = pthread_cond_timedwait(&device_cond, &device_mutex, &ts);
+            if(result == ETIMEDOUT) {
+                ChipLogProgress(DeviceLayer, "Timeout waiting for response from Device[%s]", mName);
+                SetReachable(false);
+                break;
+            } else {
+                ChipLogProgress(DeviceLayer, "Set Device[%s]: Success", mName);
+                mOn = aOn;
+            }
+        }
+        pthread_mutex_unlock(&device_mutex);
     }
+
+done:
+    ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, mOn ? "ON" : "OFF");
+}
+
+void DeviceOnOff::SyncOnOff(bool aOn)
+{
+    pthread_mutex_lock(&device_mutex);
+    mOn     = aOn;
+    pthread_cond_signal(&device_cond);
+    pthread_mutex_unlock(&device_mutex);
+
 }
 
 void DeviceOnOff::GetOnOff()
 {
-    printf("device status is %s \n", this->GetZigbee()->zcb.info);
-    if ( strcmp(this->GetZigbee()->zcb.info, "off") == 0) {
-        mOn = false;
+    newdb_zcb_t zcb;
+    newDbGetZcbSaddr(this->GetZigbeeSaddr(), &zcb);
+
+    if( eReadOnoff( uint16_t(zcb.saddr)) == 0)
+    {
+        this->SetReachable(true);
+        if ( strcmp(zcb.info, "off") == 0) {
+            mOn = false;
+        } else {
+            mOn = true;
+        }
     } else {
-        mOn = true;
+        this->SetReachable(false);
     }
 }
 
@@ -203,11 +249,70 @@ void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeM
     }
 }
 
+void* DeviceTempSensor::Monitor(void *context)
+{
+    DeviceTempSensor *Dev = (DeviceTempSensor*)context;
+
+    int result;
+    struct timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += Dev->timeout;
+
+    while( 1 ) {
+        pthread_mutex_lock(&Dev->device_mutex);
+        while(Dev->mReachable == true) {
+            result = pthread_cond_timedwait(&Dev->device_cond, &Dev->device_mutex, &ts);
+            if(result == ETIMEDOUT) {
+                Dev->SetReachable(false);
+            } else {
+                clock_gettime(CLOCK_REALTIME, &ts);
+                ts.tv_sec += Dev->timeout;
+            }
+        }
+
+        while(Dev->mReachable == false) {
+            result = pthread_cond_wait(&Dev->device_cond, &Dev->device_mutex);
+            if(result == 0) {
+                Dev->SetReachable(true);
+                clock_gettime(CLOCK_REALTIME, &ts);
+                ts.tv_sec += Dev->timeout;
+            }
+        }
+        pthread_mutex_unlock(&Dev->device_mutex);
+    }
+
+}
+
 DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max,
                                    int16_t measuredValue) :
     Device(szDeviceName, szLocation),
     mMin(min), mMax(max), mMeasurement(measuredValue)
-{}
+{
+    timeout = 10; // second
+}
+
+int DeviceTempSensor::StartMonitor()
+{
+    int res = pthread_create(&Monitor_thread, nullptr, Monitor, (void*)this);
+    if (res)
+    {
+        printf("Error creating TempSensorDevice[%s] Monitor: %d\n", mName, res);
+        return -1;
+    }
+
+    return 0;
+}
+
+int DeviceTempSensor::DestoryMonitor()
+{
+    pthread_cancel(Monitor_thread);
+    if(pthread_join(Monitor_thread, NULL) == 0)
+    {
+        printf("[%s] Monitor exit !\n", mName);
+    }
+
+    return 0;
+}
 
 void DeviceTempSensor::SetMeasuredValue(int16_t measurement)
 {
