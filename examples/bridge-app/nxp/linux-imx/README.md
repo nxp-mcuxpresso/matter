@@ -92,7 +92,7 @@ defined:
         ```
         user@ubuntu:~/Desktop/git/connectedhomeip$ export export IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale-imx93
         user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
-        user@ubuntu:~/Desktop/git/connectedhomeip$ ./scripts/examples/imxlinux_example.sh examples/bridge-app/nxp/linux-imx  out/imx-bridge-app
+        user@ubuntu:~/Desktop/git/connectedhomeip$ ./scripts/examples/imxlinux_example.sh -s examples/bridge-app/nxp/linux-imx -o out/imx-bridge-app debug -d
         ```
 Then the imx-chip-bridge-app was generated under out/imx-bridge-app
 

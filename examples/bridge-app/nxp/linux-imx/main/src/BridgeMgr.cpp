@@ -43,13 +43,13 @@ int ZcbNodesNum = 0;
 
 BridgeDevMgr::BridgeDevMgr()
 {
-    thread_exit = 0;
+
 }
 
 BridgeDevMgr::~BridgeDevMgr()
 {
-    thread_exit = 1;
-
+    eZCB_SendMsg(BRIDGE_LEAVE, NULL, NULL);
+    pthread_join(this->ZcbMonitor_thread, NULL);
     RemoveAllDevice();
     printf("free BridgeDevMgr ! \n");
 }
@@ -62,12 +62,12 @@ void BridgeDevMgr::AddOnOffNode(ZigbeeDev_t *ZigbeeDev)
 
     Light->SetZigbee(*ZigbeeDev);
     Light->SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light->GetOnOff();
 
     AddDeviceEndpoint(Light, &bridgedLightEndpoint,
                 Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                 Span<DataVersion>(Light->DataVersions), 1);
 
+    Light->GetOnOff();
 }
 
 void BridgeDevMgr::AddTempSensorNode(ZigbeeDev_t *ZigbeeDev)
@@ -78,6 +78,10 @@ void BridgeDevMgr::AddTempSensorNode(ZigbeeDev_t *ZigbeeDev)
 
     TempSensor->SetZigbee(*ZigbeeDev);
     TempSensor->SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
+    if(TempSensor->StartMonitor()) {
+        delete TempSensor;
+        TempSensor = NULL;
+    }
 
     AddDeviceEndpoint(TempSensor, &bridgedTempSensorEndpoint,
                 Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
@@ -89,7 +93,7 @@ void BridgeDevMgr::AddNewZcbNode(newdb_zcb_t zcb)
     ZigbeeDev_t ZigbeeDevice;
 
     ZigbeeDevice.zcb = zcb;
-    newDbGetDevice( ZigbeeDevice.zcb.mac, &ZigbeeDevice.dev );
+    newDbGetDevice( ZigbeeDevice.zcb.mac, &ZigbeeDevice.dev);
 
     AddZcbNode(&ZigbeeDevice);
 }
@@ -186,13 +190,16 @@ void* BridgeDevMgr::ZcbMonitor(void *context)
                         }
                         break;
 
+                    case BRIDGE_LEAVE: {
+                        printf("Bridge Monitor exit ! \n");
+                        return NULL;
+                    }
+
                     default:
                         break;
                 }
             }
 
-            if (ThisMgr->thread_exit)
-                return NULL;
         }
 
         ZcbMsg.HandleMask = true;
@@ -233,6 +240,7 @@ void BridgeDevMgr::RemoveOnOffNode(DeviceOnOff* dev)
 
 void BridgeDevMgr::RemoveTempMeasurementNode(DeviceTempSensor* dev)
 {
+    dev->DestoryMonitor();
     delete dev;
     dev = nullptr;
 }
@@ -252,6 +260,8 @@ int BridgeDevMgr::AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, cons
         return -1;
     }
 
+    mCurrentEndpointId = mFirstDynamicEndpointId;
+
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (nullptr == gDevices[index] )
@@ -266,11 +276,13 @@ int BridgeDevMgr::AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, cons
                 dev->SetParentEndpointId(parentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     dev->SetReachable(true);
                     dev->GetZigbee()->zcb.matterIndex = index;
                     newDbSetZcbMapID(&dev->GetZigbee()->zcb, index);
+                    newDbSetZcb(&dev->GetZigbee()->zcb);
                     ChipLogProgress(DeviceLayer, "Added device %s Saddr %x to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     dev->GetZigbeeSaddr(), mCurrentEndpointId, index);
                     return index;
@@ -383,7 +395,15 @@ EmberAfStatus HandleReadOnOffAttribute(DeviceOnOff * dev, chip::AttributeId attr
 
     if ((attributeId == OnOff::Attributes::OnOff::Id) && (maxReadLength == 1))
     {
-        *buffer = dev->IsOn() ? 1 : 0;
+        dev->GetOnOff();
+        if(dev->IsReachable())
+        {
+            *buffer = dev->IsOn() ? 1 : 0;
+        }
+        else
+        {
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
     }
     else if ((attributeId == OnOff::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
     {
@@ -543,16 +563,34 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 // -----------------------------------------------------------------------------------------
 //  zcb node report attribute to Bridge
 // -----------------------------------------------------------------------------------------
-bool BridgeDevMgr::WriteAttributeToDynamicEndpoint(newdb_zcb_t zcb, uint16_t u16ClusterID,uint16_t u16AttributeID, uint64_t u64Data, uint8_t u8DataType)
+bool BridgeDevMgr::WriteAttributeToDynamicEndpoint(newdb_zcb_t zcb, uint16_t u16ClusterID, uint16_t u16AttributeID, uint64_t u64Data, uint8_t u8DataType)
 {
     if ( gDevices[zcb.matterIndex] == NULL) {
+        ChipLogProgress(DeviceLayer, "Not found the device !");
         return false;
     }
 
-    if (u8DataType == ZCL_INT16S_ATTRIBUTE_TYPE) {
+    switch(u16ClusterID) {
+    case E_ZB_CLUSTERID_ONOFF:{
+        DeviceOnOff *Light = static_cast<DeviceOnOff *>(gDevices[zcb.matterIndex]);
+        if (Light->IsReachable() == false)
+            Light->SetReachable(true);
+        Light->SyncOnOff(static_cast<bool>(u64Data));
+        return true;
+    }
+
+    case E_ZB_CLUSTERID_MEASUREMENTSENSING_TEMP: {
         DeviceTempSensor *TempSensor = static_cast<DeviceTempSensor *>(gDevices[zcb.matterIndex]);
+        if (TempSensor->IsReachable() == false)
+            TempSensor->SetReachable(true);
         TempSensor->SetMeasuredValue(static_cast<int16_t>(u64Data));
         return true;
+    }
+
+    default:
+        ChipLogProgress(DeviceLayer, "Got attribute 0x%04x in cluster 0x%04x, but not writed",
+                                                                            u16AttributeID, u16ClusterID);
+        break;
     }
 
     return false;
