@@ -107,6 +107,11 @@
                 icon: 'info_outline',
                 show: false,
             },
+            {
+                title: 'Binding',
+                icon: 'add_circle_outline',
+                show: false,
+            },
         ];
 
         $scope.onoff = {
@@ -155,6 +160,39 @@
             status: {},
         };
 
+        $scope.aclConf1 = {
+            fabricIndex: '1',
+            privilege: '5',
+            authMode: '2',
+            subjects: '112233',
+            targets: 'null',
+        };
+
+        $scope.aclConf2 = {
+            fabricIndex: '1',
+            privilege: '3',
+            authMode: '2',
+            subjects: '',
+            targets: 'null',
+        };
+
+        $scope.bindingConf = {
+            fabricIndex: '1',
+            node: '',
+            endPointId: 1,
+            cluster: '6',
+        };
+
+        $scope.binding= {
+            lightNodeAlias: '',
+            lightNodeId: '',
+            switchNodeAlias: '',
+            switchNodeId: '',
+            aclEndpointId: 0,
+            lightEndpointId: 1,
+            switchEndpointId: 2,
+        };
+
         $scope.headerTitle = 'Home';
         $scope.status = [];
         $scope.reports = [];
@@ -167,14 +205,14 @@
 
         $scope.showPanels = function(index) {
             $scope.headerTitle = $scope.menu[index].title;
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < 7; i++) {
                 /* set i as the number of menu*/
                 $scope.menu[i].show = false;
             }
 
             $scope.menu[index].show = true;
 
-            if (index > 1 && index < 6) {
+            if (index > 1 && index < 7) {
                 var httpGetStatusReq = $http({
                     method: 'GET',
                     url: 'get_status',
@@ -549,6 +587,14 @@
             $scope.selectedNodeId = $scope.storageStatus.status[$scope.selectedNodeAlias];
         }
 
+        $scope.onLightNodeAliasChange = function() {
+            $scope.binding.lightNodeId = $scope.storageStatus.status[$scope.binding.lightNodeAlias];
+        }
+
+        $scope.onSwitchNodeAliasChange = function() {
+            $scope.binding.switchNodeId = $scope.storageStatus.status[$scope.binding.switchNodeAlias];
+        }
+
         $scope.deleteStorageNode = function(ev) {
             var confirm = $mdDialog.confirm()
                 .title('This button will delete the stored provision nodeID. Before proceeding, please confirm the nodeAlias and nodeID that need to be deleted.')
@@ -582,6 +628,77 @@
                 });
             });
         };
+
+        $scope.writeACL = function(ev) {
+            var confirm = $mdDialog.confirm()
+                .title('This button can trigger the Write Acl command. But before using it, please confirm that the light device and switch device node id and the endpoint you want to write acl.')
+                .textContent('')
+                .targetEvent(ev)
+                .ok('Okay')
+                .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function() {
+                $scope.showLoadingSpinner = true;
+                $scope.aclConf2.subjects = $scope.binding.switchNodeId;
+                var data = {
+                    aclConf1: $scope.aclConf1,
+                    aclConf2: $scope.aclConf2,
+                    lightNodeId: $scope.binding.lightNodeId,
+                    aclEndpointId: $scope.binding.aclEndpointId,
+                };
+                var httpRequest = $http({
+                    method: 'POST',
+                    url: 'write_acl',
+                    data: data,
+                });
+
+                httpRequest.then(function successCallback(response) {
+                    $scope.showLoadingSpinner = false;
+                    if (response.data.result == "successful") {
+                        $scope.showAlert(event, 'Write ACL', 'success. Please write the binding by pressing the Write Binding button.');
+                    } else {
+                        $scope.showAlert(event, 'Write ACL', 'failed');
+                    }
+                    ev.target.disabled = false;
+                });
+            });
+        };
+
+        $scope.writeBinding = function(ev) {
+            var confirm = $mdDialog.confirm()
+                .title('This button can trigger the Write Binding command. Before using it, make sure you have written the acl and that the light endpoint id and switch endpoint id are correct.')
+                .textContent('')
+                .targetEvent(ev)
+                .ok('Okay')
+                .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function() {
+                $scope.showLoadingSpinner = true;
+                $scope.bindingConf.node = $scope.binding.lightNodeId;
+                $scope.bindingConf.endPointId = $scope.binding.lightEndpointId;
+                var data = {
+                    bindingConf: $scope.bindingConf,
+                    switchNodeId: $scope.binding.switchNodeId,
+                    switchEndpointId: $scope.binding.switchEndpointId,
+                };
+                var httpRequest = $http({
+                    method: 'POST',
+                    url: 'write_binding',
+                    data: data,
+                });
+
+                httpRequest.then(function successCallback(response) {
+                    $scope.showLoadingSpinner = false;
+                    if (response.data.result == "successful") {
+                        $scope.showAlert(event, 'Write Binding', 'success. Please register the binding entry on switch device.');
+                    } else {
+                        $scope.showAlert(event, 'Write Binding', 'failed');
+                    }
+                    ev.target.disabled = false;
+                });
+            });
+        };
+
         $scope.restServerPort = '8889';
         $scope.ipAddr = window.location.hostname + ':' + $scope.restServerPort;
     };

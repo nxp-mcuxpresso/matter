@@ -543,6 +543,92 @@
             </md-list>
         </div>
 
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[6].show">
+          <h4>Binding</h4>
+            <md-content layout-padding flex="100">
+              <form name="bingingForm">
+                <h4>Write ACL</h4>
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Light Node Alias</label>
+                    <md-select required name="lightNodeAlias" ng-model="binding.lightNodeAlias" ng-change="onLightNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="bingingForm.lightNodeAlias.$error">
+                      <div ng-message="required">This value is the user-defined Light Node Alias of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Light Node ID</label>
+                    <input required name="lightNodeId" ng-model="binding.lightNodeId">
+                    <div ng-messages="bingingForm.lightNodeId.$error">
+                      <div ng-message="required">This value is the user-defined Light Node ID of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Switch Node Alias</label>
+                    <md-select required name="switchNodeAlias" ng-model="binding.switchNodeAlias" ng-change="onSwitchNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="bingingForm.switchNodeAlias.$error">
+                      <div ng-message="required">This value is the user-defined Switch Node Alias of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Switch Node ID</label>
+                    <input required name="switchNodeId" ng-model="binding.switchNodeId">
+                    <div ng-messages="bingingForm.switchNodeId.$error">
+                      <div ng-message="required">This value is the user-defined Switch Node ID of the commissioned node.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="100">
+                    <label>ACL EndPoint ID</label>
+                    <input required name="aclEndPointId" type="number" min="0" max="2" ng-model="binding.aclEndpointId">
+                    <div ng-messages="bingingForm.aclEndPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id should be between 0 and 2. 0 means all endpoints.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="writeAclButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="writeACL($event)">Write ACL</md-button>
+                </div>
+
+                <h4>Write Binding</h4>
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Light EndPoint ID</label>
+                    <input required name="lightEndPointId" type="number" min="1" max="2" ng-model="binding.lightEndpointId">
+                    <div ng-messages="bingingForm.lightEndPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 2, and it must be the light endpoint you want to bind.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Switch EndPoint ID</label>
+                    <input required name="switchEndPointId" type="number" min="1" max="2" ng-model="binding.switchEndpointId">
+                    <div ng-messages="bingingForm.switchEndPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 2, and it must be the switch endpoint you want to bind.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div>
+                  <md-button name="bindingButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="writeBinding($event)">Write Binding</md-button>
+                </div>
+
+              </form>
+            </md-content>
+        </div>
+
       </div>
     </main>
   </div>
