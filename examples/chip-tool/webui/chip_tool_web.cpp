@@ -625,6 +625,92 @@ int main()
         }
     };
 
+    server.resource["^/write_acl$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            std::array<std::string, 2> aclConfString;
+            for(int i = 0; i < 2; i++)
+            {
+                std::string aclConfKey = "aclConf" + std::to_string(i + 1);
+                ptree aclConf = root.get_child(aclConfKey);
+                auto fabricIndex = aclConf.get<string>("fabricIndex");
+                auto privilege = aclConf.get<string>("privilege");
+                auto authMode = aclConf.get<string>("authMode");
+                auto subjects = aclConf.get<string>("subjects");
+                auto targets = aclConf.get<string>("targets");
+                aclConfString[i] = "{\"fabricIndex\": " +  fabricIndex + ", \"privilege\": " + privilege + ", \"authMode\": " + authMode +
+                                   ", \"subjects\": [" + subjects + "], \"targets\": " + targets + "}";
+            }
+            auto lightNodeId = root.get<string>("lightNodeId");
+            auto aclEndpointId = root.get<string>("aclEndpointId");
+            ChipLogError(NotSpecified, "Received POST request to Write ACL");
+            std::string command;
+            command = "accesscontrol write acl '[" + aclConfString[0] +"," + aclConfString[1] + "]'" + lightNodeId + " " + aclEndpointId;
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                root.put("result", RESPONSE_SUCCESS);
+            }
+
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception &e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
+    server.resource["^/write_binding$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            ptree bindingConf = root.get_child("bindingConf");
+            auto fabricIndex = bindingConf.get<string>("fabricIndex");
+            auto node = bindingConf.get<string>("node");
+            auto endpoint = bindingConf.get<string>("endPointId");
+            auto cluster = bindingConf.get<string>("cluster");
+            std::string bindingConfString = "{\"fabricIndex\": " +  fabricIndex + ", \"node\": " + node
+                                            + ", \"endpoint\": " + endpoint + ", \"cluster\": " + cluster + "}";
+            auto switchNodeId = root.get<string>("switchNodeId");
+            auto switchEndpointId = root.get<string>("switchEndpointId");
+            ChipLogError(NotSpecified, "Received POST request to Write Binding");
+            std::string command;
+            command ="binding write binding '[" + bindingConfString + "]'" + switchNodeId + " " + switchEndpointId;
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                root.put("result", RESPONSE_SUCCESS);
+            }
+
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception &e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
     // Get example simulating heavy work in a separate thread
     server.resource["^/work$"]["GET"] = [&server](shared_ptr<HttpServer::Response> response,
                                                   shared_ptr<HttpServer::Request> /*request*/) {
