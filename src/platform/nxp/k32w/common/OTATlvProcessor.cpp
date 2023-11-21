@@ -106,7 +106,7 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
     uint8_t iv[16];
-    uint8_t key[16];
+    uint8_t key[kOTAEncryptionKeyLength];
     uint8_t dataOut[16]={0};
     uint32_t u32IVCount;
     uint32_t Offset = 0;
@@ -123,17 +123,14 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
     iv[13] = (uint8_t)((u32IVCount >> 16) &  0xff);
     iv[14] = (uint8_t)((u32IVCount >> 8) &  0xff);
     iv[15] = (uint8_t)(u32IVCount &  0xff);
-    
-    size_t len = strlen(OTA_ENCRYPTION_KEY);
 
-    if (len != 32) {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+    if (Encoding::HexToBytes(OTA_ENCRYPTION_KEY, strlen(OTA_ENCRYPTION_KEY),
+                             key,kOTAEncryptionKeyLength) != kOTAEncryptionKeyLength)
+    {
+        //Failed to convert the OTAEncryptionKey string to octstr type value
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
-    for (size_t i = 0; i < len; i += 2) {
-        char hex[3] = {OTA_ENCRYPTION_KEY[i], OTA_ENCRYPTION_KEY[i+1], '\0'};
-        key[i/2] = (uint8_t)strtol(hex, NULL, 16);
-    }
     ByteSpan KEY = ByteSpan(key);
     Encoding::LittleEndian::Reader reader_key(KEY.data(), KEY.size());
     ReturnErrorOnFailure(reader_key.Read32(&sKey.u32register0).Read32(&sKey.u32register1).Read32(&sKey.u32register2).Read32(&sKey.u32register3).StatusCode());
