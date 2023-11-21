@@ -20,8 +20,11 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <src/app/InteractionModelEngine.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <src/app/reporting/reporting.h>
+#include <lib/support/BufferReader.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 
@@ -374,6 +377,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+
+    app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
 
     // Set the necessary information to inform the SSBL that a new image is available
     // and trigger the actual device reboot after some time, to take into account
