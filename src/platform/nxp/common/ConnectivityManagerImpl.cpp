@@ -53,15 +53,14 @@ extern "C" {
 
 #include <app/server/Dnssd.h>
 
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #include <openthread/mdns_server.h>
 
-#include "udp_plat.h"
-#include "infra_if.h"
 #include "border_agent.h"
 #include "br_rtos_manager.h"
+#include "infra_if.h"
+#include "udp_plat.h"
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
@@ -121,8 +120,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanConnectEvent)
     {
-        bool is_wlan_added = false;
-        struct wlan_network searchedNetwork = {0};
+        bool is_wlan_added                  = false;
+        struct wlan_network searchedNetwork = { 0 };
 
         /* If network was added before on a previous connection call or other API, do not add it again */
         if (wlan_get_network_byname(event->Platform.pNetworkDataEvent->name, &searchedNetwork) != WM_SUCCESS)
@@ -382,12 +381,12 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
                 {
                     haveIPv6Conn = true;
-                    addr6 = netif_ip6_addr(netif, i);
-#if CHIP_ENABLE_OPENTHREAD 
+                    addr6        = netif_ip6_addr(netif, i);
+#if CHIP_ENABLE_OPENTHREAD
                     // We are using ot mDNS sever and need to add IP address to server list
                     memcpy(&newIpAddress.mFields.m32, addr6->addr, sizeof(Inet::IPAddress));
                     otMdnsServerAddAddress(ThreadStackMgrImpl().OTInstance(), &newIpAddress);
-#endif                    
+#endif
                     break;
                 }
             }
@@ -408,10 +407,10 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
 
-#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS sever 
+#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS sever
             /* (Re-)start the DNSSD server */
             chip::app::DnssdServer::Instance().StartServer();
-#endif            
+#endif
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -427,14 +426,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
-        
+
 #if CHIP_ENABLE_OPENTHREAD
-            //Start the Border Router services including MDNS Server
+            // Start the Border Router services including MDNS Server
             StartBrServices();
-#else // No need to do this for OT mDNS sever             
+#else // No need to do this for OT mDNS sever
             /* (Re-)start the DNSSD server */
             chip::app::DnssdServer::Instance().StartServer();
-#endif            
+#endif
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -487,16 +486,17 @@ void ConnectivityManagerImpl::StartBrServices()
 {
     if (mBorderRouterInit == false)
     {
-        struct netif *extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());;
-        struct netif  *thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
-        otInstance *thrInstancePtr;
+        struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
+        ;
+        struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
+        otInstance * thrInstancePtr;
 
-        //Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
-        //properly. If the thread netif is !=null it means that it was fully initialized
+        // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
+        // properly. If the thread netif is !=null it means that it was fully initialized
 
-        //Lock OT task
+        // Lock OT task
         if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
-        { 
+        {
             mBorderRouterInit = true;
             // Check if OT instance is init
             thrInstancePtr = ThreadStackMgrImpl().OTInstance();

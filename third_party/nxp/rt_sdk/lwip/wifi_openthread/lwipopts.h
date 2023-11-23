@@ -28,7 +28,7 @@
 #define MEMP_NUM_NETCONN (4)
 #define NETIF_MAX_HWADDR_LEN 8U
 
-//BR specific defines
+// BR specific defines
 #define LWIP_IPV6_SCOPES 1
 #define MAX_SOCKETS_UDP 10
 #define MEMP_NUM_UDP_PCB (MAX_SOCKETS_UDP + 2)
@@ -44,10 +44,10 @@
 #define LWIP_IPV6_DHCP6_STATEFUL 1
 #define LWIP_IPV6_DHCP6_PD 1
 
-// Header file with lwIP hooks 
+// Header file with lwIP hooks
 #define LWIP_HOOK_FILENAME "lwip_hooks.h"
 
-// Hook for multicast forwarding and other filtering 
+// Hook for multicast forwarding and other filtering
 #define LWIP_HOOK_IP6_CANFORWARD lwipCanForwardHook
 
 // Hook for filtering of input traffic

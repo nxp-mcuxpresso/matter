@@ -319,7 +319,7 @@ CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation
 {
     uint8_t productFinish;
     uint16_t length = 0;
-    auto err = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
     ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
@@ -331,7 +331,7 @@ CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInfor
 {
     uint8_t color;
     uint16_t length = 0;
-    auto err = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
+    auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
     ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
     *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);

@@ -409,7 +409,6 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
 
-
 // For Thread-only platforms this is unnecessary but Border router config needs to redefine to larger value
 #define LWIP_RAW 1
 #ifndef MEMP_NUM_RAW_PCB
@@ -471,7 +470,7 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define SUB_ETHERNET_HEADER_SPACE (0)
 #define PBUF_LINK_HLEN (14)
 
-#if LWIP_IPV6 
+#if LWIP_IPV6
 #ifndef LWIP_IPV6_NUM_ADDRESSES
 #define LWIP_IPV6_NUM_ADDRESSES 5
 #endif

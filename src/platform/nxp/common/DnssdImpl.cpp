@@ -19,8 +19,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
 
 #include <openthread/mdns_server.h>
 
@@ -115,25 +115,26 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = "";
     snprintf(serviceType, sizeof(serviceType), "%s.%s.local.", service->mType, GetProtocolString(service->mProtocol));
 
-    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = "";
+    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] =
+        "";
     snprintf(fullInstName, sizeof(fullInstName), "%s.%s", service->mName, serviceType);
 
     Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
     Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
 
-    uint8_t txtBuffer[chip::Dnssd::kDnssdTextMaxSize] = {0};
+    uint8_t txtBuffer[chip::Dnssd::kDnssdTextMaxSize] = { 0 };
     uint32_t txtBufferOffset                          = 0;
-    for (uint32_t i =0; i < service->mTextEntrySize; i++)
+    for (uint32_t i = 0; i < service->mTextEntrySize; i++)
     {
         uint32_t keySize = strlen(service->mTextEntries[i].mKey);
-        //add TXT entry len + 1 is for '='    
+        // add TXT entry len + 1 is for '='
         *(txtBuffer + txtBufferOffset++) = keySize + service->mTextEntries[i].mDataSize + 1;
-        
-        //add TXT entry key
+
+        // add TXT entry key
         memcpy(txtBuffer + txtBufferOffset, service->mTextEntries[i].mKey, keySize);
         txtBufferOffset += keySize;
-        
-        //add TXT entry value if pointer is not null, if pointer is null it means we have bool value
+
+        // add TXT entry value if pointer is not null, if pointer is null it means we have bool value
         if (service->mTextEntries[i].mData)
         {
             *(txtBuffer + txtBufferOffset++) = '=';
@@ -141,8 +142,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
             txtBufferOffset += service->mTextEntries[i].mDataSize;
         }
     }
-    aTxtEntry.mKey = nullptr;
-    aTxtEntry.mValue = txtBuffer;
+    aTxtEntry.mKey         = nullptr;
+    aTxtEntry.mValue       = txtBuffer;
     aTxtEntry.mValueLength = txtBufferOffset;
     otMdnsServerAddService(thrInstancePtr, fullInstName, serviceType, service->mPort, &aTxtEntry, 1);
 
@@ -151,21 +152,21 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-    //#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    //    ThreadStackMgr().InvalidateAllSrpServices();
-    //    return CHIP_NO_ERROR;
-    //#else
+    // #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    //     ThreadStackMgr().InvalidateAllSrpServices();
+    //     return CHIP_NO_ERROR;
+    // #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
-    //#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    // #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-    //#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    //    return ThreadStackMgr().RemoveInvalidSrpServices();
-    //#else
+    // #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    //     return ThreadStackMgr().RemoveInvalidSrpServices();
+    // #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
-    //#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    // #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
@@ -177,11 +178,11 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-    mDnsBrowseCallback = callback;
+    mDnsBrowseCallback          = callback;
 
     // +1 for null-terminator
-    //uint32_t serviceTypeSize = chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1;
-    //char * serviceType = static_cast<char *>(Platform::MemoryAlloc (serviceTypeSize));
+    // uint32_t serviceTypeSize = chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1;
+    // char * serviceType = static_cast<char *>(Platform::MemoryAlloc (serviceTypeSize));
 
     DnsResult * dnsResult = Platform::New<DnsResult>(context, CHIP_NO_ERROR);
     VerifyOrReturnError(dnsResult != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -213,7 +214,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     return MapOpenThreadError(error);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif    
+#endif
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
@@ -222,10 +223,11 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId inter
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
-    mDnsResolveCallback = callback;
+    mDnsResolveCallback         = callback;
 
     char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = ""; // +1 for null-terminator
-    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = "";
+    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] =
+        "";
     snprintf(serviceType, sizeof(serviceType), "%s.%s.local.", browseResult->mType, GetProtocolString(browseResult->mProtocol));
     snprintf(fullInstName, sizeof(fullInstName), "%s.%s", browseResult->mName, serviceType);
 
@@ -241,9 +243,9 @@ CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR FromOtDnsResponseToMdnsData(
-    otDnsServiceInfo & serviceInfo, const char * serviceType, chip::Dnssd::DnssdService & mdnsService,
-    DnsServiceTxtEntries & serviceTxtEntries, otError error)
+CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
+                                       chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries,
+                                       otError error)
 {
     char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
@@ -410,7 +412,7 @@ static void ChipDnssdOtBrowseCallback(otError aError, const otDnsBrowseResponse 
 
 exit:
     // Invoke callback to notify about end-of-browse when OT_ERROR_RESPONSE_TIMEOUT is received, otherwise ignore errors
-    if (aError == OT_ERROR_RESPONSE_TIMEOUT) 
+    if (aError == OT_ERROR_RESPONSE_TIMEOUT)
     {
         DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(browseContext));
     }
@@ -421,13 +423,13 @@ exit:
         DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(browseContext));
     }
 }
-static void ChipDnssdOtServiceCallback(otError aError, const otDnsServiceResponse * aResponse, void * aContext) 
+static void ChipDnssdOtServiceCallback(otError aError, const otDnsServiceResponse * aResponse, void * aContext)
 {
     CHIP_ERROR error;
     otError otErr;
     otDnsServiceInfo serviceInfo;
     DnsResult * dnsResult = Platform::New<DnsResult>(aContext, MapOpenThreadError(aError));
-    bool bStopQuery = false;
+    bool bStopQuery       = false;
 
     if (aError != OT_ERROR_RESPONSE_TIMEOUT)
     {
@@ -491,7 +493,8 @@ exit:
 
     if (bStopQuery)
     {
-        char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = "";
+        char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE +
+                          1] = "";
         snprintf(fullInstName, sizeof(fullInstName), "%s.%s", dnsResult->mMdnsService.mName, type);
 
         otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
