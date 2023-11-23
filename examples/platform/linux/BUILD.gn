@@ -86,8 +86,9 @@ source_set("app-main") {
 
   if (chip_with_imx_ele == 1) {
     sources += [
-      "DeviceAttestationCredsEle.cpp",
-      "DeviceAttestationCredsEle.h",
+#TODO enable this when official tool ready
+#      "DeviceAttestationCredsEle.cpp",
+#      "DeviceAttestationCredsEle.h",
       "PersistentStorageOperationalKeystoreEle.cpp",
       "PersistentStorageOperationalKeystoreEle.h",
     ]
@@ -129,7 +130,8 @@ source_set("app-main") {
 
   if (chip_with_imx_ele == 1) {
     defines += [ "CHIP_OP_KEYSTORE_ELE=1" ]
-    defines += [ "CHIP_ATTESTATION_ELE=1" ]
+#TODO enable this when official tool ready
+#   defines += [ "CHIP_ATTESTATION_ELE=1" ]
   } else {
     defines += [ "CHIP_OP_KEYSTORE_ELE=0" ]
     defines += [ "CHIP_ATTESTATION_ELE=0" ]
