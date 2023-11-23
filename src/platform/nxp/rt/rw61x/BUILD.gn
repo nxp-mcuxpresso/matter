@@ -103,7 +103,9 @@ static_library("nxp_platform") {
       "../../common/NetworkCommissioningDriver.h",
       "../../common/NetworkCommissioningWiFiDriver.cpp",
     ]
+    defines += [ "WIFI_DFS_OPTIMIZATION=1" ]
   }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "../../common/OTAImageProcessorImpl.cpp",
