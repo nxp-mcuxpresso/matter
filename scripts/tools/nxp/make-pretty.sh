@@ -46,19 +46,6 @@ readonly INCLUDE_DIRS=(
 )
 readonly CLANG_SOURCES=('*.c' '*.cpp' '*.h' '*.hpp')
 
-CLANG_VERSION="$(clang-format --version)"
-EXPECTED_VERSION="clang-format version 17"
-
-check_clang_version()
-{
-    case "${CLANG_VERSION}" in *"${EXPECTED_VERSION}"*);;
-        *)
-            echo "${EXPECTED_VERSION} is required"
-            exit 1
-            ;;
-    esac
-}
-
 do_clang_format()
 {
     echo -e '========================================'
@@ -105,8 +92,6 @@ do_clang_format_check()
 
 main()
 {
-    check_clang_version || exit 1
-
     if [ $# == 0 ]; then
         do_clang_format
     elif [ "$1" == 'format' ]; then
