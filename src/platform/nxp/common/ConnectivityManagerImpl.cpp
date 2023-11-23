@@ -142,7 +142,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             _SetWiFiStationState(kWiFiStationState_Connecting);
             ChipLogProgress(DeviceLayer, "WLAN connecting to network.name = \"%s\"", event->Platform.pNetworkDataEvent->name);
+#if WIFI_DFS_OPTIMIZATION
+            /* Skip DFS (Dynamic Frequency Selection) channels during scan, DFS is used to avoid interferences */
+            wlan_connect_opt(event->Platform.pNetworkDataEvent->name, true);
+#else
             wlan_connect(event->Platform.pNetworkDataEvent->name);
+#endif
         }
 
         if (event->Platform.pNetworkDataEvent != NULL)
