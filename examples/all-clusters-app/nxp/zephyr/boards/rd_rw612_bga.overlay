@@ -50,30 +50,6 @@
 	};
 };
 
-&smu1 {
-	#address-cells = <1>;
-	#size-cells = <1>;
-
-	smu1_data: memory@0 {
-		compatible = "zephyr,memory-region","mmio-sram";
-		reg = <0x0 DT_SIZE_K(510)>;
-		zephyr,memory-region = "SMU1";
-		zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_RAM))>;
-	};
-};
-
-&smu2 {
-	#address-cells = <1>;
-	#size-cells = <1>;
-
-	smu2_data: memory@0 {
-		compatible = "zephyr,memory-region","mmio-sram";
-		reg = <0x0 DT_SIZE_K(140)>;
-		zephyr,memory-region = "SMU2";
-		zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_RAM))>;
-	};
-};
-
 &flexspi {
 	status = "okay";
 
