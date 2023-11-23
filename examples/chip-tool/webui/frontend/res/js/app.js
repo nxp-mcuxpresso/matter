@@ -112,6 +112,11 @@
                 icon: 'add_circle_outline',
                 show: false,
             },
+            {
+                title: 'MediaControl',
+                icon: 'add_circle_outline',
+                show: false,
+            },
         ];
 
         $scope.onoff = {
@@ -183,7 +188,7 @@
             cluster: '6',
         };
 
-        $scope.binding= {
+        $scope.binding = {
             lightNodeAlias: '',
             lightNodeId: '',
             switchNodeAlias: '',
@@ -193,10 +198,23 @@
             switchEndpointId: 2,
         };
 
+        $scope.media = {
+            endPointId: 1,
+            launcher_type: 'launch',
+            mediaControl_type: 'play',
+            mediaRead_type: 'currentstate',
+        };
+
+        $scope.launchConf = {
+            catalogVendorID: '123',
+            applicationID: 'exampleid',
+        };
+
         $scope.headerTitle = 'Home';
         $scope.status = [];
         $scope.reports = [];
         $scope.subscribeStatus = [];
+        $scope.mediaReports = [];
 
         $scope.selectedNodeAlias = '';
         $scope.selectedNodeId = '';
@@ -205,14 +223,14 @@
 
         $scope.showPanels = function(index) {
             $scope.headerTitle = $scope.menu[index].title;
-            for (var i = 0; i < 7; i++) {
+            for (var i = 0; i < 8; i++) {
                 /* set i as the number of menu*/
                 $scope.menu[i].show = false;
             }
 
             $scope.menu[index].show = true;
 
-            if (index > 1 && index < 7) {
+            if (index > 1 && index < 8) {
                 var httpGetStatusReq = $http({
                     method: 'GET',
                     url: 'get_status',
@@ -696,6 +714,151 @@
                     }
                     ev.target.disabled = false;
                 });
+            });
+        };
+
+        $scope.launchApp = function(ev) {
+            $scope.showLoadingSpinner = true;
+            $scope.lanucher_type = "launch";
+            var data = {
+                nodeId: $scope.selectedNodeId,
+                endPointId: $scope.media.endPointId,
+                type: $scope.lanucher_type,
+                launchConf: $scope.launchConf,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'launcher',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'Launch App', 'success');
+                } else {
+                    $scope.showAlert(event, 'Launch App', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.stopApp = function(ev) {
+            $scope.showLoadingSpinner = true;
+            $scope.lanucher_type = "stop";
+            var data = {
+                nodeId: $scope.selectedNodeId,
+                endPointId: $scope.media.endPointId,
+                type: $scope.lanucher_type,
+                launchConf: $scope.launchConf,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'launcher',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'Stop App', 'success');
+                } else {
+                    $scope.showAlert(event, 'Stop App', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.mediaControl = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var buttonName = event.currentTarget.name;
+            switch (buttonName) {
+                case 'playButton':
+                    $scope.media.mediaControl_type = 'play';
+                    break;
+                case 'pauseButton':
+                    $scope.media.mediaControl_type = 'pause';
+                    break;
+                case 'stopButton':
+                    $scope.media.mediaControl_type = 'stop';
+                    break;
+                case 'startOverButton':
+                    $scope.media.mediaControl_type = 'startover';
+                    break;
+                case 'previousButton':
+                    $scope.media.mediaControl_type = 'previous';
+                    break;
+                case 'nextButton':
+                    $scope.media.mediaControl_type = 'next';
+                    break;
+                case 'rewindButton':
+                    $scope.media.mediaControl_type = 'rewind';
+                    break;
+                case 'fastForwardButton':
+                    $scope.media.mediaControl_type = 'fastforward';
+                    break;
+            }
+            var data = {
+                nodeId: $scope.selectedNodeId,
+                endPointId: $scope.media.endPointId,
+                type: $scope.media.mediaControl_type,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'media_control',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'Control Media App', 'success');
+                } else {
+                    $scope.showAlert(event, 'Control Media App', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.mediaRead = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var buttonName = event.currentTarget.name;
+            switch (buttonName) {
+                case 'currentStateButton':
+                    $scope.media.mediaRead_type = 'currentstate';
+                    break;
+                case 'startTimeButton':
+                    $scope.media.mediaRead_type = 'starttime';
+                    break;
+                case 'durationButton':
+                    $scope.media.mediaRead_type = 'duration';
+                    break;
+                case 'playbackSpeedButton':
+                    $scope.media.mediaRead_type = 'playbackspeed';
+                    break;
+            }
+            var data = {
+                nodeId: $scope.selectedNodeId,
+                endPointId: $scope.media.endPointId,
+                type: $scope.media.mediaRead_type,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'media_read',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'read operation is success, and get report', 'success');
+                    var reportsStr = response.data.report;
+                    $scope.mediaReports.reverse();
+                    $scope.mediaReports.push({
+                        report: reportsStr,
+                        icon: 'res/img/icon-info.png',
+                    });
+                    $scope.mediaReports.reverse();
+                } else {
+                    $scope.showAlert(event, 'read operation is success, but get report', 'failed');
+                }
+                ev.target.disabled = false;
             });
         };
 

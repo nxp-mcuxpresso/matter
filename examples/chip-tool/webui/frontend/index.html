@@ -629,6 +629,83 @@
             </md-content>
         </div>
 
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[7].show">
+            <md-content layout-padding flex="100">
+              <form name="mediaControlForm">
+                <h4>Media App Launch</h4>
+                <div layout="row">
+                  <md-input-container flex="50">
+                    <label>Node Alias</label>
+                    <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                      <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                    </md-select>
+                    <div ng-messages="mediaControlForm.nodeAlias.$error">
+                      <div ng-message="required">Required nodeAlias to delete.</div>
+                    </div>
+                  </md-input-container>
+
+                  <md-input-container flex="50">
+                    <label>Node ID</label>
+                    <input required name="nodeId" ng-model="selectedNodeId">
+                    <div ng-messages="mediaControlForm.nodeId.$error">
+                      <div ng-message="required">Required nodeId to delete.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+
+                <div layout="row">
+                  <md-input-container flex="100">
+                    <label>EndPoint ID</label>
+                    <input required name="endPointId" type="number" min="1" max="240" ng-model="media.endPointId">
+                    <div ng-messages="mediaControlForm.endPointId.$error">
+                      <div ng-message-exp="['required', 'min', 'max']">The endpoint id must be between 1 and 240.</div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div>
+                  <md-button name="launchAppButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="launchApp($event)">Launch APP</md-button>
+                  <md-button name="stopAppButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="stopApp($event)">Stop APP</md-button>
+                </div>
+
+                <h4>Media Control</h4>
+                <div>
+                  <md-button name="playButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Play</md-button>
+                  <md-button name="pauseButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Pause</md-button>
+                  <md-button name="stopButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Stop</md-button>
+                </div>
+
+                <div>
+                  <md-button name="previousButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Privious</md-button>
+                  <md-button name="nextButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Next</md-button>
+                  <md-button name="startOverButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Start Over</md-button>
+                </div>
+
+                <div>
+                  <md-button name="rewindButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Rewind</md-button>
+                  <md-button name="fastForwardButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaControl($event)">Fast Forward</md-button>
+                </div>
+
+                <h4>Media Status</h4>
+                <div>
+                  <md-button name="currentStateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaRead($event)">CurrentState</md-button>
+                  <md-button name="startTimeButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaRead($event)">StartTime</md-button>
+                  <md-button name="durationButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaRead($event)">Duration</md-button>
+                  <md-button name="playbackSpeedButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="mediaRead($event)">Playback Speed</md-button>
+                </div>
+              </form>
+            </md-content>
+
+            <md-list class="md-dense" flex=100>
+              <md-list-item class="md-3-line" ng-repeat="item in mediaReports">
+                <img ng-src="{{item.icon}}" class="md-avatar" alt="" />
+                  <div class="md-list-item-text" layout="column">
+                      <h4><div style="white-space:pre-wrap">{{ item.report }}</div></h4>
+                  </div>
+                <md-divider></md-divider>
+              </md-list-item>
+            </md-list>
+        </div>
+
       </div>
     </main>
   </div>
