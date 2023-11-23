@@ -90,6 +90,34 @@ private:
 };
 
 std::queue<ChipReport> SubscribeBuffers::m_queue;
+
+class MediaReportBuffers
+{
+public:
+    static void AddReport(const ChipReport & report) { m_queue.push(report); }
+
+    static ChipReport DequeueReport()
+    {
+        auto report = m_queue.front();
+        m_queue.pop();
+        return report;
+    }
+
+    static void ResetQueue()
+    {
+        while (!m_queue.empty())
+        {
+            m_queue.pop();
+        }
+    }
+
+    static bool IsQueueEmpty() { return m_queue.empty(); }
+
+private:
+    static std::queue<ChipReport> m_queue;
+};
+
+std::queue<ChipReport> MediaReportBuffers::m_queue;
 #endif
 
 class ReportCommand : public InteractionModelReports, public ModelCommand, public chip::app::ReadClient::Callback
@@ -118,7 +146,69 @@ private:
                     }
                     break;
                 }
+                break;
             }
+            case MediaPlayback::Id: {
+                switch (path.mAttributeId)
+                {
+                    case MediaPlayback::Attributes::CurrentState::Id:
+                    {
+                        MediaPlayback::PlaybackStateEnum val;
+                        chip::app::DataModel::Decode(*data, val);
+                        report.attr  = "CurrentState";
+                        switch (val)
+                        {
+                            case MediaPlayback::PlaybackStateEnum::kPlaying:
+                                report.value = "Play";
+                                break;
+                            case MediaPlayback::PlaybackStateEnum::kPaused:
+                                report.value = "Pause";
+                                break;
+                            case MediaPlayback::PlaybackStateEnum::kNotPlaying:
+                                report.value = "Stop";
+                                break;
+                            case MediaPlayback::PlaybackStateEnum::kBuffering:
+                                report.value = "Buffering";
+                                break;
+                            default:
+                                report.value = "Unknown";
+                                break;
+                        }
+                        ChipLogError(chipTool, "generate one report mediaplayback current-state=%s", report.value.c_str());
+                        break;
+                    }
+                    case MediaPlayback::Attributes::StartTime::Id:
+                    {
+                        uint64_t val;
+                        chip::app::DataModel::Decode(*data, val);
+                        report.attr  = "StartTime";
+                        report.value = std::to_string(val);
+                        ChipLogError(chipTool, "generate one report mediaplayback start-time=%s", report.value.c_str());
+                        break;
+                    }
+                    case MediaPlayback::Attributes::Duration::Id:
+                    {
+                        uint64_t val;
+                        chip::app::DataModel::Decode(*data, val);
+                        report.attr  = "Duration";
+                        report.value = std::to_string(val) + "ms";
+                        ChipLogError(chipTool, "generate one report mediaplayback duration-value=%s", report.value.c_str());
+                        break;
+                    }
+                    case MediaPlayback::Attributes::PlaybackSpeed::Id:
+                    {
+                        float val;
+                        chip::app::DataModel::Decode(*data, val);
+                        report.attr  = "PlaybackSpeed";
+                        report.value = std::to_string(val);
+                        ChipLogError(chipTool, "generate one report mediaplayback PlaybackSpeed=%s", report.value.c_str());
+                        break;
+                    }
+                    break;
+                }
+                break;
+            }
+            break;
         }
         return report;
     }
@@ -168,7 +258,20 @@ public:
             mError = error;
             return;
         }
-        ReportBuffers::AddReport(GenerateReport(path, data, peerId));
+        switch (path.mClusterId)
+        {
+            case OnOff::Id:
+            {
+                ReportBuffers::AddReport(GenerateReport(path, data, peerId));
+                break;
+            }
+            case MediaPlayback::Id:
+            {
+                MediaReportBuffers::AddReport(GenerateReport(path, data, peerId));
+                break;
+            }
+            break;
+        }
     }
     #else
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,

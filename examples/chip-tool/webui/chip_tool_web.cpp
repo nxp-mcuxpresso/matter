@@ -711,6 +711,166 @@ int main()
         }
     };
 
+    server.resource["^/launcher$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            auto nodeId  = root.get<string>("nodeId");
+            auto endPointId = root.get<int>("endPointId");
+            auto type  = root.get<string>("type");
+            auto launchConf = root.get_child("launchConf");
+            auto catalogVendorID = launchConf.get<string>("catalogVendorID");
+            auto applicationID = launchConf.get<string>("applicationID");
+            std::string launchConfString = "'{\"catalogVendorID\": " +  catalogVendorID + ", \"applicationID\": \"" + applicationID + "\"}'";
+            std::string command;
+            if (type == "launch") {
+                command = "applicationlauncher launch-app " + launchConfString + nodeId + " " + std::to_string(endPointId);
+                ChipLogError(NotSpecified, "Received POST request to Launch App");
+            } else if (type == "stop") {
+                command = "applicationlauncher stop-app " + launchConfString + nodeId + " " + std::to_string(endPointId);
+                ChipLogError(NotSpecified, "Received POST request to Stop App");
+            }
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                root.put("result", RESPONSE_SUCCESS);
+            }
+
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception &e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
+    server.resource["^/media_control$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            auto nodeId  = root.get<string>("nodeId");
+            auto endPointId = root.get<int>("endPointId");
+            auto type  = root.get<string>("type");
+            ChipLogError(NotSpecified, "Received POST request for media control" );
+            std::string command;
+            if (type == "play") {
+                command = "mediaplayback play " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "pause") {
+                command = "mediaplayback pause " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "stop") {
+                command = "mediaplayback stop " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "startover") {
+                command = "mediaplayback start-over " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "previous") {
+                command = "mediaplayback previous " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "next") {
+                command = "mediaplayback next " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "rewind") {
+                command = "mediaplayback rewind " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "fastforward") {
+                command = "mediaplayback fast-forward " + nodeId + " " + std::to_string(endPointId);
+            }
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                root.put("result", RESPONSE_SUCCESS);
+            }
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception & e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
+    server.resource["^/media_read$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request)
+    {
+        try
+        {
+            ptree root;
+            read_json(request->content, root);
+            auto nodeId  = root.get<string>("nodeId");
+            auto endPointId = root.get<int>("endPointId");
+            auto type  = root.get<string>("type");
+            ChipLogError(NotSpecified, "Received POST request for media control" );
+            std::string command;
+            if (type == "currentstate") {
+                command = "mediaplayback read current-state " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "starttime") {
+                command = "mediaplayback read start-time " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "duration") {
+                command = "mediaplayback read duration " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "sampledposition") {
+                command = "mediaplayback read sampled-position " + nodeId + " " + std::to_string(endPointId);
+            } else if (type == "playbackspeed") {
+                command = "mediaplayback read playback-speed " + nodeId + " " + std::to_string(endPointId);
+            }
+            auto start_time = std::chrono::steady_clock::now();
+            if (chipToolInteractiveCommand(command.c_str())) {
+                root.put("result", RESPONSE_FAILURE);
+            } else {
+                string report_text;
+                root.put("result", RESPONSE_SUCCESS);
+                if (!MediaReportBuffers::IsQueueEmpty())
+                {
+                    ChipReport r = MediaReportBuffers::DequeueReport();
+                    stringstream report_ss;
+                    ptree storageNodes = getStorageKeyNodeID();
+                    string nodeAlias;
+                    for (const auto& pair : storageNodes)
+                    {
+                        if (pair.second.get_value<int>() == r.nodeid)
+                        {
+                            nodeAlias = pair.first;
+                            break;
+                        }
+                    }
+                    report_ss << "Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
+                                    << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
+                    report_text = report_ss.str();
+                    root.put("report", report_text);
+                    ChipLogError(NotSpecified, "Generated media app report successfully: %s", report_text.c_str());
+                } else {
+                    std::thread([](){
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }).detach();
+                }
+            }
+            auto end_time = std::chrono::steady_clock::now();
+            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+            if (elapsed_seconds > 60) {
+                root.put("result", RESPONSE_FAILURE);
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            response->write(strContent);
+        } catch (const exception & e)
+        {
+            response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
+        }
+    };
+
     // Get example simulating heavy work in a separate thread
     server.resource["^/work$"]["GET"] = [&server](shared_ptr<HttpServer::Response> response,
                                                   shared_ptr<HttpServer::Request> /*request*/) {
