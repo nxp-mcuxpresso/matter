@@ -94,7 +94,3 @@
 		};
 	};
 };
-
-&enet {
-	status = "disabled";
-};
