@@ -250,7 +250,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue bool = %u", val);
+#endif
 
 exit:
     return err;
@@ -268,7 +270,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint32_t & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue uint32_t = %lu", val);
+#endif
 
 exit:
     return err;
@@ -286,7 +290,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint64_t & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue uint64_t = " ChipLogFormatX64, ChipLogValueX64(val));
+#endif
 
 exit:
     return err;
@@ -302,7 +308,9 @@ CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, si
     status = ramStorageGet(&ramDescrKeyInt, (uint8_t *) &key, sizeof(Key), 0, (uint8_t *) buf, &sizeToRead);
     SuccessOrExit(err = MapRamStorageStatus(status));
     outLen = sizeToRead;
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValueStr lenRead = %u", outLen);
+#endif
 
 exit:
     return err;
@@ -323,7 +331,9 @@ CHIP_ERROR NXPConfig::ReadConfigValueBin(const char * keyString, uint8_t * buf, 
     status = ramStorageGet(&ramDescrKeyString, (const uint8_t *) keyString, strlen(keyString), 0, (uint8_t *) buf, &sizeToRead);
     SuccessOrExit(err = MapRamStorageStatus(status));
     outLen = sizeToRead;
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValueStr lenRead = %u", outLen);
+#endif
 
 exit:
     return err;
@@ -349,7 +359,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, bool val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -369,7 +381,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint32_t val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -389,7 +403,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint64_t val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue64: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -414,7 +430,9 @@ CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str, size_t strL
     (void) err_len;
     DBG_PRINTF("WriteConfigValueStr: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -439,7 +457,9 @@ CHIP_ERROR NXPConfig::WriteConfigValueBin(const char * keyString, const uint8_t 
     (void) err_len;
     DBG_PRINTF("WriteConfigValueBin: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
