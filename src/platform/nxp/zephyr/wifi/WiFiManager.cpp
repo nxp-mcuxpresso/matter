@@ -147,7 +147,7 @@ const Map<uint32_t, WiFiManager::NetEventHandler, 5>
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
-    if (0 == strcmp(iface->if_dev->dev->name, "ml"))
+    if (0 == strcmp(iface->if_dev->dev->name, InetUtils::GetInterface()->if_dev->dev->name))
     {
         Platform::UniquePtr<uint8_t> eventData(new uint8_t[cb->info_length]);
         VerifyOrReturn(eventData);
