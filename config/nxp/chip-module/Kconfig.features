@@ -26,17 +26,10 @@ config CHIP_WIFI
 	select WIFI_NXP
 	select WPA_SUPP
 	select WPA_SUPP_AP
-	select WPA_SUPP_CRYPTO
 	select WPA_SUPP_WPS
 	select WPA_SUPP_WPA3
 	select WPA_SUPP_CRYPTO_ENTERPRISE
-	select POSIX_CLOCK
-	select NET_IPV4
-	select NET_IPV6
-	select NET_DHCPV4
-	select NET_MGMT_EVENT
-	select NET_L2_ETHERNET
-	select MBEDTLS_ENTROPY_C
+	imply MBEDTLS_ENTROPY_C
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
 	imply NET_PKT_TIMESTAMP
