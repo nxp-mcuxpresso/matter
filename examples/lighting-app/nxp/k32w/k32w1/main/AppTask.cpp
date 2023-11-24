@@ -359,7 +359,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != OTA_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != SOFT_RESET_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -373,9 +373,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = LightActionEventHandler;
     }
-    else if (pin_no == OTA_BUTTON)
+    else if (pin_no == SOFT_RESET_BUTTON)
     {
-        //button_event.Handler = OTAHandler;
+        // Soft reset ensures that platform manager shutdown procedure is called.
+        button_event.Handler = SoftResetHandler;
     }
     else if (pin_no == BLE_BUTTON)
     {
@@ -427,7 +428,7 @@ button_status_t AppTask::KBD_Callback(void *buttonHandle, button_callback_messag
 
                 case LIGHT_BUTTON:
                     //K32W_LOG("pb2 long press");
-                    ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
+                    ButtonEventHandler(SOFT_RESET_BUTTON, SOFT_RESET_BUTTON_PUSH);
                     break;
             }
             break;
@@ -549,28 +550,13 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::OTAHandler(AppEvent * aEvent)
+void AppTask::SoftResetHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != OTA_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != SOFT_RESET_BUTTON)
         return;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (sAppTask.mFunction != kFunction_NoneSelected)
-    {
-        K32W_LOG("Another function is scheduled. Could not initiate OTA!");
-        return;
-    }
-
-    PlatformMgr().ScheduleWork(StartOTAQuery, 0);
-#endif
+    PlatformMgrImpl().CleanReset();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void AppTask::StartOTAQuery(intptr_t arg)
-{
-    GetRequestorInstance()->TriggerImmediateQuery();
-}
-#endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
 {

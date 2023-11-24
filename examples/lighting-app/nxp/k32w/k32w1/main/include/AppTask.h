@@ -79,7 +79,7 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static button_status_t KBD_Callback(void *buttonHandle, button_callback_message_t *message,void *callbackParam);
-    static void OTAHandler(AppEvent * aEvent);
+    static void SoftResetHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void LightActionEventHandler(AppEvent * aEvent);
