@@ -492,5 +492,7 @@ void AppTask::SwitchCommissioningStateHandler(void)
 
 void AppTask::FactoryResetHandler(void)
 {
-    ConfigurationMgr().InitiateFactoryReset();
+    /* Emit the ShutDown event before factory reset */
+    chip::Server::GetInstance().GenerateShutDownEvent();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
