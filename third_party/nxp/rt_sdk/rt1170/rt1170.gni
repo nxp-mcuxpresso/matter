@@ -166,8 +166,7 @@ template("rt1170_sdk_drivers") {
       ]
     }
 
-    if ((chip_enable_wifi) && (iwx12_transceiver))
-    {
+    if (chip_enable_wifi && iwx12_transceiver) {
       # Need to define the WLAN_REGION_CODE for the tx power
       defines += [ "WLAN_REGION_CODE=\"WW\"" ]
     }
@@ -193,14 +192,14 @@ template("rt1170_sdk_drivers") {
         # This flag must be defined here in order for the controller to only be initialized once for all (ble, ot, wifi)
         "CONTROLLER_INIT_ESCAPE=1",
       ]
-      _rt1170_sdk_drivers_include_dirs += [ 
+      _rt1170_sdk_drivers_include_dirs += [
         # Adding bt_crypto includes as this is needed by bt_pal_smp.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
+
         # Adding fifo needed by bt_pal_att.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
       ]
     }
-
 
     if (chip_enable_matter_cli) {
       #When the CLI is enabled the debug console should be moved in UART2 for RT1170
@@ -290,13 +289,14 @@ template("rt1170_sdk_drivers") {
 
     if (chip_enable_ble) {
       sources += [
-        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_wifi_nxp.c",
-        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_uart.c",
         # Adding bt_crypto as this is needed by bt_pal_smp.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto/bt_crypto.c",
+
         # Adding fifo needed by bt_pal_att.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c",
-        ]
+        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_wifi_nxp.c",
+        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_uart.c",
+      ]
     }
 
     if (chip_enable_wifi) {

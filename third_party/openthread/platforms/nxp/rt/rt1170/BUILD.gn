@@ -34,9 +34,9 @@ config("openthread_rt1170_config") {
     "${openthread_root}/examples/platforms",
   ]
   defines = [ "OT_PLAT_SPINEL_OVER_SPI" ]
-  
+
   if (chip_enable_wifi && chip_enable_openthread) {
-    defines = [
+    defines += [
       "OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE=1",
       "OPENTHREAD_CONFIG_COMMISSIONER_ENABLE=1",
       "OPENTHREAD_CONFIG_BORDER_ROUTING_ENABLE=1",
@@ -72,12 +72,12 @@ source_set("libopenthread-rt1170") {
 
   if (chip_enable_wifi && chip_enable_openthread) {
     sources += [
-    "${openthread_nxp_root}/src/common/br/infra_if.c",
-    "${openthread_nxp_root}/src/common/br/udp_plat.c",
-    "${openthread_nxp_root}/src/common/br/border_agent.c",
-    "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
-    "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
-    "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/border_agent.c",
+      "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/infra_if.c",
+      "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
+      "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/udp_plat.c",
     ]
   }
 
