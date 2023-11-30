@@ -27,9 +27,15 @@
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA || CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #if WIFI_TRANSCEIVER_SUPPORT
-#define NOT_DEFINE_DEFAULT_WIFI_MODULE
-/* app_config.h comes from: <sdk>/components/wifi_bt_module/template/wifi_config.h */
+#ifdef NXP_SDK_2_15_SUPPORT
+/* comes from: <sdk>/components/wifi_bt_module/incl/wifi_bt_module_config.h */
+#include "wifi_bt_module_config.h"
+#else
+/* app_config.h comes from: <sdk>/components/wifi_bt_module/template */
 #include "app_config.h"
+#endif
+/* comes from: <sdk>/components/wifi_bt_module/template/wifi_config.h */
+#include "wifi_config.h"
 #endif /* WIFI_TRANSCEIVER_SUPPORT */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

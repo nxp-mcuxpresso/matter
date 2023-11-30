@@ -67,6 +67,9 @@ declare_args() {
 
   # Enables Watchdog support
   use_watchdog = 0
+
+  # SDK 2.15 support
+  is_sdk_2_15 = false
 }
 
 declare_args() {
@@ -83,6 +86,11 @@ if (!defined(rt_fwk_platform)) {
 }
 
 assert(rt_sdk_root != "", "rt_sdk_root must be specified")
+
+# Assuming 2.15 SDK support for RT1170
+if (!is_sdk_2_15 && rt_platform == "rt1170") {
+  is_sdk_2_15 = true
+}
 
 rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos-kernel"
 
@@ -309,6 +317,7 @@ template("rt_sdk") {
       "${rt_core_sdk_root}/components/wifi_bt_module/AzureWave/tx_pwr_limits",
       "${rt_core_sdk_root}/components/wifi_bt_module/Murata/tx_pwr_limits",
       "${rt_core_sdk_root}/components/wifi_bt_module/template",
+      "${rt_core_sdk_root}/components/wifi_bt_module/incl",
       "${rt_core_sdk_root}/components/messaging",
       "${rt_core_sdk_root}/components/mem_manager",
       "${rt_core_sdk_root}/components/flash/mflash",
@@ -323,6 +332,8 @@ template("rt_sdk") {
       "${rt_sdk_root}/middleware/wireless/framework/FileCache",
       "${rt_sdk_root}/middleware/wireless/framework/FSAbstraction",
       "${rt_sdk_root}/middleware/wireless/framework/KeyStorage",
+
+      #"${rt_sdk_root}/middleware/wireless/framework/DBG",
 
       #littlefs
       "${rt_sdk_root}/middleware/littlefs",
@@ -427,13 +438,10 @@ template("rt_sdk") {
         # No OSA main task
         "FSL_OSA_MAIN_FUNC_ENABLE=0",
       ]
-      if (chip_enable_openthread)
-      {
-        defines += ["CONFIG_MAX_IPV6_ADDRESSES=8"]
-      }
-      else
-      {
-        defines += ["CONFIG_MAX_IPV6_ADDRESSES=5"]
+      if (chip_enable_openthread) {
+        defines += [ "CONFIG_MAX_IPV6_ADDRESSES=8" ]
+      } else {
+        defines += [ "CONFIG_MAX_IPV6_ADDRESSES=5" ]
       }
     }
 
@@ -465,7 +473,6 @@ template("rt_sdk") {
       defines += [
         "WIFI_IW612_BOARD_RD_USD",
         "SDIO_ENABLED",
-        "SD9177",
       ]
     }
 
@@ -534,6 +541,10 @@ template("rt_sdk") {
     # Now add our "system-header" include dirs
     foreach(include_dir, _sdk_include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+
+    if (is_sdk_2_15) {
+      defines += [ "NXP_SDK_2_15_SUPPORT" ]
     }
 
     #Adding pre-include files

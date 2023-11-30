@@ -50,7 +50,9 @@ template("bt_ble_target") {
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs",
+
+      #sdk hook for fatfs config file required for ethermind include files
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
 
       #ethermind
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/include",
@@ -215,6 +217,9 @@ template("bt_ble_target") {
     if (!defined(deps)) {
       deps = []
     }
+
+    defines =
+        [ "vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE" ]
 
     # Adding a dependency to platform_buildconfig to make sure that the file platform_buildconfig.h is generated first
     # In fact depending on the build order, issue could happen if the file platform_buildconfig.h is not generated before building rand32.cpp
