@@ -72,6 +72,7 @@ if(CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS)
         ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
         ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+        ${ALL_CLUSTERS_NXP_COMMON_DIR}/main/ICDUtil.cpp
     )
 elseif(CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER)
     chip_configure_data_model(app
