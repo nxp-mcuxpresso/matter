@@ -49,7 +49,7 @@ if (is_sdk_package) {
   COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
   UTILITIES_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
   UTILITIES_SHELL_FILES_PATH =
-      "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
+      "${rt_sdk_root}/devices/${deviceBoardName}/utilities/shell"
   UTILITIES_ASSERT_FILES_PATH =
       "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
   DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
