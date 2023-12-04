@@ -46,8 +46,8 @@ static_library("nxp_platform") {
     "DefaultTestEventTriggerDelegate.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
+    "../../common/KeyValueStoreManagerImpl.cpp",
+    "../../common/KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
@@ -56,13 +56,17 @@ static_library("nxp_platform") {
   ]
 
   if (chip_key_storage == "fwk_nvm") {
-    defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
+    defines = [
+      "CHIP_PLAT_NVM_SUPPORT=1",
+      "CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT=2048",
+      "CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING=8192"
+    ]
 
     sources += [
-      "K32W1Config.cpp",
-      "K32W1Config.h",
-      "ram_storage.c",
-      "ram_storage.h"
+      "../../common/NXPConfig.cpp",
+      "../../common/NXPConfig.h",
+      "../../common/ram_storage.c",
+      "../../common/ram_storage.h"
     ]
   } else if (chip_key_storage == "littlefs") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
