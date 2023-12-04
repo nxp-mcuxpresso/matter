@@ -51,9 +51,6 @@ template("bt_ble_target") {
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
 
-      #sdk hook for fatfs config file required for ethermind include files
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
-
       #ethermind
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/include",
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/eOSAL",
@@ -109,6 +106,18 @@ template("bt_ble_target") {
       defines += [ "HAL_UART_DMA_ENABLE=1" ]
       bt_ble_include_dirs +=
           [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux" ]
+    }
+
+    if (is_sdk_2_15) {
+      bt_ble_include_dirs += [
+        #sdk hook for fatfs config file required for ethermind include files
+        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
+        ]
+
+    } else {
+      bt_ble_include_dirs += [
+        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs",
+        ]
     }
 
     defines += [

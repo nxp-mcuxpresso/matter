@@ -1,3 +1,10 @@
+/*
+ *  Copyright 2023 NXP
+ *  All rights reserved.
+ *
+ *  SPDX-License-Identifier: BSD-3-Clause
+ */
+
 #ifndef _FFCONF_H_
 #define _FFCONF_H_
 
