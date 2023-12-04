@@ -35,10 +35,6 @@
 #include "fwk_key_storage.h"
 #include "fwk_lfs_mflash.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include "ot_platform_common.h"
-#endif
-
 #if defined(DEBUG_NVM) && (DEBUG_NVM == 2)
 #include "fsl_debug_console.h"
 #define DBG_PRINTF PRINTF

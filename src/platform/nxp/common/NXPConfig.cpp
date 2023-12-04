@@ -37,10 +37,6 @@
 #define CHIP_PLAT_SAVE_NVM_DATA_ON_IDLE 1
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include "ot_platform_common.h"
-#endif
-
 #define BUFFER_LOG_SIZE 256
 
 /*
