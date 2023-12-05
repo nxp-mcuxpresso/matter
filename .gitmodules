@@ -62,6 +62,7 @@
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = ../ot-nxp.git
+	platforms = nxp
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git
