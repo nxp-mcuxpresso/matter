@@ -170,7 +170,8 @@ template("k32w1_sdk") {
           "${k32w1_sdk_root}/middleware/littlefs",
           "${k32w1_sdk_root}/components/flash/mflash",
           "${k32w1_sdk_root}/components/flash/mflash/k32w1",
-          "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction"
+          "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction",
+          "${k32w1_sdk_root}/middleware/wireless/framework/FileCache"
         ]
     }
 
@@ -590,7 +591,9 @@ template("k32w1_sdk") {
 
         "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction/fwk_fs_abstraction.c",
         "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction/fwk_lfs_mflash.c",
-        "${chip_root}/src/platform/nxp/k32w/k32w1/peripherals.c"
+        "${chip_root}/src/platform/nxp/k32w/k32w1/peripherals.c",
+
+        "${k32w1_sdk_root}/middleware/wireless/framework/FileCache/fwk_file_cache.c"
       ]
     }
 
