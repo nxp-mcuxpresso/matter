@@ -12,12 +12,14 @@ control.
 
 <hr>
 
--   [Introduction](#intro)
--   [Building](#building)
--   [Manufacturing data](#manufacturing)
--   [Flashing and debugging](#flashdebug)
--   [Testing the example](#testing-the-example)
--   [Matter Shell](#matter-shell)
+- [CHIP RT1060 All-clusters Application](#chip-rt1060-all-clusters-application)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Manufacturing data](#manufacturing-data)
+  - [Flashing and debugging](#flashing-and-debugging)
+  - [Testing the example](#testing-the-example)
+    - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
+    - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
 
 <hr>
 
@@ -57,6 +59,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
 
 ```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/repo
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west init -l manifest --mf west.yml
