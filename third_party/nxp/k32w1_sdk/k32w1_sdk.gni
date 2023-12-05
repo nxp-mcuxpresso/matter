@@ -169,7 +169,8 @@ template("k32w1_sdk") {
         _sdk_include_dirs += [
           "${k32w1_sdk_root}/middleware/littlefs",
           "${k32w1_sdk_root}/components/flash/mflash",
-          "${k32w1_sdk_root}/components/flash/mflash/k32w1"
+          "${k32w1_sdk_root}/components/flash/mflash/k32w1",
+          "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction"
         ]
     }
 
@@ -585,7 +586,11 @@ template("k32w1_sdk") {
         "${k32w1_sdk_root}/components/flash/mflash/k32w1/mflash_drv.c",
 
         "${k32w1_sdk_root}/middleware/littlefs/lfs.c",
-        "${k32w1_sdk_root}/middleware/littlefs/lfs_util.c"
+        "${k32w1_sdk_root}/middleware/littlefs/lfs_util.c",
+
+        "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction/fwk_fs_abstraction.c",
+        "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction/fwk_lfs_mflash.c",
+        "${chip_root}/src/platform/nxp/k32w/k32w1/peripherals.c"
       ]
     }
 
