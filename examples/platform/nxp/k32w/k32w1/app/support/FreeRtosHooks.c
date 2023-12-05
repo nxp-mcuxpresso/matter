@@ -29,6 +29,8 @@
 
 #if (CHIP_PLAT_NVM_SUPPORT == 1)
 #include "NVM_Interface.h"
+#elif (CHIP_PLAT_NVM_SUPPORT == 3)
+#include "fwk_file_cache.h"
 #endif
 #include "PWR_Interface.h"
 #include "board.h"
@@ -143,6 +145,8 @@ void vApplicationIdleHook(void)
     OSA_InterruptDisable();
 #if (CHIP_PLAT_NVM_SUPPORT == 1)
     NvIdle();
+#elif (CHIP_PLAT_NVM_SUPPORT == 3)
+    FC_Process();
 #endif
     OSA_InterruptEnable();
 
