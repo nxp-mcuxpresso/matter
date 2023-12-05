@@ -165,6 +165,10 @@ template("k32w1_sdk") {
           "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Interface",
           "${k32w1_sdk_root}/middleware/wireless/framework/FileSystem"
         ]
+    } else if (chip_key_storage == "littlefs") {
+        _sdk_include_dirs += [
+          "${k32w1_sdk_root}/middleware/littlefs"
+        ]
     }
 
     if (sdk_release == 1) {
@@ -371,6 +375,15 @@ template("k32w1_sdk") {
       defines += invoker.defines
     }
 
+    if (chip_key_storage == "littlefs") {
+      defines += [
+        "LFS_THREADSAFE",
+        "LFS_NO_DEBUG",
+        "LFS_NO_ERROR",
+        "LFS_NO_WARN"
+      ]
+    }
+
     cflags = [
       "-Wno-unused-function",
       "-Wno-conversion",
@@ -564,6 +577,11 @@ template("k32w1_sdk") {
     if (chip_key_storage == "fwk_nvm") {
       sources += [
         "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c"
+      ]
+    } else if (chip_key_storage == "littlefs") {
+      sources += [
+        "${k32w1_sdk_root}/middleware/littlefs/lfs.c",
+        "${k32w1_sdk_root}/middleware/littlefs/lfs_util.c"
       ]
     }
 
