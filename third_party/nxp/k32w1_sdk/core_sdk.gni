@@ -160,6 +160,13 @@ core_sdk = {
     core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK" ]
   }
 
+  if (chip_key_storage == "littlefs") {
+    core_include_dirs += [
+      "${COMPONENT_FLASH_DIR_PATH}/mflash",
+      "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1"
+    ]
+  }
+
   core_defines = [
     "CPU_K32W1480VFTA",
     "__STARTUP_CLEAR_BSS",
@@ -245,5 +252,11 @@ core_sdk = {
     core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/devices/K32W1480/fsl_pm_device.c" ]
   } else {
     core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK/fsl_pm_board.c" ]
+  }
+
+  if (chip_key_storage == "littlefs") {
+    core_sources += [
+      "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1/mflash_drv.c"
+    ]
   }
 }
