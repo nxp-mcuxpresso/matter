@@ -76,6 +76,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/path/to/previously/downloaded/SDK
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170/
 ```
