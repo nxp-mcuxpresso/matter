@@ -70,6 +70,8 @@ static_library("nxp_platform") {
     ]
   } else if (chip_key_storage == "littlefs") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
+
+    sources += [ "../../common/NXPConfigKS.cpp" ]
   }
 
   public = [
