@@ -167,7 +167,9 @@ template("k32w1_sdk") {
         ]
     } else if (chip_key_storage == "littlefs") {
         _sdk_include_dirs += [
-          "${k32w1_sdk_root}/middleware/littlefs"
+          "${k32w1_sdk_root}/middleware/littlefs",
+          "${k32w1_sdk_root}/components/flash/mflash",
+          "${k32w1_sdk_root}/components/flash/mflash/k32w1"
         ]
     }
 
@@ -580,6 +582,8 @@ template("k32w1_sdk") {
       ]
     } else if (chip_key_storage == "littlefs") {
       sources += [
+        "${k32w1_sdk_root}/components/flash/mflash/k32w1/mflash_drv.c",
+
         "${k32w1_sdk_root}/middleware/littlefs/lfs.c",
         "${k32w1_sdk_root}/middleware/littlefs/lfs_util.c"
       ]
