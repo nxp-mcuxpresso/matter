@@ -88,7 +88,8 @@ static_library("nxp_platform") {
       "../../common/KeyValueStoreManagerImpl.cpp",
       "../../common/KeyValueStoreManagerImpl.h",
       "../../common/NXPConfigKS.cpp",
-      "../../common/NXPConfig.h"
+      "../../common/NXPConfig.h",
+      "peripherals.c"
     ]
   }
 
