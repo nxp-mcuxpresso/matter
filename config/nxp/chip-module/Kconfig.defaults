@@ -345,3 +345,6 @@ config FLASH_SHELL
 endif # SHELL
 
 endif
+
+config NXP_FW_LOADER_MONOLITHIC
+	default y if NXP_FW_LOADER
