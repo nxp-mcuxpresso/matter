@@ -130,6 +130,7 @@ function(nxp_generate_factory_data_bin script_path output_path)
     string(APPEND script_args "--serial_num \"${CONFIG_CHIP_DEVICE_SERIAL_NUMBER}\"\n")
     string(APPEND script_args "--date \"${CONFIG_CHIP_DEVICE_MANUFACTURING_DATE}\"\n")
     string(APPEND script_args "--unique_id \"${CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID}\"\n")
+    string(APPEND script_args "--product_finish ${CONFIG_CHIP_DEVICE_PRODUCT_FINISH}\n")
     string(APPEND script_args "--out \"${output_path}/factory_data.bin\"\n")
 
     # for development purpose user can use default certs instead of generating or providing them
@@ -173,6 +174,10 @@ function(nxp_generate_factory_data_bin script_path output_path)
         endif()
 
         string(APPEND script_args "--aes128_key \"${CONFIG_CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY}\"\n")
+    endif()
+
+    if(CONFIG_CHIP_DEVICE_PRODUCT_COLOR)
+        string(APPEND script_args "--product_primary_color ${CONFIG_CHIP_DEVICE_PRODUCT_COLOR}\n")
     endif()
 
     # execute the script which can generate the factory_data.bin file
