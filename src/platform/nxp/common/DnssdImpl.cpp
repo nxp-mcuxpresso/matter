@@ -125,6 +125,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 {
     ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
+    otError otErr;
     otDnsTxtEntry aTxtEntry;
     uint32_t txtBufferOffset = 0;
 
@@ -167,8 +168,12 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     aTxtEntry.mValue       = txtBuffer;
     aTxtEntry.mValueLength = txtBufferOffset;
 
-    return MapOpenThreadError(otMdnsServerAddService(thrInstancePtr, fullInstName, serviceType, service->mSubTypes,
-                                                     service->mSubTypeSize, service->mPort, &aTxtEntry, 1));
+    otErr = otMdnsServerAddService(thrInstancePtr, fullInstName, serviceType, service->mSubTypes, service->mSubTypeSize, 
+                                   service->mPort, &aTxtEntry, 1);
+    // Ignore duplicate error and threat it as error none
+    if (otErr == OT_ERROR_DUPLICATED) otErr = OT_ERROR_NONE;
+
+    return MapOpenThreadError(otErr);
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
