@@ -20,7 +20,7 @@
 #include "AppEvent.h"
 #include <app/server/Server.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include "binding-handler.h"
 
 #include <app/server/OnboardingCodesUtil.h>
