@@ -115,8 +115,8 @@ CHIP_ERROR ChipDnssdRemoveServices()
 {
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
 
-    otMdnsServerRemoveService(thrInstancePtr, nullptr, "_matter._tcp.local.");
-    otMdnsServerRemoveService(thrInstancePtr, nullptr, "_matterc._udp.local.");
+    otMdnsServerMarkServiceForRemoval(thrInstancePtr, nullptr, "_matter._tcp.local.");
+    otMdnsServerMarkServiceForRemoval(thrInstancePtr, nullptr, "_matterc._udp.local.");
 
     return CHIP_NO_ERROR;
 }
@@ -178,7 +178,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    otMdnsServerRemoveMarkedServices(ThreadStackMgrImpl().OTInstance());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
