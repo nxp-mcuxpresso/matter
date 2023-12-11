@@ -463,7 +463,7 @@ SECTIONS
     KEEP(*(.heap*))
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data
+  } > m_data2
 
   .stack :
   {
@@ -471,7 +471,7 @@ SECTIONS
     __StackLimit = .;
     . += STACK_SIZE;
     __StackTop = .;
-  } > m_data
+  } > m_data2
 
   PROVIDE(__stack = __StackTop);
 
