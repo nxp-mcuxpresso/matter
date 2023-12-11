@@ -31,6 +31,7 @@
 /* comes from: <sdk>/components/wifi_bt_module/incl/wifi_bt_module_config.h */
 #include "wifi_bt_module_config.h"
 #else
+#define NOT_DEFINE_DEFAULT_WIFI_MODULE
 /* app_config.h comes from: <sdk>/components/wifi_bt_module/template */
 #include "app_config.h"
 #endif
