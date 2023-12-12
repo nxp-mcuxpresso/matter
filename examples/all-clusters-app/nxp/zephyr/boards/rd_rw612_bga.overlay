@@ -50,6 +50,12 @@
 	};
 };
 
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &fw_storage;
+/delete-node/ &storage_partition;
+
 &flexspi {
 	status = "okay";
 
@@ -57,14 +63,29 @@
 		status = "okay";
 
 		partitions {
-			storage_partition: partition@a60000 {
+			boot_partition: partition@0 {
+				label = "mcuboot";
+				reg = <0x00000000 DT_SIZE_K(128)>;
+			};
+
+			slot0_partition: partition@20000 {
+				label = "image-0";
+				reg = <0x00020000 0x440000>;
+			};
+
+			slot1_partition: partition@460000 {
+				label = "image-1";
+				reg = <0x00460000 0x440000>;
+			};
+
+			storage_partition: partition@3FEF000 {
 				label = "storage";
-				reg = <0xa60000 DT_SIZE_K(54908)>;
+				reg = <0x03FEF000 DT_SIZE_K(64)>;
 			};
 
 			factory_partition: partition@3FFF000 {
 				label = "factory-data";
-				reg = <0x3FFF000 DT_SIZE_K(4)>;
+				reg = <0x03FFF000 DT_SIZE_K(4)>;
 			};
 
 		};
