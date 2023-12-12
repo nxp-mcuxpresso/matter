@@ -20,6 +20,10 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 get_filename_component(ALL_CLUSTERS_NXP_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/nxp/common REALPATH)
 
+# Perform common operations like detecting extra overlays in the platform folder for the target board
+# This must be called before find_package(Zephyr)
+include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
