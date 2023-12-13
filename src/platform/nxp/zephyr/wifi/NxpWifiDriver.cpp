@@ -162,8 +162,6 @@ CHIP_ERROR NxpWifiDriver::RevertConfiguration()
             // we are already connected to this network, so return prematurely
             return CHIP_NO_ERROR;
         }
-
-        WiFiManager::Instance().Disconnect();
     }
 
     if (mStagingNetwork.IsConfigured())
