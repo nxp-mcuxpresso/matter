@@ -22,6 +22,8 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 
+#include <platform/nxp/common/ConnectivityManagerImpl.h>
+
 #include <openthread/mdns_server.h>
 
 using namespace ::chip::DeviceLayer;
@@ -307,7 +309,8 @@ CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const cha
         mdnsService.mPort = serviceInfo.mPort;
     }
 
-    mdnsService.mInterface = Inet::InterfaceId::Null();
+    // All mDNS replies come from the External Netif
+    mdnsService.mInterface = ConnectivityManagerImpl().GetExternalInterface();
 
     // Check if AAAA record was included in DNS response.
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))

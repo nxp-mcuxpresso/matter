@@ -492,6 +492,13 @@ void ConnectivityManagerImpl::StartBrServices()
         struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
         otInstance * thrInstancePtr;
 
+        // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
+        // get the underlying IP interface
+        Inet::InterfaceId tmpExtIf(extNetIfPtr);
+        Inet::InterfaceId tmpThrIf(thrNetIfPtr);
+        mExternalNetIf = tmpExtIf;
+        mThreadNetIf = tmpThrIf;
+
         // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
         // properly. If the thread netif is !=null it means that it was fully initialized
 
@@ -506,6 +513,16 @@ void ConnectivityManagerImpl::StartBrServices()
             otMdnsServerStart(thrInstancePtr);
         }
     }
+}
+
+Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()
+{
+    return sInstance.mThreadNetIf;
+}
+
+Inet::InterfaceId ConnectivityManagerImpl::GetExternalInterface()
+{
+    return sInstance.mExternalNetIf;
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

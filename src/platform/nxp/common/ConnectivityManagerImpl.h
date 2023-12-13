@@ -87,6 +87,11 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+#if CHIP_ENABLE_OPENTHREAD
+    Inet::InterfaceId GetExternalInterface();
+    Inet::InterfaceId GetThreadInterface();
+#endif
+
 #endif
 
 private:
@@ -133,6 +138,11 @@ private:
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
     static netif_ext_callback_t sNetifCallback;
+
+#if CHIP_ENABLE_OPENTHREAD
+    Inet::InterfaceId mThreadNetIf;
+    Inet::InterfaceId mExternalNetIf;
+#endif
 
     static int _WlanEventCallback(enum wlan_event_reason event, void * data);
     static void _NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
@@ -181,7 +191,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * Chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the NXP platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {
