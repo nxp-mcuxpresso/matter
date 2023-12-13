@@ -154,6 +154,15 @@ loadfile factory_data.bin 0xf4000
 
 where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the corresponding .map file (can be different if using a custom linker script).
 
+For **RW61X** platform, the binary needs to be written in the internal flash at
+location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
+
+```
+loadfile factory_data.bin 0xBFFF000
+```
+
+where `0xBFFF000` is the value of `__FACTORY_DATA_START` in the corresponding .map file (can be different if using a custom linker script).
+
 For the **RT1060**, **RT1170** and **RW61X** platform, the binary needs to be
 written using `MCUXpresso Flash Tool GUI` at the address value corresponding to
 `__FACTORY_DATA_START` (the map file of the application should be checked to get
