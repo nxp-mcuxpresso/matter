@@ -222,6 +222,7 @@ Status NxpWifiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableC
 void NxpWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     Status status = Status::kSuccess;
+    WiFiManager::StationStatus stationStatus;
     WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
                                               [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
                                               System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
@@ -229,17 +230,31 @@ void NxpWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
     mpConnectCallback = callback;
 
-    VerifyOrExit(WiFiManager::StationStatus::CONNECTING != WiFiManager::Instance().GetStationStatus(),
-                 status = Status::kOtherConnectionFailure);
+    stationStatus = WiFiManager::Instance().GetStationStatus();
+
+    VerifyOrExit(WiFiManager::StationStatus::CONNECTING != stationStatus, status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
     WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
 
 exit:
-    if (status != Status::kSuccess && mpConnectCallback)
+    if(mpConnectCallback != nullptr)
     {
-        mpConnectCallback->OnResult(status, CharSpan(), 0);
-        mpConnectCallback = nullptr;
+        if (status == Status::kSuccess)
+        {
+            /* If the device is already connected to a network, send the success status right now to the cluster
+             * to make sure we have time to send command response before switch to another network */
+            if (stationStatus >= WiFiManager::StationStatus::CONNECTED)
+            {
+                mpConnectCallback->OnResult(status, CharSpan(), 0);
+                mpConnectCallback = nullptr;
+            }
+        }
+        else
+        {
+            mpConnectCallback->OnResult(status, CharSpan(), 0);
+            mpConnectCallback = nullptr;
+        }
     }
 }
 
