@@ -21,6 +21,8 @@ declare_args() {
   chip_with_low_power = 0
   chip_convert_dac_private_key = 0
   sdk_release = 1
+  chip_ot_commit = "d4155e4e5f2a74cc50a545aa3dfb78f558dc117b"
+  chip_ot_nxp_commit = "a926e80ae2533f0423f18a3986bfcf3e8db7e18d"
 }
 
 nxp_platform = "k32w/k32w1"

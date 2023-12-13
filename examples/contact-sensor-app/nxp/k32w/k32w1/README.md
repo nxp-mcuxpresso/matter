@@ -134,6 +134,12 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
+NOTE: The `gn gen` command will call internally the
+[checkout-modules.py](../../../../platform/nxp/k32w/k32w1/scripts/checkout-modules.py)
+script which will checkout the `openthread/repo` and `openthread/ot-nxp` to the required
+commit-ids.
+The user should call `git submodule update` after build to revert the changes if needed.
+
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
 
