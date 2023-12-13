@@ -491,7 +491,7 @@ template("rt_sdk") {
 
     if (iwx12_transceiver) {
       defines += [
-        "WIFI_IW612_BOARD_RD_USD",
+        "WIFI_IW612_BOARD_MURATA_2EL_USD",
         "SDIO_ENABLED",
       ]
     }
