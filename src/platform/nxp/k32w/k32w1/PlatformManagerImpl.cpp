@@ -75,7 +75,7 @@ void PlatformManagerImpl::CleanReset()
 {
     StopEventLoopTask();
     Shutdown();
-#if CHIP_PLAT_NVM_SUPPORT
+#if (CHIP_PLAT_NVM_SUPPORT == 1)
     NvCompletePendingOperations();
 #endif
     HAL_ResetMCU();
