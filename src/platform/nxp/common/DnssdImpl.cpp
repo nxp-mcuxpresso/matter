@@ -32,25 +32,8 @@ using namespace chip::DeviceLayer::Internal;
 namespace chip {
 namespace Dnssd {
 
-static const char * GetProtocolString(DnssdServiceProtocol protocol);
-
-static void OtBrowseCallback(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
-static void OtServiceCallback(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
-
-static void DispatchBrowseEmpty(intptr_t context);
-static void DispatchBrowse(intptr_t context);
-static void DispatchBrowseNoMemory(intptr_t context);
-
-void DispatchAddressResolve(intptr_t context);
-void DispatchResolve(intptr_t context);
-void DispatchResolveNoMemory(intptr_t context);
-
-static DnsBrowseCallback mDnsBrowseCallback;
-static DnsResolveCallback mDnsResolveCallback;
-
-static bool bBrowseInProgress = false;
-
 #define LOCAL_DOMAIN_STRING_SIZE 7
+#define ARPA_DOMAIN_STRING_SIZE 22
 #define MATTER_DNS_TXT_SIZE 128
 
 // Support both operational and commissionable discovery, so buffers sizes must be worst case.
@@ -63,6 +46,11 @@ static constexpr size_t kTotalMdnsServiceTxtKeySize =
 
 static constexpr size_t kTotalMdnsServiceTxtBufferSize =
     kTotalMdnsServiceTxtKeySize + kMaxMdnsServiceTxtEntriesNumber + kTotalMdnsServiceTxtValueSize;
+
+static const char * GetProtocolString(DnssdServiceProtocol protocol)
+{
+    return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
+}
 
 struct DnsServiceTxtEntries
 {
@@ -85,10 +73,29 @@ struct mDnsQueryCtx
     }
 };
 
-static const char * GetProtocolString(DnssdServiceProtocol protocol)
-{
-    return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
-}
+static const char * GetProtocolString(DnssdServiceProtocol protocol);
+
+static void OtBrowseCallback(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
+static void OtServiceCallback(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
+
+static void DispatchBrowseEmpty(intptr_t context);
+static void DispatchBrowse(intptr_t context);
+static void DispatchBrowseNoMemory(intptr_t context);
+
+void DispatchAddressResolve(intptr_t context);
+void DispatchResolve(intptr_t context);
+void DispatchResolveNoMemory(intptr_t context);
+
+static DnsBrowseCallback mDnsBrowseCallback;
+static DnsResolveCallback mDnsResolveCallback;
+
+CHIP_ERROR ResolveBySrp(DnssdService * mdnsReq, otInstance * thrInstancePtr, char * instanceName, void * context);
+CHIP_ERROR BrowseBySrp(otInstance * thrInstancePtr, char * serviceName, void * context);
+
+CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService *service, const otSrpServerHost * host ,const DnssdService * mdnsQueryReq,
+                                  chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
+
+static bool bBrowseInProgress = false;
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -187,9 +194,11 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                            Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier)
 {
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
-    CHIP_ERROR error  = CHIP_NO_ERROR;
-
+    *browseIdentifier          = reinterpret_cast<intptr_t>(nullptr);
+    CHIP_ERROR error           = CHIP_NO_ERROR;
+    CHIP_ERROR srpBrowseError  = CHIP_NO_ERROR;
+    char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + ARPA_DOMAIN_STRING_SIZE + 1] = ""; // +1 for null-terminator
+    
     if (type == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -199,7 +208,14 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     mDnsQueryCtx * browseContext = Platform::New<mDnsQueryCtx>(context, CHIP_NO_ERROR);
     VerifyOrReturnError(browseContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    // First try to browse the service in the SRP cache, use default.service.arpa as domain name
+    snprintf(serviceType, sizeof(serviceType), "%s.%s.default.service.arpa.", type, GetProtocolString(protocol));
+    // After browsing in the SRP cache we will continue with regular mDNS browse
+    srpBrowseError = BrowseBySrp(thrInstancePtr, serviceType, context);
+
+    // Proceed to generate a mDNS query
     snprintf(browseContext->mServiceType, sizeof(browseContext->mServiceType), "%s.%s.local.", type, GetProtocolString(protocol));
+
     error = MapOpenThreadError(otMdnsServerBrowse(thrInstancePtr, browseContext->mServiceType, OtBrowseCallback, browseContext));
 
     if (CHIP_NO_ERROR == error)
@@ -209,7 +225,17 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     }
     else
     {
-        Platform::Delete<mDnsQueryCtx>(browseContext);
+        if (srpBrowseError == CHIP_NO_ERROR)
+        {
+            // In this case, we need to send a final browse indication to signal the Matter App that there are no more
+            // browse results coming
+            browseContext->error = error;
+            DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(browseContext));
+        }
+        else
+        {
+            Platform::Delete<mDnsQueryCtx>(browseContext);
+        }
     }
     return error;
 }
@@ -234,19 +260,218 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
+    ChipError error;
     if (browseResult == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     otInstance * thrInstancePtr = ThreadStackMgrImpl().OTInstance();
     mDnsResolveCallback         = callback;
 
-    char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] = ""; // +1 for null-terminator
-    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + LOCAL_DOMAIN_STRING_SIZE + 1] =
-        "";
-    snprintf(serviceType, sizeof(serviceType), "%s.%s.local.", browseResult->mType, GetProtocolString(browseResult->mProtocol));
-    snprintf(fullInstName, sizeof(fullInstName), "%s.%s", browseResult->mName, serviceType);
+    char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + ARPA_DOMAIN_STRING_SIZE + 1] = ""; // +1 for null-terminator
+    char fullInstName[Common::kInstanceNameMaxLength + chip::Dnssd::kDnssdTypeAndProtocolMaxSize + ARPA_DOMAIN_STRING_SIZE + 1] = "";
 
-    return MapOpenThreadError(otMdnsServerResolveService(thrInstancePtr, fullInstName, OtServiceCallback, context));
+    // First try to find the service in the SRP cache, use default.service.arpa as domain name
+    snprintf(serviceType, sizeof(serviceType), "%s.%s.default.service.arpa.", browseResult->mType, GetProtocolString(browseResult->mProtocol));
+    snprintf(fullInstName, sizeof(fullInstName), "%s.%s", browseResult->mName, serviceType);
+    
+    error = ResolveBySrp(browseResult, thrInstancePtr, fullInstName, context);
+    if (CHIP_ERROR_NOT_FOUND == error)
+    {
+        // If the SRP cache returns not found, proceed to generate a MDNS query
+        memset(serviceType, 0, sizeof(serviceType));
+        memset(fullInstName, 0, sizeof(fullInstName));
+
+        snprintf(serviceType, sizeof(serviceType), "%s.%s.local.", browseResult->mType, GetProtocolString(browseResult->mProtocol));
+        snprintf(fullInstName, sizeof(fullInstName), "%s.%s", browseResult->mName, serviceType);
+
+        return MapOpenThreadError(otMdnsServerResolveService(thrInstancePtr, fullInstName, OtServiceCallback, context));
+    }
+    else 
+    {
+        return error;
+    }
+}
+
+CHIP_ERROR BrowseBySrp(otInstance * thrInstancePtr, char * serviceName, void * context)
+{
+    const otSrpServerHost * host       = nullptr;
+    const otSrpServerService * service = nullptr;
+    CHIP_ERROR error                   = CHIP_ERROR_NOT_FOUND;
+
+    while ((host = otSrpServerGetNextHost(thrInstancePtr, host)) != nullptr)
+    {
+        service = otSrpServerHostFindNextService(
+            host, service, OT_SRP_SERVER_FLAGS_ANY_TYPE_ACTIVE_SERVICE, serviceName, nullptr);
+        if (service != nullptr)
+        {
+            mDnsQueryCtx * serviceContext;
+
+            serviceContext = Platform::New<mDnsQueryCtx>(context, CHIP_NO_ERROR);
+            if (serviceContext != nullptr)
+            {
+                if (CHIP_NO_ERROR == FromSrpCacheToMdnsData(service, host, nullptr, serviceContext->mMdnsService, serviceContext->mServiceTxtEntry))
+                {
+                    // Set error to CHIP_NO_ERROR to signal that there was at least one service found in the cache
+                    error = CHIP_NO_ERROR;
+                    DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(serviceContext));
+                }
+                else
+                {
+                    Platform::Delete<mDnsQueryCtx>(serviceContext);
+                }
+            }
+        }
+    }
+    return error;
+}
+
+CHIP_ERROR ResolveBySrp(DnssdService * mdnsReq, otInstance * thrInstancePtr, char * instanceName, void * context)
+{
+    const otSrpServerHost * host       = nullptr;
+    const otSrpServerService * service = nullptr;
+    CHIP_ERROR error                   = CHIP_ERROR_NOT_FOUND;
+
+    while ((host = otSrpServerGetNextHost(thrInstancePtr, host)) != nullptr)
+    {
+        service = otSrpServerHostFindNextService(
+            host, service, (OT_SRP_SERVER_SERVICE_FLAG_BASE_TYPE | OT_SRP_SERVER_SERVICE_FLAG_ACTIVE), nullptr, instanceName);
+        if (service != nullptr)
+        {
+            error = CHIP_NO_ERROR;
+            mDnsQueryCtx * serviceContext;
+
+            serviceContext = Platform::New<mDnsQueryCtx>(context, CHIP_NO_ERROR);
+            if (serviceContext != nullptr)
+            {
+                error = FromSrpCacheToMdnsData(service, host, mdnsReq, serviceContext->mMdnsService, serviceContext->mServiceTxtEntry);
+                if (error == CHIP_NO_ERROR)
+                {
+                    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(serviceContext));
+                }
+                else
+                {
+                    Platform::Delete<mDnsQueryCtx>(serviceContext);
+                }
+            }
+            else
+            {
+                error = CHIP_ERROR_NO_MEMORY;
+            }
+            break;
+        }
+    }
+    return error;
+}
+
+CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService *service, const otSrpServerHost * host, const DnssdService * mdnsQueryReq, 
+                                  chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries)
+{
+    const char *tmpName;
+    const uint8_t *txtStringPtr;
+    size_t substringSize;
+    uint8_t addrNum = 0;
+    uint16_t txtDataLen;
+    const otIp6Address *ip6AddrPtr = otSrpServerHostGetAddresses(host, &addrNum);
+
+    if (mdnsQueryReq != nullptr)
+    {
+        Platform::CopyString(mdnsService.mName, sizeof(mdnsService.mName), mdnsQueryReq->mName);
+        Platform::CopyString(mdnsService.mType, sizeof(mdnsService.mType), mdnsQueryReq->mType);
+        mdnsService.mProtocol = mdnsQueryReq->mProtocol;
+    }
+    else
+    {
+        tmpName = otSrpServerServiceGetInstanceName(service);
+        // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <instance> part
+        size_t substringSize = strchr(tmpName, '.') - tmpName;
+        if (substringSize >= ArraySize(mdnsService.mName))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        Platform::CopyString(mdnsService.mName, substringSize + 1, tmpName);
+        
+        // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <type> part.
+        tmpName = tmpName + substringSize + 1;
+        substringSize = strchr(tmpName, '.') - tmpName;
+        if (substringSize >= ArraySize(mdnsService.mType))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        Platform::CopyString(mdnsService.mType, substringSize + 1, tmpName);
+
+        // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <type> part.
+        tmpName = tmpName + substringSize + 1;
+        substringSize = strchr(tmpName, '.') - tmpName;
+        if (substringSize >= (chip::Dnssd::kDnssdProtocolTextMaxSize + 1))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (strncmp(tmpName, "_udp", substringSize) == 0)
+        {
+            mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUdp;
+        }
+        else if (strncmp(tmpName, "_tcp", substringSize) == 0)
+        {
+            mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolTcp;
+        }
+        else
+        {
+            mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
+        }
+    }
+
+    // Extract from the <hostname>.<domain-name>. the <hostname> part.
+    tmpName = otSrpServerHostGetFullName(host);
+    substringSize = strchr(tmpName, '.') - tmpName;
+    if (substringSize >= ArraySize(mdnsService.mHostName))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    Platform::CopyString(mdnsService.mHostName, substringSize + 1, tmpName);
+    mdnsService.mPort = otSrpServerServiceGetPort(service);
+
+    // All SRP cache hits come from the Thread Netif
+    mdnsService.mInterface = ConnectivityManagerImpl().GetThreadInterface();
+
+    mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
+    mdnsService.mAddress = MakeOptional(ToIPAddress(*ip6AddrPtr));
+
+    // Extract TXT record SRP service
+    txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
+    if (txtDataLen != 0)
+    {
+        otDnsTxtEntryIterator iterator;
+        otDnsInitTxtEntryIterator(&iterator, txtStringPtr, txtDataLen);
+
+        otDnsTxtEntry txtEntry;
+        chip::FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
+
+        uint8_t entryIndex = 0;
+        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
+        {
+            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
+                continue;
+
+            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
+            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
+            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
+            entryIndex++;
+        }
+
+        ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
+        mdnsService.mTextEntrySize = entryIndex;
+    }
+    else
+    {
+        mdnsService.mTextEntrySize = 0;
+    }
+    
+    mdnsService.mSubTypes = nullptr;
+    mdnsService.mSubTypeSize = 0;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
