@@ -334,7 +334,7 @@
 	url = https://github.com/nxp-imx/libtrustymatter
 [submodule "repo"]
 	path = third_party/imx-secure-enclave/repo
-	url = ssh://git@bitbucket.sw.nxp.com/lfac/secure_enclave.git
+	url = https://github.com/nxp-imx/imx-secure-enclave.git
 	branch = lf-6.1.55_2.2.0
 [submodule "third_party/nxp/k32w0_zigbee_bridge"]
 	path = third_party/nxp/k32w0_zigbee_bridge
