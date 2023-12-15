@@ -96,6 +96,13 @@ static_library("nxp_zephyr") {
     ]
   }
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "ota/OTAImageProcessorImpl.cpp",
+      "ota/OTAImageProcessorImpl.h",
+    ]
+  }
+
   if (chip_malloc_sys_heap) {
     sources += [ "../../Zephyr/SysHeapMalloc.cpp" ]
   }
