@@ -60,6 +60,16 @@ target_compile_definitions(app PUBLIC
     "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/zephyr/FactoryDataProviderImpl.h\""
 )
 
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE
+                   ${CHIP_ROOT}/examples/platform/nxp/common/OTARequestorInitiatorCommon.cpp
+                   ${CHIP_ROOT}/examples/platform/nxp/common/OTARequestorInitiatorZephyr.cpp
+    )
+    target_include_directories(app PRIVATE
+                               ${CHIP_ROOT}/examples/platform/nxp/common/
+    )
+endif()
+
 if(CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS)
     chip_configure_data_model(app
         INCLUDE_SERVER

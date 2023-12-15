@@ -11,6 +11,7 @@ and provides a prototype application that demonstrates device commissioning and 
 -   [Building](#building)
 -   [Flashing and debugging](#flashdebug)
 -   [Manufacturing data](#manufacturing)
+-   [OTA Software Update](#ota-software-update)
 -   [Testing the example](#testing-the-example)
 -   [Using Matter CLI in NXP Zephyr examples](#matter-cli)
 
@@ -132,6 +133,12 @@ In order to flash it to your device, you need to know the partition address: ple
 #### Manually
 
 See [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp_manufacturing_flow.md)
+
+<a name="ota-software-update"></a>
+
+## OTA Software Update
+
+See [Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/guides/nxp_zephyr_ota_software_update.md)
 
 <a name="testing-the-example"></a>
 

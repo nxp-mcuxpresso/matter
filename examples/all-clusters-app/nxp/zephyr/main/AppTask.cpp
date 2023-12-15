@@ -53,9 +53,9 @@
 #include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
 
-// #if CONFIG_CHIP_OTA_REQUESTOR
-// #include "OTAUtil.h"
-// #endif
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTARequestorInitiator.h"
+#endif
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -201,7 +201,13 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_CHIP_APP_DEVICE_TYPE_ALL_CLUSTERS || CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 #endif
-
+#if CONFIG_CHIP_OTA_REQUESTOR
+    if(err == CHIP_NO_ERROR) {
+        LOG_INF("Initialization succeeded: Keep the OTA upgrade");
+        /* If an update is under test make it permanent */
+        OTARequestorInitiator::Instance().HandleSelfTest();
+    }
+#endif
     return err;
 }
 
