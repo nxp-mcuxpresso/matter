@@ -22,7 +22,7 @@ declare_args() {
   chip_convert_dac_private_key = 0
   sdk_release = 1
   chip_ot_commit = "d4155e4e5f2a74cc50a545aa3dfb78f558dc117b"
-  chip_ot_nxp_commit = "a926e80ae2533f0423f18a3986bfcf3e8db7e18d"
+  chip_ot_nxp_commit = "178ac9ade856fb31cbd5b8aa989dec2b6251e37d"
 }
 
 nxp_platform = "k32w/k32w1"
