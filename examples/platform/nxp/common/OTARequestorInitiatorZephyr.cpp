@@ -19,36 +19,23 @@
 
 #include "OTARequestorInitiator.h"
 
-extern "C" {
-#include "mflash_drv.h"
-}
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/logging/log.h>
+
 using namespace chip;
 
 void OTARequestorInitiator::HandleSelfTest()
 {
-    /* If application is in test mode after an OTA update
-       mark image as "ok" to switch the update state to permanent
-       (if we have arrived this far, the bootloader had validated the image) */
-
-    mflash_drv_init();
-
-    OtaImgState_t update_state;
-
-    /* Retrieve current update state */
-    update_state = OTA_GetImgState();
-
-    if (update_state == OtaImgState_RunCandidate)
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
     {
-        if (OTA_UpdateImgState(OtaImgState_Permanent) != gOtaSuccess_c)
+        int img_confirmation = boot_write_img_confirmed();
+        if (img_confirmation)
         {
             ChipLogError(SoftwareUpdate, "Self-testing : Failed to switch update state to permanent");
-            return;
         }
-
-        ChipLogProgress(SoftwareUpdate, "Successful software update... applied permanently");
+        else
+        {
+            ChipLogProgress(SoftwareUpdate, "Successful software update... applied permanently");
+        }
     }
-
-    OTA_Initialize();
-
-    /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */
 }

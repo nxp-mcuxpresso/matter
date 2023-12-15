@@ -155,6 +155,7 @@ rt_executable("all_cluster_app") {
   if (chip_enable_ota_requestor) {
     sources += [
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.cpp",
+      "${chip_root}/examples/platform/nxp/common/OTARequestorInitiatorCommon.cpp",
       "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.h",
     ]
     include_dirs += [ "${chip_root}/examples/platform/nxp/common" ]
