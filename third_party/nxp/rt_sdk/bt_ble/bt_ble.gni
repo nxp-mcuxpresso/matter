@@ -230,9 +230,6 @@ template("bt_ble_target") {
     defines =
         [ "vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE" ]
 
-    # Adding a dependency to platform_buildconfig to make sure that the file platform_buildconfig.h is generated first
-    # In fact depending on the build order, issue could happen if the file platform_buildconfig.h is not generated before building rand32.cpp
-    deps += [ "${chip_root}/src/platform:platform_buildconfig" ]
 
     if (!defined(public_configs)) {
       public_configs = []
