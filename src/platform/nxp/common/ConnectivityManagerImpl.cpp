@@ -51,7 +51,6 @@ extern "C" {
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
-#include <app/server/Dnssd.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
@@ -408,11 +407,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv4Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
-
-#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS sever
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
-#endif
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -432,9 +426,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 #if CHIP_ENABLE_OPENTHREAD
             // Start the Border Router services including MDNS Server
             StartBrServices();
-#else // No need to do this for OT mDNS sever
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
 #endif
         }
         err = PlatformMgr().PostEvent(&event);

@@ -30,6 +30,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <laundry-washer-mode.h>
+#include <app/server/Dnssd.h>
 
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -99,6 +100,17 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
 
     case DeviceEventType::kInterfaceIpAddressChanged:
+#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS server
+        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+        {
+            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
+            // will not trigger a 'internet connectivity change' as there is no internet
+            // connectivity. MDNS still wants to refresh its listening interfaces to include the
+            // newly selected address.
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+#endif
         OnInterfaceIpAddressChanged(event);
         break;
 
@@ -151,6 +163,9 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         char ip_addr[Inet::IPAddress::kMaxStringLength];
         event->InternetConnectivityChange.ipAddress.ToString(ip_addr);
         ChipLogProgress(DeviceLayer, "Server ready at: %s:%d", ip_addr, CHIP_PORT);
+#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS server
+        chip::app::DnssdServer::Instance().StartServer();
+#endif
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -161,6 +176,9 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         char ip_addr[Inet::IPAddress::kMaxStringLength];
         event->InternetConnectivityChange.ipAddress.ToString(ip_addr);
         ChipLogProgress(DeviceLayer, "IPv6 Server ready at: [%s]:%d", ip_addr, CHIP_PORT);
+#if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS server
+        chip::app::DnssdServer::Instance().StartServer();
+#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
