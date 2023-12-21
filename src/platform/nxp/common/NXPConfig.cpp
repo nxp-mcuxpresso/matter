@@ -538,8 +538,17 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
     /* Reset the key string file system as it contains on data that needs to be erased when doing a factoryreset */
     FLib_MemSet((void *) &chipConfigRamStructKeyString, 0, sizeof(chipConfigRamStructKeyString));
 
+#if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
+    /*
+     * Save to flash now. System is restarting and there is no more time to
+     * wait for the idle task to save the data.
+     */
+    NvSyncSave(&chipConfigRamStructKeyString, false);
+    NvSyncSave(&chipConfigRamStructKeyInt, false);
+#else
     SaveStringKeysToFS();
     SaveIntKeysToFS();
+#endif
     DBG_PRINTF("FactoryResetConfig done\r\n");
 
     return CHIP_NO_ERROR;
