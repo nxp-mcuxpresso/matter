@@ -69,7 +69,10 @@ config("lwip_rt_config") {
   } else if (chip_enable_openthread) {
     include_dirs += [ "lwip/openthread" ]
   } else if (chip_enable_wifi) {
-    include_dirs += [ "lwip/wifi" ]
+    include_dirs += [ 
+      "lwip/wifi",
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
+    ]
   }
 }
 
@@ -85,6 +88,14 @@ lwip_target("nxp_lwip") {
       "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif_kinetis.c",
     ]
   }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
+    ]
+  }
+
   public_configs = [ ":lwip_rt_config" ]
 
   public_deps = [ ":nxp_sdk" ]
