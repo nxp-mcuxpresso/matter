@@ -28,6 +28,7 @@ executable("nxp-media-app") {
     "${chip_root}/examples/nxp-media-app/nxp-media-common:nxp-media-common-sources",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   cflags = [ "-Wconversion" ]

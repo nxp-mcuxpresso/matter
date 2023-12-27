@@ -1,39 +1,75 @@
 #include "AudioOutput.h"
+
+#include <fstream>
 #include <iostream>
+#include <json/json.h>
+#include <lib/core/CHIPCore.h>
+#include <string>
 
 int AudioOutput::Init() {
-    int ret = system("pulseaudio --check");
+    int ret = system("systemctl --user status pipewire wireplumber pipewire-pulse > /dev/null");
     if (ret != 0) {
-        ret = system("pulseaudio --start");
+        int retry = 3;
+        while (retry--) {
+            ChipLogError(NotSpecified, "pipewire, wireplumber and pipewire-pulse not started. Enabling...");
+            ret = system("systemctl --user start pipewire wireplumber pipewire-pulse && sleep 2");
+            if (ret != 0) {
+                ChipLogError(NotSpecified, "Failed to enable pipewire ,wireplumber and pipewire-pulse.");
+            }
+            ret = system("systemctl --user status pipewire wireplumber pipewire-pulse > /dev/null");
+            if (ret != 0) {
+                ChipLogError(NotSpecified, "manual enabling pipewire failed...");
+            } else {
+                break;
+            }
+        }
         if (ret != 0) {
-            return -1;
+            ChipLogError(NotSpecified, "With multiple retry, failed to kick pipewire, wireplumber and pipewire-pulse, return");
+            return ret;
         }
     }
-    std::string cmd = "pacmd list-sinks | grep -oP 'name: \\K\\S+' | sed 's/<//g' | sed 's/>//g'";
-
-    FILE* pipe = popen(cmd.c_str(), "r");
-    if (!pipe) {
-        return -1;
+    std::string cmd = "pw-dump > /tmp/pw_dump.json";
+    ret = system(cmd.c_str());
+    if (ret != 0) {
+        ChipLogError(NotSpecified, "Failed to get pw dump.");
+        return ret;
     }
 
-    char buffer[128];
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL) {
-            sinks_.push_back(buffer);
+    //start to parse json
+    std::ifstream input("/tmp/pw_dump.json");
+    Json::Value root;
+    Json::Reader reader;
+    bool parsedSuccess = reader.parse(input, root);
+
+    if (!parsedSuccess) {
+        ChipLogError(NotSpecified, "Failed to parse JSON");
+        return 1;
+    }
+
+    for (unsigned int i = 0; i < root.size(); i++) {
+        Json::Value item = root[i];
+        int id = item["id"].asInt();
+        if (item["info"].isMember("props")) {
+            if (item["info"]["props"].isMember("factory.name")) {
+                if (item["info"]["props"]["factory.name"].asString().find("sink") != std::string::npos) {
+                    std::string cardName = item["info"]["props"]["alsa.long_card_name"].asString();
+                    sink_list.push_back(cardName);
+                    sinks_[cardName] = id;
+                }
+            }
         }
     }
-    pclose(pipe);
 
     return 0;
 }
 
 int AudioOutput::Select(uint32_t number) {
     if(number >= sinks_.size()) {
-        std::cout << "Invalid sink number" << std::endl;
+        ChipLogError(NotSpecified, "Invalid sink number");
         return -1;
     }
 
-    std::string cmd = "pacmd set-default-sink " + sinks_[number];
+    std::string cmd = "wpctl set-default " + std::to_string(sinks_[sink_list[number]]);
 
     return system(cmd.c_str());
 
