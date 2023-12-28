@@ -130,6 +130,8 @@ static const serial_manager_config_t s_serialManagerConfig = {
     .portConfig     = (serial_port_uart_config_t *) &uartConfig,
 };
 
+OSA_MUTEX_HANDLE_DEFINE(streamerMutex);
+
 /* -------------------------------------------------------------------------- */
 /*                              Public functions                              */
 /* -------------------------------------------------------------------------- */
@@ -183,6 +185,9 @@ int streamer_nxp_init(streamer_t * streamer)
 
     OSA_InterruptEnable();
 
+    osa_status_t status_osa = OSA_MutexCreate((osa_mutex_handle_t)streamerMutex);
+    assert(status_osa == KOSA_StatusSuccess);
+
     return status;
 }
 
@@ -225,6 +230,9 @@ ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t le
     serial_manager_status_t status = kStatus_SerialManager_Success;
     size_t len                     = 0;
 
+    /* Mutex lock to ensure the streamer write is accessed by only one task at a time */
+    osa_status_t status_osa = OSA_MutexLock(streamerMutex, osaWaitForever_c);
+
     //If length is 0 there will be an assert in Serial Manager. Some OT functions output 0 bytes, for example
     //in SrpServer::Process<Cmd("service")> -> OutputLine(hasSubType ? "" : "(null)");
     if (length > 0)
@@ -244,6 +252,9 @@ ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t le
             OSA_TimeDelay(STREAMER_UART_FLUSH_DELAY_MS);
         }
     }
+
+    status_osa = OSA_MutexUnlock(streamerMutex);
+    assert(status_osa == KOSA_StatusSuccess);
 
     return len;
 }
