@@ -212,10 +212,13 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         assert(status != kStatus_SerialManager_Error);
 
         /**
-         * If we are at the end of the line or the buffer is empty,
-         * consider the reading process done
+         * In certain cases such as a copy-paste of multiple commands, we may encounter '\n' or '\r' caracters 
+         * although the buffer is not empty yet, so the reading process should be considered done only when the 
+         * bytesRead return null,
+         * this is to ensure that all commands are processed before blocking the CLI task
+         * 
         **/
-        if ((buffer[length-1] == '\n') || (buffer[length-1] == '\r') || (bytesRead == 0))
+        if (bytesRead == 0)
         {
             readDone = true;
         }
