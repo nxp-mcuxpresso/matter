@@ -71,6 +71,8 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
+
   if (chip_enable_ble) {
     sources += [
       "../../../Zephyr/BLEAdvertisingArbiter.cpp",
