@@ -37,6 +37,7 @@ group("nxp_sdk") {
     ":nxp_transceiver",
     nxp_sdk_driver_target,
     nxp_sdk_target,
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk",
   ]
 
   if (chip_enable_ble) {
