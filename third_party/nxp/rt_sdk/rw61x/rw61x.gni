@@ -698,7 +698,10 @@ template("rw61x_sdk_drivers") {
     public_deps += [ nxp_sdk_target ]
 
     # The FactoryDataProvider/fwk_factory_data_provider.c component has a dependency to mbedtls
-    deps += [ "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config" ]
+    deps += [ 
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config",
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls",
+    ]
 
     if (chip_enable_openthread) {
       #Dep to ot header files required for mbedtls as mbedtls config file has a dependency to ot
