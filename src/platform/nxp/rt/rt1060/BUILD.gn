@@ -111,7 +111,9 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
     ]
+
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
