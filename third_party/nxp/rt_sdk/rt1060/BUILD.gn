@@ -66,3 +66,6 @@ group("nxp_mbedtls") {
 group("nxp_sdk_mbedtls_config") {
   public_configs = [ ":mbedtls_ksdk_config" ]
 }
+
+group("nxp_sdk") {
+}
