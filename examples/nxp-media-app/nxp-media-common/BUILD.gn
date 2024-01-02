@@ -39,6 +39,7 @@ source_set("nxp-media-common-sources") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/nxp-media-app/nxp-media-common",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
   ]
   public_configs = [ ":config" ]
   sources = [
