@@ -262,7 +262,6 @@ template("rt1170_sdk_drivers") {
       # framework files
       # TODO: init buttons to be implemented in framework
       #"${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
-      "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c",
 
       #sdk hook
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/kernel.c",
@@ -331,9 +330,6 @@ template("rt1170_sdk_drivers") {
 
     public_configs += [ ":${target_name}_config" ]
     public_deps += [ nxp_sdk_target ]
-
-    # The FactoryDataProvider/fwk_factory_data_provider.c component has a dependency to mbedtls
-    deps += [ "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config" ]
 
     if (chip_enable_openthread) {
       #Dep to ot header files required for mbedtls as mbedtls config file has a dependency to ot
