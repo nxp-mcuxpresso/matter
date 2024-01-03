@@ -98,7 +98,7 @@ static SERIAL_MANAGER_HANDLE_DEFINE(streamerSerialHandle);
 static SERIAL_MANAGER_WRITE_HANDLE_DEFINE(streamerSerialWriteHandle);
 static SERIAL_MANAGER_READ_HANDLE_DEFINE(streamerSerialReadHandle);
 static volatile int txCount = 0;
-static bool readDone = true;
+volatile static bool readDone = true;
 
 static streamer_serial_port_uart_config_t uartConfig = {
     .clockRate    = 0,
