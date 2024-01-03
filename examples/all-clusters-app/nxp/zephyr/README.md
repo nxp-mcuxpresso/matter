@@ -96,12 +96,42 @@ TODO
 
 <a name="manufacturing"></a>
 
-## Manufacturing data
+## Factory data
+
+### Build with factory data support
+
+To build the all-clusters-app example with factory data support, you can add `-DCONF_FILE=prj_fdata.conf` in the
+west build command line.
+
+Example:
+```bash
+west build -b rd_rw612_bga -p  <path to this folder> -DCONF_FILE=prj_fdata.conf
+```
+
+`prj_fdata.conf` configuration file will enable `CONFIG_CHIP_FACTORY_DATA` Kconfig so the application will load the
+factory data at boot.
+
+### Generate factory data
+
+#### Automatically (recommended)
+
+The factory data can be generated automatically during the build of the application.
+To do so, you can uncomment the `CONFIG_CHIP_FACTORY_DATA_BUILD=y` in `prj_fdata.conf`.
+
+You will have to specify the source of the certificates to be used for the factory data.
+Please refer to `CHIP_FACTORY_DATA_CERT_SOURCE` Kconfig for more info.
+
+>**Note**: The all cluster app demonstrates the usage of encrypted Matter factory data storage.
+> Matter factory data should be encrypted using an AES 128 software key before flashing them to the device flash.
+> You can encrypt the factory data automatically during the build by enabling `CHIP_ENCRYPTED_FACTORY_DATA` Kconfig.
+> See also `CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY` Kconfig if you want to use a specific key.
+
+The resulting factory data will be provided along `zephyr.bin` as a binary file named `factory_data.bin`.
+In order to flash it to your device, you need to know the partition address: please refer to `factory_partition` defined in `src/platform/nxp/zephyr/boards/<board>/<board>.overlay`.
+
+#### Manually
 
 See [Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp_manufacturing_flow.md)
-
->**Note**: The all cluster app demonstrates the usage of encrypted Matter manufacturing data storage.
-> Matter manufacturing data should be encrypted using an AES 128 software key before flashing them to the device flash.
 
 <a name="testing-the-example"></a>
 
