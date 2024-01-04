@@ -131,6 +131,9 @@ function(nxp_generate_factory_data_bin script_path output_path)
     string(APPEND script_args "--date \"${CONFIG_CHIP_DEVICE_MANUFACTURING_DATE}\"\n")
     string(APPEND script_args "--unique_id \"${CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID}\"\n")
     string(APPEND script_args "--product_finish ${CONFIG_CHIP_DEVICE_PRODUCT_FINISH}\n")
+    string(APPEND script_args "--product_url ${CONFIG_CHIP_DEVICE_PRODUCT_URL}\n")
+    string(APPEND script_args "--product_label ${CONFIG_CHIP_DEVICE_PRODUCT_LABEL}\n")
+    string(APPEND script_args "--part_number ${CONFIG_CHIP_DEVICE_PART_NUMBER}\n")
     string(APPEND script_args "--out \"${output_path}/factory_data.bin\"\n")
 
     # for development purpose user can use default certs instead of generating or providing them

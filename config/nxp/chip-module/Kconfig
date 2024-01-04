@@ -185,6 +185,24 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 	help
 	  Enables the generation of a random Rotating device ID unique ID.
 
+config CHIP_DEVICE_PRODUCT_URL
+	string "Product URL"
+	help
+	  Provides the URL to the product page. The URL is exposed as an attribute
+	  of the Basic Information cluster.
+
+config CHIP_DEVICE_PRODUCT_LABEL
+	string "Product label"
+	help
+	  Provides the product label. The label is exposed as an attribute
+	  of the Basic Information cluster.
+
+config CHIP_DEVICE_PART_NUMBER
+	string "Part number"
+	help
+	  Provides the part number. The part number is exposed as an attribute
+	  of the Basic Information cluster.
+
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
