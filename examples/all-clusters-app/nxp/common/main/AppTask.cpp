@@ -48,9 +48,9 @@
 #include "ICDUtil.h"
 #include <app/InteractionModelEngine.h>
 
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 #include "static-supported-temperature-levels.h"
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OTARequestorInitiator.h"
@@ -91,9 +91,9 @@ using namespace ::chip::app::Clusters;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
@@ -303,9 +303,9 @@ CHIP_ERROR AppTask::Init()
 #endif
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 exit:
     return err;

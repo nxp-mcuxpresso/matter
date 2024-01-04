@@ -23,9 +23,9 @@
 #include <cstring>
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 #include <operational-state-delegate-impl.h>
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 #ifdef ENABLE_CHIP_SHELL
 #include "task.h"
@@ -91,7 +91,7 @@ CHIP_ERROR cliReset(int argc, char * argv[])
     return CHIP_NO_ERROR;
 }
 
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
 CHIP_ERROR cliOpState(int argc, char * argv[])
 {
     if ((argc != 1) && (argc != 2))
@@ -153,7 +153,7 @@ CHIP_ERROR cliOpState(int argc, char * argv[])
     }
     return CHIP_NO_ERROR;
 }
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 CHIP_ERROR AppMatterCli_RegisterCommands(void)
 {
@@ -191,9 +191,9 @@ CHIP_ERROR AppMatterCli_RegisterCommands(void)
                 .cmd_name = "matterreset",
                 .cmd_help = "Reset the device",
             },
-#ifdef DEVICE_TYPE_LAUNDRY_WASHER
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
             { .cmd_func = cliOpState, .cmd_name = "opstate", .cmd_help = "Set the Operational State" },
-#endif /* DEVICE_TYPE_LAUNDRY_WASHER */
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
         };
 
         Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
