@@ -148,7 +148,7 @@ rt_executable("all_cluster_app") {
       ]
     }
     else if (nxp_device_type == "laundry-washer-app") {
-      defines += [ "DEVICE_TYPE_LAUNDRY_WASHER" ]
+      defines += [ "CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER" ]
       sources += [
         "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
         "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
