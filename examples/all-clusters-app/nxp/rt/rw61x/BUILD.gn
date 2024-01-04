@@ -120,7 +120,6 @@ rt_executable("all_cluster_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppFactoryDataDefaultImpl.cpp",
     "../../common/main/AppMatterButtonEmpty.cpp",
@@ -142,18 +141,24 @@ rt_executable("all_cluster_app") {
   if (nxp_device_type != "thermostat") {
     if (nxp_device_type == "all-clusters") {
       defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+      sources += [
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+      ]
     }
-    if (nxp_device_type == "laundry-washer-app") {
+    else if (nxp_device_type == "laundry-washer-app") {
       defines += [ "DEVICE_TYPE_LAUNDRY_WASHER" ]
+      sources += [
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+        "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+        "../../common/main/operational-state-delegate-impl.cpp",
+      ]
     }
-    sources += [
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
-      "../../common/main/operational-state-delegate-impl.cpp",
-    ]
   }
 
   if (chip_enable_matter_cli) {
