@@ -209,25 +209,29 @@ using namespace chip::app::Clusters;
 void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId,
                                                          uint8_t * value)
 {
-#if 0
-    /*
-     * This implementation is try to implementation the handler for TC-LWM-3.1
-     * Since this case is removed in SVE and there is a side-effect in TC-OO-2.4, remove it temporally
-    */
-    switch (attributeId) {
+    switch (attributeId)
+    {
     case Clusters::OnOff::Attributes::OnOff::Id:
-        if (*value == true) {
+#if CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+        if ((value != nullptr) && (*value == true))
+        {
             // Update the current mode to OnMode after device is on
-	    ModeBase::Instance * modeInstance = LaundryWasherMode::Instance();
-	    DataModel::Nullable<uint8_t> mode = modeInstance->GetOnMode();
-	    if (mode.IsNull() == false)
+            ModeBase::Instance * modeInstance = LaundryWasherMode::Instance();
+
+            if (modeInstance != nullptr)
             {
-	        modeInstance->UpdateCurrentMode(mode.Value());
-	    }
+                DataModel::Nullable<uint8_t> mode = modeInstance->GetOnMode();
+                if (mode.IsNull() == false)
+                {
+                    modeInstance->UpdateCurrentMode(mode.Value());
+                }
+            }
         }
+#endif
         break;
+
+    default:;
     }
-#endif //
 }
 
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
