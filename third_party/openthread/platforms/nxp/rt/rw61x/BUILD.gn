@@ -62,6 +62,7 @@ source_set("openthread_core_config_rw61x") {
 }
 
 source_set("libopenthread-rw61x") {
+  deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
@@ -78,6 +79,7 @@ source_set("libopenthread-rw61x") {
     "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
     "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
     ]
+    deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
   if (spinel_interface_rpmsg) {
     sources += [
@@ -110,7 +112,7 @@ source_set("libopenthread-rw61x") {
 
   public_configs = [ ":openthread_rw61x_config" ]
 
-  deps = [
+  deps += [
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "../../..:libopenthread-platform-utils",
     nxp_sdk_target,
