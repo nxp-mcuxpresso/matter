@@ -60,6 +60,7 @@ source_set("openthread_core_config_rt1170") {
 }
 
 source_set("libopenthread-rt1170") {
+  deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/diag.c",
@@ -79,6 +80,7 @@ source_set("libopenthread-rt1170") {
       "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
     ]
+    deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
 
   if (rt_nvm_component == "nvm_fwk") {
@@ -102,7 +104,7 @@ source_set("libopenthread-rt1170") {
 
   public_configs = [ ":openthread_rt1170_config" ]
 
-  deps = [
+  deps += [
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "${openthread_root}:libopenthread-spinel-rcp",
     "../../..:libopenthread-platform-utils",
