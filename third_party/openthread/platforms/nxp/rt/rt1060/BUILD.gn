@@ -60,6 +60,7 @@ source_set("openthread_core_config_rt1060") {
 }
 
 source_set("libopenthread-rt1060") {
+  deps = []
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/diag.c",
@@ -81,6 +82,7 @@ source_set("libopenthread-rt1060") {
     "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
     "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
     ]
+    deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
 
   if (rt_nvm_component == "nvm_fwk") {
@@ -101,7 +103,7 @@ source_set("libopenthread-rt1060") {
 
   public_configs = [ ":openthread_rt1060_config" ]
 
-  deps = [
+  deps += [
     "${nxp_sdk_build_root}:nxp_mbedtls",
     "${openthread_root}:libopenthread-spinel-rcp",
     "../../..:libopenthread-platform-utils",
