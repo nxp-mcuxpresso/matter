@@ -35,12 +35,6 @@ assert(current_os == "freertos")
 k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
 k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
 
-exec_script("${k32w1_platform_dir}/scripts/checkout-modules.py", [
-  "-d", getenv("PWD"),
-  "-ot", chip_ot_commit,
-  "-ot-nxp", chip_ot_nxp_commit,
-])
-
 k32w1_sdk("sdk") {
   sources = [
     "${k32w1_platform_dir}/app/project_include/OpenThreadConfig.h",
@@ -103,13 +97,13 @@ k32w1_executable("contact_sensor_app") {
 
   if (chip_openthread_ftd) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
     ]
   } else {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
     ]
   }
 

@@ -21,13 +21,12 @@ declare_args() {
   chip_with_low_power = 0
   chip_convert_dac_private_key = 0
   sdk_release = 1
-  chip_ot_commit = "d4155e4e5f2a74cc50a545aa3dfb78f558dc117b"
-  chip_ot_nxp_commit = "178ac9ade856fb31cbd5b8aa989dec2b6251e37d"
   # The key storage solution. Developers can select between "littlefs" and the
   # older "fwk_nvm".
   chip_key_storage = "fwk_nvm"
 }
 
+openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-k32w1"
 nxp_platform = "k32w/k32w1"
 nxp_sdk_name = "k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
