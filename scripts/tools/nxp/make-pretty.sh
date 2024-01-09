@@ -38,10 +38,18 @@ fi
 readonly BUILD_JOBS=$(getconf _NPROCESSORS_ONLN)
 readonly INCLUDE_DIRS=(
     src/platform/nxp/common
+    src/platform/nxp/k32w
     src/platform/nxp/rt
+    src/platform/nxp/zephyr
     examples/all-clusters-app/nxp/common
     examples/all-clusters-app/nxp/rt
     examples/all-clusters-app/nxp/zephyr
+    examples/contact-sensor-app/nxp/k32w
+    examples/lighting-app/nxp/k32w
+    examples/platform/nxp/common
+    examples/platform/nxp/k32w
+    examples/platform/nxp/pw_sys_io
+    examples/platform/nxp/rt
     third_party/nxp
 )
 readonly CLANG_SOURCES=('*.c' '*.cpp' '*.h' '*.hpp')
