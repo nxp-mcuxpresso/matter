@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -64,6 +64,8 @@ if(CONFIG_MBEDTLS)
     zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
     zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
 endif()
+
+zephyr_include_directories(${CHIP_ROOT}/src/platform/nxp/zephyr)
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
@@ -152,9 +154,9 @@ else()
     matter_add_gn_arg_string("chip_mdns" "none")
 endif()
 
-# if (CONFIG_CHIP_CRYPTO_PSA)
-#     matter_add_gn_arg_string("chip_crypto" "psa")
-# endif()
+if (CONFIG_CHIP_CRYPTO_PSA)
+    matter_add_gn_arg_string("chip_crypto" "psa")
+endif()
 
 # if (BOARD STREQUAL "native_posix")
 #     matter_add_gn_arg_string("target_cpu" "x86")

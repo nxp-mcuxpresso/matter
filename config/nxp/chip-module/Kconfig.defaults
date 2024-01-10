@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -268,15 +268,22 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 endif
 
 # Configure MBEDTLS lib
-
 config MBEDTLS
 	default y
 
 config MBEDTLS_CFG_FILE
-	default "wpa_supp_els_pkc_mbedtls_config.h" if WPA_SUPP
 	default "config-tls-generic.h"
 
+config MBEDTLS_USER_CONFIG_ENABLE
+    default y
+
+config MBEDTLS_USER_CONFIG_FILE
+    default "nxp-zephyr-mbedtls-config.h"
+
 config MBEDTLS_ENTROPY_ENABLED
+	default y
+
+config MBEDTLS_ZEPHYR_ENTROPY
 	default y
 
 config MBEDTLS_ENABLE_HEAP
@@ -285,26 +292,50 @@ config MBEDTLS_ENABLE_HEAP
 config MBEDTLS_HEAP_SIZE
 	default 15360
 
+config MBEDTLS_CIPHER_AES_ENABLED
+	default y
+
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_CTR_DRBG_ENABLED
+	default y
+
+config MBEDTLS_CIPHER_MODE_CBC_ENABLED
+	default y
+
 config MBEDTLS_ECP_C
 	default y
 
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
 	default y
 
-config MBEDTLS_PKCS5_C
+if CHIP_CRYPTO_PSA
+
+config MBEDTLS_PSA_CRYPTO_C
 	default y
 
-config MBEDTLS_CIPHER_CCM_ENABLED
+config WPA_SUPP_CRYPTO_MBEDTLS_PSA
+	default y if WPA_SUPP_CRYPTO
+
+endif
+
+config MCUX_ELS_PKC
+	default y if SOC_SERIES_RW6XX
+
+if MCUX_ELS_PKC
+
+config KSDK_MBEDTLS
+	default n
+
+config MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
+	default y if MBEDTLS_PSA_CRYPTO_C
+
+config ENTROPY_GENERATOR
 	default y
 
-config MBEDTLS_ECJPAKE_C
-	default y
+endif # MCUX_ELS_PKC
 
-config MBEDTLS_PK_WRITE_C
-	default y
-
-config MBEDTLS_HKDF_C
-	default y
 
 if SHELL
 

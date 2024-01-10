@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(psa_hash_operation_t)
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN psa_hash_operation_t
 #elif defined(CONFIG_CC3XX_BACKEND)
 // Size of the statically allocated context for SHA256 operations in CryptoPAL
 // determined empirically.
