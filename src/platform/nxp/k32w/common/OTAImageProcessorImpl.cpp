@@ -24,7 +24,6 @@
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <src/app/reporting/reporting.h>
-#include <lib/support/BufferReader.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 

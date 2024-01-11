@@ -55,7 +55,7 @@ struct BLECallbackDelegate
     using GapGenericCallback = void (*)(gapGenericEvent_t * event);
     using GattServerCallback = void (*)(deviceId_t id, gattServerEvent_t * event);
 
-    GapGenericCallback gapCallback = nullptr;
+    GapGenericCallback gapCallback  = nullptr;
     GattServerCallback gattCallback = nullptr;
 };
 
@@ -232,12 +232,13 @@ protected:
 
 public:
     virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;
-    virtual BLEManagerCommon* GetImplInstance() = 0;
+    virtual BLEManagerCommon * GetImplInstance()                                         = 0;
     virtual CHIP_ERROR ResetController() { return CHIP_NO_ERROR; }
     void DoBleProcessing(void);
 
     BLECallbackDelegate callbackDelegate;
-    void RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback, BLECallbackDelegate::GattServerCallback gattCallback);
+    void RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
+                              BLECallbackDelegate::GattServerCallback gattCallback);
 };
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerCommon::_GetCHIPoBLEServiceMode(void)
