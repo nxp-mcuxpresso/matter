@@ -236,7 +236,7 @@ void NxpWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
 
 exit:
-    if(mpConnectCallback != nullptr)
+    if (mpConnectCallback != nullptr)
     {
         if (status == Status::kSuccess)
         {

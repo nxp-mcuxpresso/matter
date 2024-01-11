@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/nxp/zephyr/ConfigurationManagerImpl.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
+#include <platform/nxp/zephyr/ConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

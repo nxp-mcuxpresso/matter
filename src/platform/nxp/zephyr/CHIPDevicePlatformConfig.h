@@ -217,5 +217,4 @@
 #endif // CONFIG_CHIP_FACTORY_DATA
 #endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
 
-
 #include <platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h>

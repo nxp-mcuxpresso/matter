@@ -412,7 +412,7 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
         WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
 
         /* Reset the specific network to scan */
-        if(Instance().mNetworkToScan.GetSsidSpan().size() > 0)
+        if (Instance().mNetworkToScan.GetSsidSpan().size() > 0)
         {
             Instance().mNetworkToScan.Erase();
         }
@@ -562,9 +562,7 @@ void WiFiManager::NetworkDrivenDisconnectHandler(Platform::UniquePtr<uint8_t>)
     if (!Instance().mRecoveryArmed)
     {
         Instance().mRecoveryArmed = true;
-        DeviceLayer::SystemLayer().StartTimer(
-            System::Clock::Milliseconds32(kSupplicantReconnectionTimeoutMs),
-            Recover, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kSupplicantReconnectionTimeoutMs), Recover, nullptr);
     }
 
     SystemLayer().ScheduleLambda([] {
