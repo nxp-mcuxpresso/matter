@@ -202,7 +202,8 @@ CHIP_ERROR AppTask::Init()
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 #endif
 #if CONFIG_CHIP_OTA_REQUESTOR
-    if(err == CHIP_NO_ERROR) {
+    if (err == CHIP_NO_ERROR)
+    {
         LOG_INF("Initialization succeeded: Keep the OTA upgrade");
         /* If an update is under test make it permanent */
         OTARequestorInitiator::Instance().HandleSelfTest();
