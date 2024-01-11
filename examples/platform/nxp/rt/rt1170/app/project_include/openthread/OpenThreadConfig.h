@@ -27,7 +27,7 @@
 // When operating in a less than ideal RF environment, having a more forgiving configuration
 // of OpenThread makes thread a great deal more reliable.
 #define OPENTHREAD_CONFIG_TMF_ADDRESS_QUERY_MAX_RETRY_DELAY 120    // default is 28800
-#define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_DIRECT 30 // default is 3
+#define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_DIRECT 30  // default is 3
 #define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_INDIRECT 1 // default is 0
 #define OPENTHREAD_CONFIG_MAC_MAX_TX_ATTEMPTS_INDIRECT_POLLS 16    // default is 4
 
@@ -53,7 +53,7 @@
 #define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
 #endif
 
-// Enable usage of external heap allocator for ot 
+// Enable usage of external heap allocator for ot
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
 // Disable TCP

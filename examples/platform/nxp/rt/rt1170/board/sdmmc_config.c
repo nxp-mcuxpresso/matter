@@ -24,8 +24,7 @@ AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_sdmmcHostDmaBuffer[BOARD_SDMMC_H
                               SDMMCHOST_DMA_DESCRIPTOR_BUFFER_ALIGN_SIZE);
 #if defined SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER
 /* two cache line length for sdmmc host driver maintain unalign transfer */
-SDK_ALIGN(static uint8_t s_sdmmcCacheLineAlignBuffer[BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U],
-          BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE);
+SDK_ALIGN(static uint8_t s_sdmmcCacheLineAlignBuffer[BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U], BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE);
 #endif
 #if defined(SDIO_ENABLED) || defined(SD_ENABLED)
 static sd_detect_card_t s_cd;
@@ -48,7 +47,7 @@ GPIO_HANDLE_DEFINE(s_PowerResetGpioHandle);
  ******************************************************************************/
 uint32_t BOARD_USDHC1ClockConfiguration(void)
 {
-    clock_root_config_t rootCfg = {0};
+    clock_root_config_t rootCfg = { 0 };
     /* SYS PLL2 528MHz. */
     const clock_sys_pll2_config_t sysPll2Config = {
         .ssEnable = false,
@@ -95,7 +94,7 @@ bool BOARD_SDCardGetDetectStatus(void)
     return false;
 }
 
-void SDMMC_SD_CD_Callback(void *param)
+void SDMMC_SD_CD_Callback(void * param)
 {
     if (s_cd.callback != NULL)
     {
@@ -123,7 +122,7 @@ void BOARD_SDCardDAT3PullFunction(uint32_t status)
     }
 }
 
-void BOARD_SDCardDetectInit(sd_cd_t cd, void *userData)
+void BOARD_SDCardDetectInit(sd_cd_t cd, void * userData)
 {
     uint8_t pinState;
 
@@ -191,7 +190,7 @@ void BOARD_SDCardPowerControl(bool enable)
 #endif
 
 #ifdef SD_ENABLED
-void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *userData)
+void BOARD_SD_Config(void * card, sd_cd_t cd, uint32_t hostIRQPriority, void * userData)
 {
     assert(card);
 
@@ -205,15 +204,15 @@ void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *use
     s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
 #endif
 
-    ((sd_card_t *)card)->host                                = &s_host;
-    ((sd_card_t *)card)->host->hostController.base           = BOARD_SDMMC_SD_HOST_BASEADDR;
-    ((sd_card_t *)card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
+    ((sd_card_t *) card)->host                                = &s_host;
+    ((sd_card_t *) card)->host->hostController.base           = BOARD_SDMMC_SD_HOST_BASEADDR;
+    ((sd_card_t *) card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
 
-    ((sd_card_t *)card)->usrParam.cd         = &s_cd;
-    ((sd_card_t *)card)->usrParam.pwr        = BOARD_SDCardPowerControl;
-    ((sd_card_t *)card)->usrParam.ioStrength = NULL;
-    ((sd_card_t *)card)->usrParam.ioVoltage  = &s_ioVoltage;
-    ((sd_card_t *)card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
+    ((sd_card_t *) card)->usrParam.cd         = &s_cd;
+    ((sd_card_t *) card)->usrParam.pwr        = BOARD_SDCardPowerControl;
+    ((sd_card_t *) card)->usrParam.ioStrength = NULL;
+    ((sd_card_t *) card)->usrParam.ioVoltage  = &s_ioVoltage;
+    ((sd_card_t *) card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
 
     BOARD_SDCardPowerResetInit();
 
@@ -228,7 +227,7 @@ void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *use
 #endif
 
 #ifdef SDIO_ENABLED
-void BOARD_SDIO_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, sdio_int_t cardInt)
+void BOARD_SDIO_Config(void * card, sd_cd_t cd, uint32_t hostIRQPriority, sdio_int_t cardInt)
 {
     assert(card);
 
@@ -242,19 +241,19 @@ void BOARD_SDIO_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, sdio_in
     s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
 #endif
 
-    ((sdio_card_t *)card)->host                                = &s_host;
-    ((sdio_card_t *)card)->host->hostController.base           = BOARD_SDMMC_SDIO_HOST_BASEADDR;
-    ((sdio_card_t *)card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
+    ((sdio_card_t *) card)->host                                = &s_host;
+    ((sdio_card_t *) card)->host->hostController.base           = BOARD_SDMMC_SDIO_HOST_BASEADDR;
+    ((sdio_card_t *) card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
 
-    ((sdio_card_t *)card)->usrParam.cd         = &s_cd;
-    ((sdio_card_t *)card)->usrParam.pwr        = BOARD_SDCardPowerControl;
-    ((sdio_card_t *)card)->usrParam.ioStrength = NULL;
-    ((sdio_card_t *)card)->usrParam.ioVoltage  = &s_ioVoltage;
-    ((sdio_card_t *)card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
+    ((sdio_card_t *) card)->usrParam.cd         = &s_cd;
+    ((sdio_card_t *) card)->usrParam.pwr        = BOARD_SDCardPowerControl;
+    ((sdio_card_t *) card)->usrParam.ioStrength = NULL;
+    ((sdio_card_t *) card)->usrParam.ioVoltage  = &s_ioVoltage;
+    ((sdio_card_t *) card)->usrParam.maxFreq    = BOARD_SDMMC_SD_HOST_SUPPORT_SDR104_FREQ;
     if (cardInt != NULL)
     {
-        s_sdioInt.cardInterrupt                 = cardInt;
-        ((sdio_card_t *)card)->usrParam.sdioInt = &s_sdioInt;
+        s_sdioInt.cardInterrupt                  = cardInt;
+        ((sdio_card_t *) card)->usrParam.sdioInt = &s_sdioInt;
     }
 
     BOARD_SDCardPowerResetInit();
@@ -269,7 +268,7 @@ void BOARD_SDIO_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, sdio_in
 #endif
 
 #ifdef MMC_ENABLED
-void BOARD_MMC_Config(void *card, uint32_t hostIRQPriority)
+void BOARD_MMC_Config(void * card, uint32_t hostIRQPriority)
 {
     assert(card);
 
@@ -283,17 +282,17 @@ void BOARD_MMC_Config(void *card, uint32_t hostIRQPriority)
     s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
 #endif
 
-    ((mmc_card_t *)card)->host                                = &s_host;
-    ((mmc_card_t *)card)->host->hostController.base           = BOARD_SDMMC_MMC_HOST_BASEADDR;
-    ((mmc_card_t *)card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
-    ((mmc_card_t *)card)->host->tuningType                    = BOARD_SDMMC_MMC_TUNING_TYPE;
-    ((mmc_card_t *)card)->usrParam.ioStrength                 = NULL;
-    ((mmc_card_t *)card)->usrParam.maxFreq                    = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
+    ((mmc_card_t *) card)->host                                = &s_host;
+    ((mmc_card_t *) card)->host->hostController.base           = BOARD_SDMMC_MMC_HOST_BASEADDR;
+    ((mmc_card_t *) card)->host->hostController.sourceClock_Hz = BOARD_USDHC1ClockConfiguration();
+    ((mmc_card_t *) card)->host->tuningType                    = BOARD_SDMMC_MMC_TUNING_TYPE;
+    ((mmc_card_t *) card)->usrParam.ioStrength                 = NULL;
+    ((mmc_card_t *) card)->usrParam.maxFreq                    = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
 
-    ((mmc_card_t *)card)->usrParam.capability |= BOARD_SDMMC_MMC_SUPPORT_8_BIT_DATA_WIDTH;
+    ((mmc_card_t *) card)->usrParam.capability |= BOARD_SDMMC_MMC_SUPPORT_8_BIT_DATA_WIDTH;
 
-    ((mmc_card_t *)card)->hostVoltageWindowVCC  = BOARD_SDMMC_MMC_VCC_SUPPLY;
-    ((mmc_card_t *)card)->hostVoltageWindowVCCQ = BOARD_SDMMC_MMC_VCCQ_SUPPLY;
+    ((mmc_card_t *) card)->hostVoltageWindowVCC  = BOARD_SDMMC_MMC_VCC_SUPPLY;
+    ((mmc_card_t *) card)->hostVoltageWindowVCCQ = BOARD_SDMMC_MMC_VCCQ_SUPPLY;
 
     NVIC_SetPriority(BOARD_SDMMC_MMC_HOST_IRQ, hostIRQPriority);
 

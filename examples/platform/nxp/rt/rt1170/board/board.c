@@ -40,9 +40,9 @@ void BOARD_InitDebugConsole(void)
 }
 
 #if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
-void BOARD_LPI2C_Init(LPI2C_Type *base, uint32_t clkSrc_Hz)
+void BOARD_LPI2C_Init(LPI2C_Type * base, uint32_t clkSrc_Hz)
 {
-    lpi2c_master_config_t lpi2cConfig = {0};
+    lpi2c_master_config_t lpi2cConfig = { 0 };
 
     /*
      * lpi2cConfig.debugEnable = false;
@@ -59,7 +59,7 @@ void BOARD_LPI2C_Init(LPI2C_Type *base, uint32_t clkSrc_Hz)
 }
 
 status_t BOARD_LPI2C_Send(LPI2C_Type * base, uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t * txBuff,
-                          uint8_t     txBuffSize)
+                          uint8_t txBuffSize)
 {
     lpi2c_master_transfer_t xfer;
 
@@ -109,7 +109,7 @@ status_t BOARD_LPI2C_SendSCCB(LPI2C_Type * base, uint8_t deviceAddress, uint32_t
 status_t BOARD_LPI2C_ReceiveSCCB(LPI2C_Type * base, uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize,
                                  uint8_t * rxBuff, uint8_t rxBuffSize)
 {
-    status_t                status;
+    status_t status;
     lpi2c_master_transfer_t xfer;
 
     xfer.flags          = kLPI2C_TransferDefaultFlag;
@@ -142,13 +142,13 @@ void BOARD_Accel_I2C_Init(void)
 
 status_t BOARD_Accel_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint32_t txBuff)
 {
-    uint8_t data = (uint8_t)txBuff;
+    uint8_t data = (uint8_t) txBuff;
 
     return BOARD_LPI2C_Send(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subaddressSize, &data, 1);
 }
 
 status_t BOARD_Accel_I2C_Receive(uint8_t deviceAddress, uint32_t subAddress, uint8_t subaddressSize, uint8_t * rxBuff,
-                                 uint8_t  rxBuffSize)
+                                 uint8_t rxBuffSize)
 {
     return BOARD_LPI2C_Receive(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subaddressSize, rxBuff, rxBuffSize);
 }
@@ -159,13 +159,13 @@ void BOARD_Codec_I2C_Init(void)
 }
 
 status_t BOARD_Codec_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t * txBuff,
-                              uint8_t        txBuffSize)
+                              uint8_t txBuffSize)
 {
     return BOARD_LPI2C_Send(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *) txBuff, txBuffSize);
 }
 
 status_t BOARD_Codec_I2C_Receive(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t * rxBuff,
-                                 uint8_t  rxBuffSize)
+                                 uint8_t rxBuffSize)
 {
     return BOARD_LPI2C_Receive(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
 }
@@ -184,26 +184,26 @@ void BOARD_Camera_I2C_Init(void)
 }
 
 status_t BOARD_Camera_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t * txBuff,
-                               uint8_t        txBuffSize)
+                               uint8_t txBuffSize)
 {
     return BOARD_LPI2C_Send(BOARD_CAMERA_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *) txBuff, txBuffSize);
 }
 
 status_t BOARD_Camera_I2C_Receive(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t * rxBuff,
-                                  uint8_t  rxBuffSize)
+                                  uint8_t rxBuffSize)
 {
     return BOARD_LPI2C_Receive(BOARD_CAMERA_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
 }
 
 status_t BOARD_Camera_I2C_SendSCCB(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t * txBuff,
-                                   uint8_t        txBuffSize)
+                                   uint8_t txBuffSize)
 {
-    return BOARD_LPI2C_SendSCCB(BOARD_CAMERA_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *)txBuff,
+    return BOARD_LPI2C_SendSCCB(BOARD_CAMERA_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *) txBuff,
                                 txBuffSize);
 }
 
 status_t BOARD_Camera_I2C_ReceiveSCCB(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t * rxBuff,
-                                      uint8_t  rxBuffSize)
+                                      uint8_t rxBuffSize)
 {
     return BOARD_LPI2C_ReceiveSCCB(BOARD_CAMERA_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
 }
@@ -222,14 +222,14 @@ void BOARD_MIPIPanelTouch_I2C_Init(void)
 }
 
 status_t BOARD_MIPIPanelTouch_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t * txBuff,
-                                       uint8_t        txBuffSize)
+                                       uint8_t txBuffSize)
 {
     return BOARD_LPI2C_Send(BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *) txBuff,
                             txBuffSize);
 }
 
 status_t BOARD_MIPIPanelTouch_I2C_Receive(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t * rxBuff,
-                                          uint8_t  rxBuffSize)
+                                          uint8_t rxBuffSize)
 {
     return BOARD_LPI2C_Receive(BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
 }
@@ -244,27 +244,27 @@ void BOARD_ConfigMPU(void)
     /* RW_m_ncache_unused is a auxiliary region which is used to get the whole size of noncache section */
     extern uint32_t Image$$RW_m_ncache_unused$$Base[];
     extern uint32_t Image$$RW_m_ncache_unused$$ZI$$Limit[];
-    uint32_t        nonCacheStart = (uint32_t)Image$$RW_m_ncache$$Base;
-    uint32_t        size          = ((uint32_t)Image$$RW_m_ncache_unused$$Base == nonCacheStart)
-                        ? 0
-                        : ((uint32_t)Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
+    uint32_t nonCacheStart = (uint32_t) Image$$RW_m_ncache$$Base;
+    uint32_t size          = ((uint32_t) Image$$RW_m_ncache_unused$$Base == nonCacheStart)
+                 ? 0
+                 : ((uint32_t) Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
 #elif defined(__MCUXPRESSO)
 #if defined(__USE_SHMEM)
     extern uint32_t __base_rpmsg_sh_mem;
     extern uint32_t __top_rpmsg_sh_mem;
-    uint32_t        nonCacheStart = (uint32_t)(&__base_rpmsg_sh_mem);
-    uint32_t        size          = (uint32_t)(&__top_rpmsg_sh_mem) - nonCacheStart;
+    uint32_t nonCacheStart = (uint32_t) (&__base_rpmsg_sh_mem);
+    uint32_t size          = (uint32_t) (&__top_rpmsg_sh_mem) - nonCacheStart;
 #else
     extern uint32_t __base_NCACHE_REGION;
     extern uint32_t __top_NCACHE_REGION;
-    uint32_t        nonCacheStart = (uint32_t)(&__base_NCACHE_REGION);
-    uint32_t        size          = (uint32_t)(&__top_NCACHE_REGION) - nonCacheStart;
+    uint32_t nonCacheStart = (uint32_t) (&__base_NCACHE_REGION);
+    uint32_t size          = (uint32_t) (&__top_NCACHE_REGION) - nonCacheStart;
 #endif
 #elif defined(__ICCARM__) || defined(__GNUC__)
     extern uint32_t __NCACHE_REGION_START[];
     extern uint32_t __NCACHE_REGION_SIZE[];
-    uint32_t        nonCacheStart = (uint32_t)__NCACHE_REGION_START;
-    uint32_t        size          = (uint32_t)__NCACHE_REGION_SIZE;
+    uint32_t nonCacheStart = (uint32_t) __NCACHE_REGION_START;
+    uint32_t size          = (uint32_t) __NCACHE_REGION_SIZE;
 #endif
     volatile uint32_t i = 0;
 
@@ -398,7 +398,7 @@ void BOARD_ConfigMPU(void)
     {
         /* The MPU region size should be 2^N, 5<=N<=32, region base should be multiples of size. */
         assert(!(nonCacheStart % size));
-        assert(size == (uint32_t)(1 << i));
+        assert(size == (uint32_t) (1 << i));
         assert(i >= 5);
 
         /* Region 10 setting: Memory with Normal type, not shareable, non-cacheable */
@@ -445,20 +445,20 @@ void BOARD_ConfigMPU(void)
     /* RW_m_ncache_unused is a auxiliary region which is used to get the whole size of noncache section */
     extern uint32_t Image$$RW_m_ncache_unused$$Base[];
     extern uint32_t Image$$RW_m_ncache_unused$$ZI$$Limit[];
-    uint32_t nonCacheStart = (uint32_t)Image$$RW_m_ncache$$Base;
-    uint32_t nonCacheSize = ((uint32_t)Image$$RW_m_ncache_unused$$Base == nonCacheStart)
-                                ? 0
-                                : ((uint32_t)Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
+    uint32_t nonCacheStart = (uint32_t) Image$$RW_m_ncache$$Base;
+    uint32_t nonCacheSize  = ((uint32_t) Image$$RW_m_ncache_unused$$Base == nonCacheStart)
+         ? 0
+         : ((uint32_t) Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
 #elif defined(__MCUXPRESSO)
     extern uint32_t __base_NCACHE_REGION;
     extern uint32_t __top_NCACHE_REGION;
-    uint32_t        nonCacheStart = (uint32_t)(&__base_NCACHE_REGION);
-    uint32_t        nonCacheSize  = (uint32_t)(&__top_NCACHE_REGION) - nonCacheStart;
+    uint32_t nonCacheStart = (uint32_t) (&__base_NCACHE_REGION);
+    uint32_t nonCacheSize  = (uint32_t) (&__top_NCACHE_REGION) - nonCacheStart;
 #elif defined(__ICCARM__) || defined(__GNUC__)
     extern uint32_t __NCACHE_REGION_START[];
     extern uint32_t __NCACHE_REGION_SIZE[];
-    uint32_t        nonCacheStart = (uint32_t)__NCACHE_REGION_START;
-    uint32_t        nonCacheSize  = (uint32_t)__NCACHE_REGION_SIZE;
+    uint32_t nonCacheStart = (uint32_t) __NCACHE_REGION_START;
+    uint32_t nonCacheSize  = (uint32_t) __NCACHE_REGION_SIZE;
 #endif
 #if defined(__USE_SHMEM)
 #if defined(__CC_ARM) || defined(__ARMCC_VERSION)
@@ -466,18 +466,18 @@ void BOARD_ConfigMPU(void)
     /* RPMSG_SH_MEM_unused is a auxiliary region which is used to get the whole size of RPMSG_SH_MEM section */
     extern uint32_t Image$$RPMSG_SH_MEM_unused$$Base[];
     extern uint32_t Image$$RPMSG_SH_MEM_unused$$ZI$$Limit[];
-    uint32_t rpmsgShmemStart = (uint32_t)Image$$RPMSG_SH_MEM$$Base;
-    uint32_t rpmsgShmemSize = (uint32_t)Image$$RPMSG_SH_MEM_unused$$ZI$$Limit - rpmsgShmemStart;
+    uint32_t rpmsgShmemStart = (uint32_t) Image$$RPMSG_SH_MEM$$Base;
+    uint32_t rpmsgShmemSize  = (uint32_t) Image$$RPMSG_SH_MEM_unused$$ZI$$Limit - rpmsgShmemStart;
 #elif defined(__MCUXPRESSO)
     extern uint32_t __base_rpmsg_sh_mem;
     extern uint32_t __top_rpmsg_sh_mem;
-    uint32_t        rpmsgShmemStart = (uint32_t)(&__base_rpmsg_sh_mem);
-    uint32_t        rpmsgShmemSize  = (uint32_t)(&__top_rpmsg_sh_mem) - rpmsgShmemStart;
+    uint32_t rpmsgShmemStart = (uint32_t) (&__base_rpmsg_sh_mem);
+    uint32_t rpmsgShmemSize  = (uint32_t) (&__top_rpmsg_sh_mem) - rpmsgShmemStart;
 #elif defined(__ICCARM__) || defined(__GNUC__)
     extern uint32_t __RPMSG_SH_MEM_START[];
     extern uint32_t __RPMSG_SH_MEM_SIZE[];
-    uint32_t        rpmsgShmemStart = (uint32_t)__RPMSG_SH_MEM_START;
-    uint32_t        rpmsgShmemSize  = (uint32_t)__RPMSG_SH_MEM_SIZE;
+    uint32_t rpmsgShmemStart = (uint32_t) __RPMSG_SH_MEM_START;
+    uint32_t rpmsgShmemSize  = (uint32_t) __RPMSG_SH_MEM_SIZE;
 #endif
 #endif
     uint32_t i = 0;
@@ -492,7 +492,8 @@ void BOARD_ConfigMPU(void)
         LMEM->PCCCR |= LMEM_PCCCR_PUSHW0_MASK | LMEM_PCCCR_PUSHW1_MASK | LMEM_PCCCR_GO_MASK;
         /* Wait until the cache command completes. */
         while ((LMEM->PCCCR & LMEM_PCCCR_GO_MASK) != 0U)
-        {}
+        {
+        }
         /* As a precaution clear the bits to avoid inadvertently re-running this command. */
         LMEM->PCCCR &= ~(LMEM_PCCCR_PUSHW0_MASK | LMEM_PCCCR_PUSHW1_MASK);
         /* Now disable the cache. */
@@ -506,7 +507,8 @@ void BOARD_ConfigMPU(void)
         LMEM->PSCCR |= LMEM_PSCCR_PUSHW0_MASK | LMEM_PSCCR_PUSHW1_MASK | LMEM_PSCCR_GO_MASK;
         /* Wait until the cache command completes. */
         while ((LMEM->PSCCR & LMEM_PSCCR_GO_MASK) != 0U)
-        {}
+        {
+        }
         /* As a precaution clear the bits to avoid inadvertently re-running this command. */
         LMEM->PSCCR &= ~(LMEM_PSCCR_PUSHW0_MASK | LMEM_PSCCR_PUSHW1_MASK);
         /* Now disable the cache. */
@@ -538,7 +540,7 @@ void BOARD_ConfigMPU(void)
     {
         /* The MPU region size should be 2^N, 5<=N<=32, region base should be multiples of size. */
         assert(!(nonCacheStart % nonCacheSize));
-        assert(nonCacheSize == (uint32_t)(1 << i));
+        assert(nonCacheSize == (uint32_t) (1 << i));
         assert(i >= 5);
 
         /* Region 3 setting: Memory with device type, not shareable, non-cacheable */
@@ -558,7 +560,7 @@ void BOARD_ConfigMPU(void)
     {
         /* The MPU region size should be 2^N, 5<=N<=32, region base should be multiples of size. */
         assert(!(rpmsgShmemStart % rpmsgShmemSize));
-        assert(rpmsgShmemSize == (uint32_t)(1 << i));
+        assert(rpmsgShmemSize == (uint32_t) (1 << i));
         assert(i >= 5);
 
         /* Region 4 setting: Memory with device type, not shareable, non-cacheable */
@@ -576,7 +578,7 @@ void BOARD_ConfigMPU(void)
     {
         /* The MPU region size should be 2^N, 5<=N<=32, region base should be multiples of size. */
         assert(!(nonCacheStart % nonCacheSize));
-        assert(nonCacheSize == (uint32_t)(1 << i));
+        assert(nonCacheSize == (uint32_t) (1 << i));
         assert(i >= 5);
 
         /* Region 0 setting: Memory with device type, not shareable, non-cacheable */
@@ -596,7 +598,7 @@ void BOARD_ConfigMPU(void)
     {
         /* The MPU region size should be 2^N, 5<=N<=32, region base should be multiples of size. */
         assert(!(rpmsgShmemStart % rpmsgShmemSize));
-        assert(rpmsgShmemSize == (uint32_t)(1 << i));
+        assert(rpmsgShmemSize == (uint32_t) (1 << i));
         assert(i >= 5);
 
         /* Region 1 setting: Memory with device type, not shareable, non-cacheable */
@@ -614,7 +616,8 @@ void BOARD_ConfigMPU(void)
     LMEM->PSCCR |= LMEM_PSCCR_INVW0_MASK | LMEM_PSCCR_INVW1_MASK | LMEM_PSCCR_GO_MASK;
     /* Wait until the cache command completes */
     while ((LMEM->PSCCR & LMEM_PSCCR_GO_MASK) != 0U)
-    {}
+    {
+    }
     /* As a precaution clear the bits to avoid inadvertently re-running this command. */
     LMEM->PSCCR &= ~(LMEM_PSCCR_INVW0_MASK | LMEM_PSCCR_INVW1_MASK);
     /* Now enable the system bus cache. */
@@ -625,7 +628,8 @@ void BOARD_ConfigMPU(void)
     LMEM->PCCCR |= LMEM_PCCCR_INVW0_MASK | LMEM_PCCCR_INVW1_MASK | LMEM_PCCCR_GO_MASK;
     /* Wait until the cache command completes. */
     while ((LMEM->PCCCR & LMEM_PCCCR_GO_MASK) != 0U)
-    {}
+    {
+    }
     /* As a precaution clear the bits to avoid inadvertently re-running this command. */
     LMEM->PCCCR &= ~(LMEM_PCCCR_INVW0_MASK | LMEM_PCCCR_INVW1_MASK);
     /* Now enable the code bus cache. */
