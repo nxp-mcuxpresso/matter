@@ -61,29 +61,30 @@ component:
  **********************************************************************************************************************/
 
 #ifdef WATCHDOG_ALLOWED
-static void WDOG1_init(void) {
-   wdog_config_t config;
-  /*
-  * wdogConfig->enableWdog = true;
-  * wdogConfig->workMode.enableWait = false;
-  * wdogConfig->workMode.enableStop = false;
-  * wdogConfig->workMode.enableDebug = false;
-  * wdogConfig->enableInterrupt = false;
-  * wdogConfig->enablePowerdown = false;
-  * wdogConfig->resetExtension = false;
-  * wdogConfig->timeoutValue = 0xFFU;
-  * wdogConfig->interruptTimeValue = 0x04u;
-  */
-  WDOG_GetDefaultConfig(&config);
-  /* 
-  * Timeout value is (0xF + 1)/2 = 8 sec.
-  * Once the WDOG is activated, it must be serviced by the software on a periodic basis, by calling WDOG_Refresh. If
-  * servicing does not take place, the timer times out. Upon timeout, the WDOG asserts the internal system reset signal,
-  * WDOG_RESET_B_DEB to the System Reset Controller (SRC).
-  */
-  config.timeoutValue = 0xF;
-  /* WDOG peripheral initialization */
-  WDOG_Init(WDOG1, &config);
+static void WDOG1_init(void)
+{
+    wdog_config_t config;
+    /*
+     * wdogConfig->enableWdog = true;
+     * wdogConfig->workMode.enableWait = false;
+     * wdogConfig->workMode.enableStop = false;
+     * wdogConfig->workMode.enableDebug = false;
+     * wdogConfig->enableInterrupt = false;
+     * wdogConfig->enablePowerdown = false;
+     * wdogConfig->resetExtension = false;
+     * wdogConfig->timeoutValue = 0xFFU;
+     * wdogConfig->interruptTimeValue = 0x04u;
+     */
+    WDOG_GetDefaultConfig(&config);
+    /*
+     * Timeout value is (0xF + 1)/2 = 8 sec.
+     * Once the WDOG is activated, it must be serviced by the software on a periodic basis, by calling WDOG_Refresh. If
+     * servicing does not take place, the timer times out. Upon timeout, the WDOG asserts the internal system reset signal,
+     * WDOG_RESET_B_DEB to the System Reset Controller (SRC).
+     */
+    config.timeoutValue = 0xF;
+    /* WDOG peripheral initialization */
+    WDOG_Init(WDOG1, &config);
 };
 #endif
 
@@ -145,24 +146,22 @@ instance:
 /* clang-format on */
 /* LittleFS context */
 extern struct lfs_mflash_ctx LittleFS_ctx;
-const struct lfs_config LittleFS_config = {
-  .context = (void*)&LittleFS_ctx,
-  .read = lfs_mflash_read,
-  .prog = lfs_mflash_prog,
-  .erase = lfs_mflash_erase,
-  .sync = lfs_mflash_sync,
+const struct lfs_config LittleFS_config = { .context = (void *) &LittleFS_ctx,
+                                            .read    = lfs_mflash_read,
+                                            .prog    = lfs_mflash_prog,
+                                            .erase   = lfs_mflash_erase,
+                                            .sync    = lfs_mflash_sync,
 #ifdef LFS_THREADSAFE
-  .lock = lfs_mutex_lock,
-  .unlock = lfs_mutex_unlock,
+                                            .lock   = lfs_mutex_lock,
+                                            .unlock = lfs_mutex_unlock,
 #endif
-  .read_size = LITTLEFS_READ_SIZE,
-  .prog_size = LITTLEFS_PROG_SIZE,
-  .block_size = LITTLEFS_BLOCK_SIZE,
-  .block_count = LITTLEFS_BLOCK_COUNT,
-  .block_cycles = LITTLEFS_BLOCK_CYCLES,
-  .cache_size = LITTLEFS_CACHE_SIZE,
-  .lookahead_size = LITTLEFS_LOOKAHEAD_SIZE
-};
+                                            .read_size      = LITTLEFS_READ_SIZE,
+                                            .prog_size      = LITTLEFS_PROG_SIZE,
+                                            .block_size     = LITTLEFS_BLOCK_SIZE,
+                                            .block_count    = LITTLEFS_BLOCK_COUNT,
+                                            .block_cycles   = LITTLEFS_BLOCK_CYCLES,
+                                            .cache_size     = LITTLEFS_CACHE_SIZE,
+                                            .lookahead_size = LITTLEFS_LOOKAHEAD_SIZE };
 
 /* Empty initialization function (commented out)
 static void LittleFS_init(void) {
@@ -173,9 +172,9 @@ static void LittleFS_init(void) {
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
 {
-  /* Initialize components */
+    /* Initialize components */
 #ifdef WATCHDOG_ALLOWED
-  WDOG1_init();
+    WDOG1_init();
 #endif
 }
 
@@ -184,5 +183,5 @@ void BOARD_InitPeripherals(void)
  **********************************************************************************************************************/
 void BOARD_InitBootPeripherals(void)
 {
-  BOARD_InitPeripherals();
+    BOARD_InitPeripherals();
 }
