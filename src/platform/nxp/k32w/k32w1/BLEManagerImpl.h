@@ -55,7 +55,7 @@ public:
     friend BLEManager;
 
     CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) override;
-    BLEManagerCommon* GetImplInstance() override;
+    BLEManagerCommon * GetImplInstance() override;
     CHIP_ERROR ResetController() override;
 
 private:

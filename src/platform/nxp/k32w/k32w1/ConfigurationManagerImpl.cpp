@@ -54,9 +54,9 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    uint32_t rebootCount = 0;
+    uint32_t rebootCount      = 0;
     uint32_t operationalHours = 0;
-    uint32_t bootReason = 0;
+    uint32_t bootReason       = 0;
 
     err = GetRebootCount(rebootCount);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
