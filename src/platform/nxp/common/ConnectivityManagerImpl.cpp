@@ -51,7 +51,6 @@ extern "C" {
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #include <openthread/mdns_server.h>
@@ -488,7 +487,7 @@ void ConnectivityManagerImpl::StartBrServices()
         Inet::InterfaceId tmpExtIf(extNetIfPtr);
         Inet::InterfaceId tmpThrIf(thrNetIfPtr);
         mExternalNetIf = tmpExtIf;
-        mThreadNetIf = tmpThrIf;
+        mThreadNetIf   = tmpThrIf;
 
         // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
         // properly. If the thread netif is !=null it means that it was fully initialized
