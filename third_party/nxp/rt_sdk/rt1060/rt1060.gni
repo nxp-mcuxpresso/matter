@@ -56,8 +56,9 @@ STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
 FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
     "${rt_sdk_root}/core/devices/${deviceBoardName}/xip"
 
+# Folder does not exist in the SDK for evkc so force it to become evkb
 WIRELESS_CONFIG_TEMPLATE_PATH =
-    "${rt_sdk_root}/core/boards/${evkname}/wireless_config_template"
+    "${rt_sdk_root}/core/boards/evkbmimxrt1060/wireless_config_template"
 
 template("rt1060_sdk_drivers") {
   config("${target_name}_config") {
@@ -278,7 +279,14 @@ template("rt1060_sdk_drivers") {
     }
 
     if (chip_enable_wifi) {
-      sources += [ "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/wifi-sdio.c" ]
+      sources += [
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ax.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11k.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11v.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_action.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_mbo.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/wifi-sdio.c",
+      ]
     }
 
     if (chip_enable_openthread) {

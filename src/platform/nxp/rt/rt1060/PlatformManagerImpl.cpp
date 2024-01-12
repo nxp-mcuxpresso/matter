@@ -28,6 +28,7 @@
 #include "DiagnosticDataProviderImpl.h"
 #include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
+#include "fwk_platform_coex.h"
 #include "ksdk_mbedtls.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
@@ -107,7 +108,13 @@ extern "C" void BOARD_InitHardware(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+/*
+Currently only IW612 and K32W0 support controller initialization in the connectivity framework
+* Include should be removed otherwise it will introduce double firmware definition
+*/
+#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
 #include "wlan_bt_fw.h"
+#endif
 
 extern "C" {
 #include "wlan.h"
@@ -211,6 +218,8 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     return chipRes;
 }
 
+/* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
+#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 {
@@ -262,6 +271,7 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 
     return result;
 }
+#endif
 #endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -339,6 +349,22 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     otPlatRadioInitSpinelInterface();
+#endif
+
+/* Currently only IW612 and K32W0 support controller initialization in the connectivity framework */
+#ifdef WIFI_IW612_BOARD_MURATA_2EL_M2
+    /* Init the controller by giving as an arg the connectivity supported */
+    PLATFORM_InitControllers(connBle_c
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+                             | conn802_15_4_c
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+                             | connWlan_c
+#endif
+    );
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
@@ -358,7 +384,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+/* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
+#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
     err = WiFiInterfaceInit();
+#endif
 
     if (err != CHIP_NO_ERROR)
     {
@@ -445,8 +474,7 @@ void PlatformManagerImpl::Reset(void)
     // Restart the system.
     NVIC_SystemReset();
     while (1)
-    {
-    }
+    {}
 }
 
 void PlatformManagerImpl::ScheduleResetInIdle(void)

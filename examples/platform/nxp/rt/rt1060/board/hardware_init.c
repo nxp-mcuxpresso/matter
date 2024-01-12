@@ -54,9 +54,15 @@ void BOARD_InitHardware(void)
 #else
         BOARD_InitENETPins();
 #endif
+
 #if (defined(WIFI_IW416_BOARD_MURATA_1XK_USD) || defined(WIFI_88W8987_BOARD_MURATA_1ZM_USD))
         BOARD_InitMurataModulePins();
+#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2))
+        BOARD_InitPinsM2();
+        BOARD_InitM2SPIPins();
+        BOARD_InitM2I2CPins();
 #endif
+
 #ifdef BOARD_OTW_K32W0_PIN_INIT
         BOARD_InitOTWPins();
 #endif
