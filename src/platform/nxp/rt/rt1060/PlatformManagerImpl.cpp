@@ -474,7 +474,8 @@ void PlatformManagerImpl::Reset(void)
     // Restart the system.
     NVIC_SystemReset();
     while (1)
-    {}
+    {
+    }
 }
 
 void PlatformManagerImpl::ScheduleResetInIdle(void)

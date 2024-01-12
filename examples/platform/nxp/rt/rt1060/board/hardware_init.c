@@ -16,7 +16,8 @@
 
 #if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
     (defined(WIFI_IW416_BOARD_AW_AM510_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
-    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
+    (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
 #include "controller_hci_uart.h"
 #endif
 
@@ -140,6 +141,29 @@ int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
     config->instance        = BOARD_BT_UART_INSTANCE;
     config->enableRxRTS     = 1u;
     config->enableTxCTS     = 1u;
+    return 0;
+}
+#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
+{
+    if (NULL == config)
+    {
+        return -1;
+    }
+    config->clockSrc        = BOARD_BT_UART_CLK_FREQ;
+    config->defaultBaudrate = 115200u;
+    config->runningBaudrate = BOARD_BT_UART_BAUDRATE;
+    config->instance        = BOARD_BT_UART_INSTANCE;
+    config->enableRxRTS     = 1u;
+    config->enableTxCTS     = 1u;
+#if (defined(HAL_UART_DMA_ENABLE) && (HAL_UART_DMA_ENABLE > 0U))
+    config->dma_instance     = 0U;
+    config->rx_channel       = 4U;
+    config->tx_channel       = 5U;
+    config->dma_mux_instance = 0U;
+    config->rx_request       = kDmaRequestMuxLPUART3Rx;
+    config->tx_request       = kDmaRequestMuxLPUART3Tx;
+#endif
     return 0;
 }
 #endif
