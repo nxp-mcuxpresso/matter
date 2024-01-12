@@ -132,6 +132,7 @@ k32w0_executable("contact_sensor_app") {
 
   ldflags = [
     "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--defsym=__stack_size__=0x480",
     "-Wl,-print-memory-usage",
   ]
 
