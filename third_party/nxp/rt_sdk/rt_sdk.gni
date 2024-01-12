@@ -422,11 +422,6 @@ template("rt_sdk") {
       "PRINTF_ADVANCED_ENABLE=1",
     ]
 
-    if (rt_platform != "rw61x") {
-      # This adds a temporary workakound to fix mbdetls concurrent access to crypto hardware
-      defines += [ "RT_MATTER_SUPPORT" ]
-    }
-
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
     }
