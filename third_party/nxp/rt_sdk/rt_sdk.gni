@@ -24,7 +24,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")  # declares some sdk args such as
 
 declare_args() {
   # Location of the rt SDK.
-  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo"
+  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo/sdk-2.15"
 
   # Enables Matter over Ethernet support
   chip_enable_ethernet = false
@@ -70,6 +70,9 @@ declare_args() {
 
   # SDK 2.15 support
   is_sdk_2_15 = false
+
+  # Describe the transceiver detail flags
+  nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
 }
 
 declare_args() {
@@ -88,8 +91,12 @@ if (!defined(rt_fwk_platform)) {
 assert(rt_sdk_root != "", "rt_sdk_root must be specified")
 
 # Assuming 2.15 SDK support for RT1170
-if (!is_sdk_2_15 && rt_platform == "rt1170") {
+if (rt_platform == "rt1060" || rt_platform == "rt1170") {
   is_sdk_2_15 = true
+}
+
+if (rt_platform == "rt1060") {
+  nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_M2"
 }
 
 rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos-kernel"
@@ -107,6 +114,7 @@ template("rt_transceiver") {
       _transceiver_include_dirs += [
         # Transceiver files
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
         "${rt_sdk_root}/middleware/sdmmc/common",
         "${rt_sdk_root}/middleware/sdmmc/sdio",
         "${rt_sdk_root}/middleware/sdmmc/host/usdhc",
@@ -129,9 +137,8 @@ template("rt_transceiver") {
           "${rt_sdk_root}/middleware/wifi_nxp/firmware_dnld",
         ]
       } else {
-        _transceiver_include_dirs += [
-           "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware",
-        ]
+        _transceiver_include_dirs +=
+            [ "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware" ]
       }
     }
 
@@ -489,7 +496,7 @@ template("rt_sdk") {
 
     if (iwx12_transceiver) {
       defines += [
-        "WIFI_IW612_BOARD_MURATA_2EL_USD",
+        nxp_transceiver_interface_detail,
         "SDIO_ENABLED",
       ]
     }

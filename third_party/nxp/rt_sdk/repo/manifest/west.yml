@@ -4,31 +4,24 @@
 #
 # https://docs.zephyrproject.org/latest/guides/west/index.html
 manifest:
-  remotes:
-  - name: nxpmicro
-    url-base: https://github.com/NXPmicro
-  defaults:
-    remote: nxpmicro
   projects:
-  - name: mcux-sdk
-    revision: 173fe5ba170474f02164e210f285dbe8f164e7a7
-    path: core
-    import:
-      name-allowlist:
-        - FreeRTOS-Kernel
-        - CMSIS_5
-        - mcux-sdk-middleware-sdmmc
-        - fatfs
-        - mcux-sdk-middleware-edgefast-bluetooth
-        - mcux-sdk-middleware-ethermind
-        - mbedtls
-        - wifi_nxp
-        - littlefs
-  - name: framework
-    url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
-    revision: ac523d9
-    path: middleware/wireless/framework
-  - name: lwip
-    url: https://github.com/nxp-mcuxpresso/lwip.git
-    revision: e0550ec8bab
-    path: middleware/lwip
+    - name: sdk-release
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
+      import:
+        file: MCUX_2.15.000_RC1.yml
+        name-allowlist:
+          - mcux-sdk
+          - mcux-sdk-examples
+          - FreeRTOS-Kernel
+          - CMSIS_5
+          - mcux-sdk-middleware-sdmmc
+          - mcux-sdk-middleware-connectivity-framework
+          - fatfs
+          - mcux-sdk-middleware-edgefast-bluetooth
+          - mcux-sdk-middleware-ethermind
+          #- mbedtls
+          - wifi_nxp
+          #- lwip
+          - littlefs
+        path-prefix: sdk-2.15
+      revision: release/2.15.0_major_rfp
