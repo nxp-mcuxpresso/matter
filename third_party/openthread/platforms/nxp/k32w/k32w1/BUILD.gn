@@ -40,6 +40,10 @@ config("openthread_k32w1_config") {
       "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=0",
     ]
   }
+
+  if (chip_key_storage == "littlefs") {
+    defines += [ "OT_PLAT_SAVE_NVM_DATA_ON_IDLE=0" ]
+  }
 }
 
 source_set("openthread_core_config_k32w1") {
