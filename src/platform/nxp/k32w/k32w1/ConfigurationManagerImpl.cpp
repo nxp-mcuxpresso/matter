@@ -29,7 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
-#include <platform/nxp/common/NXPConfig.h>
+#include <platform/nxp/k32w/k32w1/K32W1Config.h>
 #if defined(USE_SMU2_DYNAMIC)
 #include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
 #endif
@@ -54,41 +54,43 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    uint32_t rebootCount      = 0;
-    uint32_t operationalHours = 0;
-    uint32_t bootReason       = 0;
+    uint32_t rebootCount = 0;
 
-    err = GetRebootCount(rebootCount);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
     {
-        err = StoreRebootCount(0);
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
     }
     else
     {
-        err = StoreRebootCount(rebootCount + 1);
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(0);
+        SuccessOrExit(err);
     }
-    SuccessOrExit(err);
 
-    err = GetTotalOperationalHours(operationalHours);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
     }
-    SuccessOrExit(err);
 
-    err = GetBootReason(bootReason);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
     }
-    SuccessOrExit(err);
 
-    err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
 
     err = CHIP_NO_ERROR;
+
 exit:
     return err;
 }
@@ -101,22 +103,22 @@ CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+    return ReadConfigValue(K32WConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValue(K32WConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ReadConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return ReadConfigValue(K32WConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(K32WConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
@@ -147,7 +149,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
-    return WriteConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+    return WriteConfigValue(K32WConfig::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -166,7 +168,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 {
     CHIP_ERROR err;
 
-    err = NXPConfig::ReadConfigValueCounter(persistedStorageKey, value);
+    err = K32WConfig::ReadConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -184,7 +186,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = NXPConfig::WriteConfigValueCounter(persistedStorageKey, value);
+    err = K32WConfig::WriteConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -197,62 +199,62 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return NXPConfig::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return NXPConfig::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return NXPConfig::ReadConfigValue(key, val);
+    return K32WConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return NXPConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return K32WConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return NXPConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return K32WConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return NXPConfig::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return NXPConfig::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return NXPConfig::WriteConfigValue(key, val);
+    return K32WConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return NXPConfig::WriteConfigValueStr(key, str);
+    return K32WConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return NXPConfig::WriteConfigValueStr(key, str, strLen);
+    return K32WConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return NXPConfig::WriteConfigValueBin(key, data, dataLen);
+    return K32WConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    NXPConfig::RunConfigUnitTest();
+    K32WConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -261,7 +263,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = NXPConfig::FactoryResetConfig();
+    err = K32WConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
