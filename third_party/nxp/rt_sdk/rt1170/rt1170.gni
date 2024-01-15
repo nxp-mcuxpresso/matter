@@ -25,70 +25,39 @@ declare_args() {
   deviceBoardName = "MIMXRT1176"
 }
 
-if (is_sdk_package) {
-  COMPONENT_FILES_PATH = "${rt_sdk_root}/components"
-  DRIVER_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/drivers"
-  DRIVER_LPUART_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_LPSPI_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_EDMA_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_DMAMUX_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_PIT_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_GPT_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_FLEXSPI_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_IGPIO_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cm7"
-  DRIVER_CAAM_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/drivers"
-  DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_DEVICE_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_USDHC_FILES_PATH = "${DRIVER_FILES_PATH}"
-  COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
-  COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
-  COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
-  COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
-  COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
-  UTILITIES_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
-  UTILITIES_SHELL_FILES_PATH =
-      "${rt_sdk_root}/devices/${deviceBoardName}/utilities/shell"
-  UTILITIES_ASSERT_FILES_PATH =
-      "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
-  DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
-  STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
-  FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
-      "${rt_sdk_root}/devices/${deviceBoardName}/xip"
-  WIRELESS_CONFIG_TEMPLATE_PATH =
-      "${rt_sdk_root}/boards/${evkname}/wireless_config_template"
-} else {
-  COMPONENT_FILES_PATH = "${rt_sdk_root}/components"
-  DRIVER_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/drivers"
-  DRIVER_LPUART_FILES_PATH = "${rt_sdk_root}/platform/drivers/lpuart"
-  DRIVER_LPSPI_FILES_PATH = "${rt_sdk_root}/platform/drivers/lpspi"
-  DRIVER_EDMA_FILES_PATH = "${rt_sdk_root}/platform/drivers/edma"
-  DRIVER_DMAMUX_FILES_PATH = "${rt_sdk_root}/platform/drivers/dmamux"
-  DRIVER_PIT_FILES_PATH = "${rt_sdk_root}/platform/drivers/pit"
-  DRIVER_GPT_FILES_PATH = "${rt_sdk_root}/platform/drivers/gpt"
-  DRIVER_FLEXSPI_FILES_PATH = "${rt_sdk_root}/platform/drivers/flexspi"
-  DRIVER_IGPIO_FILES_PATH = "${rt_sdk_root}/platform/drivers/igpio"
-  DRIVER_ENET_FILES_PATH = "${rt_sdk_root}/platform/drivers/enet"
-  DRIVER_CACHE_FILES_PATH = "${rt_sdk_root}/platform/drivers/cache/armv7-m7"
-  DRIVER_CAAM_FILES_PATH = "${rt_sdk_root}/platform/drivers/caam"
-  DRIVER_COMMON_FILES_PATH = "${rt_sdk_root}/platform/drivers/common"
-  DRIVER_DEVICE_FILES_PATH = "${DRIVER_FILES_PATH}"
-  DRIVER_USDHC_FILES_PATH = "${rt_sdk_root}/platform/drivers/usdhc"
-  COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
-  COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
-  COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
-  COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
-  COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
-  UTILITIES_FILES_PATH = "${rt_sdk_root}/platform/utilities"
-  UTILITIES_SHELL_FILES_PATH = "${rt_sdk_root}/platform/utilities/shell"
-  UTILITIES_ASSERT_FILES_PATH = "${rt_sdk_root}/platform/utilities/assert"
-  DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
-  STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
-  FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
-      "${rt_sdk_root}/devices/${deviceBoardName}/xip"
-  WIRELESS_CONFIG_TEMPLATE_PATH = "${rt_sdk_root}/boards/${evkname}"
-}
+
+COMPONENT_FILES_PATH = "${rt_sdk_root}/core/components"
+DRIVER_FILES_PATH = "${rt_sdk_root}/core/devices/${deviceBoardName}/drivers"
+DRIVER_LPUART_FILES_PATH = "${rt_sdk_root}/core/drivers/lpuart"
+DRIVER_LPSPI_FILES_PATH = "${rt_sdk_root}/core/drivers/lpspi"
+DRIVER_EDMA_FILES_PATH = "${rt_sdk_root}/core/drivers/edma"
+DRIVER_DMAMUX_FILES_PATH = "${rt_sdk_root}/core/drivers/dmamux"
+DRIVER_PIT_FILES_PATH = "${rt_sdk_root}/core/drivers/pit"
+DRIVER_GPT_FILES_PATH = "${rt_sdk_root}/core/drivers/gpt"
+DRIVER_FLEXSPI_FILES_PATH = "${rt_sdk_root}/core/drivers/flexspi"
+DRIVER_IGPIO_FILES_PATH = "${rt_sdk_root}/core/drivers/igpio"
+DRIVER_ENET_FILES_PATH = "${rt_sdk_root}/core/drivers/enet"
+DRIVER_CACHE_FILES_PATH = "${rt_sdk_root}/core/drivers/cache/armv7-m7"
+DRIVER_CAAM_FILES_PATH = "${rt_sdk_root}/core/drivers/caam"
+DRIVER_COMMON_FILES_PATH = "${rt_sdk_root}/core/drivers/common"
+DRIVER_DEVICE_FILES_PATH = "${DRIVER_FILES_PATH}"
+DRIVER_USDHC_FILES_PATH = "${rt_sdk_root}/core/drivers/usdhc"
+COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
+COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
+COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
+COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
+UTILITIES_FILES_PATH = "${rt_sdk_root}/core/utilities"
+UTILITIES_SHELL_FILES_PATH = "${rt_sdk_root}/core/utilities/shell"
+UTILITIES_ASSERT_FILES_PATH = "${rt_sdk_root}/core/utilities/assert"
+DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
+STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
+FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
+"${rt_sdk_root}/core/devices/${deviceBoardName}/xip"
+WIRELESS_CONFIG_TEMPLATE_PATH = "${rt_sdk_root}/core/boards/${evkname}/wireless_config_template"
+
+
+
 template("rt1170_sdk_drivers") {
   config("${target_name}_config") {
     include_dirs = []
@@ -100,8 +69,8 @@ template("rt1170_sdk_drivers") {
 
     _rt1170_sdk_drivers_include_dirs = [
       #Drivers files
-      "${rt_sdk_root}/devices/${deviceBoardName}/drivers",
-      "${rt_sdk_root}/devices/${deviceBoardName}",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}/drivers",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}",
       "${COMPONENT_UART_FILES_PATH}",
       "${COMPONENT_TIMER_FILES_PATH}",
       "${COMPONENT_GPIO_FILES_PATH}",
@@ -125,9 +94,9 @@ template("rt1170_sdk_drivers") {
       "${STR_FILES_PATH}",
 
       # XIP
-      "${rt_sdk_root}/boards/${evkname}/xip",
-      "${rt_sdk_root}/components/flash/mflash",
-      "${rt_sdk_root}/components/flash/mflash/${mevkname}",
+      "${rt_sdk_root}/core/boards/${evkname}/xip",
+      "${rt_sdk_root}/core/components/flash/mflash",
+      "${rt_sdk_root}/core/components/flash/mflash/${mevkname}",
       "${rt_sdk_root}/core/components/internal_flash",
 
       # freertos
@@ -271,12 +240,12 @@ template("rt1170_sdk_drivers") {
       # freertos
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
-      "${rt_sdk_root}/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
-      "${rt_sdk_root}/components/flash/mflash/${mevkname}/mflash_drv.c",
+      "${rt_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
+      "${rt_sdk_root}/core/components/flash/mflash/${mevkname}/mflash_drv.c",
 
       #startup files
-      "${rt_sdk_root}/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}_cm7.S",
-      "${rt_sdk_root}/devices/${deviceBoardName}/system_${deviceBoardName}_cm7.c",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}_cm7.S",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}/system_${deviceBoardName}_cm7.c",
 
       # Wi-Fi bt config files
       "${WIRELESS_CONFIG_TEMPLATE_PATH}/wifi_bt_config.c",

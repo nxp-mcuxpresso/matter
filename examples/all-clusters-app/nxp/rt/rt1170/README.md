@@ -60,32 +60,29 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
     to setup the environment to be able to build Matter.
 
--   Download [RT1170+IW61X SDK v2.13.3](https://mcuxpresso.nxp.com/en/select).
-    Creating an nxp.com account is required before being able to download the
-    SDK. Once the account is created, login and follow the steps for downloading
-    SDK. The SDK Builder UI selection should be similar with the one from the
-    image below. In case you do not have access to the SDK, please ask your NXP
-    representative.
-
-![MCUXpresso SDK Download](../../../../platform/nxp/rt/rt1170/doc/images/mcux-sdk-download.png)
-
-    (Note: All SDK components should be selected. If size is an issue Azure RTOS
-    component can be omitted.)
-
--   Start building the application.
+- Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/path/to/previously/downloaded/SDK
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/repo
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west init -l manifest --mf west.yml
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west update
+```
+- In case there are local modification to the already installed git NXP SDK. Use the west forall command instead of the west init to reset the west workspace before running the west update command. Warning: all local changes will be lost after running this command.
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+```
+
+-   Start building the application
+
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170/
 ```
 
 Optional GN options that can be added when building an application:
 
 - To enable the [matter CLI](#testing-with-matter-shell), the argument ```chip_enable_matter_cli=true``` must be added to the *gn gen* command.
-- To switch the SDK type used, the argument ```is_<sdk_type>=true``` must be added to the *gn gen* command (with <sdk_type> being either sdk_package or sdk_internal).
 - To build the application in debug mode, the argument ```is_debug=true optimize_debug=false``` must be added to the *gn gen* command.
 - To build with the option to have Matter certificates/keys pre-loaded in a specific flash area the argument ```chip_with_factory_data=1``` must be added to the *gn gen* command. (for more information see [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
 - To build the application with the OTA Requestor enabled, the arguments ```chip_enable_ota_requestor=true no_mcuboot=false``` must be added to the *gn gen* command. (More information about the OTA Requestor feature in [OTA Requestor README](README_OTA_Requestor.md)))
