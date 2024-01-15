@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t nvmId)
+constexpr inline uint16_t NXPConfigKey(uint8_t chipId, uint8_t nvmId)
 {
     return static_cast<uint16_t>(chipId) << 8 | nvmId;
 }
@@ -49,7 +49,7 @@ constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t nvmId)
  * naturally provides implementations for the delegated members referenced by
  * the template class (e.g. the ReadConfigValue() method).
  */
-class K32WConfig
+class NXPConfig
 {
 public:
     // Category ids used by the CHIP Device Layer
@@ -68,47 +68,47 @@ public:
 
     // Key definitions for well-known configuration values.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum             = K32WConfigKey(kFileId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId           = K32WConfigKey(kFileId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert         = K32WConfigKey(kFileId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey   = K32WConfigKey(kFileId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate     = K32WConfigKey(kFileId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode          = K32WConfigKey(kFileId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts     = K32WConfigKey(kFileId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_HardwareVersion       = K32WConfigKey(kFileId_ChipFactory, 0x07);
-    static constexpr Key kConfigKey_SetupDiscriminator    = K32WConfigKey(kFileId_ChipFactory, 0x08);
-    static constexpr Key kConfigKey_Spake2pIterationCount = K32WConfigKey(kFileId_ChipFactory, 0x09);
-    static constexpr Key kConfigKey_Spake2pSalt           = K32WConfigKey(kFileId_ChipFactory, 0x0A);
-    static constexpr Key kConfigKey_Spake2pVerifier       = K32WConfigKey(kFileId_ChipFactory, 0x0B);
+    static constexpr Key kConfigKey_SerialNum             = NXPConfigKey(kFileId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = NXPConfigKey(kFileId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = NXPConfigKey(kFileId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = NXPConfigKey(kFileId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = NXPConfigKey(kFileId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_SetupPinCode          = NXPConfigKey(kFileId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = NXPConfigKey(kFileId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_HardwareVersion       = NXPConfigKey(kFileId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_SetupDiscriminator    = NXPConfigKey(kFileId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_Spake2pIterationCount = NXPConfigKey(kFileId_ChipFactory, 0x09);
+    static constexpr Key kConfigKey_Spake2pSalt           = NXPConfigKey(kFileId_ChipFactory, 0x0A);
+    static constexpr Key kConfigKey_Spake2pVerifier       = NXPConfigKey(kFileId_ChipFactory, 0x0B);
 
     // CHIP Config Keys
-    static constexpr Key kConfigKey_ServiceConfig      = K32WConfigKey(kFileId_ChipConfig, 0x01);
-    static constexpr Key kConfigKey_PairedAccountId    = K32WConfigKey(kFileId_ChipConfig, 0x02);
-    static constexpr Key kConfigKey_ServiceId          = K32WConfigKey(kFileId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId = K32WConfigKey(kFileId_ChipConfig, 0x05);
-    static constexpr Key kConfigKey_FailSafeArmed      = K32WConfigKey(kFileId_ChipConfig, 0x06);
-    static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kFileId_ChipConfig, 0x07);
-    static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kFileId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kFileId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kFileId_ChipConfig, 0x0B);
+    static constexpr Key kConfigKey_ServiceConfig      = NXPConfigKey(kFileId_ChipConfig, 0x01);
+    static constexpr Key kConfigKey_PairedAccountId    = NXPConfigKey(kFileId_ChipConfig, 0x02);
+    static constexpr Key kConfigKey_ServiceId          = NXPConfigKey(kFileId_ChipConfig, 0x03);
+    static constexpr Key kConfigKey_LastUsedEpochKeyId = NXPConfigKey(kFileId_ChipConfig, 0x05);
+    static constexpr Key kConfigKey_FailSafeArmed      = NXPConfigKey(kFileId_ChipConfig, 0x06);
+    static constexpr Key kConfigKey_RegulatoryLocation = NXPConfigKey(kFileId_ChipConfig, 0x07);
+    static constexpr Key kConfigKey_CountryCode        = NXPConfigKey(kFileId_ChipConfig, 0x08);
+    static constexpr Key kConfigKey_UniqueId           = NXPConfigKey(kFileId_ChipConfig, 0x0A);
+    static constexpr Key kConfigKey_SoftwareVersion    = NXPConfigKey(kFileId_ChipConfig, 0x0B);
 
     // CHIP Counter Keys
-    static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kFileId_ChipCounter, 0x00);
-    static constexpr Key kCounterKey_UpTime                = K32WConfigKey(kFileId_ChipCounter, 0x01);
-    static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kFileId_ChipCounter, 0x02);
-    static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kFileId_ChipCounter, 0x03);
+    static constexpr Key kCounterKey_RebootCount           = NXPConfigKey(kFileId_ChipCounter, 0x00);
+    static constexpr Key kCounterKey_UpTime                = NXPConfigKey(kFileId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_TotalOperationalHours = NXPConfigKey(kFileId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_BootReason            = NXPConfigKey(kFileId_ChipCounter, 0x03);
 
     // Set key id limits for each group.
-    static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kFileId_ChipFactory, 0x00);
-    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kFileId_ChipFactory, 0xFF);
-    static constexpr Key kMinConfigKey_ChipConfig  = K32WConfigKey(kFileId_ChipConfig, 0x00);
-    static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kFileId_ChipConfig, 0xFF);
-    static constexpr Key kMinConfigKey_ChipCounter = K32WConfigKey(kFileId_ChipCounter, 0x00);
-    static constexpr Key kMaxConfigKey_ChipCounter = K32WConfigKey(kFileId_ChipCounter, 0xFF); // Allows 32 Counters to be created.
-    static constexpr Key kMinConfigKey_KVSKey      = K32WConfigKey(kFileId_KVSKey, 0x00);
-    static constexpr Key kMaxConfigKey_KVSKey      = K32WConfigKey(kFileId_KVSKey, 0xFF);
-    static constexpr Key kMinConfigKey_KVSValue    = K32WConfigKey(kFileId_KVSValue, 0x00);
-    static constexpr Key kMaxConfigKey_KVSValue    = K32WConfigKey(kFileId_KVSValue, 0xFF);
+    static constexpr Key kMinConfigKey_ChipFactory = NXPConfigKey(kFileId_ChipFactory, 0x00);
+    static constexpr Key kMaxConfigKey_ChipFactory = NXPConfigKey(kFileId_ChipFactory, 0xFF);
+    static constexpr Key kMinConfigKey_ChipConfig  = NXPConfigKey(kFileId_ChipConfig, 0x00);
+    static constexpr Key kMaxConfigKey_ChipConfig  = NXPConfigKey(kFileId_ChipConfig, 0xFF);
+    static constexpr Key kMinConfigKey_ChipCounter = NXPConfigKey(kFileId_ChipCounter, 0x00);
+    static constexpr Key kMaxConfigKey_ChipCounter = NXPConfigKey(kFileId_ChipCounter, 0xFF); // Allows 32 Counters to be created.
+    static constexpr Key kMinConfigKey_KVSKey      = NXPConfigKey(kFileId_KVSKey, 0x00);
+    static constexpr Key kMaxConfigKey_KVSKey      = NXPConfigKey(kFileId_KVSKey, 0xFF);
+    static constexpr Key kMinConfigKey_KVSValue    = NXPConfigKey(kFileId_KVSValue, 0x00);
+    static constexpr Key kMaxConfigKey_KVSValue    = NXPConfigKey(kFileId_KVSValue, 0xFF);
 
     static CHIP_ERROR Init(void);
 

@@ -25,7 +25,10 @@
 
 #pragma once
 
-#include "K32W1Config.h"
+#ifdef EXTERNAL_NXP_CONFIG
+#include EXTERNAL_NXP_CONFIG
+#endif
+
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
@@ -34,7 +37,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the K32W platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::K32WConfig>
+class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::NXPConfig>
 {
 public:
     // This returns an instance of this class.

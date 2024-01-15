@@ -156,6 +156,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
 
       "${chip_root}/src/platform/nxp/k32w/k32w1",
+      "${chip_root}/src/platform/nxp/common"
     ]
 
     if (chip_key_storage == "fwk_nvm") {
@@ -284,6 +285,17 @@ template("k32w1_sdk") {
       "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
+
+    if (chip_key_storage == "fwk_nvm") {
+      defines += [
+        "EXTERNAL_NXP_CONFIG=\"platform/nxp/k32w/k32w1/NXPConfig.h\""
+      ]
+    } else if (chip_key_storage == "littlefs") {
+      defines += [
+        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\"",
+        "EXTERNAL_NXP_CONFIG=\"platform/nxp/common/NXPConfig.h\""
+      ]
+    }
 
     if (chip_enable_pw_rpc) {
       defines += [

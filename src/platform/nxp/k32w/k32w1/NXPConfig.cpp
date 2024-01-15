@@ -25,7 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/k32w/k32w1/K32W1Config.h>
+#include <platform/nxp/k32w/k32w1/NXPConfig.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
@@ -51,19 +51,12 @@ namespace Internal {
 #define CHIP_PLAT_NVM_STATIC_ALLOC 1
 #endif
 
-#define CHIP_CONFIG_RAM_BUFFER_SIZE 14336
+#ifndef CHIP_CONFIG_RAM_BUFFER_SIZE
+#define CHIP_CONFIG_RAM_BUFFER_SIZE 10240
+#endif
 
 #ifndef NVM_ID_CHIP_CONFIG_DATA
 #define NVM_ID_CHIP_CONFIG_DATA 0xf104
-#endif
-
-#if 0
-typedef struct
-{
-    uint16_t chipConfigRamBufferLen;
-    uint8_t chipConfigRamBuffer[3072];
-} ChipConfigRamStruct_t;
-static ChipConfigRamStruct_t *chipConfigRamStruct;
 #endif
 
 #if CHIP_PLAT_NVM_STATIC_ALLOC
@@ -110,7 +103,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::Init()
+CHIP_ERROR NXPConfig::Init()
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     bool bLoadDataFromNvm = true;
@@ -148,7 +141,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, bool & val)
+CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
     bool tempVal;
@@ -164,7 +157,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
+CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err;
     uint32_t tempVal;
@@ -180,7 +173,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
+CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err;
     uint32_t tempVal;
@@ -196,7 +189,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
     rsError status;
@@ -213,18 +206,18 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR NXPConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     return ReadConfigValueStr(key, (char *) buf, bufSize, outLen);
 }
 
-CHIP_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
+CHIP_ERROR NXPConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
     Key key = kMinConfigKey_ChipCounter + counterIdx;
     return ReadConfigValue(key, val);
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
+CHIP_ERROR NXPConfig::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
     rsError status;
@@ -242,7 +235,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, bool val)
+CHIP_ERROR NXPConfig::WriteConfigValueSync(Key key, bool val)
 {
     CHIP_ERROR err;
     rsError status;
@@ -260,7 +253,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
+CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
     rsError status;
@@ -278,7 +271,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
+CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
     rsError status;
@@ -296,12 +289,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str)
+CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str)
 {
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     CHIP_ERROR err;
     rsError status;
@@ -327,18 +320,18 @@ exit:
     return err;
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+CHIP_ERROR NXPConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     return WriteConfigValueStr(key, (char *) data, dataLen);
 }
 
-CHIP_ERROR K32WConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
+CHIP_ERROR NXPConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
     Key key = kMinConfigKey_ChipCounter + counterIdx;
     return WriteConfigValue(key, val);
 }
 
-CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
+CHIP_ERROR NXPConfig::ClearConfigValue(Key key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     rsError status;
@@ -355,7 +348,7 @@ exit:
     return err;
 }
 
-bool K32WConfig::ConfigValueExists(Key key)
+bool NXPConfig::ConfigValueExists(Key key)
 {
     rsError status;
     uint16_t sizeToRead;
@@ -369,7 +362,7 @@ bool K32WConfig::ConfigValueExists(Key key)
     return found;
 }
 
-CHIP_ERROR K32WConfig::FactoryResetConfig(void)
+CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -386,7 +379,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     return err;
 }
 
-void K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
+void NXPConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
 {
     for (Key key = firstKey; key <= lastKey; key++)
     {
@@ -394,7 +387,7 @@ void K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
     }
 }
 
-CHIP_ERROR K32WConfig::MapRamStorageStatus(rsError rsStatus)
+CHIP_ERROR NXPConfig::MapRamStorageStatus(rsError rsStatus)
 {
     CHIP_ERROR err;
 
@@ -414,7 +407,7 @@ CHIP_ERROR K32WConfig::MapRamStorageStatus(rsError rsStatus)
     return err;
 }
 
-bool K32WConfig::ValidConfigKey(Key key)
+bool NXPConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
     if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVSValue))
@@ -425,7 +418,7 @@ bool K32WConfig::ValidConfigKey(Key key)
     return false;
 }
 
-void K32WConfig::RunConfigUnitTest() {}
+void NXPConfig::RunConfigUnitTest() {}
 
 } // namespace Internal
 } // namespace DeviceLayer
