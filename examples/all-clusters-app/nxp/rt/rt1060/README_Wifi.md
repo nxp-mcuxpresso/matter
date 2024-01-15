@@ -6,6 +6,7 @@ Here are listed configurations that allow to support Matter over Wi-Fi on RT1060
 
 - RT1060 + IW416 (Wi-Fi + BLE)
 - RT1060 + 8801 (Wi-Fi)
+- RT1060-EVKC + IW612 (Wi-fi +BLE)
 
 ## Hardware requirements RT1060+IW416
 
@@ -60,7 +61,6 @@ Additional information about the AW-AM510-uSD can be found in the user manual *U
 
 ## Hardware requirements RT1060+8801
 Host part:
-
 - 1 MIMXRT1060-EVKB
 
 Transceiver part :
@@ -70,6 +70,19 @@ Transceiver part :
 The 8801 2DS M.2 Module should be inserted into the Murata uSD-M.2 Adapter and inserted in the uSD slot J22 of MIMXRT1060-EVKB. The Murata uSD-M.2 Adapter can be powered up using uSD pins. For that, set the J1 jumper of Murata uSD-M.2 to position 2-3 (Position 2-3: VBAT supply, typical 3.1 ~ 3.3V, from microSD connector).
 
 Note: as the 8801 module supports only the 2.4 GHz Wi-Fi band, it is mandatory to connect it to a Wi-Fi access point on the 2.4 GHz band.
+
+## Hardware requirements RT1060-EVKC+IW612
+Host part:
+- 1 MIMXRT1060-EVKC
+
+    Hardware should be reworked as below:
+    - populate R93, R96, R2155, R2156, R2157, R2158, R2159 with 0Ohm resistors
+    - J76 and J107 jumpers in 2-3 position.
+
+Transceiver part :
+- 1 IW612 ( Firecrest)  2EL M.2 Module (rev A1)
+
+The Iw612 module should be plugged to the M.2 connector on RT1060-EVKC board. 
 
 ## Building
 
@@ -88,6 +101,19 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_config_network_layer_ble=false tcp_download=true wifi_ssid=\"your_wifi_ssid\" wifi_password=\"your_wifi_password\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
+```
+
+-   Build the Wi-fi configuration for MIMXRT1060-EVKC board + IW612 transceiver (with BLE for commissioning).
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true evkname=\"evkcmimxrt1060\" " out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
+```
+-   Build the Wi-fi configuration for MIMXRT1060-EVKC board + IW612 with Matter-over-Wifi configuration and only onnetwork commissioning (without BLE, the WiFi network credentials are provided at build-time which will enable the device to join the Wi-Fi AP at startup):
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true iwx12_transceiver=true evkname=\"evkcmimxrt1060\" chip_config_network_layer_ble=false tcp_download=true wifi_ssid=\"your_wifi_ssid\" wifi_password=\"your_wifi_password\"" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
