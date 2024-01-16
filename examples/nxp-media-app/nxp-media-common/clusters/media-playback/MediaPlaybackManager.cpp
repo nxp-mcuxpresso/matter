@@ -107,7 +107,39 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
     mDuration = gMediaIPCHelper->GetDuration();
     return mDuration;
 }
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveAudioTrack);
+}
 
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & audioTrack : mAvailableAudioTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(audioTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveTextTrack);
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & textTrack : mAvailableTextTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(textTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     CHECKSERVICE();
@@ -125,7 +157,7 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -139,7 +171,7 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -154,11 +186,12 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     CHECKSERVICE();
     // TODO: Insert code here
@@ -169,7 +202,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
         // if already at max speed, return error
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        response.status = StatusEnum::kSpeedOutOfRange;
         helper.Success(response);
         return;
     }
@@ -185,7 +218,7 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -199,11 +232,12 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                        const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     CHECKSERVICE();
     // TODO: Insert code here
@@ -214,7 +248,7 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
         // if already at max speed in reverse, return error
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        response.status = StatusEnum::kSpeedOutOfRange;
         helper.Success(response);
         return;
     }
@@ -230,20 +264,20 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-        const uint64_t & deltaPositionMilliseconds)
+                                              const uint64_t & deltaPositionMilliseconds)
 {
     CHECKSERVICE();
     // TODO: Insert code here
     auto position = gMediaIPCHelper->GetPosition();
     mPlaybackPosition.position = chip::app::DataModel::Nullable<uint64_t>(position);
     uint64_t newPosition = (mPlaybackPosition.position.Value() > deltaPositionMilliseconds
-            ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
-            : 0);
+                                ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
+                                : 0);
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
     uint64_t positionSeconds = newPosition/1000;
     char buf[80] = {0};
@@ -253,12 +287,12 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-        const uint64_t & deltaPositionMilliseconds)
+                                             const uint64_t & deltaPositionMilliseconds)
 {
     CHECKSERVICE();
     // TODO: Insert code here
@@ -276,12 +310,12 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-        const uint64_t & positionMilliseconds)
+                                      const uint64_t & positionMilliseconds)
 {
     CHECKSERVICE();
     // TODO: Insert code here
@@ -290,7 +324,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
     {
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        response.status = MediaPlaybackStatusEnum::kSeekOutOfRange;
+        response.status = StatusEnum::kSeekOutOfRange;
         helper.Success(response);
     }
     else
@@ -304,7 +338,7 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
 
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        response.status = MediaPlaybackStatusEnum::kSuccess;
+        response.status = StatusEnum::kSuccess;
         helper.Success(response);
     }
 }
@@ -321,7 +355,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -335,8 +369,58 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
-    response.status = MediaPlaybackStatusEnum::kSuccess;
+    response.status = StatusEnum::kSuccess;
     helper.Success(response);
+}
+
+bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
+{
+    bool foundMatch = false;
+    for (auto const & availableAudioTrack : mAvailableAudioTracks)
+    {
+        if (strcmp(availableAudioTrack.id.data(), trackId.data()) == 0)
+        {
+            mActiveAudioTrack = availableAudioTrack;
+            foundMatch        = true;
+        }
+    }
+
+    if (!foundMatch)
+    {
+        // return an error
+    }
+
+    return true;
+}
+
+bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
+{
+    bool foundMatch = false;
+    for (auto const & availableTextTrack : mAvailableTextTracks)
+    {
+        if (strcmp(availableTextTrack.id.data(), trackId.data()) == 0)
+        {
+            mActiveAudioTrack = availableTextTrack;
+            foundMatch        = true;
+        }
+    }
+
+    if (!foundMatch)
+    {
+        // return an error
+    }
+
+    return true;
+}
+
+bool MediaPlaybackManager::HandleDeactivateTextTrack()
+{
+    // Handle Deactivate Text Track
+    if (mActiveTextTrack.id.data() != nullptr)
+    {
+        mActiveTextTrack = {};
+    }
+    return true;
 }
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)

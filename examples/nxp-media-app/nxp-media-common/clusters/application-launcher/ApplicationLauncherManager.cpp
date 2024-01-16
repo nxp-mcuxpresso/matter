@@ -43,7 +43,7 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
 void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                                  const ApplicationType & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp application.catalogVendorID=%u, applicationID=%u", application.catalogVendorID, application.applicationID);
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
     // TODO: Insert code here
     if (gMediaIPCHelper->StartPlayer()) {
@@ -53,7 +53,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
     LauncherResponseType response;
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
-    response.status = ApplicationLauncherStatusEnum::kSuccess;
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -70,7 +70,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     LauncherResponseType response;
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
-    response.status = ApplicationLauncherStatusEnum::kSuccess;
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -83,6 +83,6 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
     LauncherResponseType response;
     const char * buf = "data";
     response.data.SetValue(ByteSpan(from_const_char(buf), strlen(buf)));
-    response.status = ApplicationLauncherStatusEnum::kSuccess;
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
