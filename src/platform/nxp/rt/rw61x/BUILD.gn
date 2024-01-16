@@ -151,6 +151,8 @@ static_library("nxp_platform") {
       "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
       "../../common/factory_data/FactoryDataProviderFwkImpl.h",
     ]
+
+    deps += [ "${chip_root}/src/credentials:credentials_header" ]
   }
 
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
