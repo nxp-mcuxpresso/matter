@@ -37,6 +37,7 @@ config CHIP_WIFI
 	imply NET_IPV6_NBR_CACHE
 	imply NET_STATISTICS_IPV6
 	imply NET_STATISTICS_USER_API
+	imply NET_CONTEXT_RECV_PKTINFO
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"
