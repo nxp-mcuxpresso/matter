@@ -63,8 +63,9 @@
 #define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
 #define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
 
-// Temporary workaround till we can enable this via the gn
-#define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 1
+#ifndef OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE
+#define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 0
+#endif /* OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE */
 
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.
