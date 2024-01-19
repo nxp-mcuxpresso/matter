@@ -5,13 +5,12 @@
 # https://docs.zephyrproject.org/latest/guides/west/index.html
 manifest:
   projects:
-    - name: sdk-release
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
+    - name: mcux-sdk
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
+      revision: MCUX_2.15.000
+      path: core
       import:
-        file: MCUX_2.15.000_RC1_0.yml
         name-allowlist:
-          - mcux-sdk
-          - mcux-sdk-examples
           - FreeRTOS-Kernel
           - CMSIS_5
           - mcux-sdk-middleware-sdmmc
@@ -23,5 +22,9 @@ manifest:
           - wifi_nxp
           - lwip
           - littlefs
+          - mcuboot
         path-prefix: sdk-2.15
-      revision: release/2.15.0_major_rfp
+    - name: mcux-sdk-examples
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
+      revision: MCUX_2.15.000_RT1170
+      path: sdk-2.15/examples
