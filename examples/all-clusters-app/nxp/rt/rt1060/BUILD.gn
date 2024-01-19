@@ -77,8 +77,17 @@ rt_sdk("sdk") {
 
   # Indicate paths to default board files
   include_dirs += [ "${example_platform_dir}/board/" ]
-  include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
-  sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
+  # RT1060 rev A use same pin mux as rev B
+  # If user needs different pin mux files for rev A and rev B boards, the source and include from below needs to be updated accordingly
+  if (evkname == "evkmimxrt1060"){
+    include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+    sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
+  }
+  else{
+    include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+    sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
+  }
+  
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
