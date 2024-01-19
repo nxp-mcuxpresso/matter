@@ -51,6 +51,10 @@ config("openthread_rt1170_config") {
       "OPENTHREAD_CONFIG_GENERIC_TASKLET_ENABLE=1",
     ]
   }
+  # ot cli configs
+  defines += [
+    "OPENTHREAD_CONFIG_PING_SENDER_ENABLE=1"
+  ]
 }
 
 #Config used by the openthread stack to get the path to OpenthreadConfig.h
