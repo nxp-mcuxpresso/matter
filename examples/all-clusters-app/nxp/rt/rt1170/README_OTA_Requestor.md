@@ -46,16 +46,23 @@ Run the following commands :
 ```
 J-Link > erase 0x30000000, 0x3043f000
 ```
-- Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK previously downloaded.
-![mcuboot_demo](../../../../platform/nxp/rt/rt1170/doc/images/mcuboot_demo.PNG)
-- Before building the demo example, MCUBoot should be configured to use swap mechanism. This can be done by defining `CONFIG_MCUBOOT_SWAP_MOVE` as 1 in the settings of the mcuboot_opensource project :
-```
-Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "CONFIG_MCUBOOT_SWAP_MOVE=1" in the Defined Symbols
-```
-![mcuboot_swap_config](../../../../platform/nxp/rt/rt1170/doc/images/mcuboot_swap_config.png)
+- Build mcuboot binary:
 
-- Build the demo example project and program it to the target board.
-- To run the flashed demo, either press the reset button of the device or use the debugger IDE of MCUXpresso. If it runs successfully, the following logs will be displayed on the terminal :
+```
+cd <matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/examples/evkmimxrt1170/ota_examples/mcuboot_opensource/cm7/armgcc
+```
+Edit the file `flags.cmake` and `-DCONFIG_MCUBOOT_SWAP_MOVE=1` in `CMAKE_C_FLAGS_FLEXSPI_NOR_RELEASE` and `CMAKE_CXX_FLAGS_FLEXSPI_NOR_DEBUG`.
+
+```
+chmod +x build_flexspi_nor_release.sh
+export ARMGCC_DIR=/opt/gcc-arm-none-eabi-10-2020-q4-major/ # with ARMGCC_DIR referencing the compiler path
+./build_flexspi_nor_release.sh
+```
+Flash the generated binary with JLINK
+```
+J-Link >  loadbin <matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/examples/evkmimxrt1170/ota_examples/mcuboot_opensource/cm7/armgcc/flexspi_nor_release/mcuboot_opensource.elf
+```
+If it runs successfully, the following logs will be displayed on the terminal :
 
 ```
 hello sbl.
@@ -68,7 +75,7 @@ erasing trailer; fa_id=2
 Unable to find bootable image
 ```
 
-Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "SDK_RT1170/boards/evkbmimxrt1170/mcuboot_opensource/".
+Note : By default, mcuboot application considers the primary and secondary partitions to be the size of 4MB. If the size is to be changed, the partition addresses should be modified in the flash_partitioning.h accordingly. For more information about the flash partitioning with mcuboot, please refer to the dedicated readme.txt located in "<matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/examples/evkmimxrt1170/ota_examples/mcuboot_opensource/".
 
 ### Generating and flashing the signed application image
 
@@ -85,21 +92,20 @@ The resulting executable file found in out/debug/chip-rt1170-all-cluster-example
 ```
 arm-none-eabi-objcopy -R .flash_config -R .ivt -R .NVM -O binary chip-rt1170-all-cluster-example chip-rt1170-all-cluster-example.bin
 ```
-To sign the image and wrap the raw binary of the application with the header and trailer, "imgtool" is provided in the SDK and can be found in "/middleware/mcuboot_opensource/scripts/".
+To sign the image and wrap the raw binary of the application with the header and trailer, "imgtool" is provided in the SDK and can be found in "<matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/middleware/mcuboot_opensource/scripts/".
 
 The following commands can be run (make sure to replace the /path/to/file/binary with the adequate files): 
 
 ```
-user@ubuntu: cd ~/Desktop/SDK_RT1170/middleware/mcuboot_opensource/scripts
+user@ubuntu: cd <matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/middleware/mcuboot_opensource/scripts/
 
 user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RT1170/boards/evkbmimxrt1170/mcuboot_opensource/cm7/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --slot-size 0x400000 --max-sectors 512 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1170/out/debug/chip-rt1170-all-cluster-example_SIGNED.bin
 ```
 Note : 
-- If internal SDK is used instead, the key can be found in : "/path_to_sdk/boards/src/mcuboot_opensource/keys/sign-rsa2048-priv.pem".
 
 - The arguments `slot-size` and `max-sectors` should be adjusted to the size of the partitions reserved for the primary and the secondary applications. (By default the size considered is 4MB)
 
-- In this example, the image is signed with the private key provided by the SDK as an example (/path_to_sdk/boards/evkbmimxrt1170/mcuboot_opensource/cm7/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
+- In this example, the image is signed with the private key provided by the SDK as an example (<matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/examples/evkmimxrt1170/ota_examples/mcuboot_opensource/cm7/keys/sign-rsa2048-priv.pem), MCUBoot is built with its corresponding public key which would be used to verify the integrity of the image. It is possible to generate a new pair of keys using the following commands. This procedure should be done prior to building the mcuboot application.
 
 - To generate the private key :
 
@@ -111,7 +117,7 @@ user@ubuntu: python3 imgtool.py keygen -k priv_key.pem -t rsa-2048
 ```
 user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
-- The extracted public key can then be copied to the /path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c, given as a value to the rsa_pub_key[] array.
+- The extracted public key can then be copied to the <matter_repo_root>/third_party/nxp/rt_sdk/repo/sdk-2.15/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c, given as a value to the rsa_pub_key[] array.
 
 
 The resulting output is the signed binary of the application version "1.0". 
