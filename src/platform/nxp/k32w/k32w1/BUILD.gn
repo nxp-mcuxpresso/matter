@@ -30,6 +30,8 @@ if (chip_crypto == "platform") {
 }
 
 static_library("nxp_platform") {
+  defines = [ "CHIP_DEVICE_K32W1=1" ]
+
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -54,9 +56,9 @@ static_library("nxp_platform") {
   ]
 
   if (chip_key_storage == "fwk_nvm") {
-    defines = [
+    defines += [
       "CHIP_PLAT_NVM_SUPPORT=1",
-      "CHIP_CONFIG_RAM_BUFFER_SIZE=14336",
+      "CHIP_CONFIG_RAM_BUFFER_SIZE=14336"
     ]
 
     sources += [
@@ -68,9 +70,7 @@ static_library("nxp_platform") {
       "ram_storage.h"
     ]
   } else if (chip_key_storage == "littlefs") {
-    defines = [
-      "CHIP_PLAT_NVM_SUPPORT=3",
-    ]
+    defines += [ "CHIP_PLAT_NVM_SUPPORT=3" ]
 
     sources +=[
       "../../common/NXPConfig.h",
