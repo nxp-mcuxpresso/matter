@@ -148,12 +148,7 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
     CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
     mCurrentState = gMediaIPCHelper->GetCurrentStatus();
 
-    //If paused, then resume, else play from very begining
-    if (mCurrentState == PlaybackStateEnum::kPaused) {
-        CHECKRESULT(gMediaIPCHelper->Notify("a"));
-    } else {
-        CHECKRESULT(gMediaIPCHelper->Notify("p"));
-    }
+    CHECKRESULT(gMediaIPCHelper->Notify("p"));
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
