@@ -389,7 +389,7 @@ std::string GetFifo()
 #if CHIP_WITH_WEBUI
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
-    read_history(kInteractiveModeHistoryFilePath);
+    read_history(GetHistoryFilePath().c_str());
 
     // Logs needs to be redirected in order to refresh the screen appropriately when something
     // is dumped to stdout while the user is typing a command.
@@ -458,7 +458,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
     #if CHIP_WITH_WEBUI
-    if (mHandler->RunInteractive(command, GetStorageDirectory())) {
+    if (mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising())) {
         SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     } else {
         SetCommandExitStatus(CHIP_NO_ERROR);
