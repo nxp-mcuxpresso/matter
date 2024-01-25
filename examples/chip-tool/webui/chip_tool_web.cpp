@@ -105,6 +105,7 @@ int chipToolInit()
     registerClusters(commands, &credIssuerCommands);
     registerCommandsStorage(commands);
     ChipLogError(NotSpecified, "chipToolInit successfuly");
+    return 0;
 }
 
 int chipToolInteractiveCommand(const char* cmd)
