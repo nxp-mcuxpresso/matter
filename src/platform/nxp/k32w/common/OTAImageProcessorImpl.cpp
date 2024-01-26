@@ -384,17 +384,14 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     imageProcessor->mAccumulator.Clear();
 
     ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+    PlatformMgr().HandleServerShuttingDown();
 
     // Set the necessary information to inform the SSBL that a new image is available
     // and trigger the actual device reboot after some time, to take into account
     // queued actions, e.g. sending events to a subscription
     SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-        [](chip::System::Layer *, void *) {
-            PlatformMgr().HandleServerShuttingDown();
-            OtaHookReset();
-        },
-        nullptr);
+        [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
