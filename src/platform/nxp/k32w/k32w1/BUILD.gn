@@ -84,7 +84,10 @@ static_library("nxp_platform") {
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
-    "${chip_root}/src/credentials/examples/ExamplePAI.h"
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h"
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
@@ -94,6 +97,10 @@ static_library("nxp_platform") {
   }
 
   if (chip_enable_ota_requestor) {
+    public += [
+      "../common/OTAImageProcessorImpl.h"
+    ]
+
     sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
@@ -158,7 +165,10 @@ static_library("nxp_platform") {
     }
   }
 
-  public_deps += [ "${chip_root}/src/crypto" ]
+  public_deps += [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform/logging:headers"
+  ]
 
   public_configs =
       [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
