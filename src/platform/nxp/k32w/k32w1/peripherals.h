@@ -32,7 +32,7 @@ extern uint32_t NV_STORAGE_MAX_SECTORS[];
 /* Maximum block read size definition */
 #define LITTLEFS_READ_SIZE 16
 /* Maximum block program size definition */
-#define LITTLEFS_PROG_SIZE 256
+#define LITTLEFS_PROG_SIZE 128
 /* Erasable block size definition */
 #define LITTLEFS_BLOCK_SIZE 8192
 /* Block count definition */
