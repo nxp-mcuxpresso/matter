@@ -111,6 +111,11 @@ static BDXDownloader gDownloader __attribute__((section(".data")));
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
+static pm_notify_element_t appNotifyElement = {
+    .notifyCallback = AppTask::LowPowerCallback,
+    .data           = NULL,
+};
+
 static void app_gap_callback(gapGenericEvent_t * event)
 {
     /* This callback is called in the context of BLE task, so event processing
@@ -146,6 +151,14 @@ CHIP_ERROR AppTask::Init()
     {
         K32W_LOG("ContactSensorMgr().Init() failed");
         assert(status == 0);
+    }
+
+    // Register enter/exit low power application callback.
+    status_t status = PM_RegisterNotify(kPM_NotifyGroup2, &appNotifyElement);
+    if (status != kStatus_Success)
+    {
+        K32W_LOG("Failed to register low power app callback.")
+        return APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED;
     }
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
@@ -723,6 +736,11 @@ void AppTask::OnIdentifyStop(Identify * identify)
         K32W_LOG("Identify process has stopped.");
         sAppTask.mFunction = Function::kNoneSelected;
     }
+}
+
+status_t AppTask::LowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data)
+{
+    return kStatus_Success;
 }
 
 void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
