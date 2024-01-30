@@ -27,6 +27,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 declare_args() {
   # Location of the k32w1 SDK.
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
+  chip_config_dimmable_led = false
   use_smu2_static = false
   use_smu2_dynamic = false
   use_hw_sha256 = false
@@ -172,6 +173,12 @@ template("k32w1_sdk") {
           "${k32w1_sdk_root}/middleware/wireless/framework/FSAbstraction",
           "${k32w1_sdk_root}/middleware/wireless/framework/FileCache",
           "${k32w1_sdk_root}/middleware/wireless/framework/KeyStorage"
+        ]
+    }
+    
+    if (chip_config_dimmable_led) {
+        _sdk_include_dirs += [
+          "${k32w1_sdk_root}/components/pwm",
         ]
     }
 
@@ -460,6 +467,11 @@ template("k32w1_sdk") {
           "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart_edma.c"
         ]
       }
+      if (chip_config_dimmable_led) {
+        sources += [
+          "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_tpm.c",
+        ]
+      }
     } else {
       sources += [
         "${k32w1_sdk_root}/devices/KW45B41Z83/drivers/fsl_clock.c",
@@ -583,6 +595,12 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/timers.c",
     ]
 
+    if (chip_config_dimmable_led) {
+        sources += [
+          "${k32w1_sdk_root}/components/pwm/fsl_adapter_pwm_tpm.c",
+        ]
+    }
+    
     if (chip_with_low_power == 1) {
       sources += []
     }

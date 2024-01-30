@@ -22,6 +22,7 @@ into an existing Matter network and can be controlled by this network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
     -   [SMU2](#smu2-memory)
+    -   [LED PWM](#led-pwm)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
@@ -174,6 +175,12 @@ commmissioning process until a factory reset is initiated.
 This way, the OpenThread buffers will be dynamically allocated instead of statically,
 freeing some SRAM. To enable this feature compile with OpenThread FTD support
 (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
+
+### LED PWM
+
+In the default configuration, the onboard RGB LED pins are configured as GPIO pins. In order to enable the dimming feature, the pins need to be configured in PWM mode and synced with channels of the TPM (Timmer PWM Module). To enable this feature, compile the application with: `chip_config_dimmable_led=true`
+
+If the feature is enabled, the LED brightness can be controlled using **Level control** cluster [commands](../../../../../docs/guides/chip_tool_guide.md#step-7-control-application-data-model-clusters).
 
 ## Manufacturing data
 

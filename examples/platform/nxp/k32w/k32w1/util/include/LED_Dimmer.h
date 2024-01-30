@@ -16,28 +16,6 @@
  *    limitations under the License.
  */
 
-// #include "LED.h"
-#include "EmbeddedTypes.h"
-#pragma once
-
-class LEDWidget
-{
-public:
-    void Init(uint8_t gpioNum, bool inverted);
-    void Set(bool state);
-    void SetLevel(uint8_t level);
-    void Invert(void);
-    void Blink(uint32_t changeRateMS);
-    void Blink(uint32_t onTimeMS, uint32_t offTimeMS);
-    void Animate();
-
-private:
-    uint64_t mLastChangeTimeMS;
-    uint32_t mBlinkOnTimeMS;
-    uint32_t mBlinkOffTimeMS;
-    uint8_t mGPIONum;
-    bool mState;
-    bool mOnLogic;
-
-    void DoSet(bool state);
-};
+void init_dimmable();
+void init_tpm();
+void move_to_level(uint8_t level);
