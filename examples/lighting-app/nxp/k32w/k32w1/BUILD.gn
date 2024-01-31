@@ -93,7 +93,7 @@ k32w1_executable("light_app") {
   deps = []
   defines = []
   
-  if (chip_config_dimmable_led)
+  if (use_pwm_tpm_module)
   {
      defines += ["CHIP_CONFIG_ENABLE_DIMMABLE_LED = 1"]
      
@@ -118,7 +118,7 @@ k32w1_executable("light_app") {
     "main/include/LightingManager.h",
     "main/main.cpp",
   ]
-  if (chip_config_dimmable_led)
+  if (use_pwm_tpm_module)
   {
      sources += [
        "${k32w1_platform_dir}/util/LED_Dimmer.cpp",

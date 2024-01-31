@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+#include "EmbeddedTypes.h"
+#pragma once
+
 void init_dimmable();
 void init_tpm();
 void move_to_level(uint8_t level);

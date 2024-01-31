@@ -178,7 +178,7 @@ freeing some SRAM. To enable this feature compile with OpenThread FTD support
 
 ### LED PWM
 
-In the default configuration, the onboard RGB LED pins are configured as GPIO pins. In order to enable the dimming feature, the pins need to be configured in PWM mode and synced with channels of the TPM (Timmer PWM Module). To enable this feature, compile the application with: `chip_config_dimmable_led=true`
+In the default configuration, the onboard RGB LED pins are configured as GPIO pins. In order to enable the dimming feature, the pins need to be configured in PWM mode and synced with channels of the TPM (Timmer PWM Module). To enable this feature, compile the application with: `use_pwm_tpm_module=true`
 
 If the feature is enabled, the LED brightness can be controlled using **Level control** cluster [commands](../../../../../docs/guides/chip_tool_guide.md#step-7-control-application-data-model-clusters).
 

@@ -27,7 +27,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 declare_args() {
   # Location of the k32w1 SDK.
   k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
-  chip_config_dimmable_led = false
+  use_pwm_tpm_module = false
   use_smu2_static = false
   use_smu2_dynamic = false
   use_hw_sha256 = false
@@ -176,7 +176,7 @@ template("k32w1_sdk") {
         ]
     }
     
-    if (chip_config_dimmable_led) {
+    if (use_pwm_tpm_module) {
         _sdk_include_dirs += [
           "${k32w1_sdk_root}/components/pwm",
         ]
@@ -467,7 +467,7 @@ template("k32w1_sdk") {
           "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart_edma.c"
         ]
       }
-      if (chip_config_dimmable_led) {
+      if (use_pwm_tpm_module) {
         sources += [
           "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_tpm.c",
         ]
@@ -595,7 +595,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/timers.c",
     ]
 
-    if (chip_config_dimmable_led) {
+    if (use_pwm_tpm_module) {
         sources += [
           "${k32w1_sdk_root}/components/pwm/fsl_adapter_pwm_tpm.c",
         ]
