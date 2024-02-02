@@ -19,7 +19,6 @@ manifest:
           - mcux-sdk-middleware-edgefast-bluetooth
           - mcux-sdk-middleware-ethermind
           - mbedtls
-          - wifi_nxp
           - lwip
           - littlefs
           - mcuboot
@@ -28,3 +27,7 @@ manifest:
       url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
       revision: MCUX_2.15.000_RT1170
       path: sdk-2.15/examples
+    - name: wifi_nxp
+      url: https://github.com/dvagner/wifi_nxp.git
+      revision: 867cac1e225306cc39159dc45ad99977ed7500c2
+      path: sdk-2.15/middleware/wifi_nxp
