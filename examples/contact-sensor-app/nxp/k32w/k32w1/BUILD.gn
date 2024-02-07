@@ -75,6 +75,23 @@ k32w1_sdk("sdk") {
     include_dirs += [ "${k32w1_platform_dir}/board" ]
   }
 
+  include_dirs += [
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480"
+  ]
+
+  sources += [
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/clock_config.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/pin_mux.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
+    "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c"
+  ]
+
   defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]

@@ -52,8 +52,6 @@ middleware_sdk = {
     "${BLE_HOST_DIR_PATH}/port",
     
     # Framework directories
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480",
     "${FRAMEWORK_DIR_PATH}/Common",
     "${FRAMEWORK_DIR_PATH}/DBG",
     "${FRAMEWORK_DIR_PATH}/FunctionLib",
@@ -203,15 +201,6 @@ middleware_sdk = {
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_lowpower_timer.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ota.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ot.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/app_services_init.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_dcdc.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_extflash.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/hardware_init.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480/clock_config.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480/pin_mux.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_lp.c",
-    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_comp.c",
 
     # BLE HOST / BLE CONTROLLER files
     "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
