@@ -25,6 +25,8 @@
 #include "controller/InvokeInteraction.h"
 #include "lib/core/CHIPError.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "AppTask.h"
+
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "lib/shell/Engine.h"
@@ -68,6 +70,8 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
+bool bnd_notify_done=true;
+#define BINDMGMT_MAX_CMD_TIMEOUT    30
 static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::OperationalDeviceProxy * peer_device,
                                       void * context)
 {
@@ -80,22 +84,28 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
         return;
     }
 
-    if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 &&
+    if (binding.type == EMBER_UNICAST_BINDING &&
         (!binding.clusterId.HasValue() || binding.clusterId.Value() == Clusters::OnOff::Id))
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");
+            bnd_notify_done = true;
         };
         auto onFailure = [](CHIP_ERROR error) {
             ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
+            bnd_notify_done = true;
         };
+        const Optional<uint16_t> tmoutInvokeCmdMs=chip::Optional<uint16_t>(20000);
+        const Optional<System::Clock::Timeout> tmoutResp = Optional<System::Clock::Timeout>::Value(15000);
         // Note: Need to change using toggle command since sSwitchOnOffState won't be changed if not triggerred from the switch
         // command (SwitchCommandHandler)
         {
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
             VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, toggleCommand, onSuccess, onFailure);
+                                             binding.remote, toggleCommand, onSuccess, onFailure
+                                             , tmoutInvokeCmdMs, tmoutResp
+                                             );
         }
     }
 }

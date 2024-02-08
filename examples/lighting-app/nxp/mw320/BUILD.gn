@@ -1,0 +1,123 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
+import("//build_overrides/mw320_sdk.gni")
+
+import("${mw320_sdk_build_root}/mw320_executable.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
+
+
+assert(current_os == "freertos")
+
+examples_plat_dir = "${chip_root}/examples/platform/nxp/mw320"
+src_root_dir = "${chip_root}/examples/all-clusters-app/nxp/mw320"
+
+mw320_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/nxp/mw320",
+    "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src/app/util",
+    "${src_root_dir}/include",
+    "${src_root_dir}/main/include",
+  ]
+
+  sources = [
+    "${src_root_dir}/include/CHIPProjectConfig.h",
+    "${src_root_dir}/include/FreeRTOSConfig.h",
+  ]
+
+  defines = [ "CHIP_CONFIG_MAX_FABRICS=8" ]
+
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  if (board == "eva") {
+    defines += [ "MW320_EVA_BOARD=1" ]
+  }
+}
+
+
+mw320_executable("lighting_app") {
+  output_name = "chip-mw320-lighting-example"
+
+  deps = [ "${chip_root}/src/platform:syscalls_stub" ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/nxp/mw320",
+    "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src/app/util",
+    "${src_root_dir}/include",
+  ]
+
+  sources = [
+    "${chip_root}/src/lib/shell/streamer_mw320.cpp",
+    "${src_root_dir}/include/CHIPProjectConfig.h",
+    "${src_root_dir}/include/FreeRTOSConfig.h",
+    "${src_root_dir}/main/AppTask.cpp",
+    "${src_root_dir}/main/ZclCallbacks.cpp",
+#    "${src_root_dir}/main/include/binding-handler.h",
+#    "${src_root_dir}/main/binding-handler.cpp",
+    "${src_root_dir}/main/main.cpp",
+  ]
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lighting-app/lighting-common/",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/setup_payload",
+  ]
+
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
+  ]
+
+  defines = [
+    "MW320_SHELL_STREAMER",
+    "SHELL_STREAMER_APP_SPECIFIC",
+  ]
+
+  # features of this app
+  defines += [
+    "img_name_str=\"lighting-app\"",
+    "MW320_FEATURE_UAP=0",
+    "MW320_FEATURE_BIND=0",
+  ]
+}
+
+group("mw320") {
+  deps = [ ":lighting_app" ]
+}
+
+group("default") {
+  deps = [ ":mw320" ]
+}

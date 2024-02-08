@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for MW320 SDK.
-  mw320_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/nxp/mw320_sdk"
-  wifi_conn_abort_support = true
-  board = "eva"
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
+
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+
+  import("//args.gni")
 }

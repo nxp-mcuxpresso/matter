@@ -30,6 +30,7 @@ mw320_sdk("sdk") {
     "${examples_plat_dir}/app/project_include",
     "${chip_root}/src/app/util",
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
+    "${chip_root}/examples/all-clusters-app/nxp/mw320/main/include",
   ]
 
   sources = [
@@ -46,6 +47,9 @@ mw320_sdk("sdk") {
   }
   if (wifi_conn_abort_support == true) {
     defines += [ "WIFI_CONN_ABORT_SUPPORT" ]
+  }
+  if (board == "eva") {
+    defines += [ "MW320_EVA_BOARD=1" ]
   }
 }
 
@@ -91,24 +95,32 @@ mw320_executable("shell_mw320") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/src/lib/shell/streamer_mw320.cpp",
-    "binding-handler.cpp",
+    "main/binding-handler.cpp",
+    "main/AppTask.cpp",
+    "main/ZclCallbacks.cpp",
+    "main/main.cpp",
     "include/CHIPProjectConfig.h",
     "include/FreeRTOSConfig.h",
-    "main.cpp",
   ]
 
   output_dir = root_out_dir
 
   ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
 
-  ldflags = [
-    "-T" + rebase_path(ldscript, root_build_dir),
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir),
     "-Wl,-print-memory-usage",
-    "-Wl,--no-warn-rwx-segment",
+    "-Wl,--no-warn-rwx-segments",
   ]
   defines = [
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",
+  ]
+
+  # features of this app
+  defines += [
+    "img_name_str=\"all-cluster-app\"",
+    "MW320_FEATURE_UAP=1",
+    "MW320_FEATURE_BIND=1",
   ]
 }
 
