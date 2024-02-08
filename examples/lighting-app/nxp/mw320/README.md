@@ -11,8 +11,11 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 -   [Introduction](#introduction)
 -   [Building](#building)
 -   [Flashing](#flashing)
+-   [Testing the example](#testing-the-example)
 
 <hr>
+
+<a name="intro"></a>
 
 ## Introduction
 
@@ -21,6 +24,8 @@ to demonstrates device commissioning and cluster control over a low-power, WiFi
 The example targets the
 [NXP MW320 WiFi Micro controller Soc](https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth/88mw32x-802-11n-wi-fi-microcontroller-soc:88MW32X)
 development kit.
+
+<a name="building"></a>
 
 ## Building
 
@@ -56,6 +61,8 @@ $ gn gen out/debug --args='treat_warnings_as_errors=false chip_crypto="platform"
 ```
     - chip_with_factory_data = [0|1] to without/with factory data
     - board = ["eva"|"murata"] to choose the different evaluation board
+
+<a name="flashdebug"></a>
 
 ## Flashing
 
