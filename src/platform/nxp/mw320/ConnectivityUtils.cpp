@@ -294,7 +294,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
         return CHIP_NO_ERROR;
     }
 
-    for (i = 0; i < MAX_IPV6_ADDRESSES; i++)
+    for (i = 0; i < CONFIG_MAX_IPV6_ADDRESSES; i++)
     {
         if (sta_network.ip.ipv6[i].addr_state == IP6_ADDR_INVALID)
         {
@@ -341,39 +341,46 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
     return err;
 }
 
+
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconRxCount(const char * ifname, uint32_t & beaconRxCount)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef GET_FROM_SDK
     int ret;
-    wifi_pkt_stats_t stats;
+    static wifi_pkt_stats_t stats;
 
     ret = wifi_get_log(&stats);
     if (ret != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
-
     beaconRxCount = stats.bcn_rcv_cnt;
     ChipLogProgress(DeviceLayer, "GetWiFiBeaconRxCount [%ld] -> working in sdk", beaconRxCount);
-
+#else
+    beaconRxCount = 1024;
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconRxCount [%ld]", beaconRxCount);
+#endif //GET_FROM_SDK
     return err;
 }
 
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef GET_FROM_SDK
     int ret;
-    wifi_pkt_stats_t stats;
+    static wifi_pkt_stats_t stats;
 
-    ret = wifi_get_log(&stats);
+    ret = wifi_get_log(&g_stats);
     if (ret != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "wifi_get_log failed ");
     }
-
     beaconLostCount = stats.bcn_miss_cnt;
     ChipLogProgress(DeviceLayer, "GetWiFiBeaconLostCount [%ld] -> working in sdk", beaconLostCount);
-
+#else
+    beaconLostCount = 0;
+    ChipLogProgress(DeviceLayer, "GetWiFiBeaconLostCount [%ld]", beaconLostCount);
+#endif //GET_FROM_SDK
     return err;
 }
 
@@ -390,6 +397,47 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     strncpy(ifname, "mlan0", bufSize);
+    return err;
+}
+
+extern "C" {
+    void test_wlan_add(int argc, char ** argv);
+};
+
+CHIP_ERROR ConnectivityUtils::ConnectWiFiNetwork(const char * ssid, const char * key)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int ret_mcuXpresso;
+    char arg0[] = "wlan-add";
+    char arg1[32];
+    char arg2[] = "ssid";
+    char arg3[32];
+    char arg4[] = "wpa2";
+    char arg5[64];
+    char * argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], NULL };
+    int argc      = (int) (sizeof(argv) / sizeof(argv[0])) - 1;
+
+    sprintf((char *) arg1, "%s", ssid);
+    sprintf((char *) arg3, "%s", ssid);
+    sprintf((char *) arg5, "%s", key);
+    test_wlan_add(argc, &argv[0]);
+    ret_mcuXpresso = wlan_connect(argv[1]);
+    if (ret_mcuXpresso == WLAN_ERROR_STATE)
+    {
+        ChipLogProgress(DeviceLayer, "Error: connect manager not running");
+        err = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
+    }
+    if (ret_mcuXpresso == -WM_E_INVAL)
+   {
+        ChipLogProgress(DeviceLayer, "Error: specify a network to connect");
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Connecting to network...\r\nUse 'wlan-stat' for "
+                        "current connection status.");
+   }
     return err;
 }
 

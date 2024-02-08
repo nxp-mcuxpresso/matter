@@ -22,11 +22,15 @@ declare_args() {
   # Location of the mw320 SDK.
   mw320_sdk_root = "${chip_root}/third_party/nxp/mw320_sdk/repo"
 
-  #mbedtls_use_tinycrypt = false
   chip_with_factory_data = 0
+  chip_crypto_flavour = "tinycrypt"
 }
 
 assert(mw320_sdk_root != "", "mw320_sdk_root must be specified")
+
+if (chip_crypto == "platform") {
+  assert(chip_crypto_flavour == "tinycrypt", "chosse tinycrypt as crypto platform")
+}
 
 # Defines an mw320 SDK build target.
 #
@@ -39,6 +43,10 @@ template("mw320_sdk") {
   }
 
   assert(mw320_sdk_root != "", "mw320_sdk_root must be specified")
+
+  if (chip_crypto == "platform") {
+    print("ECC crypto lib: ", chip_crypto_flavour)
+  }
 
   sdk_target_name = target_name
 
@@ -85,7 +93,11 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/lwip/src/include",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip/apps",
-      "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common",
+      "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common/",
+      "${mw320_sdk_root}/middleware/wifi/wps",
+      "${mw320_sdk_root}/middleware/wifi/incl/port/mbedtls",
+      "${mw320_sdk_root}/middleware/wifi/port/mbedtls",
+      "${mw320_sdk_root}/middleware/mbedtls/include",
     ]
 
     defines = [
@@ -156,6 +168,7 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/lpm.c",
       "${mw320_sdk_root}/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/network_flash_storage.c",
       "${mw320_sdk_root}/boards/rdmw320_r0/wifi_examples/mw_wifi_cli/pin_mux.c",
+      "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common/sha224-256.c",
       "${mw320_sdk_root}/components/boot2_utils/boot_flags.c",
       "${mw320_sdk_root}/components/boot2_utils/crc32.c",
       "${mw320_sdk_root}/components/boot2_utils/keystore.c",
@@ -236,7 +249,7 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/wifi/dhcpd/dhcp-server.c",
       "${mw320_sdk_root}/middleware/wifi/dhcpd/dns-server.c",
       "${mw320_sdk_root}/middleware/wifi/nw_utils/iperf.c",
-      "${mw320_sdk_root}/middleware/wifi/nw_utils/ping.c",
+      "${mw320_sdk_root}/middleware/wifi/nw_utils/wifi_ping.c",
       "${mw320_sdk_root}/middleware/wifi/port/lwip/net.c",
       "${mw320_sdk_root}/middleware/wifi/port/lwip/wifi_netif.c",
       "${mw320_sdk_root}/middleware/wifi/port/os/os.c",
@@ -270,6 +283,9 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi-uap.c",
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi.c",
       "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi_pwrmgr.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/wifi-wps.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/sdio.c",
+      "${mw320_sdk_root}/middleware/wifi/wifidriver/firmware_dnld.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan_basic_cli.c",
       "${mw320_sdk_root}/middleware/wifi/wlcmgr/wlan_tests.c",

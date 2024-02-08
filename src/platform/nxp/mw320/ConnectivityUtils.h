@@ -56,6 +56,7 @@ public:
     static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
     //    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
     //    static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
+    static CHIP_ERROR ConnectWiFiNetwork(const char * ssid, const char * key);
 
 private:
     static uint16_t Map2400MHz(const uint8_t inChannel);

@@ -112,8 +112,6 @@ inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * b
     wifi_get_device_mac_addr(&mac_addr);
 
     memcpy(buf, mac_addr.mac, 6);
-    PRINTF("MAC: %02x:%02x:%02x:%02x:%02x:%02x \r\n", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
-    // return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     return CHIP_NO_ERROR;
 }
 
