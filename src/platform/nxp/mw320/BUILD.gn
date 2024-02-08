@@ -23,6 +23,11 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
+}
+
+
 static_library("mw320") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
@@ -61,8 +66,8 @@ static_library("mw320") {
 
   if (chip_with_factory_data == 1) {
     sources += [
-      "FactoryDataProvider.cpp",
-      "FactoryDataProvider.h",
+      "MW320FactoryDataProvider.cpp",
+      "MW320FactoryDataProvider.h",
     ]
   }
 
@@ -77,6 +82,17 @@ static_library("mw320") {
   deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_crypto == "platform") {
+    if (chip_crypto_flavour == "tinycrypt") {
+      sources += [
+        "${chip_root}/src/platform/nxp/common/crypto/CHIPCryptoPALTinyCrypt.cpp",
+      ]
+      public_deps += [
+        "${mbedtls_root}:mbedtls",
+      ]
+    }
+  }
 
   if (chip_enable_openthread) {
     sources += [
