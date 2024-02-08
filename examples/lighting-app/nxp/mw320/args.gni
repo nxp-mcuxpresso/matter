@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/examples/platform/nxp/mw320/args.gni")
+
+mw320_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+
 declare_args() {
-  # Root directory for MW320 SDK.
-  mw320_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/nxp/mw320_sdk"
-  wifi_conn_abort_support = true
-  board = "eva"
+  chip_enable_ota_requestor = true
 }
