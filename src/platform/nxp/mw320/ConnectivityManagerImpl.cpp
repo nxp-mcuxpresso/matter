@@ -26,6 +26,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 #include <platform/nxp/mw320/ConnectivityManagerImpl.h>
+#include <platform/nxp/mw320/ConnectivityUtils.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
@@ -45,6 +46,7 @@ void test_wlan_scan(int argc, char ** argv);
 void test_wlan_add(int argc, char ** argv);
 static struct wlan_network sta_network;
 }
+#include "AppTask.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
@@ -115,6 +117,14 @@ exit:
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.
+    switch (event->Type)
+    {
+        case DeviceEventType::kCommissioningComplete:
+            PRINTF("====> DeviceEventType::kCommissioningComplete\r\n");
+            break;
+        default:
+            break;
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -335,7 +345,11 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     //
     memcpy(sCfgSSID, ssidStr, ssid.size());
     sCfgSSIDLen = ssid.size();
-    //
+
+    ChipLogProgress(DeviceLayer, "ConnectWiFiNetworkAsync: [ssid, pwd]=[%s, %s]", ssidStr, keyStr);
+    // Do connection
+    chip::DeviceLayer::Internal::ConnectivityUtils::ConnectWiFiNetwork(ssidStr, keyStr);
+
     mpConnectCallback = apCallback;
 #if (MW320_CONNECT_SCAN_SYNC == 1)
     if (mpConnectCallback != nullptr)
