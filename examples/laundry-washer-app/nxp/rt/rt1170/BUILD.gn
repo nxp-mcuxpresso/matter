@@ -147,7 +147,8 @@ rt_executable("laundry-washer-app") {
   sources += [
     "${common_example_dir}/icd/source/ICDUtil.cpp",
     "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
-    "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
+    "${common_example_dir}/matter_cli/source/AppCLIBase.cpp",
+    "${common_example_dir}/matter_cli/source/AppCLIFreeRTOS.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",

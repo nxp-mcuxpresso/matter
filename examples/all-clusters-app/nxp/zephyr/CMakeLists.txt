@@ -86,6 +86,21 @@ chip_configure_data_model(app
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 
+if(CONFIG_CHIP_LIB_SHELL)
+    target_compile_definitions(app PRIVATE ENABLE_CHIP_SHELL)
+    target_include_directories(app PRIVATE 
+                               ${CHIP_ROOT}/examples/shell/shell_common/include
+                               ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/include
+    )
+    target_sources(app PRIVATE
+                   ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIBase.cpp
+                   ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_cli/source/AppCLIZephyr.cpp
+                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_misc.cpp
+                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_otcli.cpp
+                   ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
+    )
+endif()
+
 target_sources(app
     PRIVATE
     ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
