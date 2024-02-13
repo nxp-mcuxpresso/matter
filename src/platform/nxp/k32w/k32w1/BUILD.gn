@@ -70,9 +70,7 @@ static_library("nxp_platform") {
       "ram_storage.h"
     ]
   } else if (chip_key_storage == "littlefs") {
-    defines += [
-      "CHIP_PLAT_NVM_SUPPORT=3",
-      "KS_MATTER_SCRATCH_AREA_SIZE_MAX=4096" ]
+    defines += [ "CHIP_PLAT_NVM_SUPPORT=3" ]
 
     sources +=[
       "../../common/NXPConfig.h",
