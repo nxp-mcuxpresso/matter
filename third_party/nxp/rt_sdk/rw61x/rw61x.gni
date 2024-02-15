@@ -115,11 +115,11 @@ if (is_sdk_package) {
   WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
 }
 
-ELS_PKC_CL_PATH = "${rt_sdk_root}/components/els_pkc/"
+ELS_PKC_CL_PATH = "${COMPONENT_FILES_PATH}/els_pkc/"
 
 template("rw61x_sdk_drivers") {
   # Convert the CPU1/CPU2 fw binaries into src files
-  fw_bin_path = "${rt_sdk_root}/components/conn_fwloader"
+  fw_bin_path = "${COMPONENT_FILES_PATH}/conn_fwloader"
   fw_args = [
     "-t",
     cpu1_cpu2_fw_type,
@@ -135,7 +135,7 @@ template("rw61x_sdk_drivers") {
   }
 
   print(exec_script(
-            "${rt_sdk_root}/components/conn_fwloader/script/fw_bin2c_conv.py",
+            "${COMPONENT_FILES_PATH}/conn_fwloader/script/fw_bin2c_conv.py",
             fw_args,
             "list lines"))
 
@@ -212,6 +212,7 @@ template("rw61x_sdk_drivers") {
 
     defines += [
       "CPU_RW612ETA1I",
+      "CPU_RW612ETA2I",
       "CPU3",
       "FSL_RTOS_FREE_RTOS",
 
@@ -300,18 +301,31 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/platforms/rw61x",
         "${ELS_PKC_CL_PATH}/src/platforms/rw61x/inc",
       ]
+      if (is_sdk_2_15) {
+        _rw61x_sdk_drivers_include_dirs -= [ "${ELS_PKC_CL_PATH}/src/inc/impl" ]
+        _rw61x_sdk_drivers_include_dirs += [
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClBuffer/inc",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClBuffer/inc/internal",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/inc/internal",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClMemory/inc/internal",
+        ]
+      }
     }
 
     if (chip_enable_wifi) {
       _rw61x_sdk_drivers_include_dirs += [
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
 
-        # Include lpm.h and host_sleep.h files
-        "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/common/lpm",
-
         # wifi config file path
         "${WIFI_BT_TEMPLATE_PATH}",
       ]
+
+      # Include lpm.h and host_sleep.h files
+      if (is_sdk_2_15) {
+        _rw61x_sdk_drivers_include_dirs += [ "${rt_sdk_root}/examples/rdrw612bga/wifi_examples/common/lpm" ]
+      } else {
+        _rw61x_sdk_drivers_include_dirs += [ "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/common/lpm" ]
+      }
     }
 
     if (chip_enable_ble) {
@@ -440,9 +454,9 @@ template("rw61x_sdk_drivers") {
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
 
       # fw binaries for cpu1/cpu2
-      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu1.c",
-      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_ble.c",
-      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_combo.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu1.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu2_ble.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu2_combo.c",
 
       # this platform file is needed for BLE/15.4 Controller wake up
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ble.c",
@@ -451,6 +465,10 @@ template("rw61x_sdk_drivers") {
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_coex.c",
 
     ]
+
+    if (is_sdk_2_15) {
+      sources += [ "${rt_core_sdk_root}/components/conn_fwloader/fsl_loader_utils.c" ]
+    }
 
     if (sdk_fsl_assert_support) {
       sources += [ "${UTILITIES_ASSERT_FILES_PATH}/fsl_assert.c" ]
@@ -646,6 +664,38 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/platforms/rw61x/mcux_els.c",
         "${ELS_PKC_CL_PATH}/src/platforms/rw61x/mcux_pkc.c",
       ]
+
+      if (is_sdk_2_15) {
+        sources -= [
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Modes.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_DecodePoint_Ed448.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_DhKeyAgreement.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_DhKeyGeneration.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_SignatureMechanisms.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateCustomKeyType.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateDomainParams.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateDomainParams_FUP.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_NoEncode.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_NoVerify.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Public_FUP.c",
+        ]
+        sources += [
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClBuffer/src/mcuxClBuffer.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Crypt_Els_Modes.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_MontDH_GenerateKeyPair.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_MontDH_KeyAgreement.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateKeyPair.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_KeyAgreement_ECDH.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Core_c_sha1.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Internal_c_sha1.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_Internal.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/size/size.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_getMillerRabinTestIterations.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PublicExp.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Sign_NoEMSA.c",
+          "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Verify_NoEMSA.c",
+        ]
+      }
     }
 
     if (chip_enable_ble) {
