@@ -70,10 +70,12 @@ config("lwip_rt_config") {
   } else if (chip_enable_openthread) {
     include_dirs += [ "lwip/openthread" ]
   } else if (chip_enable_wifi) {
-    include_dirs += [ 
-      "lwip/wifi",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
-    ]
+    include_dirs += [ "lwip/wifi" ]
+    if (is_sdk_2_15 && (rt_platform == "rw61x")) {
+      include_dirs += [ "${rt_sdk_root}/middleware/wifi_nxp/port/net" ]
+    } else {
+      include_dirs += [ "${rt_sdk_root}/middleware/wifi_nxp/port/lwip" ]
+    }
   }
 }
 
@@ -91,10 +93,17 @@ lwip_target("nxp_lwip") {
   }
 
   if (chip_enable_wifi) {
-    sources += [
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
-    ]
+    if (is_sdk_2_15 && (rt_platform == "rw61x")) {
+      sources += [
+        "${rt_sdk_root}/middleware/wifi_nxp/port/net/net.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/port/net/wifi_netif.c",
+      ]
+    } else {
+      sources += [
+        "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
+      ]
+    }
   }
 
   public_configs = [ ":lwip_rt_config" ]
