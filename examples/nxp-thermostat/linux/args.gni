@@ -15,13 +15,4 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
-#chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-#chip_project_config_include = "<CHIPProjectAppConfig.h>"
-#chip_system_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include = "<CHIPProjectConfig.h>"
-chip_system_project_config_include = "<CHIPProjectConfig.h>"
-
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/nxp-thermostat/linux/include" ]
-
+matter_enable_tracing_support = true
