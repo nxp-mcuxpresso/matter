@@ -175,6 +175,7 @@ source_set("libelematter") {
 
     "repo/${PLAT_COMMON_PATH}/sab_messaging.c",
     "repo/${PLAT_COMMON_PATH}/sab_common_err.c",
+    "repo/${PLAT_COMMON_PATH}/se_global_info.c",
     "repo/${PLAT_PATH}/ele_os_abs_linux.c",
   ]
 
