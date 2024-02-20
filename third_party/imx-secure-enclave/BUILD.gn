@@ -103,9 +103,6 @@ config("libele_config") {
     "repo/include/hsm",
     "repo/include/she",
   ]
-
-  cflags = [ "-Wno-implicit-fallthrough -O1 -Werror -Wformat -fPIC" ]
-  cflags_cc = [ "-std=c++17" ]
 }
 
 source_set("libelematter") {
@@ -178,6 +175,9 @@ source_set("libelematter") {
     "repo/${PLAT_COMMON_PATH}/se_global_info.c",
     "repo/${PLAT_PATH}/ele_os_abs_linux.c",
   ]
+
+  cflags = [ "-Wno-implicit-fallthrough -O1 -Werror -Wformat -fPIC" ]
+  cflags_cc = [ "-std=c++17" ]
 
   public_configs = [ ":libele_config" ]
 }

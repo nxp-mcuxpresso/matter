@@ -19,9 +19,6 @@ config("libtrustymatter_config") {
     "repo/matter_client/include",
     "repo/libtrusty/include",
   ]
-
-  cflags = [ "-Wno-implicit-fallthrough" ]
-  cflags_cc = [ "-std=c++17" ]
 }
 
 source_set("libtrustymatter") {
@@ -42,6 +39,9 @@ source_set("libtrustymatter") {
     "repo/libtrusty/include/trusty/ipc.h",
     "repo/libtrusty/include/trusty/tipc.h",
   ]
+
+  cflags = [ "-Wno-implicit-fallthrough" ]
+  cflags_cc = [ "-std=c++17" ]
 
   public_configs = [ ":libtrustymatter_config" ]
 }
