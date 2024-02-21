@@ -38,18 +38,36 @@ config("nxp_platform_config") {
       "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1"
     ]
 
-    if(chip_enable_secure_dac_private_key_storage == 1){
+    if (chip_enable_secure_dac_private_key_storage == 1) {
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
-    }
-    else{
+    } else {
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
     }
   }
-  if (chip_enable_wifi && chip_enable_openthread)
-  {
+  if (chip_enable_wifi && chip_enable_openthread) {
     # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
     defines += [ "_NO_NETWORK_COMMISSIONING_DRIVER_" ]
   }
+}
+
+static_library("ble_zephry_matter_port") {
+  if (chip_enable_ble) {
+    # NXP SDK is providing a Zephyr BLE abstraction that could run on FreeRTOS
+    # Therefore the Matter Zephyr BLE a port could be used
+    sources = [
+      "../../../Zephyr/BLEAdvertisingArbiter.cpp",
+      "../../../Zephyr/BLEManagerImpl.cpp",
+      "../../common/ble_zephyr/BLEManagerImpl.h",
+    ]
+
+    #Define ZEPHYR to 1 to have the function MapErrorZephyr linked
+    defines = [ "__ZEPHYR__=1" ]
+  }
+
+  deps = [ "${nxp_sdk_build_root}:nxp_sdk" ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_configs = [ ":nxp_platform_config" ]
 }
 
 static_library("nxp_platform") {
@@ -82,23 +100,20 @@ static_library("nxp_platform") {
       "../../common/ram_storage.c",
       "../../common/ram_storage.h",
     ]
-  } else if(rt_nvm_component == "key_storage") {
+  } else if (rt_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
   }
-
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_ble) {
     sources += [
       # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/random.cpp",
-      "../../../Zephyr/BLEAdvertisingArbiter.cpp",
-      "../../../Zephyr/BLEManagerImpl.cpp",
-      "../../common/ble_zephyr/BLEManagerImpl.h",
     ]
   }
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
   if (rt_nvm_component == "nvm_fwk") {
@@ -138,16 +153,13 @@ static_library("nxp_platform") {
 
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
-      sources += [
-           "../../common/DnssdImpl.cpp",
-      ]
-      }
-      else {
-      sources += [
-        "../../../OpenThread/DnssdImpl.cpp",
-        "../../../OpenThread/OpenThreadDnssdImpl.cpp",
-        "../../../OpenThread/OpenThreadDnssdImpl.h",
-      ]
+        sources += [ "../../common/DnssdImpl.cpp" ]
+      } else {
+        sources += [
+          "../../../OpenThread/DnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+        ]
       }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
@@ -158,16 +170,15 @@ static_library("nxp_platform") {
       "../../common/factory_data/FactoryDataProvider.cpp",
       "../../common/factory_data/FactoryDataProvider.h",
     ]
-    if(chip_enable_secure_dac_private_key_storage == 1){
+    if (chip_enable_secure_dac_private_key_storage == 1) {
       sources += [
-        "FactoryDataProviderImpl.cpp",
-        "FactoryDataProviderImpl.h",
         # TO BE MOVED TO THE SDK
         "ELSFactoryData.c",
         "ELSFactoryData.h",
+        "FactoryDataProviderImpl.cpp",
+        "FactoryDataProviderImpl.h",
       ]
-    }
-    else{
+    } else {
       sources += [
         "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
         "../../common/factory_data/FactoryDataProviderFwkImpl.h",
@@ -178,10 +189,13 @@ static_library("nxp_platform") {
   }
 
   if (chip_convert_dac_private_key == 1) {
-      defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
-    }
+    defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+  }
 
-  deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]
+  deps += [
+    ":ble_zephry_matter_port",
+    "${nxp_sdk_build_root}:nxp_sdk",
+  ]
 
   public_deps += [
     "${chip_root}/examples/platform/nxp/common/app/support:freertos_memory_utils",
