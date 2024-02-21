@@ -24,6 +24,19 @@
  */
 
 #pragma once
+
+/*
+ * __ZEPHYR__ flag is mandatory to build Zephyr/BLEManagerImpl.cpp file to enable MapErrorZephyr function
+ * Nevertheless this flag should not be used in NXP SDK ".h" file when building a freeRTOS OS, therefore undef it when a NXP SDK
+ * file is included.
+ */
+#ifdef __ZEPHYR__
+#define ZEPHYR_FLAG_DEFINED 1
+#undef __ZEPHYR__
+#else
+#define ZEPHYR_FLAG_DEFINED 0
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <sys/atomic.h>
 #include <toolchain.h>
@@ -33,10 +46,16 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif /* _cplusplus */
+
 #include "wlan.h"
+
 #if defined(__cplusplus)
 }
 #endif
+#endif
+
+#if ZEPHYR_FLAG_DEFINED
+#define __ZEPHYR__
 #endif
 
 #include <platform/CHIPDeviceEvent.h>
