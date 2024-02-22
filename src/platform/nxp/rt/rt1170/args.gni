@@ -45,6 +45,11 @@ declare_args() {
   no_mcuboot = true
 }
 
+declare_args() {
+  # Location of the rt SDK.
+  sdk_repo = "rt/repo/sdk-2.15"
+}
+
 # As a temporary workaround, we are disabling the session resumption because currently
 # the mbedtls port does not support this.
 # If not disabled, reconnecting to the OTA Provider node will fail.
