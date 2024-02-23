@@ -1,0 +1,231 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
+
+middleware_sdk = {
+  BLE_CONTROLLER_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/ble_controller"
+  BLE_HOST_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/bluetooth"
+  FRAMEWORK_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/framework"
+  FREERTOS_DIR_PATH = "${k32w1_sdk_root}/rtos/freertos"
+  IEEE_802_15_4_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4"
+  MBEDTLS_DIR_PATH = "${k32w1_sdk_root}/middleware/mbedtls"
+  MULTICORE_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore"
+  MULTICORE_RPMSG_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite"
+  SECURE_SUBSYSTEM_DIR_PATH = "${k32w1_sdk_root}/middleware/secure-subsystem"
+
+  if(is_sdk_2_15) {
+    FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
+    FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos-kernel"
+  } else {
+    FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/kw45_k32w1"
+    FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos_kernel"
+  }
+
+  middleware_include_dirs = [
+    # BLE HOST / BLE CONTROLLER directories
+    "${BLE_CONTROLLER_DIR_PATH}/interface",
+    "${BLE_HOST_DIR_PATH}/application/common",
+    "${BLE_HOST_DIR_PATH}/application/common/gatt_db",
+    "${BLE_HOST_DIR_PATH}/application/common/gatt_db/macros",
+    "${BLE_HOST_DIR_PATH}/hci_transport/interface",
+    "${BLE_HOST_DIR_PATH}/host/config",
+    "${BLE_HOST_DIR_PATH}/host/interface",
+    "${BLE_HOST_DIR_PATH}/port",
+    
+    # Framework directories
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480",
+    "${FRAMEWORK_DIR_PATH}/Common",
+    "${FRAMEWORK_DIR_PATH}/DBG",
+    "${FRAMEWORK_DIR_PATH}/FunctionLib",
+    "${FRAMEWORK_DIR_PATH}/HWParameter",
+    "${FRAMEWORK_DIR_PATH}/LowPower",
+    "${FRAMEWORK_DIR_PATH}/ModuleInfo",
+    "${FRAMEWORK_DIR_PATH}/NVM/Source",
+    "${FRAMEWORK_DIR_PATH}/NVM/Interface",
+    "${FRAMEWORK_DIR_PATH}/OtaSupport/Interface",
+    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source",
+    "${FRAMEWORK_DIR_PATH}/RNG",
+    "${FRAMEWORK_DIR_PATH}/SecLib",
+    "${FRAMEWORK_DIR_PATH}/Sensors",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/configs",
+    "${FRAMEWORK_DIR_PATH}/platform/include",
+
+    # Freertos directories
+    "${FREERTOS_DIR_PATH}/libraries/3rdparty/mbedtls_config",
+    "${FREERTOS_KERNEL_DIR_PATH}/include",
+    "${FREERTOS_KERNEL_DIR_PATH}/portable/GCC/ARM_CM33_NTZ/non_secure",
+
+    # IEEE 802.15.4 directories
+    "${IEEE_802_15_4_DIR_PATH}/ieee_802_15_4/phy/interface",
+    "${IEEE_802_15_4_DIR_PATH}/utils",
+
+    # Mbedtls directories
+    "${MBEDTLS_DIR_PATH}/include",
+    "${MBEDTLS_DIR_PATH}/include/mbedtls",
+    "${MBEDTLS_DIR_PATH}/library",
+    "${MBEDTLS_DIR_PATH}/port/ksdk",
+    "${MBEDTLS_DIR_PATH}/port/sssapi",
+
+    # Multicore / Rpmsg directories
+    "${MULTICORE_DIR_PATH}/mcmgr/src",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/include",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/include/environment/freertos",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/k32w1",
+
+    # Secure subsystem directories
+    "${SECURE_SUBSYSTEM_DIR_PATH}/inc",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/inc/elemu",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1",
+  ]
+
+  middleware_defines = [
+    "gMainThreadPriority_c=5",
+    "SDK_COMPONENT_INTEGRATION=1",
+    "gSerialManagerMaxInterfaces_c=1",
+    "gAppHighSystemClockFrequency_d=1",
+    "USE_NBU=1",
+    "KW45_A0_SUPPORT=0",
+    "gAspCapability_d=1",
+    "gNvStorageIncluded_d=1",
+    "gUnmirroredFeatureSet_d=1",
+    "gNvFragmentation_Enabled_d=1",
+    "gAppButtonCnt_c=2",
+    "gAppLowpowerEnabled_d=1",
+    "SSS_CONFIG_FILE=\"fsl_sss_config_elemu.h\"",
+    "SSCP_CONFIG_FILE=\"fsl_sscp_config_elemu.h\"",
+    "APP_SERIAL_INTERFACE_INSTANCE=1",
+    "configFRTOS_MEMORY_SCHEME=4",
+    "osCustomStartup=1",
+    "CHIP_ENABLE_OPENTHREAD=1",
+    "gUseHciTransportDownward_d=1",
+    "gAppMaxConnections_c=1",
+    "gL2caMaxLeCbChannels_c=2",
+    "gGapSimultaneousEAChainedReports_c=0",
+    "gTmrStackTimers_c= 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c",
+    "gAppUseBonding_d=0",
+    "gAppUsePairing_d=0",
+    "gAppUsePrivacy_d=0",
+    "gGattUseUpdateDatabaseCopyProc_c=0",
+    "gBleBondIdentityHeaderSize_c=56",
+    "gPasskeyValue_c=999999",
+    "gMainThreadStackSize_c=3096",
+    "gHost_TaskStackSize_c=2400",
+    "gBleSetMacAddrFromVendorCommand_d=1",
+    "CHIP_PLAT_NVM_SUPPORT=1",
+    "mAdvertisingDefaultTxPower_c=0", # default advertising TX power
+    "mConnectionDefaultTxPower_c=0",  # default connection TX power
+    "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
+    "gAdvertisingPowerLeveldBm_c=0",
+    "gConnectPowerLeveldBm_c=0",
+  ]
+
+  if(is_sdk_2_15) {
+    middleware_defines += [ "MULTICORE_APP=1" ]
+  }
+
+  middleware_sources = [
+    # Framework files
+    "${FRAMEWORK_DIR_PATH}/Common/rtos/freertos/heap_mem_manager.c",
+    "${FRAMEWORK_DIR_PATH}/FunctionLib/FunctionLib.c",
+    "${FRAMEWORK_DIR_PATH}/HWParameter/HWParameter.c",
+    "${FRAMEWORK_DIR_PATH}/LowPower/PWR.c",
+    "${FRAMEWORK_DIR_PATH}/LowPower/PWR_systicks.c",
+    "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c",
+    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaExternalFlash.c",
+    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
+    "${FRAMEWORK_DIR_PATH}/RNG/RNG.c",
+    "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_sss.c",
+    "${FRAMEWORK_DIR_PATH}/Sensors/sensors.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ble.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_extflash.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ics.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_lowpower.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_lowpower_timer.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ota.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ot.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/app_services_init.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_dcdc.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_extflash.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/hardware_init.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480/clock_config.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/K32W1480/pin_mux.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_lp.c",
+    "${FRAMEWORK_DIR_PATH}/boards/kw45_k32w1/board_comp.c",
+
+    # BLE HOST / BLE CONTROLLER files
+    "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
+    "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
+    "${BLE_HOST_DIR_PATH}/application/common/ble_init.c",
+    "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
+    "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
+    "${BLE_HOST_DIR_PATH}/host/config/ble_globals.c",
+    "${BLE_HOST_DIR_PATH}/port/fwk_generic_list.c",
+    "${BLE_HOST_DIR_PATH}/port/fwk_timer_manager.c",
+
+    # Freertos files
+    "${FREERTOS_KERNEL_DIR_PATH}/croutine.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/event_groups.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/list.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/queue.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/stream_buffer.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/tasks.c",
+    "${FREERTOS_KERNEL_DIR_PATH}/timers.c",
+
+    # IEEE 802.15.4 files
+    "${IEEE_802_15_4_DIR_PATH}/ieee_802_15_4/phy/source/PhyTime.c",
+    "${IEEE_802_15_4_DIR_PATH}/ieee_802_15_4/phy/source/SerialDevice/ASP.c",
+    "${IEEE_802_15_4_DIR_PATH}/ieee_802_15_4/phy/source/SerialDevice/Phy.c",
+
+    # Multicore / Rpmsg files
+    "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr.c",
+    "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_imu_internal.c",
+    "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1.c",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/common/llist.c",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/environment/rpmsg_env_freertos.c",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/rpmsg_lite.c",
+    "${MULTICORE_RPMSG_DIR_PATH}/lib/virtio/virtqueue.c",
+
+    # Secure subsystem directories
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_aes.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_aes_cmac.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_ccm.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_ecdh.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_hmac_sha256.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_init.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1/sss_sha256.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sscp_mu.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sss_mgmt.c",
+    "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sss_sscp.c",
+  ]
+
+  if(is_sdk_2_15) {
+    middleware_sources += [
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform_ext.c"
+    ]
+  }
+}
