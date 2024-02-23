@@ -228,9 +228,9 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/repo
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west init -l manifest --mf west.yml
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west update
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/rt
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west init -l manifest --mf west.yml
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west update
 ```
 
 -   In case there are local modification to the already installed git NXP SDK.
