@@ -19,11 +19,11 @@ In the Border Router configuration, the Matter CLI needs to be enabled to contro
 
 - Build Matter Border Router configuration with onnetwork commissioning (the Wi-Fi network credentials are provided at build-time which will enable the device to join the network at the startup):
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=true tcp_download=true is_debug=true optimize_debug=false chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" chip_config_network_layer_ble=true hci_spinel_single_uart=true wifi_ssid=\"your_wifi_ssid\" wifi_password=\"your_wifi_password\" openthread_root =\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=true tcp_download=true is_debug=true optimize_debug=false chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true wifi_ssid=\"your_wifi_ssid\" wifi_password=\"your_wifi_password\" openthread_root =\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
-The resulting output file can be found in out/debug/chip-rw610-all-cluster-example.
+The resulting output file can be found in out/debug/chip-rt1060-all-cluster-example.
 
 <a name="flashdebug"></a>
 
