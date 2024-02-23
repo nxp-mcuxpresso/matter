@@ -39,9 +39,7 @@ declare_args() {
 
 assert(current_os == "freertos")
 
-common_example_dir = "${chip_root}/examples/platform/nxp/common"
-k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
-k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
+k32w1_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
 
 k32w1_sdk("sdk") {
   sources = [
