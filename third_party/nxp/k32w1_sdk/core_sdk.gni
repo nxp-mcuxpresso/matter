@@ -1,0 +1,249 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
+
+core_sdk = {
+  if (sdk_release) {
+    CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/CMSIS/Core"
+    COMPONENT_DIR_PATH = "${k32w1_sdk_root}/components"
+    DRIVER_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480/drivers"
+    DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_CRC_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_ELEMU_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_FLASH_K4_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_GPIO_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_IMU_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_LPSPI_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_LPTMR_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_LPUART_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_LTC_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480"
+    DEVICES_KW45B41Z83_DIR_PATH = "${DRIVER_DIR_PATH}"
+    UTILITIES_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480/utilities"
+    UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}"
+  }
+  else {
+    if(is_sdk_2_15){
+      CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/core/CMSIS/Core"
+      COMPONENT_DIR_PATH = "${k32w1_sdk_root}/core/components"
+      DRIVER_DIR_PATH = "${k32w1_sdk_root}/core/drivers"
+      DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/core/devices/K32W1480"
+      DEVICES_KW45B41Z83_DIR_PATH = "${k32w1_sdk_root}/core/devices/KW45B41Z83/drivers"
+      UTILITIES_DIR_PATH = "${k32w1_sdk_root}/core/utilities"
+    }
+    else {
+      CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/CMSIS/Core"
+      COMPONENT_DIR_PATH = "${k32w1_sdk_root}/components"
+      DRIVER_DIR_PATH = "${k32w1_sdk_root}/platform/drivers"
+      DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480"
+      DEVICES_KW45B41Z83_DIR_PATH = "${k32w1_sdk_root}/devices/KW45B41Z83/drivers"
+      UTILITIES_DIR_PATH = "${k32w1_sdk_root}/platform/utilities"
+    }
+
+    DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
+    DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"
+    DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}/common"
+    DRIVER_CRC_DIR_PATH = "${DRIVER_DIR_PATH}/crc"
+    DRIVER_ELEMU_DIR_PATH = "${DRIVER_DIR_PATH}/elemu"
+    DRIVER_FLASH_K4_DIR_PATH = "${DRIVER_DIR_PATH}/flash_k4"
+    DRIVER_GPIO_DIR_PATH = "${DRIVER_DIR_PATH}/gpio"
+    DRIVER_IMU_DIR_PATH = "${DRIVER_DIR_PATH}/imu"
+    DRIVER_LPSPI_DIR_PATH = "${DRIVER_DIR_PATH}/lpspi"
+    DRIVER_LPTMR_DIR_PATH = "${DRIVER_DIR_PATH}/lptmr"
+    DRIVER_LPUART_DIR_PATH = "${DRIVER_DIR_PATH}/lpuart"
+    DRIVER_LTC_DIR_PATH = "${DRIVER_DIR_PATH}/ltc"
+    DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}/port"
+    DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}/spc"
+    DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}/wuu"
+    UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}/assert"
+  }
+
+  COMPONENT_BUTTON_DIR_PATH = "${COMPONENT_DIR_PATH}/button"
+  COMPONENT_FLASH_DIR_PATH = "${COMPONENT_DIR_PATH}/flash"
+  COMPONENT_GPIO_DIR_PATH = "${COMPONENT_DIR_PATH}/gpio"
+  COMPONENT_INTERNAL_FLASH_DIR_PATH = "${COMPONENT_DIR_PATH}/internal_flash"
+  COMPONENT_LED_DIR_PATH = "${COMPONENT_DIR_PATH}/led"
+  COMPONENT_LISTS_DIR_PATH = "${COMPONENT_DIR_PATH}/lists"
+  COMPONENT_MEM_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/mem_manager"
+  COMPONENT_MESSAGING_DIR_PATH = "${COMPONENT_DIR_PATH}/messaging"
+  COMPONENT_OSA_DIR_PATH = "${COMPONENT_DIR_PATH}/osa"
+  COMPONENT_PANIC_DIR_PATH = "${COMPONENT_DIR_PATH}/panic"
+  COMPONENT_POWER_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/power_manager"
+  COMPONENT_PWM_DIR_PATH = "${COMPONENT_DIR_PATH}/pwm"
+  COMPONENT_RESET_DIR_PATH = "${COMPONENT_DIR_PATH}/reset"
+  COMPONENT_RPMSG_DIR_PATH = "${COMPONENT_DIR_PATH}/rpmsg"
+  COMPONENT_SERIAL_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/serial_manager"
+  COMPONENT_TIMER_DIR_PATH = "${COMPONENT_DIR_PATH}/timer"
+  COMPONENT_TIMER_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/timer_manager"
+  COMPONENT_TIME_STAMP_DIR_PATH = "${COMPONENT_DIR_PATH}/time_stamp"
+  COMPONENT_UART_DIR_PATH = "${COMPONENT_DIR_PATH}/uart"
+
+  core_include_dirs = [
+    # CMSIS directories
+    "${CMSIS_CORE_DIR_PATH}/Include",
+
+    # Devices directories
+    "${DEVICES_K32W1480_DIR_PATH}",
+    "${DEVICES_KW45B41Z83_DIR_PATH}",
+
+    # Drivers directories
+    "${DRIVER_CCM32K_DIR_PATH}",
+    "${DRIVER_CMC_DIR_PATH}",
+    "${DRIVER_COMMON_DIR_PATH}",
+    "${DRIVER_CRC_DIR_PATH}",
+    "${DRIVER_ELEMU_DIR_PATH}",
+    "${DRIVER_FLASH_K4_DIR_PATH}",
+    "${DRIVER_GPIO_DIR_PATH}",
+    "${DRIVER_IMU_DIR_PATH}",
+    "${DRIVER_LPSPI_DIR_PATH}",
+    "${DRIVER_LPTMR_DIR_PATH}",
+    "${DRIVER_LPUART_DIR_PATH}",
+    "${DRIVER_LTC_DIR_PATH}",
+    "${DRIVER_PORT_DIR_PATH}",
+    "${DRIVER_SPC_DIR_PATH}",
+    "${DRIVER_WUU_DIR_PATH}",
+
+    # Components directories
+    "${COMPONENT_BUTTON_DIR_PATH}",
+    "${COMPONENT_FLASH_DIR_PATH}/nor",
+    "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi",
+    "${COMPONENT_GPIO_DIR_PATH}",
+    "${COMPONENT_INTERNAL_FLASH_DIR_PATH}",
+    "${COMPONENT_LED_DIR_PATH}",
+    "${COMPONENT_LISTS_DIR_PATH}",
+    "${COMPONENT_MEM_MGR_DIR_PATH}",
+    "${COMPONENT_MESSAGING_DIR_PATH}",
+    "${COMPONENT_OSA_DIR_PATH}",
+    "${COMPONENT_PANIC_DIR_PATH}",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/core",
+    "${COMPONENT_RESET_DIR_PATH}",
+    "${COMPONENT_RPMSG_DIR_PATH}",
+    "${COMPONENT_SERIAL_MGR_DIR_PATH}",
+    "${COMPONENT_TIMER_DIR_PATH}",
+    "${COMPONENT_TIMER_MGR_DIR_PATH}",
+    "${COMPONENT_TIME_STAMP_DIR_PATH}",
+    "${COMPONENT_UART_DIR_PATH}",
+
+    # Utilities directories
+    "${UTILITIES_DIR_PATH}",
+    "${UTILITIES_DIR_PATH}/debug_console",
+    "${UTILITIES_DIR_PATH}/misc_utilities",
+    "${UTILITIES_DIR_PATH}/str",
+  ]
+
+  if(is_sdk_2_15) {
+    core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/devices/K32W1480" ]
+  } else {
+    core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK" ]
+  }
+
+  core_defines = [
+    "CPU_K32W1480VFTA",
+    "__STARTUP_CLEAR_BSS",
+    "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
+    "SERIAL_USE_CONFIGURE_STRUCTURE=1",
+    "SDK_OS_FREE_RTOS",
+    "HAL_RPMSG_SELECT_ROLE=0",
+    "TM_ENABLE_TIME_STAMP=1",
+    "FSL_OSA_TASK_ENABLE=1",
+    "FSL_OSA_MAIN_FUNC_ENABLE=1",
+
+    "BUTTON_SHORT_PRESS_THRESHOLD=1500",
+    "BUTTON_LONG_PRESS_THRESHOLD=2500",
+    "SDK_DEBUGCONSOLE=1",
+    "USE_RTOS=1",
+    "FSL_RTOS_FREE_RTOS=1",
+    "MinimalHeapSize_c=0x7C00",
+    "gMemManagerLightExtendHeapAreaUsage=0",
+    "ENABLE_RAM_VECTOR_TABLE=1",
+
+    "NO_SYSCORECLK_UPD=0",
+    "USE_SDK_OSA=0",
+    "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
+    "gLoggingActive_d=0",
+    "gLogRingPlacementOffset_c=0xF000",
+  ]
+
+  if(is_sdk_2_15) {
+    core_defines += [ "gAppUseSerialManager_c=1" ]
+  }
+
+  core_sources = [
+    # Devices files
+    "${DEVICES_K32W1480_DIR_PATH}/gcc/startup_K32W1480.S",
+    "${DEVICES_K32W1480_DIR_PATH}/system_K32W1480.c",
+    "${DEVICES_KW45B41Z83_DIR_PATH}/fsl_clock.c",
+    
+    # Drivers files
+    "${DRIVER_CCM32K_DIR_PATH}/fsl_ccm32k.c",
+    "${DRIVER_CMC_DIR_PATH}/fsl_cmc.c",
+    "${DRIVER_CRC_DIR_PATH}/fsl_crc.c",
+    "${DRIVER_ELEMU_DIR_PATH}/fsl_elemu.c",
+    "${DRIVER_FLASH_K4_DIR_PATH}/fsl_k4_controller.c",
+    "${DRIVER_FLASH_K4_DIR_PATH}/fsl_k4_flash.c",
+    "${DRIVER_GPIO_DIR_PATH}/fsl_gpio.c",
+    "${DRIVER_IMU_DIR_PATH}/fsl_imu.c",
+    "${DRIVER_LPSPI_DIR_PATH}/fsl_lpspi.c",
+    "${DRIVER_LPTMR_DIR_PATH}/fsl_lptmr.c",
+    "${DRIVER_LPUART_DIR_PATH}/fsl_lpuart.c",
+    "${DRIVER_LTC_DIR_PATH}/fsl_ltc.c",
+    "${DRIVER_SPC_DIR_PATH}/fsl_spc.c",
+    "${DRIVER_WUU_DIR_PATH}/fsl_wuu.c",
+
+    # Components files
+    "${COMPONENT_BUTTON_DIR_PATH}/fsl_component_button.c",
+    "${COMPONENT_DIR_PATH}/rpmsg/fsl_adapter_rpmsg.c",
+    "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi/fsl_lpspi_mem_adapter.c",
+    "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi/fsl_lpspi_nor_flash.c",
+    "${COMPONENT_GPIO_DIR_PATH}/fsl_adapter_gpio.c",
+    "${COMPONENT_INTERNAL_FLASH_DIR_PATH}/fsl_adapter_k4_flash.c",
+    "${COMPONENT_LED_DIR_PATH}/fsl_component_led.c",
+    "${COMPONENT_LISTS_DIR_PATH}/fsl_component_generic_list.c",
+    "${COMPONENT_MEM_MGR_DIR_PATH}/fsl_component_mem_manager_light.c",
+    "${COMPONENT_MESSAGING_DIR_PATH}/fsl_component_messaging.c",
+    "${COMPONENT_OSA_DIR_PATH}/fsl_os_abstraction_free_rtos.c",
+    "${COMPONENT_PANIC_DIR_PATH}/fsl_component_panic.c",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/core/fsl_pm_core.c",
+    "${COMPONENT_RESET_DIR_PATH}/fsl_adapter_reset.c",
+    "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_manager.c",
+    "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_port_uart.c",
+    "${COMPONENT_TIMER_DIR_PATH}/fsl_adapter_lptmr.c",
+    "${COMPONENT_TIMER_MGR_DIR_PATH}/fsl_component_timer_manager.c",
+    "${COMPONENT_TIME_STAMP_DIR_PATH}/fsl_adapter_lptmr_time_stamp.c",
+    "${COMPONENT_UART_DIR_PATH}/fsl_adapter_lpuart.c",
+    
+    # Utilities files
+    "${UTILITIES_DIR_PATH}/debug_console/fsl_debug_console.c",
+    "${UTILITIES_DIR_PATH}/str/fsl_str.c",
+    "${UTILITIES_DIR_PATH_ASSERT}/fsl_assert.c",
+  ]
+
+  if(is_sdk_2_15) {
+    core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/devices/K32W1480/fsl_pm_device.c" ]
+  } else {
+    core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK/fsl_pm_board.c" ]
+  }
+}
