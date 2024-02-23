@@ -20,7 +20,16 @@ declare_args() {
   chip_with_ot_cli = 0
   chip_with_low_power = 0
   chip_convert_dac_private_key = 0
-  sdk_release = 1
+  sdk_release = false
+  k32w1_sdk_root = ""
+  is_sdk_2_15 = true
+}
+
+if(!sdk_release && is_sdk_2_15) {
+  k32w1_sdk_root = "${chip_root}/third_party/nxp/github_sdk/rw_k32w1/repo/sdk-2.15"
+}
+else {
+  k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
 }
 
 openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-k32w1"
