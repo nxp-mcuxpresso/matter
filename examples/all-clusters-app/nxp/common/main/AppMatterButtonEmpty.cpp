@@ -1,6 +1,7 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2021 Nest Labs, Inc.
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright 2023 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,34 +17,10 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "AppMatterButton.h"
 
-struct AppEvent;
-using EventHandler = void (*)(const AppEvent &);
-
-struct AppEvent
+CHIP_ERROR AppMatterButton_registerButtons(void)
 {
-    enum AppEventTypes
-    {
-        kEventType_Timer = 0,
-        kEventType_TurnOn,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } ClusterEvent;
-    };
-
-    EventHandler Handler;
-};
+    /* Empty content could be re-defined in a dedicated platform AppMatterButton_registerButtons function */
+    return CHIP_NO_ERROR;
+}

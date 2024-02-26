@@ -19,7 +19,7 @@
 #pragma once
 
 struct AppEvent;
-using EventHandler = void (*)(const AppEvent &);
+typedef void (*EventHandler)(AppEvent *);
 
 struct AppEvent
 {

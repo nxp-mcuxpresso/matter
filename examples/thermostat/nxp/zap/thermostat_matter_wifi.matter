@@ -2216,14 +2216,13 @@ endpoint 0 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
@@ -2307,9 +2306,11 @@ endpoint 0 {
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command TestEventTrigger;
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster WiFiNetworkDiagnostics {
@@ -2463,11 +2464,10 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    callback attribute lastConfiguredBy default = 0x00;
-    ram      attribute sceneTableSize default = 0x10;
+    ram      attribute sceneTableSize;
     callback attribute fabricSceneInfo;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
     handle command AddSceneResponse;
