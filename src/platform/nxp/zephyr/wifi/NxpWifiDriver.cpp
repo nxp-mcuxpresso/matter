@@ -147,6 +147,10 @@ CHIP_ERROR NxpWifiDriver::CommitConfiguration()
 
 CHIP_ERROR NxpWifiDriver::RevertConfiguration()
 {
+    // Abort Connection Recovery if it is in progress during reverting configuration.
+    // This is needed to stop recovery process after failsafe timer expiring.
+    WiFiManager::Instance().AbortConnectionRecovery();
+
     LoadFromStorage();
 
     if (WiFiManager::StationStatus::CONNECTING <= WiFiManager::Instance().GetStationStatus())

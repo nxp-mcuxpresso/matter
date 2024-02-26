@@ -25,5 +25,3 @@
 #pragma once
 
 #include <platform/Zephyr/SystemPlatformConfig.h>
-
-#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
