@@ -52,10 +52,8 @@ Note: This solution is temporary.
 In order to use the tinycrypt ecc operations, use the following build arguments:
 
 ```
-$ gn gen out/debug --args='treat_warnings_as_errors=false chip_crypto="platform" chip_with_factory_data=0 board="murata"'
+$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" chip_crypto="tinycrypt"'
 ```
-    - chip_with_factory_data = [0|1] to without/with factory data
-    - board = ["eva"|"murata"] to choose the different evaluation board
 
 ## Flashing
 
