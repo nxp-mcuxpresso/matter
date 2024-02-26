@@ -30,10 +30,6 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
-#endif
-
 #include "FreeRTOS.h"
 #include "fsl_component_button.h"
 #include "timers.h"
@@ -49,9 +45,6 @@
 class AppTask
 {
 public:
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
-#endif
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
@@ -81,7 +74,7 @@ private:
     static void FunctionTimerEventHandler(void * aGenericEvent);
     static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
     static void HandleKeyboard(void);
-    static void SoftResetHandler(void * aGenericEvent);
+    static void OTAHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void ContactActionEventHandler(void * aGenericEvent);
@@ -96,6 +89,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
+    static void StartOTAQuery(intptr_t arg);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);

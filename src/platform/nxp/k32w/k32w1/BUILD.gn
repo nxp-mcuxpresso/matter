@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/k32w1_sdk.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
 
-assert(chip_device_platform == "nxp")
-assert(nxp_platform == "k32w/k32w1")
+assert(chip_device_platform == "k32w1")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -29,7 +28,7 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-static_library("nxp_platform") {
+static_library("k32w1") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -59,15 +58,7 @@ static_library("nxp_platform") {
     "ram_storage.h",
   ]
 
-  public = [
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
-    "${chip_root}/src/credentials/examples/ExampleDACs.h",
-    "${chip_root}/src/credentials/examples/ExamplePAI.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h",
-  ]
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
@@ -96,25 +87,10 @@ static_library("nxp_platform") {
       "K32W1PersistentStorageOpKeystore.h",
     ]
 
-    if (chip_with_factory_data == 1) {
-      sources += [
-        "../common/FactoryDataProvider.cpp",
-        "FactoryDataProviderImpl.cpp",
-      ]
-      public += [
-        "${chip_root}/src/credentials/CHIPCert.h",
-        "${chip_root}/src/credentials/CertificationDeclaration.h",
-      ]
-
-      if (chip_convert_dac_private_key == 1) {
-        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
-      }
-    }
-
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_openthread) {
     sources += [
@@ -131,17 +107,7 @@ static_library("nxp_platform") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-
-    if (use_smu2_dynamic) {
-      sources += [
-        "SMU2Manager.cpp",
-        "SMU2Manager.h",
-      ]
-    }
   }
 
-  public_deps += [
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/platform/logging:headers",
-  ]
+  public_deps += [ "${chip_root}/src/crypto" ]
 }

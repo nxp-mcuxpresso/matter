@@ -27,10 +27,6 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
-#endif
-
 #include "FreeRTOS.h"
 #include "fsl_component_button.h"
 #include "timers.h"
@@ -46,9 +42,6 @@
 class AppTask
 {
 public:
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
-#endif
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
@@ -63,7 +56,6 @@ public:
     static void OnIdentifyStop(Identify * identify);
     static void OnTriggerEffect(Identify * identify);
     static void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState);
-    static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -79,13 +71,14 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
-    static void SoftResetHandler(AppEvent * aEvent);
+    static void OTAHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void LightActionEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);
 
+    static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

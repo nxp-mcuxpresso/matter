@@ -233,7 +233,6 @@ protected:
 public:
     virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;
     virtual BLEManagerCommon * GetImplInstance()                                         = 0;
-    virtual CHIP_ERROR ResetController() { return CHIP_NO_ERROR; }
     void DoBleProcessing(void);
 
     BLECallbackDelegate callbackDelegate;

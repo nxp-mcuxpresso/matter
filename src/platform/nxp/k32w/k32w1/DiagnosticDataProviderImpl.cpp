@@ -31,10 +31,11 @@
 #include <lwip/tcpip.h>
 #endif
 
-#include <openthread/platform/entropy.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
 
-#include "fsl_component_mem_manager.h"
+#include <openthread/platform/entropy.h>
+
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -49,31 +50,31 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-    auto freeHeapSize = static_cast<uint32_t>(MEM_GetFreeHeapSize());
-    currentHeapFree   = static_cast<uint64_t>(freeHeapSize);
+    size_t freeHeapSize;
 
+    freeHeapSize    = xPortGetFreeHeapSize();
+    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-    auto freeHeapSize = static_cast<uint32_t>(MEM_GetFreeHeapSize());
-    currentHeapUsed   = static_cast<uint64_t>(MinimalHeapSize_c - freeHeapSize);
+    size_t freeHeapSize;
+    size_t usedHeapSize;
 
+    freeHeapSize = xPortGetFreeHeapSize();
+    usedHeapSize = MinimalHeapSize_c - freeHeapSize;
+
+    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    currentHeapHighWatermark = static_cast<uint64_t>(MinimalHeapSize_c - MEM_GetFreeHeapSizeLowWaterMark());
+    size_t highWatermarkHeapSize;
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
-{
-    MEM_ResetFreeHeapSizeLowWaterMark();
-
+    highWatermarkHeapSize    = MinimalHeapSize_c - xPortGetMinimumEverFreeHeapSize();
+    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     return CHIP_NO_ERROR;
 }
 

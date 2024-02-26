@@ -94,9 +94,6 @@ using namespace chip;
 using namespace chip::app;
 
 AppTask AppTask::sAppTask;
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-static AppTask::FactoryDataProvider sFactoryDataProvider;
-#endif
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
@@ -153,14 +150,8 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-    ReturnErrorOnFailure(sFactoryDataProvider.Init());
-    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
-    SetCommissionableDataProvider(&sFactoryDataProvider);
-#else
+    // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();
@@ -367,7 +358,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != CONTACT_SENSOR_BUTTON) && (pin_no != SOFT_RESET_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != CONTACT_SENSOR_BUTTON) && (pin_no != OTA_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -385,10 +376,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = ContactActionEventHandler;
     }
-    else if (pin_no == SOFT_RESET_BUTTON)
+    else if (pin_no == OTA_BUTTON)
     {
-        // Soft reset ensures that platform manager shutdown procedure is called.
-        button_event.Handler = SoftResetHandler;
+        // Starting OTA by button functionality is not used.
+        // button_event.Handler = OTAHandler;
     }
     else if (pin_no == BLE_BUTTON)
     {
@@ -441,7 +432,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
 
         case CONTACT_SENSOR_BUTTON:
             K32W_LOG("pb2 long press");
-            ButtonEventHandler(SOFT_RESET_BUTTON, SOFT_RESET_BUTTON_PUSH);
+            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
             break;
         }
         break;
@@ -570,14 +561,29 @@ void AppTask::ContactActionEventHandler(void * aGenericEvent)
     }
 }
 
-void AppTask::SoftResetHandler(void * aGenericEvent)
+void AppTask::OTAHandler(void * aGenericEvent)
 {
     AppEvent * aEvent = (AppEvent *) aGenericEvent;
-    if (aEvent->ButtonEvent.PinNo != SOFT_RESET_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != OTA_BUTTON)
         return;
 
-    PlatformMgrImpl().CleanReset();
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    if (sAppTask.mFunction != Function::kNoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not initiate OTA!");
+        return;
+    }
+
+    PlatformMgr().ScheduleWork(StartOTAQuery, 0);
+#endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void AppTask::StartOTAQuery(intptr_t arg)
+{
+    GetRequestorInstance()->TriggerImmediateQuery();
+}
+#endif
 
 void AppTask::BleHandler(void * aGenericEvent)
 {

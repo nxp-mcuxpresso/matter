@@ -51,7 +51,7 @@
         }
       ],
       "deviceVersions": [
-        2
+        1
       ],
       "deviceIdentifiers": [
         22
@@ -3994,6 +3994,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

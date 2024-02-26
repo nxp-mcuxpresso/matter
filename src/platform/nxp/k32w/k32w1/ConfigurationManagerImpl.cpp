@@ -30,9 +30,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/k32w/k32w1/K32W1Config.h>
-#if defined(USE_SMU2_DYNAMIC)
-#include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
-#endif
 
 // #include <openthread/platform/misc.h>
 #include "fsl_cmc.h"
@@ -273,10 +270,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ThreadStackMgr().ErasePersistentInfo();
 
-#if defined(USE_SMU2_DYNAMIC)
-    SMU2::Deactivate();
-#endif
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");

@@ -1506,7 +1506,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 2;
+  device type ma_rootdevice = 22, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
 
