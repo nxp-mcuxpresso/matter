@@ -36,7 +36,6 @@
 
 #include "FreeRTOS.h"
 #include "fsl_component_button.h"
-#include "fsl_pm_core.h"
 #include "timers.h"
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -46,7 +45,6 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-#define APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class AppTask
 {
@@ -68,8 +66,6 @@ public:
     // Identify cluster callbacks.
     static void OnIdentifyStart(Identify * identify);
     static void OnIdentifyStop(Identify * identify);
-
-    static status_t LowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -100,7 +96,6 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
     void StartTimer(uint32_t aTimeoutInMs);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
