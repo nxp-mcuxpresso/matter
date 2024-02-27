@@ -99,7 +99,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the configuration system.
-    err = Internal::K32WConfig::Init();
+    err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
