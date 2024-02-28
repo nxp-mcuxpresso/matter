@@ -160,7 +160,7 @@ core_sdk = {
     core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK" ]
   }
 
-  if (chip_key_storage == "littlefs") {
+  if (chip_key_storage != "fwk_nvm") {
     core_include_dirs += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash",
       "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1"
@@ -254,7 +254,7 @@ core_sdk = {
     core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK/fsl_pm_board.c" ]
   }
 
-  if (chip_key_storage == "littlefs") {
+  if (chip_key_storage != "fwk_nvm") {
     core_sources += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1/mflash_drv.c"
     ]
