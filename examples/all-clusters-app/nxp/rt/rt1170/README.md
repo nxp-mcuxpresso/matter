@@ -17,8 +17,7 @@ control.
   - [Building](#building)
   - [Hardware requirements for RT1170 and IWX12](#hardware-requirements-for-rt1170-and-iwx12)
     - [Hardware rework for SPI support on EVKB-MIMXRT1170](#hardware-rework-for-spi-support-on-evkb-mimxrt1170)
-    - [Hardware rework to connect SPI on 2EL M2 IW612 Module](#hardware-rework-to-connect-spi-on-2el-m2-iw612-module)
-    - [Board settings (Spinel over SPI, BLE over UART)](#board-settings-spinel-over-spi-ble-over-uart)
+    - [Board settings (Spinel over SPI, I2C, BLE over UART)](#board-settings-spinel-over-spi-i2c-ble-over-uart)
   - [Manufacturing data](#manufacturing-data)
   - [Flashing and debugging](#flashing-and-debugging)
   - [Testing the example](#testing-the-example)
@@ -62,6 +61,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 - Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
 
 ```
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/rt_sdk/repo
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west init -l manifest --mf west.yml
