@@ -109,6 +109,13 @@ middleware_sdk = {
       "${FRAMEWORK_DIR_PATH}/FileCache",
       "${FRAMEWORK_DIR_PATH}/KeyStorage"
     ]
+  } else if (chip_key_storage == "nvs") {
+    middleware_include_dirs += [
+      "${FRAMEWORK_DIR_PATH}/NVS/Interface",
+      "${FRAMEWORK_DIR_PATH}/NVS/Interface/port",
+      "${FRAMEWORK_DIR_PATH}/Settings/Interface",
+      "${FRAMEWORK_DIR_PATH}/Settings/Interface/port"
+    ]
   }
 
   middleware_defines = [
@@ -161,6 +168,15 @@ middleware_sdk = {
       "LFS_NO_DEBUG",
       "LFS_NO_ERROR",
       "LFS_NO_WARN"
+    ]
+  } else if (chip_key_storage == "nvs") {
+    middleware_defines += [
+      "gAppNvsExternalFlash_c=0",
+      "gAppNvsInternalFlash_c=1",
+      "CONFIG_NVS_LOOKUP_CACHE=1",
+      "CONFIG_NVS_LOOKUP_CACHE_SIZE=32",
+      "CONFIG_SETTINGS_DYNAMIC_HANDLERS=1",
+      "CONFIG_SETTINGS_RUNTIME=1"
     ]
   }
 
@@ -259,6 +275,18 @@ middleware_sdk = {
       "${FRAMEWORK_DIR_PATH}/FSAbstraction/fwk_lfs_mflash.c",
       "${FRAMEWORK_DIR_PATH}/FileCache/fwk_file_cache.c",
       "${FRAMEWORK_DIR_PATH}/KeyStorage/fwk_key_storage.c"
+    ]
+  } else if (chip_key_storage == "nvs") {
+    middleware_sources += [
+      "${FRAMEWORK_DIR_PATH}/NVS/Source/nvs.c",
+      "${FRAMEWORK_DIR_PATH}/NVS/Source/crc8.c",
+      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_flash.c",
+      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_InternalFlash.c",
+      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_init.c",
+      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings.c",
+      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_store.c",
+      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_nvs.c",
+      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_runtime.c"
     ]
   }
 }
