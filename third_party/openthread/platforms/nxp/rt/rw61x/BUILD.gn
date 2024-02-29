@@ -104,6 +104,9 @@ source_set("libopenthread-rw61x") {
   } else if (rt_nvm_component == "key_storage") {
     sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]  
   }
+  else if (rt_nvm_component == "nvs") {
+    sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
+  }
 
   defines = [
     "OPENTHREAD_FTD",
