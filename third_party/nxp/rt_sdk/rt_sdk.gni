@@ -49,6 +49,9 @@ declare_args() {
   # Defines the RT NVM component supported
   rt_nvm_component = "littlefs"
 
+  # Enable NVS
+  #rt_nvm_component = "nvs"
+
   # KeyStorage enable only for RW61x
   #if(nxp_platform == "rt/rw61x"){
   #rt_nvm_component = "key_storage"
@@ -380,8 +383,6 @@ template("rt_sdk") {
 
       #"${rt_sdk_root}/middleware/wireless/framework/DBG",
 
-      #littlefs
-      "${rt_sdk_root}/middleware/littlefs",
     ]
 
     #OtaSupport
@@ -392,9 +393,36 @@ template("rt_sdk") {
       ]
     }
 
+    if (rt_nvm_component != "nvs"){
+      _sdk_include_dirs += [
+        #littlefs
+        "${rt_sdk_root}/middleware/littlefs",
+      ]
+    }
+
     if (rt_nvm_component == "nvm_fwk") {
       _sdk_include_dirs +=
           [ "${rt_sdk_root}/middleware/wireless/framework/NVM/Interface" ]
+    }
+
+    else if (rt_nvm_component == "nvs"){  
+      # Settings    
+      _sdk_include_dirs += [
+       "${rt_sdk_root}/middleware/wireless/framework/Settings/Source",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings",
+       "${rt_sdk_root}/middleware/wireless/framework",
+       "${rt_sdk_root}/middleware/wireless/framework/Settings/Interface",
+      ]
+      # NVS
+      _sdk_include_dirs += [
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Interface/port",
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Interface",
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Source",
+
+      ]
+       _sdk_include_dirs += [
+          "${rt_sdk_root}/middleware/wireless/framework/platform/Common",
+       ]
     }
 
     libs = []
@@ -441,6 +469,12 @@ template("rt_sdk") {
       #Multithread tests
       "PRINTF_ADVANCED_ENABLE=1",
     ]
+
+    if (rt_nvm_component == "nvs"){ 
+      # define gAppNvsInternalFlash_c = 0 to be sure it will not be define as 1 in the framework (NVS/Interface/port/nvs_port.h)
+      defines += [ "gAppNvsExternalFlash_c = 1", "gNvsExternalFlash_d = 1", "gAppNvsInternalFlash_c = 0", "CONFIG_NVS_LOOKUP_CACHE=1",
+        "CONFIG_NVS_LOOKUP_CACHE_SIZE=32",]
+    }
 
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
@@ -633,8 +667,12 @@ template("rt_sdk") {
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaPrivate.h",
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
-        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_extflash.c",
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ota.c",
+        ]
+    }
+    if (chip_enable_ota_requestor || rt_nvm_component == "nvs"){
+      sources += [ 
+        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_extflash.c",
       ]
     }
 
@@ -669,6 +707,22 @@ template("rt_sdk") {
         #littlefs
         "${rt_sdk_root}/middleware/littlefs/lfs.c",
         "${rt_sdk_root}/middleware/littlefs/lfs_util.c",
+      ]
+    }
+
+    if (rt_nvm_component == "nvs") {   
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_store.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_runtime.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_nvs.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_init.c",
+      ]
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/fwk_nvs_ExternalFlash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/fwk_nvs_flash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/nvs.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/crc8.c",
       ]
     }
 
