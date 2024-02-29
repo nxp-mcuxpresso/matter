@@ -11,18 +11,24 @@ manifest:
       import:
         file: west.yml
         name-allowlist:
+          - CMSIS_5
+          - fatfs
+          - FreeRTOS-Kernel
+          - littlefs
+          - lwip
+          - mbedtls
+          - mcuboot
           - mcux-sdk
           - mcux-sdk-examples
-          - FreeRTOS-Kernel
-          - CMSIS_5
-          - mcux-sdk-middleware-sdmmc
+          - mcux-sdk-middleware-bluetooth-controller
+          - mcux-sdk-middleware-bluetooth-host
           - mcux-sdk-middleware-connectivity-framework
-          - fatfs
           - mcux-sdk-middleware-edgefast-bluetooth
           - mcux-sdk-middleware-ethermind
-          - mbedtls
+          - mcux-sdk-middleware-ieee_802.15.4
+          - mcux-sdk-middleware-multicore
+          - mcux-sdk-middleware-sdmmc
+          - rpmsg-lite
+          - secure-subsystem
           - wifi_nxp
-          - lwip
-          - littlefs
-          - mcuboot
         path-prefix: repo/sdk-2.15
