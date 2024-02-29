@@ -80,7 +80,10 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
-  sources += [ "${example_platform_dir}/board/peripherals.c" ]
+  
+  if (rt_nvm_component != "nvs"){
+    sources += [ "${example_platform_dir}/board/peripherals.c" ]
+  }
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
