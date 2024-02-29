@@ -27,7 +27,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#if (CHIP_PLAT_NVM_SUPPORT == 1)
 #include "NVM_Interface.h"
+#endif
 #include "PWR_Interface.h"
 #include "board.h"
 #include "fsl_os_abstraction.h"
@@ -139,7 +141,7 @@ void vApplicationIdleHook(void)
     // to ensure there is no context switch during the actual
     // writing, thus avoiding race conditions.
     OSA_InterruptDisable();
-#if CHIP_PLAT_NVM_SUPPORT
+#if (CHIP_PLAT_NVM_SUPPORT == 1)
     NvIdle();
 #endif
     OSA_InterruptEnable();
