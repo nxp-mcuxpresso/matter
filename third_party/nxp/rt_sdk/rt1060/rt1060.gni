@@ -175,9 +175,6 @@ template("rt1060_sdk_drivers") {
         # Adding bt_crypto includes as this is needed by bt_pal_smp.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
-
-        # Adding fifo needed by bt_pal_att.c
-        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
       ]
     }
 
@@ -277,8 +274,6 @@ template("rt1060_sdk_drivers") {
         # Adding bt_crypto as this is needed by bt_pal_smp.c
         "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto/bt_crypto.c",
 
-        # Adding fifo needed by bt_pal_att.c
-        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c",
         "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_uart.c",
       ]
 
