@@ -58,7 +58,6 @@ source_set("openthread_mbedtls_config_k32w1") {
 source_set("libopenthread-k32w1") {
   sources = [
     "${openthread_nxp_root}/src/common/crypto.c",
-    "${openthread_nxp_root}/src/common/flash_nvm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/alarm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/diag.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/entropy.c",
@@ -78,6 +77,16 @@ source_set("libopenthread-k32w1") {
 
     if (use_hw_aes) {
       sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
+    }
+
+    if (chip_key_storage == "fwk_nvm") {
+      sources += [
+        "${openthread_nxp_root}/src/common/flash_nvm.c"
+      ]
+    } else if (chip_key_storage == "littlefs") {
+      sources += [
+        "${openthread_nxp_root}/src/common/flash_fsa.c"
+      ]
     }
   }
 

@@ -59,8 +59,6 @@ middleware_sdk = {
     "${FRAMEWORK_DIR_PATH}/HWParameter",
     "${FRAMEWORK_DIR_PATH}/LowPower",
     "${FRAMEWORK_DIR_PATH}/ModuleInfo",
-    "${FRAMEWORK_DIR_PATH}/NVM/Source",
-    "${FRAMEWORK_DIR_PATH}/NVM/Interface",
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Interface",
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Source",
     "${FRAMEWORK_DIR_PATH}/RNG",
@@ -98,6 +96,13 @@ middleware_sdk = {
     "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1",
   ]
 
+  if (chip_key_storage == "fwk_nvm") {
+    middleware_include_dirs += [
+      "${FRAMEWORK_DIR_PATH}/NVM/Source",
+      "${FRAMEWORK_DIR_PATH}/NVM/Interface"
+    ]
+  }
+
   middleware_defines = [
     "gMainThreadPriority_c=5",
     "SDK_COMPONENT_INTEGRATION=1",
@@ -131,7 +136,6 @@ middleware_sdk = {
     "gMainThreadStackSize_c=3096",
     "gHost_TaskStackSize_c=2400",
     "gBleSetMacAddrFromVendorCommand_d=1",
-    "CHIP_PLAT_NVM_SUPPORT=1",
     "mAdvertisingDefaultTxPower_c=0", # default advertising TX power
     "mConnectionDefaultTxPower_c=0",  # default connection TX power
     "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
@@ -150,7 +154,6 @@ middleware_sdk = {
     "${FRAMEWORK_DIR_PATH}/HWParameter/HWParameter.c",
     "${FRAMEWORK_DIR_PATH}/LowPower/PWR.c",
     "${FRAMEWORK_DIR_PATH}/LowPower/PWR_systicks.c",
-    "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c",
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaExternalFlash.c",
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
     "${FRAMEWORK_DIR_PATH}/RNG/RNG.c",
@@ -227,5 +230,9 @@ middleware_sdk = {
     middleware_sources += [
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform_ext.c"
     ]
+  }
+
+  if (chip_key_storage == "fwk_nvm") {
+    middleware_sources += [ "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c" ]
   }
 }
