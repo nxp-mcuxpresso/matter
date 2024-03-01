@@ -38,10 +38,13 @@ The example supports:
     [README_Wifi.md][README_Wifi.md].
 -   Matter over openthread. For that follow instructions from
     [README_Openthread.md][README_Openthread.md].
+-   Matter Border Router . For that follow instructions from
+    [README_Border_Router.md][README_Border_Router.md].
 
 [README_Ethernet.md]: README_Ethernet.md
 [README_Wifi.md]: README_Wifi.md
 [README_Openthread.md]: README_Openthread.md
+[README_Border_Router.md]: README_Border_Router.md
 
 The example targets the
 [NXP MIMXRT1060-EVKB](https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK)
