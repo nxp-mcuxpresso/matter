@@ -5,12 +5,13 @@
 # https://docs.zephyrproject.org/latest/guides/west/index.html
 manifest:
   projects:
-    - name: mcux-sdk
-      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
-      revision: MCUX_2.15.000
-      path: core
+    - name: sdk-release
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
+      revision: release/2.15.100_minor_rfp
       import:
+        file: west_2.15.100_minor_RC1.yml
         name-allowlist:
+          - mcux-sdk
           - FreeRTOS-Kernel
           - CMSIS_5
           - mcux-sdk-middleware-sdmmc
@@ -22,12 +23,13 @@ manifest:
           - lwip
           - littlefs
           - mcuboot
+          - mcux-sdk-examples
         path-prefix: repo/sdk-2.15
-    - name: mcux-sdk-examples
-      url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
-      revision: MCUX_2.15.000_RT1170
-      path: repo/sdk-2.15/examples
     - name: wifi_nxp
-      url: https://github.com/dvagner/wifi_nxp.git
-      revision: 867cac1e225306cc39159dc45ad99977ed7500c2
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-wifi-nxp.git
+      revision: c4c6bee926c65518af26b03ad8182e65e7e82909
       path: repo/sdk-2.15/middleware/wifi_nxp
+    - name: mcux-sdk-middleware-connectivity-framework
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-middleware-connectivity-framework.git
+      revision: afe4811ed28bdcff6759d0765a59e0b526f16f51
+      path: repo/sdk-2.15/middleware/wireless/framework
