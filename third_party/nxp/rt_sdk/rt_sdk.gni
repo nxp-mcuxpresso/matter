@@ -228,7 +228,7 @@ template("rt_wifi") {
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
     ]
 
-    if (is_sdk_2_15 && (rt_platform == "rw61x")) {
+    if (is_sdk_2_15) {
       _wifi_include_dirs += [
         "${rt_sdk_root}/middleware/wifi_nxp/incl/port/net",
         "${rt_sdk_root}/middleware/wifi_nxp/port/net",
