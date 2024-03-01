@@ -25,8 +25,7 @@ commissioning and different cluster control.
 
 The RW61x all-cluster application provides a working demonstration of the
 RW610/RW612 board integration, built using the Project CHIP codebase and the NXP
-RW612 SDK. The example supports basic ZCL commands and acts as a thermostat
-device-type.
+RW612 SDK.
 
 The example supports:
 
@@ -123,8 +122,6 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   To switch the device type to thermostat `nxp_device_type=\"thermostat\"`
-    must be added to the _gn gen_ command.
 -   To switch the SDK type used, the argument `is_<sdk_type>=true` must be added
     to the _gn gen_ command (with <sdk_type> being either sdk_package or
     sdk_internal or sdk_2_15).
@@ -257,6 +254,12 @@ using the matter shell, follow instructions from
 
 In this configuration, the device can be commissioned over Wi-Fi with the
 'ble-wifi' pairing method.
+
+### NVM
+
+By default the file system used by the application is littlefs.
+The `rt_nvm_component=\"nvs\"` argument must be added to the _gn
+gen_ command to enable NVS/settings file system.
 
 ### Testing the all-clusters application without Matter CLI:
 
