@@ -154,7 +154,7 @@ extern "C" void main_task(void const * argument)
      */
     sched_enable();
 
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    err = ConnectivityMgr().SetThreadDeviceType(CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
     {
         goto exit;

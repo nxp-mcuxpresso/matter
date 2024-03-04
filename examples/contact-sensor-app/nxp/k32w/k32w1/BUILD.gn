@@ -125,6 +125,10 @@ k32w1_executable("contact_sensor_app") {
     "${k32w1_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
 
+  defines += [
+      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_SleepyEndDevice"
+  ]
+
   #lit and sit are using different zap files
   if (chip_enable_icd_lit) {
     deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
