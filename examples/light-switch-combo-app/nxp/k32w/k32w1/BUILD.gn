@@ -109,8 +109,9 @@ k32w1_sdk("sdk") {
 k32w1_executable("light-switch-combo_app") {
   output_name = "chip-k32w1-light-switch-combo-example"
 
-  sources = []
+  defines = []
   deps = []
+  sources = []
 
   if (chip_enable_pw_rpc) {
     forward_variables_from(pw_rpc_server, "*")
@@ -148,10 +149,16 @@ k32w1_executable("light-switch-combo_app") {
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
     ]
+    defines += [
+      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_Router"
+    ]
   } else {
     deps += [
       "${openthread_root}:libopenthread-cli-mtd",
       "${openthread_root}:libopenthread-mtd",
+    ]
+    defines += [
+      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_MinimalEndDevice"
     ]
   }
 
