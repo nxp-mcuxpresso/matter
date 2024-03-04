@@ -118,17 +118,14 @@ k32w0_executable("contact_sensor_app") {
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
 
-  if (chip_openthread_ftd) {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-    ]
-  } else {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-    ]
-  }
+  defines += [
+      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_SleepyEndDevice"
+  ]
+
+  deps += [
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+  ]
 
   #lit and sit are using different zap files
   if (chip_enable_icd_lit) {
