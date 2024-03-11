@@ -27,7 +27,6 @@ manifest:
           - mcux-sdk-middleware-ethermind
           - mcux-sdk-middleware-ieee_802.15.4
           - mcux-sdk-middleware-multicore
-          - mcux-sdk-middleware-sdmmc
           - rpmsg-lite
           - secure-subsystem
           - wifi_nxp
