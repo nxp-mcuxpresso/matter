@@ -1,0 +1,22 @@
+# The west manifest file (west.yml) for MCUXpresso SDK delivery.
+#
+# See the west documentation for more information:
+#
+# https://docs.zephyrproject.org/latest/guides/west/index.html
+manifest:
+  projects:
+    - name: mcux-sdk-k32w0-2.6.14
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
+      revision: release/2.6.x_k32w0
+      import:
+        file: west.yml
+        name-allowlist:
+          - mcux-sdk
+          - mcux-sdk-examples
+          - mcux-sdk-middleware-connectivity-framework
+          - mcux-sdk-middleware-bluetooth-controller
+          - mcux-sdk-middleware-bluetooth-host
+          - mcux-sdk-middleware-ieee_802.15.4
+          - mbedtls
+          - amazon-freertos
+        path-prefix: repo
