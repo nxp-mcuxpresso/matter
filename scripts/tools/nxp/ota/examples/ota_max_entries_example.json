@@ -1,7 +1,7 @@
 {
     "inputs": [
         {
-            "tag": 100,
+            "tag": 4,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -22,7 +22,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 101,
+            "tag": 5,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -43,7 +43,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 102,
+            "tag": 6,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -64,7 +64,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 103,
+            "tag": 7,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -85,7 +85,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 104,
+            "tag": 8,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -106,7 +106,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 105,
+            "tag": 9,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -127,7 +127,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 106,
+            "tag": 10,
             "descriptor": [
                 {
                     "name": "ssbl_version",
@@ -148,7 +148,7 @@
             "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
         },
         {
-            "tag": 107,
+            "tag": 11,
             "descriptor": [
                 {
                     "name": "ssbl_version",
