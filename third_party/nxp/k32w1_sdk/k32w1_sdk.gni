@@ -248,8 +248,7 @@ template("k32w1_sdk") {
 
     if (chip_config_dimmable_led) {
         sources += [
-          "${COMPONENT_PWM_DIR_PATH}/fsl_adapter_pwm_tpm.c",
-          "${DRIVER_TPM_DIR_PATH}/fsl_tpm.c",
+          "${COMPONENT_PWM_DIR_PATH}fsl_adapter_pwm_tpm.c",
         ]
       }
 
