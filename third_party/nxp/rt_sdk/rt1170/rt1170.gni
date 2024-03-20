@@ -102,7 +102,7 @@ template("rt1170_sdk_drivers") {
       "${rt_sdk_root}/core/components/internal_flash",
 
       # freertos
-      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM7/r0p1",
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
 
       # Framework
       "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
@@ -242,7 +242,7 @@ template("rt1170_sdk_drivers") {
 
       # freertos files
       # freertos
-      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM7/r0p1/port.c",
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
       "${rt_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
       "${rt_sdk_root}/core/components/flash/mflash/${mevkname}/mflash_drv.c",
