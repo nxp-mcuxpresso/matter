@@ -162,14 +162,13 @@ void RamStorage::OnFactoryReset()
     {
         while (PDM_bDoesDataExist(mPdmId + i, &length))
         {
-            ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: 0x%x", mPdmId + i);
+            ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: %x", mPdmId + i);
             PDM_vDeleteDataRecord(mPdmId + i);
             i++;
         }
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: 0x%x", mPdmId);
         PDM_vDeleteDataRecord(mPdmId);
     }
     mutex_unlock(mBuffer);
