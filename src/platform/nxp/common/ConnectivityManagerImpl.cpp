@@ -590,6 +590,15 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
         PlatformMgr().UnlockChipStack();
     }
 }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    /*
+     * ToDo: Call API to put device into sleep
+     */
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 
 } // namespace DeviceLayer
