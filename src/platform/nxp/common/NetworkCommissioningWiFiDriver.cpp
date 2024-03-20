@@ -69,7 +69,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -78,7 +78,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     {
         ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT,
                         err.Format());
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -90,7 +90,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     // Connect to saved network
-    err = ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
 
     return err;
 }
@@ -193,8 +193,6 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
-    CommitConfiguration();
-
     if (mpConnectCallback != nullptr)
     {
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
@@ -236,29 +234,6 @@ exit:
     {
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
-}
-
-int NXPWiFiDriver::DisconnectNetwork(void)
-{
-    int ret = 0;
-
-    if (ConnectivityMgrImpl().IsWiFiStationConnected())
-    {
-        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
-
-        ret = wlan_disconnect();
-
-        if (ret != WM_SUCCESS)
-        {
-            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
-        }
-    }
-    else
-    {
-        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
-    }
-
-    return ret;
 }
 
 CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
@@ -408,15 +383,6 @@ void NXPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
     }
-}
-
-uint32_t NXPWiFiDriver::GetSupportedWiFiBandsMask() const
-{
-    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
-#ifdef CONFIG_5GHz_SUPPORT
-    bands |= (1UL << chip::to_underlying(WiFiBandEnum::k5g));
-#endif
-    return bands;
 }
 
 static CHIP_ERROR GetConnectedNetwork(Network & network)
