@@ -23,7 +23,6 @@ fw_update_id_t mw320_fw_update_begin(void);
 int mw320_fw_update_wrblock(fw_update_id_t fwup_id, unsigned char * pblock, unsigned int blksize);
 int mw320_fw_update_end(fw_update_id_t fwup_id, int rst_delay_sec);
 int mw320_fw_update_abort(fw_update_id_t fwup_id);
-void mw320_dev_reset(unsigned int delay_ms);
 
 #define MW320_OTA_TEST 0
 #if (MW320_OTA_TEST == 1)
