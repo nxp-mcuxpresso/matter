@@ -46,11 +46,14 @@ declare_args() {
   # firmware download logs for K32W0 transceiver
   otw_logs_enabled = false
 
-  # Defines the RT NVM component supported
-  rt_nvm_component = "littlefs"
-
-  # Enable NVS
-  #rt_nvm_component = "nvs"
+  # NVS enable by default only for RW61x
+  if(nxp_platform == "rt/rw61x"){
+    rt_nvm_component = "nvs"
+  }
+  else{
+    # Defines the RTs NVM component supported
+    rt_nvm_component = "littlefs"
+  }
 
   # KeyStorage enable only for RW61x
   #if(nxp_platform == "rt/rw61x"){
