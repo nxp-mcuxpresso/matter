@@ -47,12 +47,14 @@ CHIP_ERROR chip::NXP::App::AppMatterButton_registerButtons(void)
 {
     button_config_t buttonConfig;
     button_status_t bStatus;
+    timer_status_t tStatus;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     do
     {
         /* Init the Platform Timer Manager */
-        if (PLATFORM_InitTimerManager() != 0)
+        tStatus = PLATFORM_InitTimerManager();
+        if (tStatus != kStatus_TimerSuccess)
         {
             err = CHIP_ERROR_UNEXPECTED_EVENT;
             ChipLogError(DeviceLayer, "tmr init error");
