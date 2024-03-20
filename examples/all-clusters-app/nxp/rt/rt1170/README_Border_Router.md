@@ -85,7 +85,7 @@ To retrieve the active dataset that is used by the chip tool to comission other 
 Done
 ```
 
-Then we can run the chip tool from any Linux based controller device that is in the same Wi-Fi network with the RT1170 OTBR device to commission a Matter over Thread device using the active dataset obtained above.
+Then we can run the chip tool from any Linux based controller device that is in the same Wi-Fi network with the RT1060 OTBR device to commission a Matter over Thread device using the active dataset obtained above.
 
 ```
 ./chip-tool pairing ble-thread 1 hex:<dataset> 20202021 3840
