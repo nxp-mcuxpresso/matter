@@ -33,8 +33,8 @@ chip_inet_config_enable_dns_resolver = false
 chip_detail_logging = false
 chip_build_tests = false
 chip_progress_logging = true
-chip_access_control_policy_logging_verbosity = 1
-enable_im_pretty_print = false
+chip_access_control_policy_logging_verbosity = 2
+enable_im_pretty_print = true
 
 chip_mdns = "minimal"
 mbedtls_target = "${chip_root}/third_party/nxp/mw320_sdk:mbedtls"
