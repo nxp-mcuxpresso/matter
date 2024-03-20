@@ -34,7 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the K32W platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::NXPConfig>
+class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<Internal::K32WConfig>
 {
 public:
     // This returns an instance of this class.
