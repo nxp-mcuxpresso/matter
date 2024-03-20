@@ -30,7 +30,6 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/gatt.h>
-#include <zephyr/bluetooth/hci.h>
 
 namespace chip {
 namespace DeviceLayer {
