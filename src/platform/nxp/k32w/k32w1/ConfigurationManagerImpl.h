@@ -25,11 +25,7 @@
 
 #pragma once
 
-#if (CHIP_PLAT_NVM_SUPPORT == 1)
-#include <platform/nxp/k32w/k32w1/K32W1Config.h>
-#else
-#include <platform/nxp/common/NXPConfig.h>
-#endif
+#include "K32W1Config.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
