@@ -33,7 +33,7 @@ public:
     {
         TURNON_ACTION = 0,
         TURNOFF_ACTION,
-        DIM_ACTION,
+
         INVALID_ACTION
     } Action;
 
@@ -43,24 +43,18 @@ public:
         kState_Off,
     } State;
 
-    static const uint8_t kLevel_Max = 254;
-    static const uint8_t kLevel_Min = 0;
-
     int Init();
     bool IsTurnedOff();
-    uint8_t GetDimLevel();
-    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t kValue);
+    bool InitiateAction(int32_t aActor, Action_t aAction);
 
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t, uint8_t level);
+    typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
     void SetState(bool state);
-    void SetDimLevel(uint8_t level);
 
 private:
     friend LightingManager & LightingMgr(void);
     State_t mState;
-    uint8_t mLevel;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
