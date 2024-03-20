@@ -166,7 +166,7 @@ int NXPConfig::SaveStringKeysToFS(void)
     int err_len;
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
     err_len = -1;
-    NvSaveOnIdle(&chipConfigRamStructKeyString, false);
+    NvSaveOnIdle(&chipConfigRamStructKeyInt, false);
 
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
     err_len = -2;
