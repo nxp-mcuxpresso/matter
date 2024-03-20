@@ -29,7 +29,7 @@ constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
 
-class ZephyrWifiScanResponseIterator : public Iterator<WiFiScanResponse>
+class NxpWifiScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
     size_t Count() override { return mResultCount; }
@@ -43,7 +43,7 @@ private:
     WiFiScanResponse * mResults = nullptr;
 };
 
-class ZephyrWifiDriver final : public WiFiDriver
+class NxpWifiDriver final : public WiFiDriver
 {
 public:
     // Define non-volatile storage keys for SSID and password.
@@ -54,14 +54,14 @@ public:
     class WiFiNetworkIterator final : public NetworkIterator
     {
     public:
-        WiFiNetworkIterator(ZephyrWifiDriver * aDriver) : mDriver(aDriver) {}
+        WiFiNetworkIterator(NxpWifiDriver * aDriver) : mDriver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~WiFiNetworkIterator() = default;
 
     private:
-        ZephyrWifiDriver * mDriver;
+        NxpWifiDriver * mDriver;
         bool mExhausted{ false };
     };
 
@@ -87,9 +87,9 @@ public:
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
-    static ZephyrWifiDriver & Instance()
+    static NxpWifiDriver & Instance()
     {
-        static ZephyrWifiDriver sInstance;
+        static NxpWifiDriver sInstance;
         return sInstance;
     }
 
@@ -103,7 +103,7 @@ private:
     ConnectCallback * mpConnectCallback{ nullptr };
     NetworkStatusChangeCallback * mpNetworkStatusChangeCallback{ nullptr };
     WiFiManager::WiFiNetwork mStagingNetwork;
-    ZephyrWifiScanResponseIterator mScanResponseIterator;
+    NxpWifiScanResponseIterator mScanResponseIterator;
     ScanCallback * mScanCallback{ nullptr };
 };
 
