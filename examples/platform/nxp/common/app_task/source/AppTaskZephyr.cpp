@@ -29,7 +29,7 @@
 #include <zephyr/logging/log.h>
 
 #ifdef CONFIG_CHIP_WIFI
-#include <platform/Zephyr/wifi/ZephyrWifiDriver.h>
+#include <platform/nxp/zephyr/wifi/NxpWifiDriver.h>
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -62,8 +62,7 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 #if defined(CONFIG_CHIP_WIFI)
 chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskZephyr::GetWifiDriverInstance()
 {
-    return static_cast<chip::DeviceLayer::NetworkCommissioning::WiFiDriver *>(
-        &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
+    return static_cast<chip::DeviceLayer::NetworkCommissioning::WiFiDriver *>(&(NetworkCommissioning::NxpWifiDriver::Instance()));
 }
 #endif // CONFIG_CHIP_WIFI
 
