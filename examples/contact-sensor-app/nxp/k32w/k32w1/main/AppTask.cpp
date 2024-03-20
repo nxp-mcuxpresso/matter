@@ -114,11 +114,6 @@ static BDXDownloader gDownloader __attribute__((section(".data")));
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
-static pm_notify_element_t appNotifyElement = {
-    .notifyCallback = AppTask::LowPowerCallback,
-    .data           = NULL,
-};
-
 static void app_gap_callback(gapGenericEvent_t * event)
 {
     /* This callback is called in the context of BLE task, so event processing
@@ -153,15 +148,7 @@ CHIP_ERROR AppTask::Init()
     if (ContactSensorMgr().Init() != 0)
     {
         K32W_LOG("ContactSensorMgr().Init() failed");
-        assert(0);
-    }
-
-    // Register enter/exit low power application callback.
-    status_t status = PM_RegisterNotify(kPM_NotifyGroup2, &appNotifyElement);
-    if (status != kStatus_Success)
-    {
-        K32W_LOG("Failed to register low power app callback.")
-        return APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED;
+        assert(status == 0);
     }
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
@@ -781,11 +768,6 @@ void AppTask::OnIdentifyStop(Identify * identify)
     }
 }
 
-status_t AppTask::LowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data)
-{
-    return kStatus_Success;
-}
-
 void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
 {
     AppEvent event;
@@ -849,12 +831,11 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = ContactSensorMgr().IsContactClosed();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    /*EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);*/
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
+
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
+        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
     }
     logBooleanStateEvent(newValue);
 }
@@ -870,8 +851,7 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 
     /* get onoff attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-    /*(void) emberAfReadAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *)
-       &stateValueAttrValue, 1);*/
+
 #if !defined(chip_with_low_power) || (chip_with_low_power == 0)
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);
