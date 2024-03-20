@@ -16,6 +16,7 @@
 #
 
 import argparse
+import fcntl
 import json
 import os
 import shutil
@@ -323,30 +324,6 @@ def runClangPrettifier(templates_file, output_dir):
         print('clang-format error: %s', err)
 
 
-def lockFile(f):
-    if sys.platform == 'linux' or sys.platform == 'darwin':
-        import fcntl
-        fcntl.lockf(f, fcntl.LOCK_EX)
-    elif sys.platform == 'win32':
-        # Not sure file locking is needed, since this might be an issue only on Darwin.
-        # Add it just in case, until further information.
-        import msvcrt
-        msvcrt.locking(f.fileno(), msvcrt.LK_RLCK, os.path.getsize(os.path.realpath(f.name)))
-    else:
-        raise Exception('Unknown platform - do not know what lock mechanism to use.')
-
-
-def unlockFile(f):
-    if sys.platform == 'linux' or sys.platform == 'darwin':
-        import fcntl
-        fcntl.lockf(f, fcntl.LOCK_UN)
-    elif sys.platform == 'win32':
-        import msvcrt
-        msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, os.path.getsize(os.path.realpath(f.name)))
-    else:
-        raise Exception('Unknown platform - do not know what lock mechanism to use.')
-
-
 class LockFileSerializer:
     def __init__(self, path):
         self.lock_file_path = path
@@ -357,13 +334,13 @@ class LockFileSerializer:
             return
 
         self.lock_file = open(self.lock_file_path, 'wb')
-        lockFile(self.lock_file)
+        fcntl.lockf(self.lock_file, fcntl.LOCK_EX)
 
     def __exit__(self, *args):
         if not self.lock_file:
             return
 
-        unlockFile(self.lock_file)
+        fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
         self.lock_file.close()
         self.lock_file = None
 
