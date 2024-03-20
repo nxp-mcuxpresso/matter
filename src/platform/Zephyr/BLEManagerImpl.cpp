@@ -39,7 +39,6 @@
 
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
-#include <zephyr/bluetooth/hci.h>
 #include <zephyr/random/rand32.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
