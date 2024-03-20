@@ -36,7 +36,7 @@ ALL_PLATFORMS = set([
     'silabs',
     'esp32',
     'infineon',
-    'nxp',
+    'k32w',
     'linux',
     'mbed',
     'nrfconnect',
