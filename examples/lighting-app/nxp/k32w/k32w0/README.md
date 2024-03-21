@@ -203,16 +203,16 @@ To bring the SDK in the environment, the user can:
 -   download it with west tool, in which case it will be handled automatically by gn:
 
     ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west init -l manifest --mf west.yml
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west update
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
     In case there are local modification to the already installed github NXP SDK, use the below `west forall` command instead of the `west init` command to reset the west workspace. Warning: all local changes will be lost after running this command.
 
     ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west forall -c "git reset --hard && git clean -xdf" -a
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
 -   set up a custom path to the SDK, in which case `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen` command:
