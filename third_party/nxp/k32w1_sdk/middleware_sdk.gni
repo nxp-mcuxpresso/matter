@@ -178,9 +178,6 @@ middleware_sdk = {
       "CONFIG_SETTINGS_DYNAMIC_HANDLERS=1",
       "CONFIG_SETTINGS_RUNTIME=1"
     ]
-
-    # Temporary fix for NVS power loss resilience issue
-    middleware_defines += [ "NO_FLASH_CONTROLLER_BLANK_CHECK=1" ]
   }
 
   middleware_sources = [
