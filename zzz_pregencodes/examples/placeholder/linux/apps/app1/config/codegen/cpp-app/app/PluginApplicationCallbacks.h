@@ -1,0 +1,106 @@
+#pragma once
+void MatterAccessControlPluginServerInitCallback();
+void MatterAccountLoginPluginServerInitCallback();
+void MatterActionsPluginServerInitCallback();
+void MatterAdministratorCommissioningPluginServerInitCallback();
+void MatterApplicationBasicPluginServerInitCallback();
+void MatterApplicationLauncherPluginServerInitCallback();
+void MatterAudioOutputPluginServerInitCallback();
+void MatterBasicInformationPluginServerInitCallback();
+void MatterBooleanStatePluginServerInitCallback();
+void MatterBridgedDeviceBasicInformationPluginServerInitCallback();
+void MatterChannelPluginServerInitCallback();
+void MatterColorControlPluginServerInitCallback();
+void MatterContentLauncherPluginServerInitCallback();
+void MatterDescriptorPluginServerInitCallback();
+void MatterDoorLockPluginServerInitCallback();
+void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
+void MatterFixedLabelPluginServerInitCallback();
+void MatterFlowMeasurementPluginServerInitCallback();
+void MatterGeneralCommissioningPluginServerInitCallback();
+void MatterGeneralDiagnosticsPluginServerInitCallback();
+void MatterGroupKeyManagementPluginServerInitCallback();
+void MatterGroupsPluginServerInitCallback();
+void MatterIdentifyPluginServerInitCallback();
+void MatterIlluminanceMeasurementPluginServerInitCallback();
+void MatterKeypadInputPluginServerInitCallback();
+void MatterLevelControlPluginServerInitCallback();
+void MatterLocalizationConfigurationPluginServerInitCallback();
+void MatterMediaInputPluginServerInitCallback();
+void MatterMediaPlaybackPluginServerInitCallback();
+void MatterModeSelectPluginServerInitCallback();
+void MatterNetworkCommissioningPluginServerInitCallback();
+void MatterOccupancySensingPluginServerInitCallback();
+void MatterOnOffPluginServerInitCallback();
+void MatterOperationalCredentialsPluginServerInitCallback();
+void MatterPowerSourcePluginServerInitCallback();
+void MatterPressureMeasurementPluginServerInitCallback();
+void MatterPumpConfigurationAndControlPluginServerInitCallback();
+void MatterRelativeHumidityMeasurementPluginServerInitCallback();
+void MatterScenesPluginServerInitCallback();
+void MatterSoftwareDiagnosticsPluginServerInitCallback();
+void MatterSwitchPluginServerInitCallback();
+void MatterTargetNavigatorPluginServerInitCallback();
+void MatterTemperatureMeasurementPluginServerInitCallback();
+void MatterThermostatPluginServerInitCallback();
+void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();
+void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
+void MatterTimeFormatLocalizationPluginServerInitCallback();
+void MatterUnitLocalizationPluginServerInitCallback();
+void MatterUserLabelPluginServerInitCallback();
+void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+void MatterWindowCoveringPluginServerInitCallback();
+
+#define MATTER_PLUGINS_INIT \
+    MatterAccessControlPluginServerInitCallback(); \
+    MatterAccountLoginPluginServerInitCallback(); \
+    MatterActionsPluginServerInitCallback(); \
+    MatterAdministratorCommissioningPluginServerInitCallback(); \
+    MatterApplicationBasicPluginServerInitCallback(); \
+    MatterApplicationLauncherPluginServerInitCallback(); \
+    MatterAudioOutputPluginServerInitCallback(); \
+    MatterBasicInformationPluginServerInitCallback(); \
+    MatterBooleanStatePluginServerInitCallback(); \
+    MatterBridgedDeviceBasicInformationPluginServerInitCallback(); \
+    MatterChannelPluginServerInitCallback(); \
+    MatterColorControlPluginServerInitCallback(); \
+    MatterContentLauncherPluginServerInitCallback(); \
+    MatterDescriptorPluginServerInitCallback(); \
+    MatterDoorLockPluginServerInitCallback(); \
+    MatterEthernetNetworkDiagnosticsPluginServerInitCallback(); \
+    MatterFixedLabelPluginServerInitCallback(); \
+    MatterFlowMeasurementPluginServerInitCallback(); \
+    MatterGeneralCommissioningPluginServerInitCallback(); \
+    MatterGeneralDiagnosticsPluginServerInitCallback(); \
+    MatterGroupKeyManagementPluginServerInitCallback(); \
+    MatterGroupsPluginServerInitCallback(); \
+    MatterIdentifyPluginServerInitCallback(); \
+    MatterIlluminanceMeasurementPluginServerInitCallback(); \
+    MatterKeypadInputPluginServerInitCallback(); \
+    MatterLevelControlPluginServerInitCallback(); \
+    MatterLocalizationConfigurationPluginServerInitCallback(); \
+    MatterMediaInputPluginServerInitCallback(); \
+    MatterMediaPlaybackPluginServerInitCallback(); \
+    MatterModeSelectPluginServerInitCallback(); \
+    MatterNetworkCommissioningPluginServerInitCallback(); \
+    MatterOccupancySensingPluginServerInitCallback(); \
+    MatterOnOffPluginServerInitCallback(); \
+    MatterOperationalCredentialsPluginServerInitCallback(); \
+    MatterPowerSourcePluginServerInitCallback(); \
+    MatterPressureMeasurementPluginServerInitCallback(); \
+    MatterPumpConfigurationAndControlPluginServerInitCallback(); \
+    MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
+    MatterScenesPluginServerInitCallback(); \
+    MatterSoftwareDiagnosticsPluginServerInitCallback(); \
+    MatterSwitchPluginServerInitCallback(); \
+    MatterTargetNavigatorPluginServerInitCallback(); \
+    MatterTemperatureMeasurementPluginServerInitCallback(); \
+    MatterThermostatPluginServerInitCallback(); \
+    MatterThermostatUserInterfaceConfigurationPluginServerInitCallback(); \
+    MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
+    MatterTimeFormatLocalizationPluginServerInitCallback(); \
+    MatterUnitLocalizationPluginServerInitCallback(); \
+    MatterUserLabelPluginServerInitCallback(); \
+    MatterWiFiNetworkDiagnosticsPluginServerInitCallback(); \
+    MatterWindowCoveringPluginServerInitCallback();
+
