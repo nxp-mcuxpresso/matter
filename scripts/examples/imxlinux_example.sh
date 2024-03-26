@@ -18,13 +18,14 @@
 helpFunction()
 {
     cat << EOF
-Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty] [-m|--imx_ele]
-    -s, --src       Source folder
-    -o, --out       Output folder
-    -d, --debug     Debug build (optional)
-    -n, --no-init   No init mode (optional)
-    -t, --trusty    Build with Trusty OS backed security enhancement (optional)
-    -m, --imx_ele   Build with IMX ELE (EdgeLock Enclave) based security enhancement (optional)
+Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty] [-m|--imx_ele] [-p|--use-pregen]
+    -s, --src           Source folder
+    -o, --out           Output folder
+    -d, --debug         Debug build (optional)
+    -n, --no-init       No init mode (optional)
+    -t, --trusty        Build with Trusty OS backed security enhancement (optional)
+    -m, --imx_ele       Build with IMX ELE (EdgeLock Enclave) based security enhancement (optional)
+    -p, --use-pregen    Use pregen zap codes instead of generate it duirng build time (optional)
 EOF
 exit 1
 }
@@ -32,7 +33,8 @@ exit 1
 trusty=0
 imx_ele=0
 release_build=true
-PARSED_OPTIONS="$(getopt -o s:o:tdmn --long src:,out:,trusty,imx_ele,debug,no-init -- "$@")"
+CURRENT_FOLDER=$(pwd)
+PARSED_OPTIONS="$(getopt -o s:o:tdmnp --long src:,out:,trusty,imx_ele,debug,no-init,use-pregen -- "$@")"
 if [ $? -ne 0 ];
 then
   helpFunction
@@ -46,6 +48,7 @@ while true; do
         -m|--imx_ele) imx_ele=1; shift ;;
         -d|--debug) release_build=false; shift ;;
         -n|--no-init) no_init=1; shift ;;
+        -p|--use-pregen) use_pregen=1; shift ;;
         --) shift; break ;;
         *) echo "Invalid option: $1" >&2; exit 1 ;;
     esac
@@ -148,6 +151,11 @@ if [ "$no_init" = "1" ]; then
     executable_python=--script-executable="/usr/bin/python3"
 fi
 
+if [ "$use_pregen" = "1" ]; then
+    pregen_arg="chip_code_pre_generated_directory=\"${CURRENT_FOLDER}/zzz_pregencodes\""
+else
+    pregen_arg=""
+fi
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
 chip_with_web=${NXP_CHIPTOOL_WITH_WEB:-0}
@@ -156,7 +164,7 @@ if [ "$chip_with_web" = 1 ]; then
     additional_gn_args+=" enable_rtti=true chip_with_web=$chip_with_web"
 fi
 gn gen $executable_python --check --fail-on-unused-args --root="$src" "$out" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
-chip_with_trusty_os=$trusty
+$pregen_arg chip_with_trusty_os=$trusty
 chip_with_imx_ele=$imx_ele
 build_without_pw=$without_pw
 enable_exceptions=true
