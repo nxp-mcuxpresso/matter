@@ -9,7 +9,7 @@ manifest:
       url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
       revision: release/2.15.100_minor_rfp
       import:
-        file: west.yml
+        file: west_2.15.100_minor_RC3_1.yml
         name-allowlist:
           - mcux-sdk
           - FreeRTOS-Kernel
