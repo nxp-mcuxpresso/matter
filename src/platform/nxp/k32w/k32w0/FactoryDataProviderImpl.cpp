@@ -55,40 +55,31 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
 
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
     Crypto::P256SerializedKeypair serializedKeypair;
+
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    /* Get private key of DAC certificate from reserved section */
     uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
-
-    VerifyOrExit(!outSignBuffer.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(outSignBuffer.size() >= signature.Capacity(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    /* Get private key of DAC certificate from reserved section */
-    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize));
     dacPrivateKeySpan.reduce_size(keySize);
 
     /* Only the private key is used when signing */
-    error = serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size());
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size()));
     memcpy(serializedKeypair.Bytes() + Crypto::kP256_PublicKey_Length, dacPrivateKeySpan.data(), dacPrivateKeySpan.size());
 
-    error = keypair.Deserialize(serializedKeypair);
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
-    error = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
-    SuccessOrExit(error);
+    // TODO: sanitize temporary buffers used to store the private key, so it doesn't leak on the stack?
 
-    error = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-
-exit:
-    /* Sanitize temporary buffer */
-    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
-    return error;
+    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
 
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
