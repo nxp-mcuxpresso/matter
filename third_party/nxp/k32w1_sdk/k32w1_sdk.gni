@@ -241,7 +241,7 @@ template("k32w1_sdk") {
 
       if (chip_enable_pw_rpc) {
         sources += [
-          "${DRIVER_LPUART_DIR_PATH}/fsl_edma.c",
+          "${DRIVER_DMA3_DIR_PATH}/fsl_edma.c",
           "${DRIVER_LPUART_DIR_PATH}/fsl_lpuart_edma.c"
         ]
       }
