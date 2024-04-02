@@ -18,6 +18,7 @@
 
 #include "config/asio_no_tls.hpp"
 #include "server.hpp"
+#include "WebSocketClient.h"
 
 // Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
@@ -27,7 +28,6 @@
 // Added for the default_resource example
 #include <algorithm>
 #include <boost/filesystem.hpp>
-#include <fstream>
 #include <vector>
 #ifdef HAVE_OPENSSL
 #include "crypto.hpp"
@@ -58,6 +58,7 @@
 #include <zap-generated/cluster/Commands.h>
 
 #include <controller/ExamplePersistentStorage.h>
+#include <json/json.h>
 
 using namespace std;
 // Added for the json-example:
@@ -91,6 +92,7 @@ Commands commands;
 bool inited = false;
 ExampleCredentialIssuerCommands credIssuerCommands;
 PersistentStorage webCommissionerStorage;
+WebSocketClient wsClient;
 int chipToolInit()
 {
     if (inited)
@@ -108,34 +110,6 @@ int chipToolInit()
     return 0;
 }
 
-int chipToolInteractiveCommand(const char* cmd)
-{
-    // Lock the critical section with a lock_guard
-    std::lock_guard<std::mutex> lock(g_mutex);
-
-    std::ofstream fifo("/tmp/webui_fifo", std::ios::app);
-    fifo << cmd << std::endl;
-    fifo.flush();
-    fifo.close();
-
-    std::ifstream fifo2("/tmp/webui_ack_fifo");
-    std::string line;
-    if (std::getline(fifo2, line))
-    {
-        std::cout << line << std::endl;
-        ChipLogError(NotSpecified, "thread read ack fifo %s", line.c_str());
-    }
-    if (fifo2.eof())
-    {
-        fifo2.clear();
-    }
-    fifo2.close();
-    if (line == "0")
-        return 0;
-    else
-        return 1;
-}
-
 string exec_cmd(string cmd) {
     char buffer[128];
     string result = "";
@@ -151,32 +125,35 @@ string exec_cmd(string cmd) {
     return result;
 }
 
-void enableFifo()
+void enableChipServer()
 {
-    if (boost::filesystem::exists("/tmp/webui_fifo"))
-    {
-        boost::filesystem::remove("/tmp/webui_fifo");
-    }
-    std::system("mkfifo /tmp/webui_fifo");
-
-    if (boost::filesystem::exists("/tmp/webui_ack_fifo"))
-    {
-        boost::filesystem::remove("/tmp/webui_ack_fifo");
-    }
-    std::system("mkfifo /tmp/webui_ack_fifo");
-
-    ChipLogError(NotSpecified, "enable fifo");
-
     while (true)
     {
-        char * args[] = { "chip-tool", "interactive", "start" };
-        int ret       = commands.Run(3, args);
+        char * args[] = { "chip-tool", "interactive", "server", "--port", "9008" };
+        ChipLogError(NotSpecified, "starting the chip-tool interactive servr.");
+        int ret       = commands.Run(5, args);
         ChipLogError(NotSpecified, "One interactive loop done!!!");
         if (ret)
         {
             ChipLogError(NotSpecified, "interactive return error %d", ret);
             break;
         }
+    }
+}
+
+void wsClientConecting()
+{
+    while (true)
+    {
+        std::string wsconnetion = wsClient.connection_staus();
+        if (wsconnetion != "Closed"){
+            ChipLogError(NotSpecified, "The connection between wsClient and chip-tool interactive wsServer is work well.");
+        }
+        else {
+            ChipLogError(NotSpecified, "The connection between wsClient and chip-tool interactive wsServer disconnect and retry connect.");
+            wsClient.connect("ws://localhost:9008");
+        }
+        this_thread::sleep_for(chrono::seconds(10));
     }
 }
 
@@ -209,30 +186,22 @@ ptree getStorageKeyNodeID()
     return storageNodes;
 }
 
-void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
+void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg, string nodeId, string nodeAlias)
 {
     string report_text;
-    ptree storageNodes = getStorageKeyNodeID();
     while (true)
     {
-        std::lock_guard<std::mutex> lock(sq_mutex);
-        if (!SubscribeBuffers::IsQueueEmpty())
+        if(!subscribeReportQueue.empty())
         {
-            //std::lock_guard<std::mutex> lock(sq_mutex);
-            ChipReport r = SubscribeBuffers::DequeueReport();
+            Json::Value resultsValue = subscribeReportQueue.front();
+            subscribeReportQueue.pop();
+            Json::Value arryValue;
+            arryValue = resultsValue[0];
             stringstream report_ss;
-            string nodeAlias;
-            for (const auto& pair : storageNodes)
-            {
-                if (pair.second.get_value<int>() == r.nodeid)
-                {
-                    nodeAlias = pair.first;
-                    break;
-                }
-            }
-            report_ss << "Subscribe Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
-                      << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
+            report_ss << "Subscribe Report from " << nodeAlias << " " << nodeId << ": " << arryValue["endpointId"] << ". " << "Cluster: "
+                    << arryValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << arryValue["value"];
             report_text = report_ss.str();
+            ChipLogError(NotSpecified, "Receive subscribe message: %s", report_text.c_str());
             try
             {
                 s->send(hdl, report_text, msg->get_opcode());
@@ -243,23 +212,63 @@ void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr 
                 ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
             }
         }
-        sleep(1);
+        this_thread::sleep_for(chrono::seconds(5));
     }
 }
 
 // Define a callback to handle incoming messages
 void on_message(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
 {
-    ChipLogError(NotSpecified, "WebSocket server receive msg: %s", msg->get_payload());
+    ChipLogError(NotSpecified, "WebSocket server for subscription receive msg: %s", msg->get_payload());
     std::string command;
     command = msg->get_payload();
-    if (chipToolInteractiveCommand(command.c_str())) {
-        ChipLogError(NotSpecified, "subscribe cmd: %s execute failed!", command.c_str());
-    } else {
-        ChipLogError(NotSpecified, "subscribe cmd: %s execute successfully!", command.c_str());
+    Json::Value jsonObject;
+    Json::Reader reader;
+    std::string minInterval, maxInterval, nodeAlias, nodeId, endPointId;
+    if (reader.parse(command, jsonObject))
+    {
+        minInterval  = jsonObject["minInterval"].asString();
+        maxInterval  = jsonObject["maxInterval"].asString();
+        nodeAlias = jsonObject["nodeAlias"].asString();
+        nodeId = jsonObject["nodeId"].asString();
+        endPointId = jsonObject["endPointId"].asString();
     }
-    std::thread generator(generateMessages, s, hdl, msg);
-    generator.detach();
+    ChipLogError(NotSpecified, "Received WebSockets request for subscribe with Node ID: %s, Endpoint ID: %s", nodeId.c_str(), endPointId.c_str());
+    std::string subscribeCommand;
+    subscribeCommand = "onoff subscribe on-off " + minInterval + " " + minInterval + " " + nodeId + " " + endPointId;
+    wsClient.sendMessage(subscribeCommand);
+    ChipLogError(NotSpecified, "Send subscribe command to chip-tool ws server.");
+    int sleepTime = 0;
+    while (reportQueue.empty() && sleepTime < 20)
+    {
+        this_thread::sleep_for(chrono::seconds(1));
+        sleepTime++;
+    }
+    if (sleepTime == 20) {
+        ChipLogError(NotSpecified, "Receive subscribe command to chip-tool ws server overtime!");
+    } else {
+        Json::Value resultsValue = reportQueue.front();
+        reportQueue.pop();
+        Json::Value arryValue = resultsValue[0];
+        stringstream report_ss;
+        string report_text;
+        report_ss << "Subscribe Report from " << nodeAlias << " " << nodeId << ": " << arryValue["endpointId"] << ". " << "Cluster: "
+                << arryValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << arryValue["value"];
+        report_text = report_ss.str();
+        ChipLogError(NotSpecified, "Generated report successfully: %s", report_text.c_str());
+        try
+        {
+            s->send(hdl, report_text, msg->get_opcode());
+            ChipLogError(NotSpecified, "WebSocket server send subscribe report msg: %s", report_text.c_str());
+        }
+        catch (websocketpp::exception const & e)
+        {
+            ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
+        }
+        ChipLogError(NotSpecified, "junmeng...... befbefore generator a thread");
+        std::thread generator(generateMessages, s, hdl, msg, nodeId, nodeAlias);
+        generator.detach();
+    }
 }
 
 int main()
@@ -271,8 +280,16 @@ int main()
     webCommissionerStorage.Init("web");
     HttpServer server;
     server.config.port = 8889;
-    // Initialize and execute a child thread
-    std::thread t(enableFifo);
+
+    // Initialize and execute a child thread to run chip-tool interactive WS server
+    std::thread t(enableChipServer);
+    this_thread::sleep_for(chrono::seconds(2));
+
+    wsClient.connect("ws://localhost:9008");
+
+    // Initialize and execute a child thread to check the connection between the wsClient and chip-tool interactive WS server 
+    // because the connection is disconnected every 400s.
+    std::thread wsc(wsClientConecting);
 
     // Add resources using path-regex and method-string, and an anonymous function
     // POST-example for the path /string, responds the posted string
@@ -358,7 +375,7 @@ int main()
                 root.put("cause", "repeat nodeAlias");
             } else {
                 ChipLogError(NotSpecified, "Received POST request for pairing with Node ID: %s, PIN Code: %s, Type: %s",
-                nodeId.c_str(), pinCode.c_str(), type.c_str());
+                                            nodeId.c_str(), pinCode.c_str(), type.c_str());
                 std::string command;
                 if (type == "onnetwork") {
                     command = "pairing onnetwork-commissioning-mode " + nodeId + " " + pinCode;
@@ -373,21 +390,31 @@ int main()
                     command = "pairing ble-thread " + nodeId + " hex:" + dataset + " " + pinCode + " " + discriminator;
                 }
                 // Get the time before executing the command
-                auto start_time = std::chrono::steady_clock::now();
-                if (chipToolInteractiveCommand(command.c_str())) {
-                    root.put("result", RESPONSE_FAILURE);
-                } else {
-                    root.put("result", RESPONSE_SUCCESS);
-                    chip::NodeId nodeIdStorage = std::stoul(nodeId);
-                    const char * nodeAliasStorage = nodeAlias.c_str();
-                    webCommissionerStorage.SetLocalKeyNodeId(nodeAliasStorage, nodeIdStorage);
+                //auto start_time = std::chrono::steady_clock::now();
+                wsClient.sendMessage(command);
+                ChipLogError(NotSpecified, "Send pairing command to chip-tool ws server.");
+                int sleepTime = 0;
+                while (reportQueue.empty() && sleepTime < 60)
+                {
+                    this_thread::sleep_for(chrono::seconds(1));
+                    sleepTime++;
                 }
-                // Get the end time of the command and calculate the difference with the start time (in seconds)
-                auto end_time = std::chrono::steady_clock::now();
-                auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-                // Set the value in root according to the timeout: 60s
-                if (elapsed_seconds > 60) {
+                if (sleepTime == 60) {
                     root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute pairing command overtime!");
+                } else {
+                    Json::Value resultsReport = reportQueue.front();
+                    reportQueue.pop();
+                    int resultsReportSize = resultsReport.size();
+                    if (resultsReportSize == 0) {
+                        root.put("result", RESPONSE_SUCCESS);
+                        chip::NodeId nodeIdStorage = std::stoul(nodeId);
+                        const char * nodeAliasStorage = nodeAlias.c_str();
+                        webCommissionerStorage.SetLocalKeyNodeId(nodeAliasStorage, nodeIdStorage);
+                    } else {
+                        root.put("result", RESPONSE_FAILURE);
+                        ChipLogError(NotSpecified, "Recieved response meaasge after sending pairing command, but pairing failed!");
+                    }
                 }
             }
             stringstream ss;
@@ -434,40 +461,54 @@ int main()
             response->write(SimpleWeb::StatusCode::client_error_bad_request, e.what());
         }
     };
-    server.resource["^/get_report$"]["POST"] = [](shared_ptr<HttpServer::Response> response,
+    server.resource["^/onoff_report$"]["POST"] = [](shared_ptr<HttpServer::Response> response,
                                                   shared_ptr<HttpServer::Request> request) {
         try
         {
             ptree root;
             read_json(request->content, root);
+            auto nodeAlias = root.get<string>("nodeAlias");
+            auto nodeId  = root.get<string>("nodeId");
+            auto endPointId = root.get<int>("endPointId");
+            auto type  = root.get<string>("type");
+            const map<string, string> typeToVerb = {
+                {"read", "read the status of"}
+            };
+            string verb = typeToVerb.count(type) ? typeToVerb.at(type) : "perform an operation on";
+            ChipLogError(NotSpecified, "Received POST request to %s the device", verb.c_str());
             ChipLogError(NotSpecified, "Received POST request for generating report");
-            string report_text;
-            if (!ReportBuffers::IsQueueEmpty())
+            string attr  = root.get<string>("attr");
+            std::string command;
+            command = "onoff read on-off " + nodeId + " " + std::to_string(endPointId);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "Send onoff read command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
             {
-                ChipReport r = ReportBuffers::DequeueReport();
-                stringstream report_ss;
-                ptree storageNodes = getStorageKeyNodeID();
-                string nodeAlias;
-                for (const auto& pair : storageNodes)
-                {
-                    if (pair.second.get_value<int>() == r.nodeid)
-                    {
-                        nodeAlias = pair.first;
-                        break;
-                    }
-                }
-                report_ss << "Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
-                                << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
-                report_text = report_ss.str();
-                root.put("result", RESPONSE_SUCCESS);
-                ChipLogError(NotSpecified, "Generated report successfully: %s", report_text.c_str());
-            } else {
-                std::thread([](){
-                    //std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                }).detach();
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime++;
             }
-            root.put("report", report_text);
+            if (sleepTime == 20) {
+                root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Generated onoff report overtime!");
+            } else {
+                Json::Value resultsReport = reportQueue.front();
+                reportQueue.pop();
+                Json::Value resultsValue = resultsReport[0];
+                if (resultsValue.isMember("error"))
+                {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Generated report failed!");
+                } else {
+                    stringstream report_ss;
+                    report_ss << "Report from " << nodeAlias << " " << nodeId << ": " << resultsValue["endpointId"] << ". " << "Cluster: "
+                              << resultsValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << resultsValue["value"];
+                    string report_text = report_ss.str();
+                    root.put("result", RESPONSE_SUCCESS);
+                    ChipLogError(NotSpecified, "Generated report successfully: %s", report_text.c_str());
+                    root.put("report", report_text);
+                }
+            }
             stringstream ss;
             write_json(ss, root);
             string strContent = ss.str();
@@ -489,7 +530,6 @@ int main()
                 {"on", "switch on"},
                 {"off", "switch off"},
                 {"toggle", "toggle"},
-                {"read", "read the status of"}
             };
             string verb = typeToVerb.count(type) ? typeToVerb.at(type) : "perform an operation on";
             ChipLogError(NotSpecified, "Received POST request to %s the device", verb.c_str());
@@ -500,21 +540,28 @@ int main()
                 command = "onoff off " + nodeId + " " + std::to_string(endPointId);
             } else if (type == "toggle") {
                 command = "onoff toggle " + nodeId + " " + std::to_string(endPointId);
-            } else if (type == "read") {
-                string attr  = root.get<string>("attr");
-                command = "onoff read on-off " + nodeId + " " + std::to_string(endPointId);
             }
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "send onoff command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
+            }
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute onoff command overtime!");
             } else {
-                root.put("result", RESPONSE_SUCCESS);
-            }
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
-                root.put("result", RESPONSE_FAILURE);
+                Json::Value resultsValue = reportQueue.front();
+                reportQueue.pop();
+                int jsonObjectsize = resultsValue.size();
+                if (jsonObjectsize == 0) {
+                    root.put("result", RESPONSE_SUCCESS);
+                } else {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute onoff command failed!");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -539,17 +586,27 @@ int main()
             ChipLogError(NotSpecified, "Received POST request to open commissioning window");
             std::string command;
             command = "pairing open-commissioning-window " + nodeId + " " + option + " " + std::to_string(windowTimeout) + " " + iteration + " " + discriminator;
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
-                root.put("result", RESPONSE_FAILURE);
-            } else {
-                root.put("result", RESPONSE_SUCCESS);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "send multiadmin command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
             }
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute multiadmin command overtime!");
+            } else {
+                Json::Value resultsValue = reportQueue.front();
+                reportQueue.pop();
+                int jsonObjectsize = resultsValue.size();
+                if (jsonObjectsize == 0) {
+                    root.put("result", RESPONSE_SUCCESS);
+                } else {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute multiadmin command failed!");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -650,17 +707,27 @@ int main()
             ChipLogError(NotSpecified, "Received POST request to Write ACL");
             std::string command;
             command = "accesscontrol write acl '[" + aclConfString[0] +"," + aclConfString[1] + "]'" + lightNodeId + " " + aclEndpointId;
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
-                root.put("result", RESPONSE_FAILURE);
-            } else {
-                root.put("result", RESPONSE_SUCCESS);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "send write_acl command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
             }
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute write acl command overtime!");
+            } else {
+                Json::Value resultsValue = reportQueue.front();
+                reportQueue.pop();
+                int jsonObjectsize = resultsValue.size();
+                if (jsonObjectsize == 0) {
+                    root.put("result", RESPONSE_SUCCESS);
+                } else {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute write acl command failed!");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -690,17 +757,27 @@ int main()
             ChipLogError(NotSpecified, "Received POST request to Write Binding");
             std::string command;
             command ="binding write binding '[" + bindingConfString + "]'" + switchNodeId + " " + switchEndpointId;
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
-                root.put("result", RESPONSE_FAILURE);
-            } else {
-                root.put("result", RESPONSE_SUCCESS);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "send write_binding command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
             }
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute write binding command overtime!");
+            } else {
+                Json::Value resultsValue = reportQueue.front();
+                reportQueue.pop();
+                int jsonObjectsize = resultsValue.size();
+                if (jsonObjectsize == 0) {
+                    root.put("result", RESPONSE_SUCCESS);
+                } else {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute write binding command failed!");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -733,17 +810,29 @@ int main()
                 command = "applicationlauncher stop-app " + launchConfString + nodeId + " " + std::to_string(endPointId);
                 ChipLogError(NotSpecified, "Received POST request to Stop App");
             }
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
-                root.put("result", RESPONSE_FAILURE);
-            } else {
-                root.put("result", RESPONSE_SUCCESS);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "send launcher command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
             }
-
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute launcher command overtime!!");
+            } else {
+                Json::Value resultsReport = reportQueue.front();
+                reportQueue.pop();
+                Json::Value resultsValue = resultsReport[0];
+                if (resultsValue.isMember("error"))
+                {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute launcher command failed!");
+                } else {
+                    root.put("result", RESPONSE_SUCCESS);
+                    ChipLogError(NotSpecified, "Execute launcher command successfully");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -783,16 +872,29 @@ int main()
             } else if (type == "fastforward") {
                 command = "mediaplayback fast-forward " + nodeId + " " + std::to_string(endPointId);
             }
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
-                root.put("result", RESPONSE_FAILURE);
-            } else {
-                root.put("result", RESPONSE_SUCCESS);
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "Send media control command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
             }
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
+            if (sleepTime == 20) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute media control command overtime!");
+            } else {
+                Json::Value resultsReport = reportQueue.front();
+                reportQueue.pop();
+                Json::Value resultsValue = resultsReport[0];
+                if (resultsValue.isMember("error"))
+                {
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute media control command failed!");
+                } else {
+                    root.put("result", RESPONSE_SUCCESS);
+                    ChipLogError(NotSpecified, "Execute media control command successfully");
+                }
             }
             stringstream ss;
             write_json(ss, root);
@@ -810,6 +912,7 @@ int main()
         {
             ptree root;
             read_json(request->content, root);
+            auto nodeAlias  = root.get<string>("nodeAlias");
             auto nodeId  = root.get<string>("nodeId");
             auto endPointId = root.get<int>("endPointId");
             auto type  = root.get<string>("type");
@@ -826,41 +929,55 @@ int main()
             } else if (type == "playbackspeed") {
                 command = "mediaplayback read playback-speed " + nodeId + " " + std::to_string(endPointId);
             }
-            auto start_time = std::chrono::steady_clock::now();
-            if (chipToolInteractiveCommand(command.c_str())) {
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "Send media read command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 46)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime;
+            }
+            if (sleepTime == 46) {
                 root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute media read command overtime!");
             } else {
-                string report_text;
-                root.put("result", RESPONSE_SUCCESS);
-                if (!MediaReportBuffers::IsQueueEmpty())
+                Json::Value resultsReport = reportQueue.front();
+                reportQueue.pop();
+                Json::Value resultsValue = resultsReport[0];
+                if (!resultsValue.isMember("error") && resultsValue.isMember("value") )
                 {
-                    ChipReport r = MediaReportBuffers::DequeueReport();
+                    string report_text;
                     stringstream report_ss;
-                    ptree storageNodes = getStorageKeyNodeID();
-                    string nodeAlias;
-                    for (const auto& pair : storageNodes)
+                    string value;
+                    if (type == "currentstate")
                     {
-                        if (pair.second.get_value<int>() == r.nodeid)
+                        switch (resultsValue["value"].asInt())
                         {
-                            nodeAlias = pair.first;
-                            break;
+                            case 0:
+                                value = "Play";
+                                break;
+                            case 1:
+                                value = "Pause";
+                                break;
+                            case 2:
+                                value = "Stop";
+                                break;
+                            default:
+                                value = "Unknown";
                         }
+                    } else {
+                        value = resultsValue["value"].asString();
                     }
-                    report_ss << "Report from " << nodeAlias << " " << r.nodeid << ": " << r.endpoint << ". "
-                                    << "Cluster: " << r.cluster << "\r\n\r\n" << r.attr << ": " << r.value;
+                    report_ss << "Report from " << nodeAlias << " " << nodeId << ": " << resultsValue["endpointId"] << ". "
+                            << "Cluster: " << resultsValue["clusterId"] << "\r\n\r\n" << type << ": " << value;
                     report_text = report_ss.str();
                     root.put("report", report_text);
                     ChipLogError(NotSpecified, "Generated media app report successfully: %s", report_text.c_str());
+                    root.put("result", RESPONSE_SUCCESS);
                 } else {
-                    std::thread([](){
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                    }).detach();
+                    root.put("result", RESPONSE_FAILURE);
+                    ChipLogError(NotSpecified, "Execute media read command failed!");
                 }
-            }
-            auto end_time = std::chrono::steady_clock::now();
-            auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-            if (elapsed_seconds > 60) {
-                root.put("result", RESPONSE_FAILURE);
             }
             stringstream ss;
             write_json(ss, root);
@@ -1077,6 +1194,7 @@ int main()
 
     server_thread.join();
     t.join(); // Wait for the child thread to end
+    wsc.join();
 
     return 0;
 }

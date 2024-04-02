@@ -21,11 +21,6 @@
 #include <platform/logging/LogV.h>
 
 #include <editline.h>
-#if CHIP_WITH_WEBUI
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-#endif
 
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
@@ -76,6 +71,14 @@ struct InteractiveServerResult
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
 
+    #if CHIP_WITH_WEBUI
+    bool mSubscribeEnabled  = false;
+    bool mIsSubscribeReport = false;
+    int  mSubscribeStatus   = EXIT_SUCCESS;
+    std::vector<std::string> mSubscribeResults;
+    std::vector<InteractiveServerResultLog> mSubscribeLogs;
+    #endif
+
     // The InteractiveServerResult instance (gInteractiveServerResult) is initially
     // accessed on the main thread in InteractiveServerCommand::RunCommand, which is
     // when chip-tool starts in 'interactive server' mode.
@@ -99,6 +102,10 @@ struct InteractiveServerResult
     // protected by a mutex.
     std::mutex mMutex;
 
+    #if CHIP_WITH_WEBUI
+    std::mutex mSubscribeMutex;
+    #endif
+
     void Setup(bool isAsyncReport, uint16_t timeout)
     {
         auto lock      = ScopedLock(mMutex);
@@ -111,6 +118,15 @@ struct InteractiveServerResult
             chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
         }
     }
+
+    #if CHIP_WITH_WEBUI
+    void SubscribeSetup(bool isSubscribeReport)
+    {
+        auto lock           = ScopedLock(mSubscribeMutex);
+        mSubscribeEnabled   = true;
+        mIsSubscribeReport  = isSubscribeReport;
+    }
+    #endif
 
     void Reset()
     {
@@ -129,11 +145,30 @@ struct InteractiveServerResult
         mLogs.clear();
     }
 
+    #if CHIP_WITH_WEBUI
+    void SubscribeReset()
+    {
+        auto lock = ScopedLock(mSubscribeMutex);
+        mSubscribeEnabled = true;
+        mSubscribeStatus  = EXIT_SUCCESS;
+        mSubscribeResults.clear();
+        mSubscribeLogs.clear();
+    }
+    #endif
+
     bool IsAsyncReport()
     {
         auto lock = ScopedLock(mMutex);
         return mIsAsyncReport;
     }
+
+    #if CHIP_WITH_WEBUI
+    bool IsSubscribeReport()
+    {
+        auto lock = ScopedLock(mSubscribeMutex);
+        return mIsSubscribeReport;
+    }
+    #endif
 
     void MaybeAddLog(const char * module, uint8_t category, const char * base64Message)
     {
@@ -164,6 +199,34 @@ struct InteractiveServerResult
         mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
     }
 
+    #if CHIP_WITH_WEBUI
+    void SubscribeMaybeAddLog(const char * module, uint8_t category, const char * base64Message)
+    {
+        auto lock = ScopedLock(mSubscribeMutex);
+        VerifyOrReturn(mSubscribeEnabled);
+
+        const char * messageType = nullptr;
+        switch (category)
+        {
+        case chip::Logging::kLogCategory_Error:
+            messageType = kCategoryError;
+            break;
+        case chip::Logging::kLogCategory_Progress:
+            messageType = kCategoryProgress;
+            break;
+        case chip::Logging::kLogCategory_Detail:
+            messageType = kCategoryDetail;
+            break;
+        default:
+            // This should not happen.
+            chipDie();
+            break;
+        }
+
+        mSubscribeLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
+    }
+    #endif
+
     void MaybeAddResult(const char * result)
     {
         auto lock = ScopedLock(mMutex);
@@ -171,6 +234,21 @@ struct InteractiveServerResult
 
         mResults.push_back(result);
     }
+
+    #if CHIP_WITH_WEBUI
+    bool IsEnabled(){
+        auto lock = ScopedLock(mMutex);
+        return mEnabled;
+    }
+
+    void SubscribeMaybeAddResult(const char * result)
+    {
+        auto lock = ScopedLock(mSubscribeMutex);
+        VerifyOrReturn(mSubscribeEnabled);
+
+        mSubscribeResults.push_back(result);
+    }
+    #endif
 
     std::string AsJsonString()
     {
@@ -227,6 +305,64 @@ struct InteractiveServerResult
         content << "}";
         return content.str();
     }
+
+    #if CHIP_WITH_WEBUI
+    std::string SubscribeAsJsonString()
+    {
+        auto lock = ScopedLock(mSubscribeMutex);
+
+        std::stringstream content;
+        content << "{";
+
+        content << "  \"subscribe_results\": [";
+        if (mSubscribeResults.size())
+        {
+            for (const auto & result : mSubscribeResults)
+            {
+                content << result << ",";
+            }
+
+            // Remove last comma.
+            content.seekp(-1, std::ios_base::end);
+        }
+
+        if (mSubscribeStatus != EXIT_SUCCESS)
+        {
+            if (mSubscribeResults.size())
+            {
+                content << ",";
+            }
+            content << "{ \"error\": \"FAILURE\" }";
+        }
+        content << "],";
+
+        content << "\"logs\": [";
+        if (mSubscribeLogs.size())
+        {
+            for (const auto & log : mSubscribeLogs)
+            {
+                content << "{"
+                           "  \"module\": \"" +
+                        log.module +
+                        "\","
+                        "  \"category\": \"" +
+                        log.messageType +
+                        "\","
+                        "  \"message\": \"" +
+                        log.message +
+                        "\""
+                        "},";
+            }
+
+            // Remove last comma.
+            content.seekp(-1, std::ios_base::end);
+        }
+        content << "]";
+
+        content << "}";
+        return content.str();
+    }
+    #endif
 
     static void StartAsyncTimeout(intptr_t arg)
     {
@@ -344,12 +480,31 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
+
+    #if CHIP_WITH_WEBUI
+    if(strstr(msg, "subscribe"))
+    {
+        bool isSubscribeReport = true;
+        gInteractiveServerResult.SubscribeSetup(isSubscribeReport);
+    }
+    #endif
+
     return shouldStop;
 }
 
 CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 {
     gInteractiveServerResult.MaybeAddResult(json);
+
+    #if CHIP_WITH_WEBUI
+    if (gInteractiveServerResult.IsSubscribeReport() && !gInteractiveServerResult.IsEnabled())
+    {
+        gInteractiveServerResult.SubscribeMaybeAddResult(json);
+        mWebSocketServer.Send(gInteractiveServerResult.SubscribeAsJsonString().c_str());
+        gInteractiveServerResult.SubscribeReset();
+    }
+    #endif
+
     if (gInteractiveServerResult.IsAsyncReport())
     {
         mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
@@ -358,63 +513,6 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_WITH_WEBUI
-void WritebackFifo(const char* ret)
-{
-
-    std::ofstream fifo("/tmp/webui_ack_fifo", std::ios::app);
-    fifo << ret << std::endl;
-    fifo.flush();
-    //
-}
-
-std::string GetFifo()
-{
-    std::ifstream fifo("/tmp/webui_fifo");
-    std::string line;
-    if (std::getline(fifo, line))
-    {
-        std::cout << line << std::endl;
-        ChipLogError(NotSpecified, "thread read fifo %s", line.c_str());
-    }
-    if (fifo.eof())
-    {
-        fifo.clear();
-    }
-    fifo.close();
-    return line;
-}
-#endif
-
-#if CHIP_WITH_WEBUI
-CHIP_ERROR InteractiveStartCommand::RunCommand()
-{
-    read_history(GetHistoryFilePath().c_str());
-
-    // Logs needs to be redirected in order to refresh the screen appropriately when something
-    // is dumped to stdout while the user is typing a command.
-    chip::Logging::SetLogRedirectCallback(LoggingCallback);
-
-    char * command = nullptr;
-    int status;
-    std::string cmd;
-    while (true)
-    {
-        cmd = GetFifo();
-        command = (char*)cmd.c_str();
-        if (command != nullptr && !ParseCommand(command, &status))
-        {
-            break;
-        }
-        CHIP_ERROR err = GetCommandExitStatus();
-        ChipLogError(NotSpecified, "sendrolon exitstatus = %s", err.AsString());
-        WritebackFifo(err == CHIP_NO_ERROR? "0":"1");
-    }
-
-    SetCommandExitStatus(CHIP_NO_ERROR);
-    return CHIP_NO_ERROR;
-}
-#else
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(GetHistoryFilePath().c_str());
@@ -443,7 +541,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
-#endif
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
@@ -457,15 +554,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
     }
 
     ClearLine();
-    #if CHIP_WITH_WEBUI
-    if (mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising())) {
-        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-    } else {
-        SetCommandExitStatus(CHIP_NO_ERROR);
-    }
-    #else
     *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
-    #endif
 
     return true;
 }

@@ -103,13 +103,6 @@ public:
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
 
-    #if CHIP_WITH_WEBUI
-    CHIP_ERROR GetCommandExitStatus()
-    {
-        return mCommandExitStatus;
-    }
-    #endif
-
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;

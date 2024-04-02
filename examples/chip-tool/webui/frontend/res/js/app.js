@@ -504,45 +504,33 @@
             $scope.showLoadingSpinner = true;
             var data = {
                 attr: $scope.onoff.attr,
+                nodeAlias: $scope.selectedNodeAlias,
                 nodeId: $scope.selectedNodeId,
                 endPointId: $scope.onoff.endPointId,
                 type: $scope.onoff.type_read,
             };
             var httpReadReq = $http({
                 method: 'POST',
-                url: 'onoff',
+                url: 'onoff_report',
                 data: data,
             });
 
             httpReadReq.then(function successCallback(response) {
                 console.log(response);
+                $scope.showLoadingSpinner = false;
                 if (response.data.result == "successful") {
-                    var httpRequest = $http({
-                    method: 'POST',
-                    url: 'get_report',
-                    data: data,
+                    $scope.showAlert(event, 'read operation is success, and get report', 'success');
+                    var reportsStr = response.data.report;
+                    $scope.reports.reverse();
+                    $scope.reports.push({
+                        report: reportsStr,
+                        icon: 'res/img/icon-info.png',
                     });
-                    httpRequest.then(function successCallback(response) {
-                        //$scope.reports = [];
-                        console.log(response);
-                        $scope.showLoadingSpinner = false;
-                        if (response.data.result == "successful") {
-                            $scope.showAlert(event, 'read operation is success, and get report', 'success');
-                            var reportsStr = response.data.report;
-                            $scope.reports.reverse();
-                            $scope.reports.push({
-                                report: reportsStr,
-                                icon: 'res/img/icon-info.png',
-                            });
-                            $scope.reports.reverse();
-                        } else {
-                            $scope.showAlert(event, 'read operation is success, but get report', 'failed');
-                        }
-                    });
+                    $scope.reports.reverse();
                 } else {
-                    $scope.showLoadingSpinner = false;
-                    $scope.showAlert(event, 'read', 'failed');
+                    $scope.showAlert(event, 'read operation is success, but get report', 'failed');
                 }
+                ev.target.disabled = false;
             });
         };
 
@@ -578,7 +566,16 @@
             console.log("New WebSocket connected.");
             $scope.showLoadingSpinner = true;
             ws.onopen = function(ev) {
-                var msg = $scope.subscribe.subscribe_cluster + ' ' + $scope.subscribe.minInterval + ' ' + $scope.subscribe.maxInterval + ' ' + $scope.selectedNodeId + ' ' + $scope.subscribe.endPointId;
+                var data = {
+                    subscribe_cluster: $scope.subscribe.subscribe_cluster,
+                    minInterval: $scope.subscribe.minInterval,
+                    maxInterval: $scope.subscribe.maxInterval,
+                    nodeAlias: $scope.selectedNodeAlias,
+                    nodeId: $scope.selectedNodeId,
+                    endPointId: $scope.subscribe.endPointId,
+                };
+                var msg = JSON.stringify(data);
+                //var msg = $scope.subscribe.subscribe_cluster + ' ' + $scope.subscribe.minInterval + ' ' + $scope.subscribe.maxInterval + ' ' + $scope.selectedNodeId + ' ' + $scope.subscribe.endPointId;
                 ws.send(msg);
                 $scope.showLoadingSpinner = false;
             };
@@ -835,6 +832,7 @@
                     break;
             }
             var data = {
+                nodeAlias: $scope.selectedNodeAlias,
                 nodeId: $scope.selectedNodeId,
                 endPointId: $scope.media.endPointId,
                 type: $scope.media.mediaRead_type,

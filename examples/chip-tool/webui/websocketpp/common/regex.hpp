@@ -37,7 +37,7 @@
 #ifdef _WEBSOCKETPP_CPP11_REGEX_
     #include <regex>
 #else
-    #include <boost/regex.hpp"
+    #include <boost/regex.hpp>
 #endif
 
 namespace websocketpp {

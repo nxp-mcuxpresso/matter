@@ -80,40 +80,6 @@ public:
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
-    #if CHIP_WITH_WEBUI
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus, NodeId peerId) override
-    {
-        if (mCalledCallback && mReadClient->IsReadType())
-        {
-            return;
-        }
-        mCalledCallback = true;
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        DecodableAttributeType value;
-
-        //
-        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
-        // callback. If we do, that's a bug.
-        //
-        VerifyOrDie(!aPath.IsListItemOperation());
-
-        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
-        VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
-        VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        SuccessOrExit(err = app::DataModel::Decode(*apData, value));
-
-        mOnSuccess(aPath, value);
-
-    exit:
-        if (err != CHIP_NO_ERROR)
-        {
-            mOnError(&aPath, err);
-        }
-    }
-    #else
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
@@ -146,7 +112,6 @@ private:
             mOnError(&aPath, err);
         }
     }
-    #endif
 
     void OnError(CHIP_ERROR aError) override
     {
