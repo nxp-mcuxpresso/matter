@@ -227,43 +227,6 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_WITH_WEBUI
-void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                                           const StatusIB & aStatus, NodeId peerId)
-{
-    CHIP_ERROR err;
-
-    //
-    // First, let's dispatch to our registered callback any buffered up list data from previous calls.
-    //
-    err = DispatchBufferedData(aPath, aStatus);
-    SuccessOrExit(err);
-
-    //
-    // We buffer up list data (only if the status was successful)
-    //
-    if (aPath.IsListOperation() && aStatus.mStatus == Protocols::InteractionModel::Status::Success)
-    {
-        err = BufferData(aPath, apData);
-        SuccessOrExit(err);
-    }
-    else
-    {
-        mCallback.OnAttributeData(aPath, apData, aStatus, peerId);
-    }
-
-    //
-    // Update our latched buffered path.
-    //
-    mBufferedPath = aPath;
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        mCallback.OnError(err);
-    }
-}
-#else
 void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                            const StatusIB & aStatus)
 {
@@ -299,6 +262,5 @@ exit:
         mCallback.OnError(err);
     }
 }
-#endif
 } // namespace app
 } // namespace chip

@@ -70,11 +70,7 @@ private:
     //
     void OnReportBegin() override;
     void OnReportEnd() override;
-    #if CHIP_WITH_WEBUI
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus, NodeId peerId) override;
-    #else
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    #endif
     void OnError(CHIP_ERROR aError) override
     {
         mBufferedList.clear();
