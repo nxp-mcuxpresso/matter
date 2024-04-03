@@ -20,7 +20,6 @@ import("${chip_root}/src/lib/lib.gni")
 chip_data_model("nxp-media-common") {
   zap_file = "nxp-media-app.zap"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/nxp-media-app/zap-generated"
   is_server = true
 }
 
