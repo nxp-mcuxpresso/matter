@@ -19,6 +19,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("nxp-thermostat-common") {
   zap_file = "nxp-thermostat.zap"
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/nxp-thermostat/zap-generated"
   is_server = true
 }
