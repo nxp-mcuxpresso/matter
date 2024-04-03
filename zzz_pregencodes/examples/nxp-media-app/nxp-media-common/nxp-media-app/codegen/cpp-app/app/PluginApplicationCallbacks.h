@@ -23,6 +23,7 @@ void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterLowPowerPluginServerInitCallback();
 void MatterMediaInputPluginServerInitCallback();
 void MatterMediaPlaybackPluginServerInitCallback();
+void MatterMessagesPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
@@ -62,6 +63,7 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterLowPowerPluginServerInitCallback(); \
     MatterMediaInputPluginServerInitCallback(); \
     MatterMediaPlaybackPluginServerInitCallback(); \
+    MatterMessagesPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \

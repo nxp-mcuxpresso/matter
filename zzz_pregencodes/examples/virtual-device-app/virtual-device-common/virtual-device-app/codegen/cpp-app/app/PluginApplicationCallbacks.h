@@ -20,7 +20,7 @@ void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback();
 void MatterPowerSourcePluginServerInitCallback();
-void MatterScenesPluginServerInitCallback();
+void MatterScenesManagementPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
 void MatterTimeFormatLocalizationPluginServerInitCallback();
@@ -50,7 +50,7 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback(); \
     MatterPowerSourcePluginServerInitCallback(); \
-    MatterScenesPluginServerInitCallback(); \
+    MatterScenesManagementPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
     MatterTimeFormatLocalizationPluginServerInitCallback(); \

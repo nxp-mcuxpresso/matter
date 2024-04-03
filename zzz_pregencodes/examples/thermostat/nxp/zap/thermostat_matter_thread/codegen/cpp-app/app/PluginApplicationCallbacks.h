@@ -15,7 +15,7 @@ void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterPowerSourcePluginServerInitCallback();
-void MatterScenesPluginServerInitCallback();
+void MatterScenesManagementPluginServerInitCallback();
 void MatterThermostatPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
 void MatterTimeFormatLocalizationPluginServerInitCallback();
@@ -39,7 +39,7 @@ void MatterUserLabelPluginServerInitCallback();
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterPowerSourcePluginServerInitCallback(); \
-    MatterScenesPluginServerInitCallback(); \
+    MatterScenesManagementPluginServerInitCallback(); \
     MatterThermostatPluginServerInitCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
     MatterTimeFormatLocalizationPluginServerInitCallback(); \

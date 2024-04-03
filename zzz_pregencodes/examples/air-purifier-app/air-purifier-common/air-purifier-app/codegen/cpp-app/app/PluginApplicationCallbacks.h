@@ -26,6 +26,7 @@ void MatterPm25ConcentrationMeasurementPluginServerInitCallback();
 void MatterRadonConcentrationMeasurementPluginServerInitCallback();
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
 void MatterTemperatureMeasurementPluginServerInitCallback();
+void MatterThermostatPluginServerInitCallback();
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
@@ -56,5 +57,6 @@ void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInit
     MatterRadonConcentrationMeasurementPluginServerInitCallback(); \
     MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
     MatterTemperatureMeasurementPluginServerInitCallback(); \
+    MatterThermostatPluginServerInitCallback(); \
     MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback();
 
