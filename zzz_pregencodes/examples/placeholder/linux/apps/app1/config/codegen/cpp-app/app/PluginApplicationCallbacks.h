@@ -37,7 +37,7 @@ void MatterPowerSourcePluginServerInitCallback();
 void MatterPressureMeasurementPluginServerInitCallback();
 void MatterPumpConfigurationAndControlPluginServerInitCallback();
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
-void MatterScenesPluginServerInitCallback();
+void MatterScenesManagementPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterSwitchPluginServerInitCallback();
 void MatterTargetNavigatorPluginServerInitCallback();
@@ -90,7 +90,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterPressureMeasurementPluginServerInitCallback(); \
     MatterPumpConfigurationAndControlPluginServerInitCallback(); \
     MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
-    MatterScenesPluginServerInitCallback(); \
+    MatterScenesManagementPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterSwitchPluginServerInitCallback(); \
     MatterTargetNavigatorPluginServerInitCallback(); \

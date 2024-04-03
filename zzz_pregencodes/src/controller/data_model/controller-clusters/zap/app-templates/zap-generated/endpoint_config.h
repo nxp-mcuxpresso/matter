@@ -59,7 +59,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 100
+#define GENERATED_CLUSTER_COUNT 106
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -78,19 +78,6 @@
   { \
       /* Endpoint: 1, Cluster: Groups (client) */ \
       .clusterId = 0x00000004, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Scenes (client) */ \
-      .clusterId = 0x00000005, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
@@ -765,6 +752,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Microwave Oven Control (client) */ \
+      .clusterId = 0x0000005F, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Operational State (client) */ \
       .clusterId = 0x00000060, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -780,6 +780,19 @@
   { \
       /* Endpoint: 1, Cluster: RVC Operational State (client) */ \
       .clusterId = 0x00000061, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Scenes Management (client) */ \
+      .clusterId = 0x00000062, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
@@ -817,6 +830,32 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Electrical Power Measurement (client) */ \
+      .clusterId = 0x00000090, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Electrical Energy Measurement (client) */ \
+      .clusterId = 0x00000091, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Device Energy Management (client) */ \
       .clusterId = 0x00000098, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -832,6 +871,45 @@
   { \
       /* Endpoint: 1, Cluster: Energy EVSE (client) */ \
       .clusterId = 0x00000099, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Power Topology (client) */ \
+      .clusterId = 0x0000009C, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Energy EVSE Mode (client) */ \
+      .clusterId = 0x0000009D, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Device Energy Management Mode (client) */ \
+      .clusterId = 0x0000009F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
@@ -1371,7 +1449,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 100, 0 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 106, 0 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1427,8 +1505,8 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
         0                                                                                                                          \
     }
 
-// Array of networks supported on each endpoint
-#define FIXED_NETWORKS                                                                                                             \
+// Array of parent endpoints for each endpoint
+#define FIXED_PARENT_ENDPOINTS                                                                                                     \
     {                                                                                                                              \
-        0                                                                                                                          \
+        kInvalidEndpointId                                                                                                         \
     }

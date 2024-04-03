@@ -6,7 +6,7 @@
 namespace chip {
 namespace TLVMeta {
 
-extern const std::array<const FlatTree::Node<ItemInfo>, 1033 + 2> clusters_meta;
+extern const std::array<const FlatTree::Node<ItemInfo>, 1108 + 2> clusters_meta;
 
 } // namespace TLVMeta
 } // namespace chip

@@ -9,6 +9,7 @@ void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterGroupsPluginServerInitCallback();
+void MatterIcdManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
@@ -34,6 +35,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterGroupsPluginServerInitCallback(); \
+    MatterIcdManagementPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
     MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \

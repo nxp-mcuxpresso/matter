@@ -141,6 +141,53 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace BarrierControl
 
+namespace BooleanStateConfiguration {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::SuppressAlarm::Id: {
+            Commands::SuppressAlarm::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::EnableDisableAlarm::Id: {
+            Commands::EnableDisableAlarm::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace BooleanStateConfiguration
+
 namespace ColorControl {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -624,6 +671,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::PayloadTestRequest::Id: {
+            Commands::PayloadTestRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1688,6 +1744,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestDifferentVendorMeiRequest::Id: {
+            Commands::TestDifferentVendorMeiRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
@@ -1706,6 +1772,52 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 }
 
 } // namespace UnitTesting
+
+namespace ValveConfigurationAndControl {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::Open::Id: {
+            Commands::Open::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfValveConfigurationAndControlClusterOpenCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::Close::Id: {
+            Commands::Close::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfValveConfigurationAndControlClusterCloseCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace ValveConfigurationAndControl
 
 namespace WiFiNetworkDiagnostics {
 
@@ -1847,6 +1959,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::BarrierControl::Id:
         Clusters::BarrierControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
+    case Clusters::BooleanStateConfiguration::Id:
+        Clusters::BooleanStateConfiguration::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
     case Clusters::ColorControl::Id:
         Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
@@ -1918,6 +2033,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::UnitTesting::Id:
         Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::ValveConfigurationAndControl::Id:
+        Clusters::ValveConfigurationAndControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WiFiNetworkDiagnostics::Id:
         Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
