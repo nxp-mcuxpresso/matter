@@ -393,15 +393,15 @@ Optional GN options that can be added when building an application:
     the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
     specific flash area the argument `chip_with_factory_data=1` must be added to
-    the _gn gen_ command. (for more information see
-    [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+    the _gn gen_ command. For more information, see
+    [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md)
 
 <a name="manufacturing"></a>
 
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md)
 
 Other comments:
 
@@ -585,9 +585,9 @@ In this configuration, the device can be commissioned over Wi-Fi with the
 
 3. Open a terminal connection on the board and watch the printed logs.
 
-4. On the client side, start sending commands using the
-   [chip-tool](../../../../../examples/chip-tool) application as it is described
-   [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+4. On the client side, start sending commands using the chip-tool application as
+   it is described
+   [here](../../../../chip-tool/README.md#using-the-client-to-send-matter-commands).
 
 ### Testing the all-clusters application with Matter CLI enabled:
 
@@ -635,10 +635,9 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
     - No parity
     - No flow control
 
-4. On the client side, start sending commands using the
-   [chip-tool](../../../../../examples/chip-tool/README.md) application as it is
-   described
-   [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
+4. On the client side, start sending commands using the chip-tool application as
+   it is described
+   [here](../../../../chip-tool/README.md#using-the-client-to-send-matter-commands).
 
 For Matter with OpenThread Border Router support, the matter CLI can be used to
 start/join the Thread network, using the following ot-cli commands. (Note that
