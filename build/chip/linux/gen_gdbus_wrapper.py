@@ -17,6 +17,7 @@
 import argparse
 import subprocess
 import sys
+import shutil
 
 
 def main(argv):
@@ -50,6 +51,8 @@ def main(argv):
 
     options = parser.parse_args(argv)
 
+    codegen_exe = shutil.which('gdbus-codegen')
+
     extra_args = []
     if options.c_namespace:
         extra_args += ["--c-namespace", options.c_namespace]
@@ -61,7 +64,7 @@ def main(argv):
         extra_args += ["--c-generate-object-manager"]
 
     if options.output_c:
-        gdbus_args = ["gdbus-codegen", "--body", "--output", options.output_c
+        gdbus_args = [sys.executable, codegen_exe, "--body", "--output", options.output_c
                       ] + extra_args + [options.input_file]
         subprocess.check_call(gdbus_args)
         sed_args = ["sed", "-i",
@@ -73,7 +76,7 @@ def main(argv):
 
     if options.output_h:
         gdbus_args = [
-            "gdbus-codegen", "--header", "--output", options.output_h
+            sys.executable, codegen_exe,  "--header", "--output", options.output_h
         ] + extra_args + [options.input_file]
         subprocess.check_call(gdbus_args)
 
