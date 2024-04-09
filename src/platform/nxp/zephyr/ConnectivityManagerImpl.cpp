@@ -50,8 +50,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(InitWiFi());
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    ReturnErrorOnFailure(InitEth());
 #endif
     return CHIP_NO_ERROR;
 }

@@ -15,28 +15,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#if CONFIG_CHIP_CRYPTO_PSA
-#define MBEDTLS_PSA_CRYPTO_DRIVERS
-#endif /* CONFIG_CHIP_CRYPTO_PSA */
+#ifndef MBEDTLS_PK_WRITE_C
+#define MBEDTLS_PK_WRITE_C
+#endif
 
-#if CONFIG_MCUX_ELS_PKC
+#ifndef MBEDTLS_X509_CREATE_C
+#define MBEDTLS_X509_CREATE_C
+#endif
 
-#define MBEDTLS_CIPHER_PADDING_PKCS7
+#ifndef MBEDTLS_X509_CSR_WRITE_C
+#define MBEDTLS_X509_CSR_WRITE_C
+#endif
 
-#if CONFIG_WIFI_NXP && CONFIG_WPA_SUPP
-#include "wpa_supp_els_pkc_mbedtls_config.h"
-#endif /* CONFIG_WIFI_NXP && CONFIG_WPA_SUPP */
+#ifndef MBEDTLS_X509_CRL_PARSE_C
+#define MBEDTLS_X509_CRL_PARSE_C
+#endif
 
-#if CONFIG_CHIP_ETHERNET
-#include "nxp-zephyr-ethernet-mbedtls-config.h"
-#endif /* CONFIG_CHIP_ETHERNET */
+#ifndef MBEDTLS_X509_CRT_PARSE_C
+#define MBEDTLS_X509_CRT_PARSE_C
+#endif
 
-#if CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
-#define PSA_CRYPTO_DRIVER_ELS_PKC
-#endif /* CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC */
+#ifndef MBEDTLS_X509_CSR_PARSE_C
+#define MBEDTLS_X509_CSR_PARSE_C
+#endif
 
-#endif /* CONFIG_MCUX_ELS_PKC */
+#ifndef MBEDTLS_X509_USE_C
+#define MBEDTLS_X509_USE_C
+#endif
 
-#undef MBEDTLS_MD4_C
-#undef MBEDTLS_ARC4_C
+#ifndef MBEDTLS_PLATFORM_SNPRINTF_ALT
+#define MBEDTLS_PLATFORM_SNPRINTF_ALT
+#endif
+
+#ifndef MBEDTLS_ECDH_C
+#define MBEDTLS_ECDH_C
+#endif
