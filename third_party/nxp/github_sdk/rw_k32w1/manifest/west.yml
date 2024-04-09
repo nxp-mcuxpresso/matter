@@ -6,10 +6,10 @@
 manifest:
   projects:
     - name: mcux-sdk-k32w1-rw-2.15
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
-      revision: develop/2.15.000_connectivity
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
+      revision: MCUX_2.15.000_RW610_RC1
+      path: core
       import:
-        file: west_2.15.000_RW612_RC1.2.yml
         name-allowlist:
           - CMSIS_5
           - fatfs
