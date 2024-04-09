@@ -215,7 +215,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     sNetworkCommissioningInstance.Init();
 #endif
-#if CONFIG_CHIP_OTA_REQUESTOR
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (err == CHIP_NO_ERROR)
     {
         /* If an update is under test make it permanent */
