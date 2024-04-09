@@ -236,10 +236,6 @@ choice SCHED_ALGORITHM
 	default SCHED_MULTIQ
 endchoice
 
-choice LIBC_IMPLEMENTATION
-	default NEWLIB_LIBC
-endchoice
-
 choice WPA_SUPP_LOG_LEVEL_CHOICE
 	default WPA_SUPP_LOG_LEVEL_ERR
 endchoice
@@ -297,6 +293,14 @@ config HEAP_MEM_POOL_SIZE
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
+
+endif
+
+if CHIP_ETHERNET || CHIP_WIFI
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
 
 endif
 
