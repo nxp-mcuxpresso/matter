@@ -717,9 +717,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     sss_sscp_asymmetric_t asyc;
     bool bFreeAsyncCtx = false;
 
-    size_t coordinateLen     = kP256_FE_Length;   /* always 32 for P256 */
-    size_t coordinateBitsLen = coordinateLen * 8; /* always 256 for P256 */
-    size_t keySize           = SSS_ECP_KEY_SZ(coordinateLen);
+    size_t keySize = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
 
     VerifyOrReturnError(sss_sscp_key_object_init(&ecdsaPublic, &g_keyStore) == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
@@ -728,18 +726,18 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
                         CHIP_ERROR_INTERNAL);
 
     // The first byte of the public key is the uncompressed marker
-    VerifyOrExit(SSS_KEY_STORE_SET_KEY(&ecdsaPublic, Uint8::to_const_uchar(*this) + 1, Length() - 1, coordinateBitsLen,
+    VerifyOrExit(SSS_KEY_STORE_SET_KEY(&ecdsaPublic, Uint8::to_const_uchar(*this) + 1, Length() - 1, keySize * 8,
                                        (uint32_t) kSSS_KeyPart_Public) == kStatus_SSS_Success,
-                 error = CHIP_ERROR_INTERNAL);
+                 CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(sss_sscp_asymmetric_context_init(&asyc, &g_sssSession, &ecdsaPublic, kAlgorithm_SSS_ECDSA_SHA256,
                                                   kMode_SSS_Verify) == kStatus_SSS_Success,
-                 error = CHIP_ERROR_INTERNAL);
+                 CHIP_ERROR_INTERNAL);
 
     bFreeAsyncCtx = true;
     VerifyOrExit(sss_sscp_asymmetric_verify_digest(&asyc, (uint8_t *) hash, hash_length, (uint8_t *) signature.ConstBytes(),
                                                    signature.Length()) == kStatus_SSS_Success,
-                 error = CHIP_ERROR_INTERNAL);
+                 CHIP_ERROR_INTERNAL);
 exit:
 
     if (bFreeAsyncCtx)
@@ -759,10 +757,9 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
-
-    size_t coordinateLen     = kP256_FE_Length;   /* always 32 for P256 */
-    size_t coordinateBitsLen = coordinateLen * 8; /* always 256 for P256 */
-    size_t keySize           = SSS_ECP_KEY_SZ(coordinateLen);
+    size_t coordinateLen        = kP256_PrivateKey_Length;
+    size_t coordinateBitsLen    = coordinateLen * 8;
+    size_t keySize              = SSS_ECP_KEY_SZ(kP256_PrivateKey_Length);
 
     sss_sscp_derive_key_t dCtx;
     sss_sscp_object_t pEcdhPubKey;
