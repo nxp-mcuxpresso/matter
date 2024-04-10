@@ -474,9 +474,6 @@ template("rt_sdk") {
       # define gAppNvsInternalFlash_c = 0 to be sure it will not be define as 1 in the framework (NVS/Interface/port/nvs_port.h)
       defines += [ "gAppNvsExternalFlash_c = 1", "gNvsExternalFlash_d = 1", "gAppNvsInternalFlash_c = 0", "CONFIG_NVS_LOOKUP_CACHE=1",
         "CONFIG_NVS_LOOKUP_CACHE_SIZE=32",]
-      
-      # Temporary fix for power loss NVS resilience issue
-      defines += [ "NO_FLASH_CONTROLLER_BLANK_CHECK = 1"]
     }
 
     if (use_watchdog != 0) {
