@@ -9,7 +9,7 @@ manifest:
       url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
       revision: develop/2.15.000_connectivity
       import:
-        file: west.yml
+        file: west_2.15.000_RW612_RC1.2.yml
         name-allowlist:
           - CMSIS_5
           - fatfs
