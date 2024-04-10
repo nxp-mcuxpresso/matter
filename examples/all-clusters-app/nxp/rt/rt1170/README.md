@@ -45,11 +45,6 @@ The example supports:
 -   Matter over Wi-Fi
 -   Matter over Openthread
 
--   Matter Border Router . For that follow instructions from
-    [README_Border_Router.md][README_Border_Router.md].
-
-[README_Border_Router.md]: README_Border_Router.md
-
 The example targets the
 [NXP MIMXRT1170-EVKB](https://www.nxp.com/part/MIMXRT1170-EVKB#/) board by
 default.
