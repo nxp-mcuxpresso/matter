@@ -2269,15 +2269,10 @@ endpoint 0 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x00;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
     handle command Identify;
-    handle command TriggerEffect;
   }
 
   server cluster Descriptor {
@@ -2323,23 +2318,16 @@ endpoint 0 {
     callback attribute productLabel;
     callback attribute serialNumber;
     persist  attribute localConfigDisabled default = 0;
+    ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute productAppearance;
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
@@ -2353,29 +2341,20 @@ endpoint 0 {
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
+    persist  attribute activeCalendarType default = 0;
+    callback attribute supportedCalendarTypes;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UnitLocalization {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
+    persist  attribute temperatureUnit default = 0;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 1;
   }
@@ -2406,10 +2385,6 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
@@ -2431,11 +2406,10 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
+    callback attribute activeHardwareFaults;
+    callback attribute activeRadioFaults;
+    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2525,6 +2499,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
+    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2576,15 +2551,10 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
     handle command Identify;
-    handle command TriggerEffect;
   }
 
   server cluster Groups {
@@ -2631,7 +2601,6 @@ endpoint 1 {
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
@@ -2655,11 +2624,10 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    callback attribute lastConfiguredBy default = 0x00;
-    ram      attribute sceneTableSize default = 0x10;
+    ram      attribute sceneTableSize;
     callback attribute fabricSceneInfo;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;

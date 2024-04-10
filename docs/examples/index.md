@@ -112,15 +112,6 @@ kotlin-matter-controller/README
 virtual-device-app/**/README
 ```
 
-## Laundry washer example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-laundry-washer-app/**/README
-```
-
 ## Lighting example
 
 ```{toctree}

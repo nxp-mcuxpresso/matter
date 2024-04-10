@@ -25,7 +25,6 @@
 /*                                  Includes                                  */
 /* -------------------------------------------------------------------------- */
 
-#include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
 #include <stdio.h>
@@ -98,10 +97,10 @@ static void Uart_TxCallBack(void * pBuffer, serial_manager_callback_message_t * 
 static SERIAL_MANAGER_HANDLE_DEFINE(streamerSerialHandle);
 static SERIAL_MANAGER_WRITE_HANDLE_DEFINE(streamerSerialWriteHandle);
 static SERIAL_MANAGER_READ_HANDLE_DEFINE(streamerSerialReadHandle);
-static volatile int txCount   = 0;
-volatile static bool readDone = true;
+static volatile int txCount = 0;
+static bool readDone        = true;
 
-static streamer_serial_port_uart_config_t uartConfig = { .clockRate    = 0,
+static streamer_serial_port_uart_config_t uartConfig = { .clockRate    = BOARD_APP_UART_CLK_FREQ,
                                                          .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
                                                          .parityMode   = kSerialManager_UartParityDisabled,
                                                          .stopBitCount = kSerialManager_UartOneStopBit,
@@ -130,8 +129,6 @@ static const serial_manager_config_t s_serialManagerConfig = {
     .portConfig = (serial_port_uart_config_t *) &uartConfig,
 };
 
-OSA_MUTEX_HANDLE_DEFINE(streamerMutex);
-
 /* -------------------------------------------------------------------------- */
 /*                              Public functions                              */
 /* -------------------------------------------------------------------------- */
@@ -148,8 +145,6 @@ int streamer_nxp_init(streamer_t * streamer)
     /* attach FRG3 clock to FLEXCOMM3 */
     BOARD_CLIAttachClk();
 #endif
-
-    uartConfig.clockRate = BOARD_APP_UART_CLK_FREQ;
 
 #if STREAMER_UART_USE_DMA
     dma_channel_mux_configure_t dma_channel_mux;
@@ -185,9 +180,6 @@ int streamer_nxp_init(streamer_t * streamer)
 
     OSA_InterruptEnable();
 
-    osa_status_t status_osa = OSA_MutexCreate((osa_mutex_handle_t) streamerMutex);
-    assert(status_osa == KOSA_StatusSuccess);
-
     return status;
 }
 
@@ -212,13 +204,10 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         assert(status != kStatus_SerialManager_Error);
 
         /**
-         * In certain cases such as a copy-paste of multiple commands, we may encounter '\n' or '\r' caracters
-         * although the buffer is not empty yet, so the reading process should be considered done only when the
-         * bytesRead return null,
-         * this is to ensure that all commands are processed before blocking the CLI task
-         *
+         * If we are at the end of the line or the buffer is empty,
+         * consider the reading process done
          **/
-        if (bytesRead == 0)
+        if ((buffer[length - 1] == '\n') || (buffer[length - 1] == '\r') || (bytesRead == 0))
         {
             readDone = true;
         }
@@ -230,35 +219,24 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     uint32_t intMask;
-    serial_manager_status_t status = kStatus_SerialManager_Success;
+    serial_manager_status_t status = kStatus_SerialManager_Error;
     size_t len                     = 0;
 
-    /* Mutex lock to ensure the streamer write is accessed by only one task at a time */
-    osa_status_t status_osa = OSA_MutexLock(streamerMutex, osaWaitForever_c);
-
-    // If length is 0 there will be an assert in Serial Manager. Some OT functions output 0 bytes, for example
-    // in SrpServer::Process<Cmd("service")> -> OutputLine(hasSubType ? "" : "(null)");
-    if (length > 0)
+    intMask = DisableGlobalIRQ();
+    txCount++;
+    status = SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle,
+                                            (uint8_t *) (const_cast<char *>(buffer)), (uint32_t) length);
+    EnableGlobalIRQ(intMask);
+    if (status == kStatus_SerialManager_Success)
     {
-        intMask = DisableGlobalIRQ();
-        txCount++;
-        status = SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle, (uint8_t *) buffer,
-                                                (uint32_t) length);
-        EnableGlobalIRQ(intMask);
-        if (status == kStatus_SerialManager_Success)
-        {
-            len = length;
-        }
-
-        /* Wait for the serial manager task to empty the TX buffer */
-        while (txCount)
-        {
-            OSA_TimeDelay(STREAMER_UART_FLUSH_DELAY_MS);
-        }
+        len = length;
     }
 
-    status_osa = OSA_MutexUnlock(streamerMutex);
-    assert(status_osa == KOSA_StatusSuccess);
+    /* Wait for the serial manager task to empty the TX buffer */
+    while (txCount)
+    {
+        OSA_TimeDelay(STREAMER_UART_FLUSH_DELAY_MS);
+    }
 
     return len;
 }

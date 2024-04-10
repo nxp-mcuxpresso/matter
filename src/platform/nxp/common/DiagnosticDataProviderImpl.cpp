@@ -118,7 +118,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
     ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
 #elif CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -129,7 +129,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+    ifp->type            = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     ifp->hardwareAddress = ByteSpan(netif->hwaddr, netif->hwaddr_len);
 #endif
 
