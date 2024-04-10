@@ -54,7 +54,7 @@ extern uint32_t NV_STORAGE_MAX_SECTORS[];
 /* Block cycles definition */
 #define LITTLEFS_BLOCK_CYCLES 100
 /* Minimum block cache size definition */
-#define LITTLEFS_CACHE_SIZE 1024
+#define LITTLEFS_CACHE_SIZE 256
 /* Minimum lookahead buffer size definition */
 #define LITTLEFS_LOOKAHEAD_SIZE 16
 /* Block starting address definition */
