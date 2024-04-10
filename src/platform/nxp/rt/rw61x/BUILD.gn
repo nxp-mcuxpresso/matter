@@ -103,9 +103,6 @@ static_library("nxp_platform") {
   } else if (rt_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
   }
-  else if(rt_nvm_component == "nvs") {
-    sources += [ "../../common/NXPConfigNVS.cpp" ]
-  }
 
   if (chip_enable_ble) {
     sources += [
