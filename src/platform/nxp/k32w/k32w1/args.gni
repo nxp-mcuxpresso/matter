@@ -26,7 +26,6 @@ declare_args() {
   # The key storage solution. Developers can select between "littlefs", "nvs"
   # and the older "fwk_nvm".
   chip_key_storage = "fwk_nvm"
-  chip_use_plain_dac_key = false
 }
 
 if(!sdk_release && is_sdk_2_15) {
