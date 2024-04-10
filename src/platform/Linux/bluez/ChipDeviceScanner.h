@@ -27,6 +27,9 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
+#include "BluezObjectManager.h"
+#include "Types.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -53,7 +56,7 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
@@ -90,13 +93,13 @@ private:
         TIMER_EXPIRED
     };
 
+    CHIP_ERROR StartScanImpl();
+    CHIP_ERROR StopScanImpl();
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-    static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
-    static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
-    static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);
-    static void SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object, GDBusProxy * aInterface,
-                                       GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
-                                       ChipDeviceScanner * self);
+
+    void SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
+    void SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject, GDBusProxy * aInterface,
+                                          GVariant * aChangedProperties, const char * const * aInvalidatedProps);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 & device);
@@ -105,12 +108,13 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GDBusObjectManager * mManager         = nullptr;
-    BluezAdapter1 * mAdapter              = nullptr;
-    ChipDeviceScannerDelegate * mDelegate = nullptr;
-    gulong mObjectAddedSignal             = 0;
-    gulong mInterfaceChangedSignal        = 0;
-    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
+    BluezObjectManager & mObjectManager;
+    GAutoPtr<BluezAdapter1> mAdapter;
+
+    ChipDeviceScannerDelegate * mDelegate  = nullptr;
+    unsigned long mObjectAddedSignal       = 0;
+    unsigned long mPropertiesChangedSignal = 0;
+    ChipDeviceScannerState mScannerState   = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
     GAutoPtr<GCancellable> mCancellable;

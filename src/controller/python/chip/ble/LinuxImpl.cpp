@@ -16,9 +16,15 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
+#include <memory>
+
+#include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/bluez/AdapterIterator.h>
+#include <platform/Linux/bluez/BluezObjectManager.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <platform/internal/BLEManager.h>
 
 using namespace chip::DeviceLayer::Internal;
@@ -93,8 +99,17 @@ public:
         mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
-    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter) { return mScanner.Init(adapter, this); }
+    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter)
+    {
+        ReturnErrorOnFailure(mBluezObjectManager.Init());
+        return mScanner.Init(adapter, this);
+    }
+
+    void ScannerShutdown() { mBluezObjectManager.Shutdown(); }
+
     CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
+
+    CHIP_ERROR ScannerStopScan() { return mScanner.StopScan(); }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {
@@ -111,11 +126,9 @@ public:
         {
             mCompleteCallback(mContext);
         }
-
-        delete this;
     }
 
-    virtual void OnScanError(CHIP_ERROR error) override
+    void OnScanError(CHIP_ERROR error) override
     {
         if (mErrorCallback)
         {
@@ -124,7 +137,8 @@ public:
     }
 
 private:
-    ChipDeviceScanner mScanner;
+    BluezObjectManager mBluezObjectManager;
+    ChipDeviceScanner mScanner{ mBluezObjectManager };
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
@@ -133,10 +147,10 @@ private:
 
 } // namespace
 
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeoutMs,
-                                            ScannerDelegateImpl::DeviceScannedCallback scanCallback,
-                                            ScannerDelegateImpl::ScanCompleteCallback completeCallback,
-                                            ScannerDelegateImpl::ScanErrorCallback errorCallback)
+extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, uint32_t timeoutMs,
+                                           ScannerDelegateImpl::DeviceScannedCallback scanCallback,
+                                           ScannerDelegateImpl::ScanCompleteCallback completeCallback,
+                                           ScannerDelegateImpl::ScanErrorCallback errorCallback)
 {
     std::unique_ptr<ScannerDelegateImpl> delegate =
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
@@ -150,4 +164,14 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
     VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
 
     return delegate.release();
+}
+
+extern "C" void pychip_ble_scanner_delete(void * scanner)
+{
+    auto * delegate = static_cast<ScannerDelegateImpl *>(scanner);
+    chip::DeviceLayer::StackLock lock;
+    // Make sure that the scanner is stopped before deleting the delegate.
+    delegate->ScannerStopScan();
+    delegate->ScannerShutdown();
+    delete delegate;
 }
