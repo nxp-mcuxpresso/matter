@@ -193,9 +193,9 @@ To bring the SDK in the environment, the user can:
     by gn:
 
     ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west init -l manifest --mf west.yml
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west update
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
     In case there are local modification to the already installed github NXP
@@ -204,8 +204,8 @@ To bring the SDK in the environment, the user can:
     running this command.
 
     ```bash
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/k32w0$ west forall -c "git reset --hard && git clean -xdf" -a
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
 -   set up a custom path to the SDK, in which case
