@@ -18,20 +18,17 @@ commissioning and different cluster control.
       - [Hardware requirements RT1060+8801](#hardware-requirements-rt10608801)
       - [Hardware requirements RT1060 + K32W0](#hardware-requirements-rt1060--k32w0)
       - [Hardware requirements RT1060-EVKC+IW612](#hardware-requirements-rt1060-evkciw612)
-      - [Hardware requirements RT1060 + 88W8801 + K32W0x1DK6](#hardware-requirements-rt1060--88w8801--k32w0x1dk6)
   - [Building](#building)
     - [Building with Matter over Wifi configuratiom on RT1060 + transceiver](#building-with-matter-over-wifi-configuratiom-on-rt1060--transceiver)
     - [Build with Matter over Thread configuration on RT1060 + transceiver](#build-with-matter-over-thread-configuration-on-rt1060--transceiver)
       - [Build with Matter over Thread configuration on RT1060 + K32W0](#build-with-matter-over-thread-configuration-on-rt1060--k32w0)
       - [Build with Matter over Thread configuration on RT1060-EVKC + IW612](#build-with-matter-over-thread-configuration-on-rt1060-evkc--iw612)
-    - [Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6](#build-with-matter-over-wi-fi--openthread-border-router-configuration-on-rt1060--88w8801--k32w0x1dk6)
     - [General Information](#general-information)
   - [Manufacturing data](#manufacturing-data)
   - [Flashing and debugging](#flashing-and-debugging)
   - [Testing the example](#testing-the-example)
       - [Matter over wifi configuration :](#matter-over-wifi-configuration-)
       - [Matter over thread configuration :](#matter-over-thread-configuration-)
-      - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
     - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
     - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
 
@@ -51,7 +48,6 @@ The example supports:
 
 -   Matter over Wi-Fi
 -   Matter over Openthread
--   Matter over Wi-Fi with Openthread Border Router support
 
 The example targets the
 [NXP MIMXRT1060-EVKB](https://www.nxp.com/design/development-boards/i-mx-evaluation-and-development-boards/mimxrt1060-evk-i-mx-rt1060-evaluation-kit:MIMXRT1060-EVK)
@@ -72,10 +68,6 @@ Matter over Thread :
 
 -   RT1060 + K32W0 (15.4 + BLE)
 -   **Experimental:** _RT1060-EVKC + IW612 (15.4 + BLE)_
-
-Matter over Wi-Fi with Openthread Border Router support :
-
--   RT1060 + 88W8801 + K32W0x1DK6
 
 ### Hardware requirements RT1060 + transceiver
 
@@ -219,15 +211,6 @@ Transceiver part :
 
 The IW612 module should be plugged to the M.2 connector on RT1060-EVKC board.
 
-#### Hardware requirements RT1060 + 88W8801 + K32W0x1DK6
-
--   i.MX RT1060 EVKA or EVKB board
--   88W8801 module (for Wi-Fi connection), for example 88W8801 2DS M.2 Module
-    (rev A) and Murata uSD-M.2 Adapter (rev B1)
--   K32W0x1 mezzanine module (for Thread connection)
--   IOTZTB-DK006 carrier board for the K32W0x1 module (referenced as DK6 carrier
-    board)
-
 <a name="building"></a>
 
 ## Building
@@ -362,18 +345,6 @@ Build the OpenThread configuration for MIMXRT1060-EVKC board + IW612 transceiver
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_openthread=true  iwx12_transceiver=true evkname=\"evkcmimxrt1060\" chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true" " out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
-```
-
-### Build with Matter over Wi-Fi + OpenThread Border Router configuration on RT1060 + 88W8801 + K32W0x1DK6
-
-This configuration requires enabling the Matter CLI in order to control the
-Thread network on the Border Router.
-
--   Build Matter with Border Router configuration with ble-wifi commissioning:
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=true chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" hci_spinel_single_uart=true openthread_root =\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
@@ -559,16 +530,6 @@ The "ble-wifi" pairing method can be used in order to commission the device.
 
 The "ble-thread" pairing method can be used in order to commission the device.
 
-#### Matter over wifi with openthread border router configuration :
-
-In order to create or join a Thread network on the Matter Border Router, the
-`otcli` commands from the matter CLI can be used. For more information about
-using the matter shell, follow instructions from
-['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
-
-In this configuration, the device can be commissioned over Wi-Fi with the
-'ble-wifi' pairing method.
-
 ### Testing the all-clusters application without Matter CLI:
 
 1. Prepare the board with the flashed `All-cluster application` (as shown
@@ -639,38 +600,3 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    [chip-tool](../../../../../examples/chip-tool/README.md) application as it is
    described
    [here](../../../../../examples/chip-tool/README.md#using-the-client-to-send-matter-commands).
-
-For Matter with OpenThread Border Router support, the matter CLI can be used to
-start/join the Thread network, using the following ot-cli commands. (Note that
-setting channel, panid, and network key is not enough anymore because of an Open
-Thread stack update. We first need to initialize a new dataset.)
-
-```
-> otcli dataset init new
-Done
-> otcli dataset
-Active Timestamp: 1
-Channel: 25
-Channel Mask: 0x07fff800
-Ext PAN ID: 42af793f623aab54
-Mesh Local Prefix: fd6e:c358:7078:5a8d::/64
-Network Key: f824658f79d8ca033fbb85ecc3ca91cc
-Network Name: OpenThread-b870
-PAN ID: 0xb870
-PSKc: f438a194a5e968cc43cc4b3a6f560ca4
-Security Policy: 672 onrc 0
-Done
-> otcli dataset panid 0xabcd
-Done
-> otcli dataset channel 25
-Done
-> otcli dataset commit active
-Done
-> otcli ifconfig up
-Done
-> otcli thread start
-Done
-> otcli state
-leader
-Done
-```
