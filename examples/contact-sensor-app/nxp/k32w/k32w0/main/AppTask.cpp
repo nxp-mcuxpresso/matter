@@ -71,9 +71,6 @@ static LEDWidget sContactSensorLED;
 
 static bool sIsThreadProvisioned = false;
 static bool sHaveBLEConnections  = false;
-#if CHIP_ENABLE_LIT
-static bool sIsDeviceCommissioned = false;
-#endif
 
 static uint32_t eventMask = 0;
 
@@ -452,12 +449,6 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
             button_event.Handler = ResetActionEventHandler;
         }
 #endif
-#if CHIP_ENABLE_LIT
-        if (button_action == USER_ACTIVE_MODE_TRIGGER_PUSH)
-        {
-            button_event.Handler = UserActiveModeHandler;
-        }
-#endif
     }
 
     sAppTask.PostEvent(&button_event);
@@ -495,16 +486,6 @@ void AppTask::HandleKeyboard(void)
 #if (defined OM15082)
             ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
             break;
-#elif CHIP_ENABLE_LIT
-            if (sIsDeviceCommissioned)
-            {
-                ButtonEventHandler(BLE_BUTTON, USER_ACTIVE_MODE_TRIGGER_PUSH);
-            }
-            else
-            {
-                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
-            }
-            break;
 #else
             ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
@@ -516,15 +497,7 @@ void AppTask::HandleKeyboard(void)
             ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
             break;
         case gKBD_EventPB4_c:
-#if CHIP_ENABLE_LIT
-            if (sIsDeviceCommissioned)
-            {
-                ButtonEventHandler(BLE_BUTTON, USER_ACTIVE_MODE_TRIGGER_PUSH);
-            }
-            else
-#endif
-
-                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
@@ -721,28 +694,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     }
 }
 
-#if CHIP_ENABLE_LIT
-void AppTask::UserActiveModeHandler(void * aGenericEvent)
-{
-    AppEvent * aEvent = (AppEvent *) aGenericEvent;
-
-    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
-        return;
-
-    if (sAppTask.mFunction != Function::kNoneSelected)
-    {
-        K32W_LOG("Another function is scheduled. Could not request ICD Active Mode!");
-        return;
-    }
-    PlatformMgr().ScheduleWork(AppTask::UserActiveModeTrigger, 0);
-}
-
-void AppTask::UserActiveModeTrigger(intptr_t arg)
-{
-    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-}
-#endif
-
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
@@ -756,12 +707,6 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
             sIsThreadProvisioned = FALSE;
         }
     }
-#if CHIP_ENABLE_LIT
-    else if (event->Type == DeviceEventType::kCommissioningComplete)
-    {
-        sIsDeviceCommissioned = TRUE;
-    }
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (event->Type == DeviceEventType::kDnssdInitialized)
