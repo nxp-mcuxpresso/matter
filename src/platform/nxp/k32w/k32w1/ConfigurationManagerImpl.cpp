@@ -29,6 +29,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/nxp/k32w/k32w1/K32W1Config.h>
 #if defined(USE_SMU2_DYNAMIC)
 #include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
 #endif
