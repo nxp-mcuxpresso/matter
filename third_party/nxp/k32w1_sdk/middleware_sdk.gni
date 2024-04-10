@@ -30,7 +30,6 @@ middleware_sdk = {
   MULTICORE_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore"
   MULTICORE_RPMSG_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite"
   SECURE_SUBSYSTEM_DIR_PATH = "${k32w1_sdk_root}/middleware/secure-subsystem"
-  LITTLEFS_DIR_PATH = "${k32w1_sdk_root}/middleware/littlefs"
 
   if(is_sdk_2_15) {
     FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
@@ -102,13 +101,6 @@ middleware_sdk = {
       "${FRAMEWORK_DIR_PATH}/NVM/Source",
       "${FRAMEWORK_DIR_PATH}/NVM/Interface"
     ]
-  } else if (chip_key_storage == "littlefs") {
-    middleware_include_dirs += [
-      "${LITTLEFS_DIR_PATH}",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction",
-      "${FRAMEWORK_DIR_PATH}/FileCache",
-      "${FRAMEWORK_DIR_PATH}/KeyStorage"
-    ]
   }
 
   middleware_defines = [
@@ -153,15 +145,6 @@ middleware_sdk = {
 
   if(is_sdk_2_15) {
     middleware_defines += [ "MULTICORE_APP=1" ]
-  }
-
-  if (chip_key_storage == "littlefs") {
-    middleware_defines += [
-      "LFS_THREADSAFE",
-      "LFS_NO_DEBUG",
-      "LFS_NO_ERROR",
-      "LFS_NO_WARN"
-    ]
   }
 
   middleware_sources = [
@@ -251,14 +234,5 @@ middleware_sdk = {
 
   if (chip_key_storage == "fwk_nvm") {
     middleware_sources += [ "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c" ]
-  } else if (chip_key_storage == "littlefs") {
-    middleware_sources += [
-      "${LITTLEFS_DIR_PATH}/lfs.c",
-      "${LITTLEFS_DIR_PATH}/lfs_util.c",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction/fwk_fs_abstraction.c",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction/fwk_lfs_mflash.c",
-      "${FRAMEWORK_DIR_PATH}/FileCache/fwk_file_cache.c",
-      "${FRAMEWORK_DIR_PATH}/KeyStorage/fwk_key_storage.c"
-    ]
   }
 }
