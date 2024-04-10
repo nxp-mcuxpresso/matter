@@ -21,11 +21,6 @@ nxp_sdk_name = "rt_sdk"
 chip_device_platform = "nxp"
 lwip_platform = "nxp"
 
-declare_args() {
-  # Location of the rt SDK.
-  sdk_repo = "rt/repo/sdk-2.15"
-}
-
 # ARM architecture flags will be set based on NXP board.
 arm_platform_config = "${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_arm.gni"
 
