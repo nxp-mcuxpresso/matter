@@ -173,22 +173,16 @@ FW_UPDATE_STORAGE_END               = FW_UPDATE_STORAGE_START + FW_UPDATE_STORAG
 fw_top                              = FW_UPDATE_STORAGE_END + 1;
 
 
-/* QACODE_REGION is used to store code for functions to be executed from ITCM RAM. Adding an offset
-  * to prevent overwrite in case of using NULL pointers to reference data
-*/
-QACODE_REGION_START          = 0X00000400;
-QACODE_REGION_END            = 0X0001FFFF;
-QACODE_SIZE                  = QACODE_REGION_END - QACODE_REGION_START + 1;
-__NCACHE_REGION_START        = QACODE_REGION_END + 1;
+
+OCRAM1_START                 = 0x20240000;
+OCRAM2_START                 = 0x202D0000;
+__NCACHE_REGION_START        = OCRAM2_START;
 __NCACHE_REGION_SIZE         = 0x2000;
-OCRAM_START                  = 0x20240000;
-OCRAM_SIZE                   = 0x00100000;
-OCRAM_END                    = OCRAM_START + OCRAM_SIZE - 1;
 HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x800;
 RPMSG_SHMEM_SIZE = DEFINED(__use_shmem__) ? 0x2000 : 0;
 VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000400 : 0;
-DATA_SIZE = OCRAM_SIZE - RPMSG_SHMEM_SIZE;
+DATA_SIZE = OCRAM2_START - OCRAM1_START;
 
 /* Specify the memory areas */
 MEMORY
@@ -198,9 +192,12 @@ MEMORY
   m_interrupts          (RX)  : ORIGIN = m_interrupts_start, LENGTH = m_interrupts_size
   m_text                (RX)  : ORIGIN = m_text_start, LENGTH = m_text_size
   NVM_region            (RW)  : ORIGIN = NV_STORAGE_START_ADDRESS, LENGTH = NV_STORAGE_SIZE
-  m_qacode              (RX)  : ORIGIN = QACODE_REGION_START, LENGTH = QACODE_SIZE
-  m_data                (RW)  : ORIGIN = OCRAM_START, LENGTH = DATA_SIZE
-  rpmsg_sh_mem          (RW)  : ORIGIN = OCRAM_END - RPMSG_SHMEM_SIZE + 1, LENGTH = RPMSG_SHMEM_SIZE
+  /* m_qacode zone is used to store code for functions to be executed from RAM. Adding an offset
+   * to prevent overwrite in case of using NULL pointers to reference data
+  */
+  m_qacode              (RX)  : ORIGIN = 0x00000400, LENGTH = 0x00040000
+  m_data                (RW)  : ORIGIN = OCRAM1_START, LENGTH = DATA_SIZE
+  rpmsg_sh_mem          (RW)  : ORIGIN = 0x20300000, LENGTH = RPMSG_SHMEM_SIZE
   m_data_noncache       (RW)  : ORIGIN = __NCACHE_REGION_START, LENGTH = __NCACHE_REGION_SIZE
   m_core1_image         (RX)  : ORIGIN = 0x30FC0000, LENGTH = 0x00040000
 }
@@ -256,24 +253,6 @@ SECTIONS
         *mflash_drv.c.o*
         *fsl_flexspi.c.o*
     ) .text)                 /* .text sections (code) */
-    *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o*
-        *mflash_drv.c.o*
-        *fsl_flexspi.c.o*
-    ) .text*)                 /* .text sections (code) */
-    *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o*
-        *mflash_drv.c.o*
-        *fsl_flexspi.c.o*
-    ) .rodata)
-    *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o*
-        *mflash_drv.c.o*
-        *fsl_flexspi.c.o*
-    ) .rodata*)
     *(.rodata)               /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)              /* .rodata* sections (constants, strings, etc.) */
     *(.glue_7)               /* glue arm to thumb code */
@@ -436,6 +415,11 @@ SECTIONS
     __DATA_RAM = .;
     __data_start__ = .;      /* create a global symbol at data start */
     *(m_usb_dma_init_data)
+    /* Explicit placement of flash and frequently executed functions in RAM */
+    *fsl_adapter_flexspi_nor_flash.c.o
+    *mflash_drv.c.o*
+    *fsl_flexspi.c.o*
+    *lfs_mflash.c.o*
     *(.data)                 /* .data sections */
     *(.data*)                /* .data* sections */
     *(.wlan_data .wlan_data.*)
@@ -466,10 +450,6 @@ SECTIONS
     . = ALIGN(32);
     __ram_function_start__ = .;
     *(CodeQuickAccess)
-    /* Explicit placement of flash and frequently executed functions in RAM */
-    *fsl_adapter_flexspi_nor_flash.c.o*(.text .text* .rodata .rodata*)
-    *mflash_drv.c.o*(.text .text* .rodata .rodata*)
-    *fsl_flexspi.c.o*(.text .text* .rodata .rodata*)
     . = ALIGN(128);
     __ram_function_end__ = .;
   } > m_qacode
