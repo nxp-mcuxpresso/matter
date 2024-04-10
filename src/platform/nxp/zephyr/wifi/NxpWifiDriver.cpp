@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ZephyrWifiDriver.h"
+#include "NxpWifiDriver.h"
 
 #include <platform/KeyValueStoreManager.h>
 
@@ -32,13 +32,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-size_t ZephyrWifiDriver::WiFiNetworkIterator::Count()
+size_t NxpWifiDriver::WiFiNetworkIterator::Count()
 {
     VerifyOrReturnValue(mDriver != nullptr, 0);
     return mDriver->mStagingNetwork.IsConfigured() ? 1 : 0;
 }
 
-bool ZephyrWifiDriver::WiFiNetworkIterator::Next(Network & item)
+bool NxpWifiDriver::WiFiNetworkIterator::Next(Network & item)
 {
     // we assume only one network is actually supported
     // TODO: verify if this can be extended
@@ -67,7 +67,7 @@ bool ZephyrWifiDriver::WiFiNetworkIterator::Next(Network & item)
     return true;
 }
 
-bool ZephyrWifiScanResponseIterator::Next(WiFiScanResponse & item)
+bool NxpWifiScanResponseIterator::Next(WiFiScanResponse & item)
 {
     if (mResultId < mResultCount)
     {
@@ -77,14 +77,14 @@ bool ZephyrWifiScanResponseIterator::Next(WiFiScanResponse & item)
     return false;
 }
 
-void ZephyrWifiScanResponseIterator::Release()
+void NxpWifiScanResponseIterator::Release()
 {
     mResultId = mResultCount = 0;
     Platform::MemoryFree(mResults);
     mResults = nullptr;
 }
 
-void ZephyrWifiScanResponseIterator::Add(const WiFiScanResponse & result)
+void NxpWifiScanResponseIterator::Add(const WiFiScanResponse & result)
 {
     void * newResults = Platform::MemoryRealloc(mResults, (mResultCount + 1) * sizeof(WiFiScanResponse));
 
@@ -95,7 +95,7 @@ void ZephyrWifiScanResponseIterator::Add(const WiFiScanResponse & result)
     }
 }
 
-CHIP_ERROR ZephyrWifiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR NxpWifiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     mpNetworkStatusChangeCallback = networkStatusChangeCallback;
 
@@ -113,7 +113,7 @@ CHIP_ERROR ZephyrWifiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
     return CHIP_NO_ERROR;
 }
 
-void ZephyrWifiDriver::OnNetworkStatusChanged(Status status)
+void NxpWifiDriver::OnNetworkStatusChanged(Status status)
 {
     if (status == Status::kSuccess)
     {
@@ -132,12 +132,12 @@ void ZephyrWifiDriver::OnNetworkStatusChanged(Status status)
     }
 }
 
-void ZephyrWifiDriver::Shutdown()
+void NxpWifiDriver::Shutdown()
 {
     mpNetworkStatusChangeCallback = nullptr;
 }
 
-CHIP_ERROR ZephyrWifiDriver::CommitConfiguration()
+CHIP_ERROR NxpWifiDriver::CommitConfiguration()
 {
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kPassKey, mStagingNetwork.pass, mStagingNetwork.passLen));
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kSsidKey, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
@@ -145,7 +145,7 @@ CHIP_ERROR ZephyrWifiDriver::CommitConfiguration()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZephyrWifiDriver::RevertConfiguration()
+CHIP_ERROR NxpWifiDriver::RevertConfiguration()
 {
     LoadFromStorage();
 
@@ -172,8 +172,8 @@ CHIP_ERROR ZephyrWifiDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status ZephyrWifiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                            uint8_t & outNetworkIndex)
+Status NxpWifiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                         uint8_t & outNetworkIndex)
 {
     outDebugText    = {};
     outNetworkIndex = 0;
@@ -191,7 +191,7 @@ Status ZephyrWifiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials,
     return Status::kSuccess;
 }
 
-Status ZephyrWifiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
+Status NxpWifiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText    = {};
     outNetworkIndex = 0;
@@ -202,7 +202,7 @@ Status ZephyrWifiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & out
     return Status::kSuccess;
 }
 
-Status ZephyrWifiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
+Status NxpWifiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText = {};
 
@@ -213,7 +213,7 @@ Status ZephyrWifiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutab
     return Status::kSuccess;
 }
 
-void ZephyrWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
+void NxpWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     Status status = Status::kSuccess;
     WiFiManager::StationStatus stationStatus;
@@ -252,7 +252,7 @@ exit:
     }
 }
 
-void ZephyrWifiDriver::LoadFromStorage()
+void NxpWifiDriver::LoadFromStorage()
 {
     WiFiManager::WiFiNetwork network;
 
@@ -262,7 +262,7 @@ void ZephyrWifiDriver::LoadFromStorage()
     mStagingNetwork = network;
 }
 
-void ZephyrWifiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status)
+void NxpWifiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus status)
 {
     VerifyOrReturn(mScanCallback != nullptr);
     mScanCallback->OnFinished(status == WiFiManager::WiFiRequestStatus::SUCCESS ? Status::kSuccess : Status::kUnknownError,
@@ -270,12 +270,12 @@ void ZephyrWifiDriver::OnScanWiFiNetworkDone(WiFiManager::WiFiRequestStatus stat
     mScanCallback = nullptr;
 }
 
-void ZephyrWifiDriver::OnScanWiFiNetworkResult(const WiFiScanResponse & response)
+void NxpWifiDriver::OnScanWiFiNetworkResult(const WiFiScanResponse & response)
 {
     mScanResponseIterator.Add(response);
 }
 
-void ZephyrWifiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
+void NxpWifiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
     mScanCallback    = callback;
     CHIP_ERROR error = WiFiManager::Instance().Scan(
