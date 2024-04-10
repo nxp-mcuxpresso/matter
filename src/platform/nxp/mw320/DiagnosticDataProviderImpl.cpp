@@ -184,15 +184,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     return CHIP_NO_ERROR;
 }
-void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
-{
-    while (netifp)
-    {
-        NetworkInterface * del = netifp;
-        netifp                 = netifp->Next;
-        delete del;
-    }
-}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
     return ConnectivityUtils::GetWiFiChannelNumber(ConnectivityMgrImpl().GetWiFiIfName(), channelNumber);
@@ -205,7 +197,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    return ConnectivityUtils::GetWiFiBeaconRxCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconRxCount);
+    return ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconRxCount);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
