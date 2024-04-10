@@ -50,8 +50,6 @@
 #endif
 
 extern "C" void BOARD_InitHardware(void);
-extern "C" void otPlatSetResetFunction(void (*fp)(void));
-extern "C" void initiateResetInIdle(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -207,7 +205,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
      */
     otPlatLogInit();
     otPlatRadioInit();
-    otPlatSetResetFunction(initiateResetInIdle);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -308,22 +305,6 @@ void PlatformManagerImpl::ScheduleResetInIdle(void)
 bool PlatformManagerImpl::GetResetInIdleValue(void)
 {
     return resetInIdle;
-}
-
-extern "C" void initiateResetInIdle(void)
-{
-    PlatformMgr().Shutdown();
-    PlatformMgrImpl().ScheduleResetInIdle();
-}
-
-extern "C" void scheduleResetInIdle(void)
-{
-    PlatformMgrImpl().ScheduleResetInIdle();
-}
-
-extern "C" bool getResetInIdleValue(void)
-{
-    return PlatformMgrImpl().GetResetInIdleValue();
 }
 
 void PlatformManagerImpl::StopBLEConnectivity(void) {}
