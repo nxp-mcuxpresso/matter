@@ -109,9 +109,9 @@ k32w1_sdk("sdk") {
 k32w1_executable("light_app") {
   output_name = "chip-k32w1-light-example"
 
-  defines = []
-  deps = []
   sources = []
+  deps = []
+  defines = []
 
   if (chip_config_dimmable_led) {
     defines += [ "CHIP_CONFIG_ENABLE_DIMMABLE_LED = 1" ]
@@ -162,16 +162,10 @@ k32w1_executable("light_app") {
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
     ]
-    defines += [
-      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_Router"
-    ]
   } else {
     deps += [
       "${openthread_root}:libopenthread-cli-mtd",
       "${openthread_root}:libopenthread-mtd",
-    ]
-    defines += [
-      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_MinimalEndDevice"
     ]
   }
 

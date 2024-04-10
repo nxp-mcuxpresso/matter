@@ -84,8 +84,6 @@ k32w0_sdk("sdk") {
 k32w0_executable("light_app") {
   output_name = "chip-k32w0x-light-example"
 
-  defines = []
-
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
     "${k32w0_platform_dir}/util/include/LEDWidget.h",
@@ -106,9 +104,7 @@ k32w0_executable("light_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines += [
-      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-    ]
+    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
   }
 
   deps = [
@@ -122,14 +118,17 @@ k32w0_executable("light_app") {
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
 
-  defines += [
-      "CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE=ConnectivityManager::kThreadDeviceType_MinimalEndDevice"
-  ]
-
-  deps += [
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-  ]
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 

@@ -98,7 +98,7 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    err = ConnectivityMgr().SetThreadDeviceType(CONNECTIVITY_MANAGER_THREAD_DEVICE_TYPE);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
     if (err != CHIP_NO_ERROR)
     {
         goto exit;
