@@ -105,20 +105,8 @@ evkbmimxrt1170 (host) to a IWX12 transceiver (rcp).
 
 -   Jumpers positions on Murata uSD to M2 adapter:
 
-    Use USB-C power supply 
-    | Jumper | Position| 
-    | :----: | :-----: | 
-    | J1 | 1-2 | 
-    | J12 | 1-2 | 
-    | J13 | 1-2 | 
-    | J14 | 1-2 | 
-    | JP1.1 (back side)| ON |
-
--   Jumpers positions on MIMXRT1170-EVKB:
-
-    | Jumper | Position| 
-    | :----: | :-----: | 
-    | J56 | 2-3 | 
+    Use USB-C power supply | Jumper | Position| | :----: | :-----: | | J1 | 1-2
+    | | J12 | 1-2 | | J13 | 1-2 | | J14 | 2-3 | | JP1.1 (back side)| ON |
 
 -   I2C connection to program IO-Expander on the IW612 module
 
