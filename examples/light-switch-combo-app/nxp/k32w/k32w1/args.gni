@@ -20,4 +20,3 @@ k32w1_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "none"
 chip_enable_ble = true
-use_smu2_static = true
