@@ -132,9 +132,6 @@ static_library("nxp_platform") {
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
-    # dep required to include 'lib/spinel/spinel.h' in PlatformManagerImpl.cpp
-    deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
-
     if (chip_mdns == "platform") {
       if (chip_enable_wifi) {
         sources += [ "../../common/DnssdImpl.cpp" ]
