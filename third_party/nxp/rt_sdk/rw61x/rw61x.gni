@@ -119,7 +119,7 @@ ELS_PKC_CL_PATH = "${COMPONENT_FILES_PATH}/els_pkc/"
 
 template("rw61x_sdk_drivers") {
   # Convert the CPU1/CPU2 fw binaries into src files
-  fw_bin_path = "${COMPONENT_FILES_PATH}/conn_fwloader/fw_bin"
+  fw_bin_path = "${COMPONENT_FILES_PATH}/conn_fwloader"
   fw_args = [
     "-t",
     cpu1_cpu2_fw_type,
@@ -456,9 +456,9 @@ template("rw61x_sdk_drivers") {
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
 
       # fw binaries for cpu1/cpu2
-      "${fw_bin_path}/${board_version}/fw_cpu1.c",
-      "${fw_bin_path}/${board_version}/fw_cpu2_ble.c",
-      "${fw_bin_path}/${board_version}/fw_cpu2_combo.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu1.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu2_ble.c",
+      "${COMPONENT_FILES_PATH}/conn_fwloader/${board_version}/fw_cpu2_combo.c",
 
       # this platform file is needed for BLE/15.4 Controller wake up
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ble.c",
