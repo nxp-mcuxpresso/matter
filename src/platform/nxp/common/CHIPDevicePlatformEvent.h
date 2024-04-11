@@ -88,6 +88,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformNxpWlanEvent,
     kPlatformNxpIpChangeEvent,
     kPlatformNxpStartWlanConnectEvent,
+    kPlatformNxpScanWiFiNetworkDoneEvent,
 };
 
 } // namespace DeviceEventType
@@ -135,6 +136,7 @@ struct ChipDevicePlatformEvent final
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
         enum wlan_event_reason WlanEventReason;
         struct wlan_network * pNetworkDataEvent;
+        unsigned int ScanWiFiNetworkCount;
 #endif
     };
 };
