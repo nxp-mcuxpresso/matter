@@ -10,8 +10,13 @@
 namespace chip {
 namespace NXP {
 namespace App {
-/* Creates a dedicated Task responsible for connecting to a WiFi network */
-void WifiConnectTaskCreate(void);
+
+/*
+ * Function allowing to join a Wi-Fi network based on Wi-Fi build credentials
+ * Must be called after completing Wi-Fi driver initialization
+ */
+void WifiConnectAtboot(void);
+
 } // namespace App
 } // namespace NXP
 } // namespace chip
