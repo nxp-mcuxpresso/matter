@@ -19,8 +19,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("light-switch-combo-common") {
   zap_file = "light-switch-combo-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/light-switch-combo-app/zap-generated"
-
   is_server = true
 }
