@@ -60,6 +60,10 @@
 	url = https://github.com/NXP/plug-and-trust.git
 	branch  = int/CHIPSE_Release
 	platforms = nxp
+[submodule "third_party/nxp/vscode"]
+	path = third_party/nxp/vscode
+	url = ../matter-vscode.git
+	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = ../ot-nxp.git
