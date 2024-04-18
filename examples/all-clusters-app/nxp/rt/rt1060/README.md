@@ -377,6 +377,13 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt106
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
 ```
 
+-   Build Matter with Border Router configuration with onnetwork commissioning:
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ gn gen --args="chip_enable_wifi=true w8801_transceiver=true chip_enable_matter_cli=true chip_config_network_layer_ble=false wifi_auto_connect_at_boot=true wifi_auto_connect_at_boot_ssid=\"your_wifi_ssid\" wifi_auto_connect_at_boot_password=\"your_wifi_password\" chip_enable_openthread=true k32w0_transceiver=true k32w0_transceiver_bin_path=\"/path/to/ot-rcp/ot-rcp-ble-hci-bb-k32w061.elf.bin.h\" openthread_root =\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\"" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rt1060$ ninja -C out/debug
+```
+
 ### General Information
 
 The resulting output file can be found in
@@ -567,7 +574,7 @@ using the matter shell, follow instructions from
 ['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
 
 In this configuration, the device can be commissioned over Wi-Fi with the
-'ble-wifi' pairing method.
+'ble-wifi' or 'onnetwork' pairing method.
 
 ### Testing the all-clusters application without Matter CLI:
 
