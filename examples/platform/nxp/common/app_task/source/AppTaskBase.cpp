@@ -63,6 +63,11 @@
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
 
+#ifdef SMOKE_CO_ALARM
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -78,6 +83,12 @@ app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
 #endif
 
 #if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#endif
+
+#ifdef SMOKE_CO_ALARM
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
@@ -103,6 +114,15 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif
+
+#ifdef SMOKE_CO_ALARM
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler) == CHIP_NO_ERROR);
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+#endif
+
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server
