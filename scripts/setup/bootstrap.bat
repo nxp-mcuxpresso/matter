@@ -22,26 +22,34 @@
 :: Allow forcing a specific Python version through the environment variable
 :: PW_BOOTSTRAP_PYTHON. Otherwise, use the system Python if one exists.
 if not "%PW_BOOTSTRAP_PYTHON%" == "" (
-  set "python=%PW_BOOTSTRAP_PYTHON%"
-  goto setup_environment
+	set "python=%PW_BOOTSTRAP_PYTHON%"
+) else (
+	:: Detect python installation.
+	where python >NUL 2>&1
+	IF %ERRORLEVEL% NEQ 0 (
+		echo.
+		echo Error: no system Python present
+		echo.
+		echo   Pigweed's bootstrap process requires a local system Python.
+		echo   Please install Python on your system, add it to your PATH
+		echo   and re-try running bootstrap.
+		goto finish
+	)
+	set "python=python"
 )
 
-:: Detect python installation.
-where python >NUL 2>&1
-if %ERRORLEVEL% EQU 0 (
-  set "python=python"
-  goto setup_environment
+:: Detect curl installation
+where curl >NUL 2>&1
+if %ERRORLEVEL% NEQ 0 (
+	echo.
+	echo Error: no system curl present
+	echo.
+	echo   Pigweed's prerequisites check requires a local system curl.
+	echo   Please install curl on your system, add it to your PATH
+	echo   and re-try running bootstrap.
+	goto finish
 )
 
-echo.
-echo Error: no system Python present
-echo.
-echo   Pigweed's bootstrap process requires a local system Python.
-echo   Please install Python on your system, add it to your PATH
-echo   and re-try running bootstrap.
-goto finish
-
-:setup_environment
 set _BOOTSTRAP_NAME=%~n0
 set _CHIP_ROOT=%cd%
 set _CONFIG_FILE=%_CHIP_ROOT%\scripts\setup\environment.json
@@ -67,13 +75,24 @@ if not exist "%_PW_ACTUAL_ENVIRONMENT_ROOT%" mkdir "%_PW_ACTUAL_ENVIRONMENT_ROOT
 set _GENERATED_PIGWEED_CIPD_JSON=%_PW_ACTUAL_ENVIRONMENT_ROOT%/pigweed.json
 
 call "%python%" "scripts/setup/gen_pigweed_cipd_json.py" -i "%_PIGWEED_CIPD_JSON%" -o "%_GENERATED_PIGWEED_CIPD_JSON%"
+if %ERRORLEVEL% NEQ 0 goto finish
 
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
-	goto pw_bootstrap
+	goto pw_check_prerequisites
 ) else (
 	call "%python%" "%PW_ROOT%\pw_env_setup\py\pw_env_setup\windows_env_start.py"
+	if %ERRORLEVEL% NEQ 0 goto finish
 	goto pw_activate
 )
+
+:: Ensure pigweed env prerequisites are OK
+:pw_check_prerequisites
+curl https://pigweed.googlesource.com/pigweed/examples/+/main/tools/setup_windows_prerequisites.bat?format=TEXT > setup_pigweed_prerequisites.b64
+certutil -decode -f setup_pigweed_prerequisites.b64 setup_pigweed_prerequisites.bat
+del setup_pigweed_prerequisites.b64
+call setup_pigweed_prerequisites.bat
+if %ERRORLEVEL% NEQ 0 goto finish
+goto pw_bootstrap
 
 :install_additional_pip_requirements
 pip install ^
@@ -91,6 +110,7 @@ call "%python%" "%PW_ROOT%\pw_env_setup\py\pw_env_setup\env_setup.py" ^
 	--virtualenv-gn-out-dir "%_PW_ACTUAL_ENVIRONMENT_ROOT%\gn_out" ^
 	--project-root "%PW_PROJECT_ROOT%" ^
     --additional-cipd-file "%_GENERATED_PIGWEED_CIPD_JSON%"
+if %ERRORLEVEL% NEQ 0 goto finish
 goto pw_activate
 
 :pw_activate
@@ -126,4 +146,5 @@ set _BOOTSTRAP_NAME=
 set PW_CIPD_INSTALL_DIR=
 set _PW_TEXT=
 set PW_DOCTOR_SKIP_CIPD_CHECKS=
+if exist setup_pigweed_prerequisites.bat del setup_pigweed_prerequisites.bat
 exit /B 0
