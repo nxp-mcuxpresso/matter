@@ -1,0 +1,30 @@
+--- a/sdmmc_config.h
++++ b/sdmmc_config.h
+@@ -8,6 +8,8 @@
+ #ifndef _SDMMC_CONFIG_H_
+ #define _SDMMC_CONFIG_H_
+ 
++#include "fsl_common.h"
++
+ #ifdef SD_ENABLED
+ #include "fsl_sd.h"
+ #endif
+@@ -47,9 +49,9 @@
+ #define BOARD_SDMMC_SD_CD_TYPE                       kSD_DetectCardByGpioCD
+ #define BOARD_SDMMC_SD_CARD_DETECT_DEBOUNCE_DELAY_MS (100U)
+ /*! @brief SD power reset */
+-#define BOARD_SDMMC_SD_POWER_RESET_GPIO_BASE GPIO1
++#define BOARD_SDMMC_SD_POWER_RESET_GPIO_BASE GPIO5
+ #define BOARD_SDMMC_SD_POWER_RESET_GPIO_PORT 1
+-#define BOARD_SDMMC_SD_POWER_RESET_GPIO_PIN  19U
++#define BOARD_SDMMC_SD_POWER_RESET_GPIO_PIN  1U
+ /*! @brief SD IO voltage */
+ #define BOARD_SDMMC_SD_IO_VOLTAGE_CONTROL_TYPE kSD_IOVoltageCtrlByHost
+ 
+@@ -111,4 +113,4 @@ void BOARD_MMC_Config(void *card, uint32_t hostIRQPriority);
+ }
+ #endif /* __cplusplus */
+ 
+-#endif /* _BOARD_H_ */
++#endif /* _BOARD_H_ */
+\ No newline at end of file

@@ -25,6 +25,7 @@
 #define __LWIPOPTS_H__
 
 #define LWIP_IPV4 1
+#define PBUF_POOL_SIZE 15
 
 #include "lwipopts_common.h"
 

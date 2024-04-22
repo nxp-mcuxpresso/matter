@@ -3,6 +3,7 @@
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
+ *    Copyright 2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,8 +40,8 @@
 
 /* Default NXP Platform general configuration overrides are used */
 
-/* For now on RT1060, due to the current file system implementation only 5 fabrics are supported */
-#define CHIP_CONFIG_MAX_FABRICS 5
+/* Maximum number of entries supported in a write binding command */
+#define CHIP_CONFIG_MAX_FABRICS 6
 
 // ==================== Security Configuration Overrides ====================
 

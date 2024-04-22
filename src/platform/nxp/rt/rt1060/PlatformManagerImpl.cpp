@@ -3,6 +3,7 @@
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
+ *    Copyright 2024 NXP.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -124,11 +125,6 @@ extern "C" {
 }
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
-
-extern "C" void vApplicationMallocFailedHook(void)
-{
-    ChipLogError(DeviceLayer, "Malloc Failure");
-}
 
 #if WIFI_PTA_ENABLED && (CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_ENABLE_OPENTHREAD)
 #ifdef SD8801

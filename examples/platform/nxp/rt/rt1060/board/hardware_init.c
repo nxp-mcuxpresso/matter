@@ -1,6 +1,5 @@
 /*
- * Copyright 2022 NXP
- * All rights reserved.
+ * Copyright 2022, 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,6 +12,8 @@
 #include "fsl_lpuart_edma.h"
 #include "peripherals.h"
 #include "pin_mux.h"
+#include "sln_rgb_led_driver.h"
+#include "sln_main.h"
 
 #if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
     (defined(WIFI_IW416_BOARD_AW_AM510_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
@@ -50,26 +51,8 @@ void BOARD_InitHardware(void)
     {
         BOARD_ConfigMPU();
         BOARD_InitBootPins();
-#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
-        BOARD_InitUSDHCPins();
-#else
-        BOARD_InitENETPins();
-#endif
-
-#if (defined(WIFI_IW416_BOARD_MURATA_1XK_USD) || defined(WIFI_88W8987_BOARD_MURATA_1ZM_USD))
-        BOARD_InitMurataModulePins();
-#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2))
-        BOARD_InitPinsM2();
-        BOARD_InitM2SPIPins();
-        BOARD_InitM2I2CPins();
-#endif
-
-#ifdef BOARD_OTW_K32W0_PIN_INIT
-        BOARD_InitOTWPins();
-#endif
         BOARD_InitBootClocks();
         BOARD_InitBootPeripherals();
-        BOARD_InitDebugConsole();
         SCB_DisableDCache();
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -82,24 +65,15 @@ void BOARD_InitHardware(void)
         EDMA_GetDefaultConfig(&config);
         EDMA_Init(dmaBases[0], &config);
 #endif
-#if (defined(WIFI_IW416_BOARD_MURATA_1XK_USD) || defined(WIFI_88W8987_BOARD_MURATA_1ZM_USD))
-        /* Turn on Bluetooth module */
-        GPIO_PinWrite(MURATA_WIFI_RESET_GPIO, MURATA_WIFI_RESET_GPIO_PIN, 1U);
-#endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_WPA
         BOARD_InitModuleClock();
 #endif
 
-        IOMUXC_EnableMode(IOMUXC_GPR, kIOMUXC_GPR_ENET1TxClkOutputDir, true);
-
-        GPIO_PinInit(GPIO1, 9, &gpio_config);
-        GPIO_PinInit(GPIO1, 10, &gpio_config);
-        /* pull up the ENET_INT before RESET. */
-        GPIO_WritePinOutput(GPIO1, 10, 1);
-        GPIO_WritePinOutput(GPIO1, 9, 0);
         delay();
-        GPIO_WritePinOutput(GPIO1, 9, 1);
+        GPIO_WritePinOutput(GPIO5, 1, 1);
+
+        sln_main();
 #endif
         isInitialize = true;
     }
@@ -120,11 +94,11 @@ int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
     config->enableTxCTS     = 1u;
 #if (defined(HAL_UART_DMA_ENABLE) && (HAL_UART_DMA_ENABLE > 0U))
     config->dma_instance     = 0U;
-    config->rx_channel       = 0U;
-    config->tx_channel       = 1U;
+    config->rx_channel       = 4U;
+    config->tx_channel       = 5U;
     config->dma_mux_instance = 0U;
-    config->rx_request       = kDmaRequestMuxLPUART3Rx;
-    config->tx_request       = kDmaRequestMuxLPUART3Tx;
+    config->rx_request       = kDmaRequestMuxLPUART1Rx;
+    config->tx_request       = kDmaRequestMuxLPUART1Tx;
 #endif
     return 0;
 }

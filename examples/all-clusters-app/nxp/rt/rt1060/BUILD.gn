@@ -44,8 +44,8 @@ declare_args() {
   wifi_connect = false
 
   # The 2 params below are used only if tcp_download or wifi_connect are true, otherwise they're unused.
-  wifi_ssid = ""
-  wifi_password = ""
+  wifi_ssid = "" 
+  wifi_password = "" 
 
   # Setup discriminator as argument
   setup_discriminator = 3840
@@ -63,31 +63,158 @@ app_common_folder = "all-clusters-app/all-clusters-common"
 # Create here the SDK instance.
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
-  defines = []
-
-  cflags = []
+  defines = ["CPU_MIMXRT106SDVL6A", "CPU_MIMXRT106SDVL6A_cm7"]
+  defines += ["XIP_BOOT_HEADER_DCD_ENABLE=1", "XIP_EXTERNAL_FLASH=1", "XIP_BOOT_HEADER_ENABLE=1"]
+  defines += ["SKIP_SYSCLK_INIT"]
+  defines += ["SDK_OS_FREE_RTOS", "USE_RTOS"]
+  defines += ["SDK_SAI_BASED_COMPONENT_USED=1", "ENABLE_WIFI=0", "SDIO_ENABLED"]
+  defines += ["SDK_I2C_BASED_COMPONENT_USED=1", "USE_MQS=1", "SERIAL_PORT_TYPE_UART=1"]
+  defines += ["DEBUG_CONSOLE_RX_ENABLE=0", "SDK_DEBUGCONSOLE_UART=1", "SDK_DEBUGCONSOLE=1"]
+  defines += ["CONFIG_FLEXRAM_AT_STARTUP=1"]
+  defines += ["RELOCATE_VECTOR_TABLE=1"]
+  defines += ["FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1"]
+  cflags = ["-imacrosapp.h"]
   public_deps = []
   public_configs = []
   sources = []
   include_dirs = []
 
-  # Indicate paths to default board files
+  # Indicate include paths
   include_dirs += [ "${example_platform_dir}/board/" ]
-  # RT1060 rev A use same pin mux as rev B
-  # If user needs different pin mux files for rev A and rev B boards, the source and include from below needs to be updated accordingly
-  if (evkname == "evkmimxrt1060"){
-    include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
-    sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
-  }
-  else{
-    include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
-    sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
-  }
-
+  include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+  include_dirs += [ "${example_platform_dir}/app/drivers" ]
+  include_dirs += [ "${example_platform_dir}/app/source" ]
+  include_dirs += [ "${example_platform_dir}/app/project_include" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/phy" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/device/include" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/device/source" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/device/source/ehci" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/include" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/device/class" ]
+  include_dirs += [ "${example_platform_dir}/app/usb/device/class/cdc" ]
+  include_dirs += [ "${example_platform_dir}/app/component/serial_manager/usb_cdc_adapter" ]
+  include_dirs += [ "${example_platform_dir}/app/component/serial_manager/" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/DSMT" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/DSMT/en" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/VIT" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/VIT/en" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/S2I" ]
+  include_dirs += [ "${example_platform_dir}/app/local_voice/S2I/en" ]
+  include_dirs += [ "${example_platform_dir}/app/audio" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/audio_processing" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/prompts" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/rdsp_includes" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/rdsp_utilities_public/include" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/rdsp_utilities_public/rdsp_memory_utils_public" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/sln_afe" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/VIT" ]
+  include_dirs += [ "${example_platform_dir}/app/audio/VIT/Inc" ]
+  include_dirs += [ "${example_platform_dir}/app/codec" ]
+  include_dirs += [ "${example_platform_dir}/app/audio_streamer" ]
+  include_dirs += [ "${example_platform_dir}/app/audio_streamer/inc" ]
+  include_dirs += [ "${example_platform_dir}/app/cjson/inc" ]
+  include_dirs += [ "${example_platform_dir}/app/CMSIS" ]
+  include_dirs += [ "${example_platform_dir}/app/libs" ]
+  
+  # Board dir
+  sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
+  sources += [ "${example_platform_dir}/board/dcd.c" ]
+
+  # Drivers dir
+  sources += [ "${example_platform_dir}/app/drivers/flexspi_nor_flash_ops.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_flexio.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_gpt.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_sai.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_sai_edma.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_flexram.c" ]
+  sources += [ "${example_platform_dir}/app/drivers/fsl_flexram_allocate.c" ]
+
+  # usb
+  sources += [ "${example_platform_dir}/app/usb/phy/usb_phy.c" ]
+  sources += [ "${example_platform_dir}/app/usb/device/source/usb_device_ch9.c" ]
+  sources += [ "${example_platform_dir}/app/usb/device/source/usb_device_dci.c" ]
+  sources += [ "${example_platform_dir}/app/usb/device/source/ehci/usb_device_ehci.c" ]
+  sources += [ "${example_platform_dir}/app/usb/device/class/usb_device_class.c" ]
+  sources += [ "${example_platform_dir}/app/usb/device/class/cdc/usb_device_cdc_acm.c" ]
+
+  # codec
+  sources += [ "${example_platform_dir}/app/codec/fsl_codec_adapter.c" ]
+  sources += [ "${example_platform_dir}/app/codec/fsl_codec_common.c" ]
+
+  # component
+  sources += [ "${example_platform_dir}/app/component/serial_manager/usb_cdc_adapter/usb_device_descriptor.c" ]
+  sources += [ "${example_platform_dir}/app/component/serial_manager/fsl_component_serial_manager.c" ]
+  sources += [ "${example_platform_dir}/app/component/serial_manager/fsl_component_serial_port_usb.c" ]
+  sources += [ "${example_platform_dir}/app/component/serial_manager/fsl_component_serial_port_uart.c" ]
+
+  # local_voice
+  sources += [ "${example_platform_dir}/app/local_voice/S2I/demo_definitions_s2i.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/S2I/en/VIT_Model_en_Home.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/IndexCommands.c" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/voice_demos_dsmt.c" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/demo_definitions_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/demo_actions_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/en/en_strings_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/en/en_strings_to_actions_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/en/en_strings_to_prompts_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/en/en_voice_demos_dsmt.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/VIT/voice_demos_vit.c" ]
+  sources += [ "${example_platform_dir}/app/local_voice/VIT/demo_actions_vit.h" ]
+  sources += [ "${example_platform_dir}/app/local_voice/DSMT/en/en_voice_model_binary_dsmt.s" ]
+
+  # audio
+  sources += [ "${example_platform_dir}/app/audio/pdm_to_pcm_task.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_amplifier_processing.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_amplifier.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_i2s_mic_processing.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_i2s_mic.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_pdm_mic.c" ]
+  sources += [ "${example_platform_dir}/app/audio/audio_processing/audio_processing_task.c" ]
+  sources += [ "${example_platform_dir}/app/audio/rdsp_utilities_public/rdsp_memory_utils_public/memcheck.c" ]
+  sources += [ "${example_platform_dir}/app/audio/rdsp_utilities_public/rdsp_memory_utils_public/RdspMemoryUtilsPublic.c" ]
+  sources += [ "${example_platform_dir}/app/audio/sln_afe/sln_afe.c" ]
+
+  # audio_stremar
+  sources += [ "${example_platform_dir}/app/audio_streamer/local_sounds_task.c" ]
+  sources += [ "${example_platform_dir}/app/audio_streamer/sln_streamer.c" ]
+  sources += [ "${example_platform_dir}/app/audio_streamer/streamer_pcm.c" ]
+
+  # cjson
+  sources += [ "${example_platform_dir}/app/cjson/src/cJSON.c" ]
+  sources += [ "${example_platform_dir}/app/cjson/src/cJSON_Utils.c" ]
+
+  # startup
+  sources += [ "${example_platform_dir}/startup/startup_mimxrt106s.cpp"]
+
+  # Source dir
+  sources += [ "${example_platform_dir}/app/source/binding_table.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_encrypt.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_flash_config.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_flash_littlefs.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_flash.c" ]
+  sources += [ "${example_platform_dir}/app/source/flash_ica_driver.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_pwm_driver_flexio.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_rgb_led_driver.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_RT10xx_RGB_LED_driver_flexio.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_shell.c" ]
+  sources += [ "${example_platform_dir}/app/source/perf.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_local_voice_dsmt.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_local_voice_vit.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_local_voice_s2i.c" ]
+  sources += [ "${example_platform_dir}/app/source/app_layer.c" ]
+  sources += [ "${example_platform_dir}/app/source/app_layer_nxp.c" ]
+  sources += [ "${example_platform_dir}/app/source/app_layer_nxp_s2i.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_app_fwupdate.c" ]
+  sources += [ "${example_platform_dir}/app/source/os_hooks.c" ]
+  sources += [ "${example_platform_dir}/app/source/iot_logging_task_dynamic_buffers.c" ]
+  sources += [ "${example_platform_dir}/app/source/fsl_str.c" ]
+  sources += [ "${example_platform_dir}/app/source/fault_handlers.c" ]
+  sources += [ "${example_platform_dir}/app/source/sln_main.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]

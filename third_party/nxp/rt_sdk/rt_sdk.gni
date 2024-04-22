@@ -85,6 +85,7 @@ declare_args() {
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
 
   rt_sdk_root = "${chip_root}/third_party/nxp/github_sdk/${sdk_repo}"
+  all_clusters_app_libs_path = "${chip_root}/examples/platform/nxp/rt/rt1060/app/libs"
 }
 
 declare_args() {
@@ -147,7 +148,7 @@ template("rt_transceiver") {
       ]
       if (is_sdk_2_15) {
         _transceiver_include_dirs += [
-          "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware/nw61x",
+          "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware/IW416",
           "${rt_sdk_root}/middleware/wifi_nxp/fwdnld_intf_abs",
           "${rt_sdk_root}/middleware/wifi_nxp/sdio_nxp_abs/incl",
           "${rt_sdk_root}/middleware/wifi_nxp/firmware_dnld",
@@ -353,7 +354,7 @@ template("rt_sdk") {
       #SDK components
       "${rt_core_sdk_root}/components/uart",
       "${rt_core_sdk_root}/components/spi",
-      "${rt_core_sdk_root}/components/serial_manager",
+      #"${rt_core_sdk_root}/components/serial_manager",
       "${rt_core_sdk_root}/components/lists",
       "${rt_core_sdk_root}/components/osa",
       "${rt_core_sdk_root}/components/common_task",
@@ -371,7 +372,7 @@ template("rt_sdk") {
       "${rt_core_sdk_root}/components/wifi_bt_module/incl",
       "${rt_core_sdk_root}/components/messaging",
       "${rt_core_sdk_root}/components/mem_manager",
-      "${rt_core_sdk_root}/components/flash/mflash",
+      # "${rt_core_sdk_root}/components/flash/mflash",
       "${rt_core_sdk_root}/components/time_stamp",
 
       #Framework files
@@ -428,7 +429,25 @@ template("rt_sdk") {
        ]
     }
 
-    libs = []
+    libs = [
+      "${all_clusters_app_libs_path}/libarm_cortexM7lfdp_math.a",
+      "${all_clusters_app_libs_path}/libccimeta.a",
+      "${all_clusters_app_libs_path}/libcommon.a",
+      "${all_clusters_app_libs_path}/libmp3dec.a",
+      "${all_clusters_app_libs_path}/libopusdec.a",
+      "${all_clusters_app_libs_path}/libopusenc.a",
+      "${all_clusters_app_libs_path}/libosa.a",
+      "${all_clusters_app_libs_path}/libPdmConvertForRt10xx.a",
+      "${all_clusters_app_libs_path}/libsln_asr_evaluation.a",
+      #"${all_clusters_app_libs_path}/libsln_asr_production.a",
+      "${all_clusters_app_libs_path}/libsln_dsp_toolbox.a",
+      "${all_clusters_app_libs_path}/libsrc48k.a",
+      "${all_clusters_app_libs_path}/libstreamer.a",
+      "${all_clusters_app_libs_path}/libVIT_CM7_Production_v06_03_01.a", 
+      #"${all_clusters_app_libs_path}/libVIT_CM7_v04_10_00.a",
+      "${all_clusters_app_libs_path}/libvoiceseeker.a",
+      "${all_clusters_app_libs_path}/libwavdec.a",
+    ]
 
     defines = [
       "__STARTUP_CLEAR_BSS",
@@ -436,8 +455,8 @@ template("rt_sdk") {
       "__STARTUP_INITIALIZE_RAMFUNCTION",
 
       #"SERIAL_MANAGER_NON_BLOCKING_MODE=1",
-      "SERIAL_MANAGER_TASK_HANDLE_RX_AVAILABLE_NOTIFY=1",
-      "SERIAL_MANAGER_RING_BUFFER_FLOWCONTROL=1",
+      #"SERIAL_MANAGER_TASK_HANDLE_RX_AVAILABLE_NOTIFY=1",
+      #"SERIAL_MANAGER_RING_BUFFER_FLOWCONTROL=1",
       "SDK_OS_FREE_RTOS",
 
       #Enable the OSA startup task
@@ -458,11 +477,11 @@ template("rt_sdk") {
       #    "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
       # For Debug Console, This flag is not use for Debug Console Light
       "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
-      "HAL_UART_ADAPTER_FIFO=1",
+      # "HAL_UART_ADAPTER_FIFO=1",
       "SDK_DEBUGCONSOLE_UART=1",
       "SERIAL_PORT_TYPE_UART=1",
       "CONFIG_ARM=1",
-      "SERIAL_MANAGER_TASK_STACK_SIZE=4048",
+      #"SERIAL_MANAGER_TASK_STACK_SIZE=4048",
 
       #LWIP common options
       "USE_RTOS=1",
@@ -537,8 +556,8 @@ template("rt_sdk") {
 
     if (iw416_transceiver) {
       defines += [
-        "WIFI_IW416_BOARD_AW_AM510_USD",
         "SDIO_ENABLED",
+        "WIFI_IW416_BOARD_AW_AM510_USD",
       ]
     }
 
@@ -659,8 +678,8 @@ template("rt_sdk") {
       "${rt_core_sdk_root}/components/messaging/fsl_component_messaging.c",
       "${rt_core_sdk_root}/components/osa/fsl_os_abstraction_free_rtos.c",
       "${rt_core_sdk_root}/components/phy/device/phyksz8081/fsl_phyksz8081.c",
-      "${rt_core_sdk_root}/components/serial_manager/fsl_component_serial_manager.c",
-      "${rt_core_sdk_root}/components/serial_manager/fsl_component_serial_port_uart.c",
+      #"${rt_core_sdk_root}/components/serial_manager/fsl_component_serial_manager.c",
+      #"${rt_core_sdk_root}/components/serial_manager/fsl_component_serial_port_uart.c",
       "${rt_core_sdk_root}/components/timer_manager/fsl_component_timer_manager.c",
 
       #Framework files
@@ -686,7 +705,7 @@ template("rt_sdk") {
       sources += [
         "${rt_sdk_root}/middleware/wireless/framework/FileSystem/fwk_filesystem.c",
         "${rt_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c",
-        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_flash.c",
+        # "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_flash.c",
       ]
     }
 
@@ -707,7 +726,7 @@ template("rt_sdk") {
     if (rt_nvm_component == "littlefs") {
       sources += [
         "${rt_sdk_root}/middleware/wireless/framework/FileSystem/fwk_filesystem.c",
-        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_flash.c",
+        # "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_flash.c",
       ]
       sources += [
         #littlefs

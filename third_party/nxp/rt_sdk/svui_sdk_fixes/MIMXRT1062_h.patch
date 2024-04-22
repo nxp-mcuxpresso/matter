@@ -1,0 +1,56 @@
+--- a/MIMXRT1062.h
++++ b/MIMXRT1062.h
+@@ -27850,11 +27850,52 @@ typedef struct {
+  *  0b1..select synced sample_lv
+  */
+ #define IOMUXC_GPR_GPR14_ACMP4_SAMPLE_SYNC_EN(x) (((uint32_t)(((uint32_t)(x)) << IOMUXC_GPR_GPR14_ACMP4_SAMPLE_SYNC_EN_SHIFT)) & IOMUXC_GPR_GPR14_ACMP4_SAMPLE_SYNC_EN_MASK)
++#define IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_MASK      (0xF0000U)
++#define IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_SHIFT     (16U)
++/*! CM7_CFGITCMSZ
++ *  0b0000..0 KB (No ITCM)
++ *  0b0011..4 KB
++ *  0b0100..8 KB
++ *  0b0101..16 KB
++ *  0b0110..32 KB
++ *  0b0111..64 KB
++ *  0b1000..128 KB
++ *  0b1001..256 KB
++ *  0b1010..512 KB
++ */
++#define IOMUXC_GPR_GPR14_CM7_CFGITCMSZ(x)        (((uint32_t)(((uint32_t)(x)) << IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_SHIFT)) & IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_MASK)
++#define IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_MASK      (0xF00000U)
++#define IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_SHIFT     (20U)
++/*! CM7_CFGDTCMSZ
++ *  0b0000..0 KB (No DTCM)
++ *  0b0011..4 KB
++ *  0b0100..8 KB
++ *  0b0101..16 KB
++ *  0b0110..32 KB
++ *  0b0111..64 KB
++ *  0b1000..128 KB
++ *  0b1001..256 KB
++ *  0b1010..512 KB
++ */
++#define IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ(x)        (((uint32_t)(((uint32_t)(x)) << IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_SHIFT)) & IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_MASK)
+ /*! @} */
+ 
+ /*! @name GPR16 - GPR16 General Purpose Register */
+ /*! @{ */
+-
++#define IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK       (0x1U)
++#define IOMUXC_GPR_GPR16_INIT_ITCM_EN_SHIFT      (0U)
++/*! INIT_ITCM_EN
++ *  0b0..ITCM is disabled
++ *  0b1..ITCM is enabled
++ */
++#define IOMUXC_GPR_GPR16_INIT_ITCM_EN(x)         (((uint32_t)(((uint32_t)(x)) << IOMUXC_GPR_GPR16_INIT_ITCM_EN_SHIFT)) & IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK)
++#define IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK       (0x2U)
++#define IOMUXC_GPR_GPR16_INIT_DTCM_EN_SHIFT      (1U)
++/*! INIT_DTCM_EN
++ *  0b0..DTCM is disabled
++ *  0b1..DTCM is enabled
++ */
++#define IOMUXC_GPR_GPR16_INIT_DTCM_EN(x)         (((uint32_t)(((uint32_t)(x)) << IOMUXC_GPR_GPR16_INIT_DTCM_EN_SHIFT)) & IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK)
+ #define IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_MASK (0x4U)
+ #define IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_SHIFT (2U)
+ /*! FLEXRAM_BANK_CFG_SEL

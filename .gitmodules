@@ -29,7 +29,7 @@
 	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
-	url = ../openthread.git
+	url = ssh://git@bitbucket.sw.nxp.com/connint/openthread.git
 	branch  = main
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
@@ -62,7 +62,7 @@
 	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
-	url = ../ot-nxp.git
+	url = ssh://git@bitbucket.sw.nxp.com/connint/ot-nxp.git
 	platforms = nxp
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo

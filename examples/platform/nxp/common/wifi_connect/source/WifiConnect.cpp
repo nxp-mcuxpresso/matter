@@ -17,6 +17,8 @@ extern "C" {
 #include <wm_os.h>
 }
 
+#include "WifiConnect.h"
+
 using namespace ::chip::DeviceLayer;
 
 /* Wifi Connect task configuration */
@@ -26,7 +28,7 @@ using namespace ::chip::DeviceLayer;
 
 /* Set to 1 in order to connect to a dedicated Wi-Fi network. */
 #ifndef WIFI_CONNECT
-#define WIFI_CONNECT 0
+#define WIFI_CONNECT 1
 #endif
 
 bool networkAdded = false;

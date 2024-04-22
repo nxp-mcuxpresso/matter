@@ -38,6 +38,17 @@
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+/* Ensure stdint is only used by the compiler, and not the assembler. */
+
+#if defined( __ICCARM__ ) || defined( __ARMCC_VERSION ) || defined( __GNUC__)
+    #include <stdint.h>
+    extern uint32_t SystemCoreClock;
+    extern int DbgConsole_Printf( const char *fmt_s, ... );
+    extern int log_shell_printf( const char *fmt_s, ... );
+    extern void vLoggingPrintf( const char *pcFormat, ... );
+    extern void sln_shell_trace_malloc(void *ptr, size_t size);
+    extern void sln_shell_trace_free(void *ptr, size_t size);
+#endif
 
 #define configUSE_PREEMPTION 1
 #define configUSE_IDLE_HOOK 1
@@ -51,10 +62,10 @@
 /* stack size increased for NVM/LITTLE_FS save in idle task */
 #define configMINIMAL_STACK_SIZE ((uint16_t) 2048)
 #ifndef configTOTAL_HEAP_SIZE
-#define configTOTAL_HEAP_SIZE ((size_t) (126 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) (150 * 1024))
 #endif
 #define configAPPLICATION_ALLOCATED_HEAP 1
-#define configSUPPORT_STATIC_ALLOCATION 0
+#define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define configFRTOS_MEMORY_SCHEME 4
 #define configMAX_TASK_NAME_LEN (16)
@@ -63,9 +74,9 @@
 #define configIDLE_SHOULD_YIELD 1
 #define configUSE_MUTEXES 1
 #define configQUEUE_REGISTRY_SIZE 8
-#define configCHECK_FOR_STACK_OVERFLOW 0
+#define configCHECK_FOR_STACK_OVERFLOW 1
 #define configUSE_RECURSIVE_MUTEXES 1
-#define configUSE_MALLOC_FAILED_HOOK 0
+#define configUSE_MALLOC_FAILED_HOOK 1
 #define configUSE_APPLICATION_TASK_TAG 0
 #define configUSE_COUNTING_SEMAPHORES 1
 #define configGENERATE_RUN_TIME_STATS 0
@@ -115,11 +126,20 @@
         }                                                                                                                          \
     }
 
-/* Map the FreeRTOS printf() to the logging task printf. */
-#define configPRINTF(x) vLoggingPrintf x
+#if ENABLE_LOGGING_TASK
+#define  configPRINTF( x )    vLoggingPrintf x
+#else
+#define  configPRINTF( x )    DbgConsole_Printf x
+#endif /* ENABLE_LOGGING_TASK */
 
 /* Map the logging task's printf to the board specific output function. */
-#define configPRINT_STRING print_string
+#if ENABLE_SHELL
+#define configPRINT_STRING    log_shell_printf
+#elif ENABLE_UART_CONSOLE
+#define configPRINT_STRING    DbgConsole_Printf
+#else
+#define configPRINT_STRING
+#endif /* ENABLE_SHELL */
 
 /* Sets the length of the buffers into which logging messages are written - so
  * also defines the maximum length of each log message. */

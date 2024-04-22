@@ -47,8 +47,8 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #endif
 
-#if CONFIG_CHIP_TCP_DOWNLOAD
-#include "TcpDownload.h"
+#if WIFI_CONNECT
+#include "WifiConnect.h"
 #endif
 
 #if CONFIG_CHIP_OTA_PROVIDER
@@ -245,8 +245,8 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
-#if CONFIG_CHIP_TCP_DOWNLOAD
-    EnableTcpDownloadComponent();
+#if WIFI_CONNECT
+    WifiConnectTaskCreate();
 #endif
 
 exit:

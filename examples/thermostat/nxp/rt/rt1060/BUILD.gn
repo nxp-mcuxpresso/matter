@@ -63,7 +63,10 @@ app_common_folder = "thermostat/nxp/zap"
 # Create here the SDK instance.
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
-  defines = []
+  defines = ["CPU_MIMXRT106SDVL6A", "CPU_MIMXRT106SDVL6A_cm7"]
+  defines += ["XIP_BOOT_HEADER_DCD_ENABLE=1", "XIP_EXTERNAL_FLASH=1", "XIP_BOOT_HEADER_ENABLE=1"]
+  defines += ["SKIP_SYSCLK_INIT"]
+  defines += ["SDK_OS_FREE_RTOS", "USE_RTOS"]
 
   cflags = []
   public_deps = []
@@ -75,19 +78,21 @@ rt_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/board/" ]
   # RT1060 rev A use same pin mux as rev B
   # If user needs different pin mux files for rev A and rev B boards, the source and include from below needs to be updated accordingly
-  if (evkname == "evkmimxrt1060"){
-    include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
-    sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
-  }
-  else{
-    include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
-    sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
-  }
+
+  include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+  sources += [ "${example_platform_dir}/board/evkbmimxrt1060/pin_mux.c" ]
+  
+
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
-
+  sources += [ "${example_platform_dir}/board/dcd.c" ]
+  sources += [ "${example_platform_dir}/board/sln_encrypt.c" ]
+  sources += [ "${example_platform_dir}/board/sln_flash_config.c" ]
+  sources += [ "${example_platform_dir}/board/sln_flash_littlefs.c" ]
+  sources += [ "${example_platform_dir}/board/sln_flash.c" ]
+  sources += [ "${example_platform_dir}/board/flexspi_nor_flash_ops.c" ]
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
 

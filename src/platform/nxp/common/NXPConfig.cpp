@@ -43,7 +43,7 @@
  * partition, use it. Othewise use the default.
  */
 #ifndef CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT
-#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT (4 * 2048)
+#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT (2 * 2048)
 #endif
 
 /*
@@ -51,7 +51,7 @@
  * partition, use it. Othewise use the default.
  */
 #ifndef CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING
-#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING (4 * 5000)
+#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING (2 * 5000)
 #endif
 
 #ifndef NVM_ID_CHIP_CONFIG_DATA_KEY_INT

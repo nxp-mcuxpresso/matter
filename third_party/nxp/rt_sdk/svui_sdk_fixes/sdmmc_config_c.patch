@@ -1,0 +1,9 @@
+--- a/sdmmc_config.c
++++ b/sdmmc_config.c
+@@ -311,4 +311,4 @@ void BOARD_MMC_Config(void *card, uint32_t hostIRQPriority)
+ 
+     NVIC_SetPriority(BOARD_SDMMC_MMC_HOST_IRQ, hostIRQPriority);
+ }
+-#endif
++#endif
+\ No newline at end of file

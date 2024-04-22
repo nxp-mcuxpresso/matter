@@ -296,7 +296,7 @@ int ramStorageReadFromFlash(const char * file_name, uint8_t * buffer, uint32_t b
 }
 
 /* Buffer size must be superior to the max ram buffer size CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE */
-static uint8_t bufferIdleWriteToFlash[4 * 5000];
+static uint8_t bufferIdleWriteToFlash[2 * 5000];
 
 int ramStorageSavetoFlash(const char * file_name, uint8_t * buffer, uint32_t buf_length)
 {

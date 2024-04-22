@@ -34,6 +34,8 @@ commissioning and different cluster control.
       - [Matter over wifi with openthread border router configuration :](#matter-over-wifi-with-openthread-border-router-configuration-)
     - [Testing the all-clusters application without Matter CLI:](#testing-the-all-clusters-application-without-matter-cli)
     - [Testing the all-clusters application with Matter CLI enabled:](#testing-the-all-clusters-application-with-matter-cli-enabled)
+    - [Testing the all-clusters application with SV integration:](#testing-the-all-clusters-application-with-sv-integration)
+    - [Customization of the all-clusters application with SV integration:](#customization-of-the-all-clusters-application-with-sv-integration)
 
 <hr>
 
@@ -250,6 +252,14 @@ user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west in
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west update
 ```
 
+Troubleshoot in case of errors with lwip:
+```
+cd repo/sdk-2.15/middleware/lwip/
+git fetch
+git checkout release/2.15.100_minor_rfp
+```
+The update command will still throw an error for lwip, but it can be safely ignored as the repository was manually checked out to the correct commit.
+
 -   In case there are local modification to the already installed git NXP SDK.
     Use the west forall command instead of the west init to reset the west
     workspace before running the west update command. Warning: all local changes
@@ -259,9 +269,95 @@ user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west up
 user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
 ```
 
+At this point, the machine is ready to build examples. When it is needed to build the project again, only the steps below should be executed.
+
 -   Start building the application.
 
-### Building with Matter over Wifi configuratiom on RT1060 + transceiver
+# Download project libraries
+​
+All libraries used in the SVUI project can be found in a zip file under the name **sln_svui_iot_libs.zip** on the solution page on [nxp.com](https://www.nxp.com/mcu-svui). After downloading, unzip the libraries and add them to the project, in the **sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs** folder.
+​
+
+After adding the files, the content for the **sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs** should look as in the image below:
+
+​
+<img src="libs.png" width=300> <br/><br/>
+​
+# DSMT production and evaluation libraries
+
+> [!NOTE]
+> For DSMT integration, there are 2 libraries included: the production lib_sln_asr and the evaluation lib_sln_asr.
+>
+> The sln_asr_production lib is found in the **sln_svui_iot_libs.zip** file together with the rest of the libraries.
+>
+> The sln_asr_evaluation lib needs to be downloaded separately from the solution page on [nxp.com](https://www.nxp.com/mcu-svui).
+>
+> The production library works only on RT106C.
+>
+> The dev kit is based on RT106V.
+>
+> In order to have the DSMT project working on RT106V, one must use the evaluation lib_sln_asr.
+>
+> The lib must be used for evaluation only and not for going into production as this will break the redistribution terms.
+
+In order to link with the production lib_sln_asr, one must:
+1. Copy libsln_asr_production.a in sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs folder.
+2. Select DSMT ASR in app.h
+3. In rt_sdk.gni, uncomment line 442 and comment line 441
+4. Continue building as per the next instructions in the README.
+
+When using the libsln_asr_production.a, for going into production with RT106C, please do not forget to set USE_DSMT_EVALUATION_MODE to 0 in app.h.
+
+In order to link with the evaluation lib_sln_asr, one must:
+1. Copy libsln_asr_evaluation.a in sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs folder.
+2. Select DSMT ASR in app.h
+3. In rt_sdk.gni, uncomment line 441 and comment line 442
+4. Continue building as per the next instructions in the README.
+
+# VIT speech-to-intent and commands libraries
+
+> [!NOTE]
+> VIT offers two types of voice detection engines: one of them used for detecting only predefined commands and the other one 
+> being able to detect intents thus offering a lot more flexibilty.
+
+The following VIT libraries are found in the **sln_svui_iot_libs.zip** file on the solution page [nxp.com](https://www.nxp.com/mcu-svui):
+- The Matter example uses VIT_CM7_Production_v06_03_01 for S2I and VIT_CM7_v04_10_00 for VIT
+
+Depending on the desired demo and engine combination, the user needs to download the specific library from the solution page and then follow the steps below.
+
+In order to link the speech-to-intent VIT library, one must:
+1. Copy VIT_CM7_Production_v06_03_01.a in sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs folder.
+2. In rt_sdk.gni, uncomment line 446 and comment line 447
+4. Select S2I ASR in app.h and build the project.
+
+In order to link the commands VIT library, one must:
+1. Copy VIT_CM7_v04_10_00.a in sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/libs folder.
+2. In rt_sdk.gni, uncomment line 447 and comment line 446
+3. Select VIT ASR in app.h and build the project.
+
+### Building with Matter over Wifi configuration on i.MX RT106V SLN-SVUI-IOT
+
+```
+cd ~/sln_svui_iot_matter/third_party/nxp/rt_sdk/svui_sdk_fixes
+./patch_rt_1060_sdk.sh
+```
+When running this a second time, it will say that the patches were already applied, this is expected. When sdk changes are made, this needs to be run on a clean sdk. To clean the sdk:
+```
+cd ~/sln_svui_iot_matter/third_party/nxp/github_sdk/rt/repo/sdk-2.15
+west forall -c "git reset --hard" -a
+```
+
+```
+cd ~/sln_svui_iot_matter
+source scripts/activate.sh
+cd examples/all-clusters-app/nxp/rt/rt1060
+gn gen out/debug
+ninja -C out/debug
+```
+
+The final binary will be found in folder `out/debug`.
+
+### Building with Matter over Wifi configuration on RT1060 + transceiver
 
 -   Build the Wi-fi configuration for **MIMXRT1060-EVKB board + IW416
     transceiver** (with BLE for commissioning).
@@ -673,4 +769,356 @@ Done
 > otcli state
 leader
 Done
+```
+
+### Testing the all-clusters application with SV integration:
+
+The Smart Voice integrated Matter project has the role of demonstrating how to control multiple Matter nodes based on voice commands and binding. Each SV board will be binded to the rest from the Matter network and will be able to control them based on the location present in the voice command. Regarding the voice control, there are 3 voice engines supported: VIT, DSMT and S2I. 
+
+The available commands for the VIT & DSMT:
+- "Turn on the lights"
+- "Turn off the lights"
+- "Open the window"
+- "Close the window"
+- "Make it brighter"
+- "Make it darker"
+
+For the S2I there are the following functionalities:
+- Turning on/off the LED
+    - This is done using the OnOff cluster
+- Changing the color of the LED
+    - This is done using the ColorControl cluster
+    - The available colors: blue, red, green, pink, orange, yellow, purple
+- Changing the level of brightness of the LED
+    - This is done using the LevelControl cluster
+    - The brightness will be set to a certain level from 0 to 100
+- Controlling shades through a PWM motor
+    - The shades will lift/lower based on a certain percentage from 0 to 100
+    
+In the following we will be referring to 2 types of controllers:
+- "Matter controller" => this is represented by the Matter controller on which the commissioning and binding take place, such as Raspberry Pi or i.MX 8M Mini
+- "voice controller" => this is represented by a SVUI board, which will take the "leader" role in a certain moment
+
+Each voice controller will have the following capabilities:
+- Detecting the wake word & command
+- Understanding what is the device that needs to be controlled based on the location present in the command
+- Sending a Matter command to that specific device in order to invoke and take the corresponding action
+
+Start with a controller. The Matter network will contain multiple SV boards that will be commissioned by the Matter controller. Each one of them should be able to have the role of the voice controller, as well as be controllable by the others. All of the boards will need to be "named" based on 4 different locations for the LED functionalities ("bedroom", "kitchen", "living room", "bathroom") and 1 location ("central") for the shades function. This is a very important step because this is how the current voice controller identifies to which board it should send commands to. After that, the user will say different voice commands (regarding the LED or the shades) to one of the SV boards. There are 3 possible situations:
+1. The commands contain the location. Then, the voice controller sends the specific Matter command to the corresponding board. 
+2. The commands contain the location of the current SV board that the user is talking to. In this case, the actions will take place locally, without the need to involve Matter communication.
+3. A location is not present in the commands. This will be interpreted as a group command, involving all Matter nodes from the fabric. 
+    
+Some examples of voice commands:
+- "Lights on"
+- "Lights on in the bedroom"
+- "Turn the lights off in the kitchen"
+- "Blue lights in the bathroom"
+- "Make living room light pink"
+- "Orange lights"
+- "Increase brightness by 10 percent in the bedroom"
+- "Raise all shades"
+- "Raise all the blinds partially"
+All available expressions can be found at path: `sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/app/local_voice/S2I/en/VIT_Model_en_Home_expressions.txt`.
+ 
+For the shades functionality: the S2I intents don’t have a location set to them, they use "side" (left, right, middle, all). For our demo:
+- The board that will represent the shades will be named "central"
+- The voice commands will be referring to the "all" shades
+- Example: "Raise all shades"; "Lower all shades"
+- Commands using "left shades", "right shades", "middle shades" won’t have any effect
+
+##  How to setup the Matter controller
+When creating the Matter network, you can choose from two options of Matter controllers: Raspberry Pi or i.MX 8M Mini.
+
+###  Raspberry Pi as the Matter controller
+When using a Raspberry Pi controller, it is recommended to have an Ubuntu 20.04 or Ubuntu 22.04 version. The chip-tool binary can be obtained by building the chip-tool application from `sln_svui_iot_matter/examples/chip-tool` folder.
+Building the example can be done from the `sln_svui_iot_matter/` root folder using the command: `scripts/examples/gn_build_example.sh examples/chip-tool FULL-PATH/`, which puts the binary at `FULL-PATH/chip-tool`. The user needs to replace FULL-PATH with the desired path instead. 
+After that, it is necessary to copy the resulted **chip-tool** binary on the Raspberry Pi device. It will be used to commission and bind the end-nodes.
+
+### i.MX 8M Mini as the Matter controller
+When using an i.MX 8M Mini controller, the first step is to flash the corresponding Matter image on the board. The steps for doing this are the following:
+- Download the **i.MX 8M Mini pre-built binary demo file for Matter** from [nxp.com](https://www.nxp.com/design/design-center/development-boards-and-designs/i-mx-evaluation-and-development-boards/mpu-linux-hosted-matter-development-platform:MPU-LINUX-MATTER-DEV-PLATFORM)
+- Make sure you have the **uuu** tool or other similar tools used for i.MX Chip image deploy installed on your machine
+- Put the i.MX controller into **download mode**
+- Connect the board to a power source
+- Connect a USB C cable from the download port to the machine you want to deploy from
+- Check if the board is seen by the UUU tool, after it has been turned on using the power switch:
+`uuu.exe -lsusb`
+-  If the board is available, the image can be downloaded to it:
+`uuu.exe -b emmc_all ..\path\to\imx-image-multimedia-imx8mmevk-matter.wic.zst`
+- The board can be booted after setting the boot pins to eMMC and turning the board off and on again through the power switch. You can see the logs by connecting a micro USB cable to the debug port and using serial monitor.
+
+Next main step is to configure the on-board Wi-Fi and Bluetooth for commissioning. You need to execute the following commands:
+- export SSID="user_wifi_ssid"
+- export PASSWORD="user_wifi_password"
+- wpa_passphrase ${SSID} ${PASSWORD} > wifiap.conf
+- ifconfig eth0 down
+- modprobe moal mod_para=nxp/wifi_mod_para.conf
+- wpa_supplicant -d -B -i mlan0 -c ./wifiap.conf
+- modprobe btnxpuart
+- hciconfig hci0 up
+- echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+- echo 1 > /proc/sys/net/ipv4/ip_forward
+- echo 2 > /proc/sys/net/ipv6/conf/all/accept_ra
+- ln -sf /usr/sbin/xtables-nft-multi /usr/sbin/ip6tables
+- ipset create -exist otbr-ingress-deny-src hash:net family inet6
+- ipset create -exist otbr-ingress-deny-src-swap hash:net family inet6
+- ipset create -exist otbr-ingress-allow-dst hash:net family inet6
+- ipset create -exist otbr-ingress-allow-dst-swap hash:net family inet6
+- otbr-agent -I wpan0 -B mlan0  'spinel+hdlc+uart:///dev/ttyUSB0?uart-baudrate=1000000' -v -d 5 &
+- iptables -A FORWARD -i mlan0 -o wpan0 -j ACCEPT
+- iptables -A FORWARD -i wpan0 -o mlan0 -j ACCEPT
+- otbr-web &
+
+All of the commands above have been integrated into a bash script for an easier user experience. The script can be found at this path: `sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/chiptool_scripts/imx_configuration_script.sh`. You can copy this script on the controller. Don't forget to replace the user_wifi_ssid and user_wifi_password fields with your own Wi-Fi network credentials.
+
+The final step refers to adding the chip-tool binary to the i.MX controller. To obtain this binary, follow the steps explained in section **Raspberry Pi as the Matter controller**, as the process is the same.
+
+## Steps for the commissioning & binding process:
+The following steps will be done on the Matter controller.
+
+### Commissioning a SVUI board:
+First, the SVUI board needs to be in advertising mode. After booting, it will enter it automatically. This can be seen in the logs: "CHIPoBLE advertising started".
+
+1. `./chip-tool pairing ble-wifi <node_id> <wifi_ssid> <wifi_password> 20202021 3840`
+- <node_id> is an integer given to each board so that we can differentiate between them; it can be any value (1, 2, 10, 123, etc)
+- <wifi_ssid> and <wifi_password> represent the wifi credentials for the network we want to join
+- "20202021" is a setup pin code and "3840" is the discriminator; these are Matter specifics
+
+We need to repeat this step with every new board that wants to join the Matter network.
+
+2. This is not a required step, but if we want to test that the binding was done successfully, we can give the following command:
+`./chip-tool onoff toggle <node_id> 1`
+
+This will toggle the LED on the board with the corresponding <node_id>. If the commissioning was done correct, this step should work and the LED should turn on or off. Parameter “1” represents the endpoint where the onoff cluster is defined.
+ 
+### Binding multiple boards:
+The binding process takes place between the voice controller and the rest of the boards commissioned in the network. For that we need to give commands to the voice controller and to each one of the rest that will be controlled. Each board will have the role of the voice controller one at a time. 
+
+On the Matter controller, do the steps in this order:
+
+1. Naming the SV boards that will be controlled (so not the voice controller) with the wanted location that they will represent (bedroom, kitchen, living room, bathroom, or central for the shades). Do this for each one of them:
+`./chip-tool basicinformation write node-label "bedroom" <node_id> 0`
+- “bedroom” represent the name of the device (the location); it will be changed based on the user’s preferences
+- <node_id> is the corresponding integer of the SV board
+- “0” represents the endpoint where the basicinformation cluster is defined
+
+If you want to check that the writing worked successfully, this command reads the node-label attribute and displays the output: `./chip-tool basicinformation read node-label <node_id> 0`.
+ 
+2. Write the ACL (Access Control List) entry on each of the SV boards that will be controlled (so not the voice controller). The command below illustrates an example for binding a node to 2 other voice controllers:
+`./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 2, "privilege": 3, "authMode": 2, "subjects": [<first_SV_controller_id>], "targets": null },{"fabricIndex": 3, "privilege": 3, "authMode": 2, "subjects": [<second_SV_controller_id>], "targets": null }]' <node_id> 0`
+
+This has the role of telling the board that it has the permissions to receive commands from the voice controllers. As we can see, for each voice controller we want to bind, there should be a `{"fabricIndex": nth, "privilege": 3, "authMode": 2, "subjects": [<nth_SV_controller_id>], "targets": null }` part in the command. Parameter “0” represents the endpoint where the accesscontrol cluster is defined.
+ 
+3. Write the binding-table entry on the voice controller for the rest of the controlled boards. There should be only one command that contains the information for all nodes. For example, if we want the voice controller to be binded to 2 SV boards, the command looks like this:
+`./chip-tool binding write binding '[{"node" : <first_device_id> , "cluster" : "0x0006" , "endpoint" : "1" }, { "node" : < second_device_id > , "cluster" : "0x0006" , "endpoint" : "1" }]' <SV_controller> 1`
+
+As we can see, for each node we want to bind, there should be a `{ "node" : < nth_device_id > , "cluster" : "0x0006" , "endpoint" : "1" }` part in the command. Parameter “1” represents the endpoint where the binding cluster is defined.
+ 
+Each board should now be able to control and be controlled by the rest. To achieve this, steps 2 and 3 must be done on each one of the SV boards. The whole process can be seen as a many-to-many relation between the devices involved.
+
+### Binding using chip-tool scripts
+For an easier user experience, all of the above commands have been integrated into bash scripts. These can be found at the following path: `/sln_svui_iot_matter/examples/platform/nxp/rt/rt1060/chiptool_scripts`. Each script is described in the README file attached there.
+
+The `write_acl_script.sh` and `write_binding_script.sh` must be customised in order to match the desired usage. Depending on the number of Matter devices available in the current network, the user needs to add corresponding entries in the command's body as explained in the scripts.
+
+## Limitations
+The current SV Matter demo's main role is to demonstrate how each device can control the others based on Matter and voice commands. Taking into consideration the available locations (kitchen, bedroom, living room, bathroom, central), this demo only supports a maximum of 5 devices in the Matter network. 
+For future customizations where it is wanted to increase this maximum number, the following configurations will need to be changed:
+- in file `/sln_svui_iot_matter/src/lib/core/CHIPConfig.h`, modify the `CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC` define; this refers to the supported entries in the `write acl` command
+- in file `/sln_svui_iot_matter/src/platform/nxp/rt/rt1060/CHIPPlatformConfig.h`, modify the `CHIP_CONFIG_MAX_FABRICS` define;  this refers to the supported entries in the `write binding` command
+
+Increasing those defines will also cause an increase in the memory usage.
+
+## Customization of the all-clusters application with SV integration:
+
+This section contains information about the process of adding or modifying the supported voice commands for controlling devices on the matter example. The guide will be presented in the form of a step-by-step guide which aims to present and explain the code that must be modified in order to obtain new functionalities or alter the existing ones.
+
+### Overview
+
+The current matter example implements the commands for LED control (on/off, brightness and color) and shades, but can be easily expanded to support any other command that can be sent via the matter protocol, on a new cluster, as long as a new speech to intent model is created which can detect these voice commands.
+
+The following sections will explain the code modifications that must be done in order to integrate new commands in the example, by showing a step by step guide for a temperature control device, like a thermostat, fridge, etc.. This guide assumes that the user already created a new speech-to-intent model to support voice commands related to setting a temperature with temperature level, like ‘hot’, ‘warm’, ‘freezing’. The TemperatureControl cluster is used for this guide, thus it needs to be activated in the .zap file of the example. (see https://project-chip.github.io/connectedhomeip-doc/getting_started/zap.html)
+
+Additional modifications are needed for the TemperatureCluster:
+1. In Build.gn, in the rt_executable("all_cluster_app") scope, the following line must be added in the sources list:
+
+```cpp
+${chip\_root}/examples/\${app_common_folder}/src/static-supported-temperature-levels.cpp
+```
+
+2. In AppTask.cpp:
+- Include:
+```cpp
+#include <static-supported-temperature-levels.h>
+```
+- Declare sAppSupportedTemperatureLevelsDelegate after using namespace declarations:
+```cpp
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+```
+- SetInstance in PostInitMatterStack:
+```cpp
+app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+```
+
+### Mapping the voice commands to matter actions
+
+The first step in integrating the TemperatureControl into our matter smart voice controller would be to map the voice commands and intents to the unified struct that is passed in the processing queue of the matter smart voice controller.
+
+The matter action struct located in demo_actions.h has the following fields:
+```cpp
+typedef enum
+{
+    kMatterActionColorChange = 0,
+    kMatterActionOnOff,
+    kMatterActionBrightnessChange,
+    kMatterActionBlindsControl,
+    kMatterActionTemperatureControl
+} matterActionType_t;
+
+typedef struct
+{
+    matterActionType_t action;
+    char *command;
+    char *location;
+    void *value;
+} matterActionStruct;
+```
+- action - field is used to determine internally the action type
+- command - field transmits the action as string (e.g.: ‘increase’, ‘decrease’, ‘lower’…)
+- location - field transmits the location as string (e.g.: ‘bedroom’, ‘kitchen’,…)
+- value - field transmits any information that is needed for the commands, in our case would be the temperature to set.
+
+An additional value in the matterActionType_t enum was added to support temperature control. Then, in app_layer_nxp_s2i.c we need to create an additional ‘else if’ branch for the TemperatureControl intents, as seen in the following snippet, in order to create a matter action structure and send it over for processing:
+
+```cpp
+if (!strcmp("TemperatureControl", INTENT_NAME(pSpeechIntent, tagsCnt)))
+{
+    if (pSpeechIntent->Slot_Tag_count == 1)
+    {
+        if (!strcmp("TemperatureLevel", TAG_NAME(pSpeechIntent, tagsCnt)))
+        {
+            matterActionStruct valueToSend = {0};
+            valueToSend.location = "all";
+            valueToSend.action = kMatterActionTemperatureControl;
+
+            if (!strcmp("hot", TAG_VALUE(pSpeechIntent, tagsCnt, 0)))
+            {
+                valueToSend.value = (void *)1;
+            }
+            else if (!strcmp("warm", TAG_VALUE(pSpeechIntent, tagsCnt, 0)))
+            {
+                valueToSend.value = (void *)2;
+            }
+            else if (!strcmp("freezing", TAG_VALUE(pSpeechIntent, tagsCnt, 0)))
+            {
+                valueToSend.value = (void *)3;
+            }
+
+            xQueueSend(xMatterActionsQueue, &valueToSend, portMAX_DELAY);
+        }
+    }
+}
+```
+
+After populating the valueToSend structure, we send it to the processing task via a queue. We don’t need to populate the ‘command’ field as the only command added would be the Set Temperature command. We move on to main.cpp file, which contains the processing task.
+
+### Sending the action structure over to the matter framework
+In the main.cpp file are located the xMatterActionsQueue freeRTOS queue which is used to send and receive the matter actions and the vMatterActionsTask freeRTOS task, which is used to send over the commands for processing. The separation of the functions is done via the ‘action’ field of the matterAction structure, and each one corresponds to a function inside AppTask.cpp. Thus, we add an additional field in the switch case for the TemperatureControl:
+```cpp
+case kMatterActionTemperatureControl: 
+    chip::NXP::App::GetAppTask().TemperatureControlFunction((int)matterAction.value, matterAction.location);
+    break;
+```
+The TemperatureControlFunction needs to be implemented in AppTask.cpp. Its’ role is to receive the relevant information from the previous matterAction structure and to translate it into an actual command that is sent to the controlee devices via the bindings. In our case, we implemented the ‘all’ location, we skip the ‘central’ name, and then we create a BindingCommandData variable, which can be further used. Also, add the function signature in AppTaskBase.h:
+
+```cpp
+void chip::NXP::App::AppTaskBase::TemperatureControlFunction(uint8_t temperatureLevel, char *location)
+{
+    if (strcmp(location, "all") == 0)
+    {
+        for (int i = 0; i < bindingEntriesNumber; i++)
+        {
+            if (strcmp(getArrayBindingStructs()[i].deviceName, "central") != 0)
+            {
+                BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+                data->clusterId           = chip::app::Clusters::TemperatureControl::Id;
+                data->commandId           = chip::app::Clusters::TemperatureControl::Commands::SetTemperature::Id;
+                data->bindingTableEntryId = getArrayBindingStructs()[i].entryId;
+                data->value               = (void *)(intptr_t)temperatureLevel;
+
+                chip::DeviceLayer::PlatformMgr().ScheduleWork(ControllerWorkerFunction, reinterpret_cast<intptr_t>(data));
+            }
+        }
+    }
+}
+```
+
+The BindingCommandData is used to send the commands over to the binding-handler.cpp file for further processing.
+```cpp
+typedef enum
+{
+    kBindingFunctionBindDevice = 99,
+} bindingFunction_t;
+
+struct BindingCommandData
+{
+    chip::NodeId bindingTableEntryId = 0;
+    chip::EndpointId remoteEndpointId = 1;
+    chip::CommandId commandId = 0;
+    chip::ClusterId clusterId = 0;
+    void *value;
+};
+```
+
+To send commands over, we use the ScheduleWork function to interact with the ControllerWorkerFunction.
+
+Moving to the binding-handler.cpp file, we need to add the TemperatureControl case for our switch in BoundDeviceChangedHandler. Also, add the function signature in the header file binding-handler.h.
+
+```cpp
+case Clusters::TemperatureCluster::Id:   
+    ProcessTemperatureControlUnicastBindingCommand(BindingTable::GetInstance().GetAt(data->bindingTableEntryId), peer_device, data);
+```
+
+Now, we need to implement the ProcessTemperatureControlUnicastBindingCommand function which would call the final piece of code to control other devices.
+
+```cpp
+void ProcessTemperatureControlUnicastBindingCommand(const EmberBindingTableEntry & binding, chip::DeviceProxy * peer_device, BindingCommandData *data)
+{
+    auto onSuccess = [data](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & status, const auto & dataResponse) {
+        ChipLogProgress(NotSpecified, "TemperatureControl command succeeds");
+        delete data;
+    };
+    auto onFailure = [data](CHIP_ERROR error) {
+        ChipLogError(NotSpecified, "TemperatureControl command failed.");
+        delete data;
+    };
+
+    chip::app::Clusters::TemperatureControl::Commands::SetTemperature::Type setTemperatureCommand;
+
+    setTemperatureCommand.targetTemperatureLevel = chip::Optional<short int>((int)data->value);
+
+    chip::Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), data->remoteEndpointId,
+            setTemperatureCommand, onSuccess, onFailure);
+}
+```
+The InvokeCommandRequest call will schedule our command to be executed, and as such we finished sending the command over to our device.
+
+Finally, in order to check on the controlled device, you need to add the following code in DeviceCallbacks.cpp:
+- In PostAttributeChangeCallback:
+```cpp
+case Clusters::TemperatureControl::Id:
+    OnTemperatureControlPostAttributeChangeCallback(endpointId, attributeId, value);
+    break;
+```
+- Implement OnTemperatureControlPostAttributeChangeCallback:
+```cpp
+void AllClustersApp::DeviceCallbacks::OnTemperatureControlPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value)
+{
+    ChipLogProgress(DeviceLayer,"newTempLevel: %d", *value);
+}
+```
+- Add the function signature inside DeviceCallbacks.h
+```cpp
+void AllClustersApp::DeviceCallbacks::OnTemperatureControlPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 ```

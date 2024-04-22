@@ -139,6 +139,13 @@ public:
     virtual void StopCommissioningHandler(void);
     virtual void SwitchCommissioningStateHandler(void);
     virtual void FactoryResetHandler(void);
+    virtual void OnOffCommandLocalAction(char *command);
+    virtual void BrightnessChangeLocalAction(char *action, uint8_t level);
+    virtual void ColorChangeLocalAction(char *color);
+    virtual void OnOffCommandFunction(char *command, char *location);
+    virtual void BrightnessChangeFunction(char *action, uint8_t level, char *location);
+    virtual void BlindsControlFunction(char *action, uint8_t percentage, char *location);
+    virtual void ColorChangeFunction(char* color, char* location);
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;

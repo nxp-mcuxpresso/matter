@@ -50,7 +50,7 @@ extern uint32_t NV_STORAGE_MAX_SECTORS[];
  * Global variables
  **********************************************************************************************************************/
 /* LittleFS configuration */
-extern const struct lfs_config LittleFS_config;
+// extern const struct lfs_config LittleFS_config;
 
 /***********************************************************************************************************************
  * Callback functions

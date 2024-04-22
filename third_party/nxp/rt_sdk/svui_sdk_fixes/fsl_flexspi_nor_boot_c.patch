@@ -1,0 +1,32 @@
+--- a/fsl_flexspi_nor_boot.c
++++ b/fsl_flexspi_nor_boot.c
+@@ -14,7 +14,7 @@
+ 
+ #if defined(XIP_BOOT_HEADER_ENABLE) && (XIP_BOOT_HEADER_ENABLE == 1)
+ #if defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__)
+-__attribute__((section(".boot_hdr.ivt"), used))
++__attribute__((section(".boot_hdr.ivt")))
+ #elif defined(__ICCARM__)
+ #pragma location = ".boot_hdr.ivt"
+ #endif
+@@ -33,17 +33,17 @@ const ivt image_vector_table = {
+ };
+ 
+ #if defined(__CC_ARM) || defined(__ARMCC_VERSION) || defined(__GNUC__)
+-__attribute__((section(".boot_hdr.boot_data"), used))
++__attribute__((section(".boot_hdr.boot_data")))
+ #elif defined(__ICCARM__)
+ #pragma location = ".boot_hdr.boot_data"
+ #endif
+ /*************************************
+  *  Boot Data
+  *************************************/
+-const BOOT_DATA_T g_boot_data = {
++const BOOT_DATA_T boot_data = {
+     FLASH_BASE,  /* boot start location */
+     FLASH_SIZE,  /* size */
+     PLUGIN_FLAG, /* Plugin flag*/
+-    0xFFFFFFFFU  /* empty - extra data word */
++    0xFFFFFFFF  /* empty - extra data word */
+ };
+ #endif

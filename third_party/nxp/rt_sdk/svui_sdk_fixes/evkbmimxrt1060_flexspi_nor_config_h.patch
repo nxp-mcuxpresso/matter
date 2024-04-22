@@ -1,0 +1,64 @@
+--- a/evkbmimxrt1060_flexspi_nor_config.h
++++ b/evkbmimxrt1060_flexspi_nor_config.h
+@@ -1,21 +1,22 @@
+ /*
+- * Copyright 2021 NXP
++ * Copyright (c) 2016, Freescale Semiconductor, Inc.
++ * Copyright 2016-2020 NXP
+  * All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+ 
+-#ifndef __EVKBMIMXRT1060_FLEXSPI_NOR_CONFIG__
+-#define __EVKBMIMXRT1060_FLEXSPI_NOR_CONFIG__
++#ifndef __SLN_SVUI_IOT_FLEXSPI_NOR_CONFIG__
++#define __SLN_SVUI_IOT_FLEXSPI_NOR_CONFIG__
+ 
+-#include <stdint.h>
+ #include <stdbool.h>
++#include <stdint.h>
+ #include "fsl_common.h"
+ 
+ /*! @name Driver version */
+ /*@{*/
+-/*! @brief XIP_BOARD driver version 2.0.1. */
+-#define FSL_XIP_BOARD_DRIVER_VERSION (MAKE_VERSION(2, 0, 1))
++/*! @brief XIP_BOARD driver version 2.0.0. */
++#define FSL_XIP_BOARD_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+ /*@}*/
+ 
+ /* FLEXSPI memory config block related defintions */
+@@ -221,19 +222,19 @@ typedef struct _FlexSPIConfig
+ 
+ #define NOR_CMD_LUT_SEQ_IDX_READ CMD_LUT_SEQ_IDX_READ //!< 0  READ LUT sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_READSTATUS \
+-    CMD_LUT_SEQ_IDX_READSTATUS  //!< 1  Read Status LUT sequence id in lookupTable stored in config block
++    CMD_LUT_SEQ_IDX_READSTATUS //!< 1  Read Status LUT sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_READSTATUS_XPI \
+-    2                           //!< 2  Read status DPI/QPI/OPI sequence id in lookupTable stored in config block
++    2 //!< 2  Read status DPI/QPI/OPI sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_WRITEENABLE \
+     CMD_LUT_SEQ_IDX_WRITEENABLE //!< 3  Write Enable sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_WRITEENABLE_XPI \
+-    4                           //!< 4  Write Enable DPI/QPI/OPI sequence id in lookupTable stored in config block
++    4 //!< 4  Write Enable DPI/QPI/OPI sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_ERASESECTOR 5 //!< 5  Erase Sector sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_ERASEBLOCK  8 //!< 8 Erase Block sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_PAGEPROGRAM \
+-    CMD_LUT_SEQ_IDX_WRITE                 //!< 9  Program sequence id in lookupTable stored in config block
+-#define NOR_CMD_LUT_SEQ_IDX_CHIPERASE 11  //!< 11 Chip Erase sequence in lookupTable id stored in config block
+-#define NOR_CMD_LUT_SEQ_IDX_READ_SFDP 13  //!< 13 Read SFDP sequence in lookupTable id stored in config block
++    CMD_LUT_SEQ_IDX_WRITE                //!< 9  Program sequence id in lookupTable stored in config block
++#define NOR_CMD_LUT_SEQ_IDX_CHIPERASE 11 //!< 11 Chip Erase sequence in lookupTable id stored in config block
++#define NOR_CMD_LUT_SEQ_IDX_READ_SFDP 13 //!< 13 Read SFDP sequence in lookupTable id stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_RESTORE_NOCMD \
+     14 //!< 14 Restore 0-4-4/0-8-8 mode sequence id in lookupTable stored in config block
+ #define NOR_CMD_LUT_SEQ_IDX_EXIT_NOCMD \
+@@ -265,4 +266,5 @@ extern "C" {
+ #ifdef __cplusplus
+ }
+ #endif
+-#endif /* __EVKBMIMXRT1060_FLEXSPI_NOR_CONFIG__ */
++#endif /* __SLN_SVUI_IOT_FLEXSPI_NOR_CONFIG__ */
++

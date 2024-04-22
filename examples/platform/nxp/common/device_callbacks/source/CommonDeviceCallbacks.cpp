@@ -2,6 +2,7 @@
  *
  *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
+ *    Copyright 2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,12 +24,16 @@
  *
  **/
 #include "CommonDeviceCallbacks.h"
+#include "AppTaskBase.h"
+#include "binding-handler.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <app/util/binding-table.h>
+#include <app/OperationalSessionSetup.h>
 
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -58,6 +63,10 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
         break;
+
+    case DeviceEventType::kBindingsChangedViaCluster:
+            OnBindingsChange(event);
+            break;
 
     case DeviceEventType::kInterfaceIpAddressChanged:
 #if !CHIP_ENABLE_OPENTHREAD // No need to do this for OT mDNS server
@@ -129,6 +138,16 @@ void chip::NXP::App::CommonDeviceCallbacks::OnInternetConnectivityChange(const C
     {
         ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
     }
+}
+
+/**
+ * @brief Application callback function that triggers the Matter logic for reading
+ * the attributes of each binded device.
+ */
+void chip::NXP::App::CommonDeviceCallbacks::OnBindingsChange(const ChipDeviceEvent * event)
+{
+    freeArrayBindingStructs();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(BindDeviceWorkerFunction, reinterpret_cast<intptr_t>(reinterpret_cast<bindingFunction_t *>(kBindingFunctionBindDevice)));
 }
 
 void chip::NXP::App::CommonDeviceCallbacks::OnInterfaceIpAddressChanged(const ChipDeviceEvent * event)

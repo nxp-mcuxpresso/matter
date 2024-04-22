@@ -5,8 +5,8 @@
  *  SPDX-License-Identifier: BSD-3-Clause
  */
 
-#define USB_HOST_CONFIG_EHCI 2
-#define CONTROLLER_ID kUSB_ControllerEhci0
+// #define USB_HOST_CONFIG_EHCI 2
+// #define CONTROLLER_ID kUSB_ControllerEhci0
 
 #if defined(WIFI_IW416_BOARD_AW_AM457_USD) || defined(WIFI_IW416_BOARD_AW_AM510_USD) ||                                            \
     defined(WIFI_88W8987_BOARD_AW_CM358_USD) || defined(WIFI_IW612_BOARD_RD_USD) || defined(WIFI_BOARD_RW610) ||                   \

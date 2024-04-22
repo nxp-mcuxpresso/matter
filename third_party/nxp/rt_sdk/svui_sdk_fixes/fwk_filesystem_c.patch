@@ -1,0 +1,306 @@
+--- a/fwk_filesystem.c
++++ b/fwk_filesystem.c
+@@ -9,6 +9,10 @@
+ #include "fwk_platform_flash.h"
+ #include "lfs.h"
+ #include "peripherals.h"
++#include "sln_flash.h"
++#include "sln_flash_fs.h"
++#include "sln_flash_littlefs.h"
++#include "sln_flash_fs_ops.h"
+ 
+ #if FWK_FILESYSTEM_LOCAL_BUF_SIZE
+ #include "FunctionLib.h"
+@@ -45,8 +49,8 @@
+  * Variables
+  ******************************************************************************/
+ 
+-static lfs_t             lfs;
+-static struct lfs_config cfg;
++//static lfs_t             s_LittlefsHandler.lfs; //maybe get them from extern so no rewriting is needed
++//static struct lfs_config s_LittlefsHandler.cfg; //maybe get them from extern so no rewriting is needed
+ static bool              lfs_mounted          = false;
+ static uint8_t           filesystem_init_done = 0;
+ 
+@@ -61,68 +65,76 @@ volatile unsigned long fs_max_time_write_flash     = 0;
+ 
+ int FS_Init(void)
+ {
+-    int res = 1; // File system already initialized
+-
+-    if (filesystem_init_done == 0)
+-    {
+-        lfs_get_default_config(&cfg);
+-
+-        res = lfs_storage_init(&cfg);
+-        if (res != kStatus_Success)
+-        {
+-            DBG_PRINTF("LFS storage init failed: %i\r\n", res);
+-        }
+-        else
+-        {
+-            res = lfs_mount(&lfs, &cfg);
+-            if (res != 0)
+-            {
+-                /* Can not mount, => format the File System */
+-                INFO_PRINTF("\rError mounting LFS: %d -> formatting\r\n", res);
+-                res = lfs_format(&lfs, &cfg);
+-                if (res != 0)
+-                {
+-                    DBG_PRINTF("\rError formatting LFS: %d\r\n", res);
+-                }
+-                else
+-                {
+-                    res = lfs_mount(&lfs, &cfg);
+-                    if (res != 0)
+-                    {
+-                        DBG_PRINTF("\rCan not mount after formating: %d\r\n", res);
+-                    }
+-                    else
+-                    {
+-#if defined(DEBUG_FWK_FILESYSTEM) && (DEBUG_FWK_FILESYSTEM > 0)
+-                        int *start_addr_dbg = (int *)cfg.context;
+-                        INFO_PRINTF("LFS mounted (after format): start address:%x blk_size=%d blk_count=%d\r\n",
+-                                    *start_addr_dbg, cfg.block_size, cfg.block_count);
+-#endif
+-                        lfs_mounted = true;
+-                    }
+-                }
+-            }
+-            else
+-            {
+-                DBG_PRINTF("LFS mounted\r\n");
+-                lfs_mounted = true;
+-            }
+-        }
+-    }
+-
+-    /* Count number of calls to FS_Init() so it can be Deinit only
+-        when counter is back to zero */
+-    if (lfs_mounted == true)
+-    {
+-        filesystem_init_done++;
+-        INFO_PRINTF("filesystem_init_done %d\r\n", filesystem_init_done);
+-    }
+-    else
+-    {
+-        DBG_PRINTF("LFS not mounted\r\n");
+-    }
+-
+-    return res;
++//    -    if (filesystem_init_done == 0)
++//    -    {
++//    -        lfs_get_default_config(&s_LittlefsHandler.cfg);
++//    -
++//    -        res = lfs_storage_init(&s_LittlefsHandler.cfg);
++//    -        if (res != kStatus_Success)
++//    -        {
++//    -            DBG_PRINTF("LFS storage init failed: %i\r\n", res);
++//    -        }
++//    -        else
++//    -        {
++//    -            res = lfs_mount(&s_LittlefsHandler.lfs, &s_LittlefsHandler.cfg);
++//    -            if (res != 0)
++//    -            {
++//    -                /* Can not mount, => format the File System */
++//    -                INFO_PRINTF("\rError mounting LFS: %d -> formatting\r\n", res);
++//    -                res = lfs_format(&s_LittlefsHandler.lfs, &s_LittlefsHandler.cfg);
++//    -                if (res != 0)
++//    -                {
++//    -                    DBG_PRINTF("\rError formatting LFS: %d\r\n", res);
++//    -                }
++//    -                else
++//    -                {
++//    -                    res = lfs_mount(&s_LittlefsHandler.lfs, &s_LittlefsHandler.cfg);
++//    -                    if (res != 0)
++//    -                    {
++//    -                        DBG_PRINTF("\rCan not mount after formating: %d\r\n", res);
++//    -                    }
++//    -                    else
++//    -                    {
++//    -#if defined(DEBUG_FWK_FILESYSTEM) && (DEBUG_FWK_FILESYSTEM > 0)
++//    -                        int *start_addr_dbg = (int *)s_LittlefsHandler.cfg.context;
++//    -                        INFO_PRINTF("LFS mounted (after format): start address:%x blk_size=%d blk_count=%d\r\n",
++//    -                                    *start_addr_dbg, s_LittlefsHandler.cfg.block_size, s_LittlefsHandler.cfg.block_count);
++//    -#endif
++//    -                        lfs_mounted = true;
++//    -                    }
++//    -                }
++//    -            }
++//    -            else
++//    -            {
++//    -                DBG_PRINTF("LFS mounted\r\n");
++//    -                lfs_mounted = true;
++//    -            }
++//    -        }
++//    -    }
++//    -
++//    -    /* Count number of calls to FS_Init() so it can be Deinit only
++//    -        when counter is back to zero */
++//    -    if (lfs_mounted == true)
++//    -    {
++//    -        filesystem_init_done++;
++//    -        INFO_PRINTF("filesystem_init_done %d\r\n", filesystem_init_done);
++//    -    }
++//    -    else
++//    -    {
++//    -        DBG_PRINTF("LFS not mounted\r\n");
++//    -    }
++
++    // SLN_Flash_Init();
++
++    // /* Init littlefs and set pre and post sector erase callbacks */
++    // sln_flash_fs_ops_init(false);
++    // sln_flash_fs_cbs_t flash_mgmt_cbs = {NULL, NULL, NULL, NULL};
++    // sln_flash_fs_ops_setcbs(&flash_mgmt_cbs);
++
++    lfs_mounted = 1;
++    filesystem_init_done++;
++
++    return 0;
+ }
+ 
+ int FS_DeInit(void)
+@@ -137,7 +149,7 @@ int FS_DeInit(void)
+             DBG_PRINTF("LFS not mounted\r\n");
+         }
+ 
+-        res = lfs_unmount(&lfs);
++        res = lfs_unmount(&s_LittlefsHandler.lfs);
+         if (res != 0)
+         {
+             INFO_PRINTF("\rError unmounting LFS: %i\r\n", res);
+@@ -157,14 +169,14 @@ int FS_ReadBufferFromFileLocation(const char *file_name, uint8_t *buffer, uint16
+     {
+         lfs_file_t file;
+ 
+-        res = lfs_file_open(&lfs, &file, file_name, LFS_O_RDONLY);
++        res = lfs_file_open(&s_LittlefsHandler.lfs, &file, file_name, LFS_O_RDONLY);
+ 
+         if (res != 0)
+         {
+             INFO_PRINTF("\rError opening file: %i   -> create new file\r\n", res);
+ 
+             /* Create new file */
+-            res = lfs_file_open(&lfs, &file, file_name, LFS_O_CREAT);
++            res = lfs_file_open(&s_LittlefsHandler.lfs, &file, file_name, LFS_O_CREAT);
+ 
+             if (res != 0)
+             {
+@@ -172,7 +184,7 @@ int FS_ReadBufferFromFileLocation(const char *file_name, uint8_t *buffer, uint16
+             }
+             else
+             {
+-                res = lfs_file_close(&lfs, &file);
++                res = lfs_file_close(&s_LittlefsHandler.lfs, &file);
+                 if (res != 0)
+                 {
+                     DBG_PRINTF("\rError closing file: %i\r\n", res);
+@@ -188,7 +200,7 @@ int FS_ReadBufferFromFileLocation(const char *file_name, uint8_t *buffer, uint16
+         {
+             if (offset != 0U)
+             {
+-                res = lfs_file_seek(&lfs, &file, offset, LFS_SEEK_SET);
++                res = lfs_file_seek(&s_LittlefsHandler.lfs, &file, offset, LFS_SEEK_SET);
+             }
+ 
+             if (res < 0)
+@@ -196,13 +208,13 @@ int FS_ReadBufferFromFileLocation(const char *file_name, uint8_t *buffer, uint16
+                 DBG_PRINTF("\rError file seek: %i\r\n", res);
+ 
+                 /* just close the file and exit */
+-                (void)lfs_file_close(&lfs, &file);
++                (void)lfs_file_close(&s_LittlefsHandler.lfs, &file);
+             }
+             else
+             {
+                 int size;
+ 
+-                size = lfs_file_read(&lfs, &file, buffer, buf_length);
++                size = lfs_file_read(&s_LittlefsHandler.lfs, &file, buffer, buf_length);
+                 if (size < 0)
+                 {
+                     /* return the error code */
+@@ -211,11 +223,11 @@ int FS_ReadBufferFromFileLocation(const char *file_name, uint8_t *buffer, uint16
+                     DBG_PRINTF("\rError reading file: %i\r\n", res);
+ 
+                     /* just close the file and exit */
+-                    (void)lfs_file_close(&lfs, &file);
++                    (void)lfs_file_close(&s_LittlefsHandler.lfs, &file);
+                 }
+                 else
+                 {
+-                    res = lfs_file_close(&lfs, &file);
++                    res = lfs_file_close(&s_LittlefsHandler.lfs, &file);
+                     if (res != 0)
+                     {
+                         DBG_PRINTF("\rError closing file: %i\r\n", res);
+@@ -256,7 +268,7 @@ int FS_WriteBufferToFile(const char *file_name, const uint8_t *buffer, uint32_t
+         FS_CRITICAL_SECTION_ENTER();
+         DEBUG_DWT_CYCLE_CNT_START();
+ #endif
+-        res = lfs_file_open(&lfs, &file, file_name, LFS_O_CREAT | LFS_O_WRONLY | LFS_O_TRUNC);
++        res = lfs_file_open(&s_LittlefsHandler.lfs, &file, file_name, LFS_O_CREAT | LFS_O_WRONLY | LFS_O_TRUNC);
+         if (res)
+         {
+             DBG_PRINTF("\rError opening file: %i\r\n", res);
+@@ -268,7 +280,7 @@ int FS_WriteBufferToFile(const char *file_name, const uint8_t *buffer, uint32_t
+ 
+             buffer_to_copy = buffer;
+ 
+-            size = lfs_file_write(&lfs, &file, buffer_to_copy, buf_length);
++            size = lfs_file_write(&s_LittlefsHandler.lfs, &file, buffer_to_copy, buf_length);
+             if (size < 0)
+             {
+                 /* return the error code */
+@@ -277,7 +289,7 @@ int FS_WriteBufferToFile(const char *file_name, const uint8_t *buffer, uint32_t
+                 DBG_PRINTF("\rError writing file: %i\r\n", res);
+             }
+ 
+-            res = lfs_file_close(&lfs, &file);
++            res = lfs_file_close(&s_LittlefsHandler.lfs, &file);
+             if (res != 0)
+             {
+                 DBG_PRINTF("\rError closing file: %i\r\n", res);
+@@ -309,13 +321,13 @@ int FS_DeleteFile(const char *file_name)
+     int        res;
+     lfs_file_t file = {0};
+ 
+-    res = (int)lfs_remove(&lfs, file_name);
++    res = (int)lfs_remove(&s_LittlefsHandler.lfs, file_name);
+     DBG_PRINTF("\rlfs_remove res=%d\r\n", res);
+ 
+-    res = (int)lfs_file_open(&lfs, &file, file_name, LFS_O_CREAT);
++    res = (int)lfs_file_open(&s_LittlefsHandler.lfs, &file, file_name, LFS_O_CREAT);
+     DBG_PRINTF("\rlfs_remove res=%d\r\n", res);
+ 
+-    res = (int)lfs_file_close(&lfs, &file);
++    res = (int)lfs_file_close(&s_LittlefsHandler.lfs, &file);
+     DBG_PRINTF("\rlfs_remove res=%d\r\n", res);
+ 
+     return res;
+@@ -326,7 +338,7 @@ int FS_CheckFileSize(const char *file_name)
+     int             res;
+     struct lfs_info info = {0};
+ 
+-    res = (int)lfs_stat(&lfs, file_name, &info);
++    res = (int)lfs_stat(&s_LittlefsHandler.lfs, file_name, &info);
+     if (res == (int)LFS_ERR_OK)
+     {
+         res = info.size;
+@@ -341,13 +353,13 @@ void *FS_InitGetHandle(void)
+ 
+     if (filesystem_init_done)
+     {
+-        p_lfs = (void *)&lfs;
++        p_lfs = (void *)&s_LittlefsHandler.lfs;
+     }
+     else
+     {
+         if (FS_Init() == 0)
+         {
+-            p_lfs = (void *)&lfs;
++            p_lfs = (void *)&s_LittlefsHandler.lfs;
+         }
+     }
+     return p_lfs;

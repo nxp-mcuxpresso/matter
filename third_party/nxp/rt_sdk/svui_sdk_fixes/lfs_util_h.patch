@@ -1,0 +1,43 @@
+--- a/lfs_util.h
++++ b/lfs_util.h
+@@ -1,7 +1,6 @@
+ /*
+  * lfs utility functions
+  *
+- * Copyright (c) 2022, The littlefs authors.
+  * Copyright (c) 2017, Arm Limited. All rights reserved.
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -167,9 +166,10 @@ static inline int lfs_scmp(uint32_t a, uint32_t b) {
+ 
+ // Convert between 32-bit little-endian and native order
+ static inline uint32_t lfs_fromle32(uint32_t a) {
+-#if (defined(  BYTE_ORDER  ) && defined(  ORDER_LITTLE_ENDIAN  ) &&   BYTE_ORDER   ==   ORDER_LITTLE_ENDIAN  ) || \
++#if !defined(LFS_NO_INTRINSICS) && ( \
++    (defined(  BYTE_ORDER  ) && defined(  ORDER_LITTLE_ENDIAN  ) &&   BYTE_ORDER   ==   ORDER_LITTLE_ENDIAN  ) || \
+     (defined(__BYTE_ORDER  ) && defined(__ORDER_LITTLE_ENDIAN  ) && __BYTE_ORDER   == __ORDER_LITTLE_ENDIAN  ) || \
+-    (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
++    (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+     return a;
+ #elif !defined(LFS_NO_INTRINSICS) && ( \
+     (defined(  BYTE_ORDER  ) && defined(  ORDER_BIG_ENDIAN  ) &&   BYTE_ORDER   ==   ORDER_BIG_ENDIAN  ) || \
+@@ -195,9 +195,10 @@ static inline uint32_t lfs_frombe32(uint32_t a) {
+     (defined(__BYTE_ORDER  ) && defined(__ORDER_LITTLE_ENDIAN  ) && __BYTE_ORDER   == __ORDER_LITTLE_ENDIAN  ) || \
+     (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+     return __builtin_bswap32(a);
+-#elif (defined(  BYTE_ORDER  ) && defined(  ORDER_BIG_ENDIAN  ) &&   BYTE_ORDER   ==   ORDER_BIG_ENDIAN  ) || \
++#elif !defined(LFS_NO_INTRINSICS) && ( \
++    (defined(  BYTE_ORDER  ) && defined(  ORDER_BIG_ENDIAN  ) &&   BYTE_ORDER   ==   ORDER_BIG_ENDIAN  ) || \
+     (defined(__BYTE_ORDER  ) && defined(__ORDER_BIG_ENDIAN  ) && __BYTE_ORDER   == __ORDER_BIG_ENDIAN  ) || \
+-    (defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
++    (defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
+     return a;
+ #else
+     return (((uint8_t*)&a)[0] << 24) |
+@@ -240,4 +241,4 @@ static inline void lfs_free(void *p) {
+ #endif
+ 
+ #endif
+-#endif
++#endif
+\ No newline at end of file

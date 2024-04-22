@@ -38,6 +38,7 @@ public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     virtual void OnWiFiConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
     virtual void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
+    virtual void OnBindingsChange(const chip::DeviceLayer::ChipDeviceEvent * event);
     virtual void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     virtual void OnInterfaceIpAddressChanged(const chip::DeviceLayer::ChipDeviceEvent * event);
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED

@@ -1,0 +1,11 @@
+--- a/board_comp.h
++++ b/board_comp.h
+@@ -21,7 +21,7 @@
+ /* The configuration of Button component. */
+ 
+ #ifndef BOARD_BUTTON_GPIO_PORT
+-#define BOARD_BUTTON_GPIO_PORT 5
++#define BOARD_BUTTON_GPIO_PORT BOARD_USER_BUTTON_GPIO
+ #endif
+ 
+ #ifndef BOARD_BUTTON_GPIO_PIN

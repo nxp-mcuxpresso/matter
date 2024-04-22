@@ -245,10 +245,10 @@ template("rt1060_sdk_drivers") {
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
       "${rt_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
-      "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c",
+      # "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c",
 
       #startup files
-      "${rt_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
+      #"${rt_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
       "${rt_sdk_root}/core/devices/${deviceBoardName}/system_${deviceBoardName}.c",
 
       # mdio

@@ -22,6 +22,8 @@
 #include "fsl_component_timer_manager.h"
 #include "fwk_platform.h"
 #include <platform/CHIPDeviceLayer.h>
+#include "binding-handler.h"
+#include "binding_table.h"
 
 static BUTTON_HANDLE_DEFINE(sdkButtonHandle);
 
@@ -35,6 +37,7 @@ static button_status_t AppMatterButton_ButtonCallback(void * buttonHandle, butto
         chip::NXP::App::GetAppTask().SwitchCommissioningStateHandler();
         break;
     case kBUTTON_EventLongPress:
+        binding_table_flash_reset();
         chip::NXP::App::GetAppTask().FactoryResetHandler();
         break;
     default:

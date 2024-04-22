@@ -1,0 +1,9 @@
+--- a/wifi_bt_config.h
++++ b/wifi_bt_config.h
+@@ -38,4 +38,4 @@ void BOARD_WIFI_BT_Enable(bool enable);
+ }
+ #endif /* __cplusplus */
+ 
+-#endif /* _WIFI_BT_CONFIG_H_ */
++#endif /* _WIFI_BT_CONFIG_H_ */
+\ No newline at end of file
