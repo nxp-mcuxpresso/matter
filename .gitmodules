@@ -62,7 +62,7 @@
 	platforms = nxp
 [submodule "third_party/nxp/vscode"]
 	path = third_party/nxp/vscode
-	url = ../matter-vscode.git
+	url = ../matter-vscode-for-mcux.git
 	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
