@@ -11,7 +11,8 @@ def main(args):
             path_prefix = "/core"
         sign_images_path = os.environ["NXP_K32W0_SDK_ROOT"] + path_prefix + "/tools/imagetool/sign_images.sh"
     else:
-        sign_images_path = os.getcwd() + "/../../../../../../../third_party/nxp/github_sdk/k32w0/repo/core/tools/imagetool/sign_images.sh"
+        sign_images_path = os.path.abspath(
+            __file__ + "/../../../../../../../third_party/nxp/github_sdk/k32w0/repo/core/tools/imagetool/sign_images.sh")
 
     # Give execute permission if needed
     if os.access(sign_images_path, os.X_OK) is False:
