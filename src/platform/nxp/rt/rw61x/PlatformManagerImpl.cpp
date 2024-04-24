@@ -196,9 +196,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#ifdef SPINEL_INTERFACE_RPMSG
-    otPlatRadioInitSpinelInterface();
-#endif /* SPINEL_INTERFACE_RPMSG */
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
