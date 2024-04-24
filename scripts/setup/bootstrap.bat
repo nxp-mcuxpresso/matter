@@ -23,22 +23,32 @@
 :: PW_BOOTSTRAP_PYTHON. Otherwise, use the system Python if one exists.
 if not "%PW_BOOTSTRAP_PYTHON%" == "" (
 	set "python=%PW_BOOTSTRAP_PYTHON%"
-) else (
-	:: Detect python installation.
-	where python >NUL 2>&1
-	IF %ERRORLEVEL% NEQ 0 (
-		echo.
-		echo Error: no system Python present
-		echo.
-		echo   Pigweed's bootstrap process requires a local system Python.
-		echo   Please install Python on your system, add it to your PATH
-		echo   and re-try running bootstrap.
-		goto finish
-	)
-	set "python=python"
+	goto check_curl
 )
 
+setlocal EnableDelayedExpansion
+:: Detect python installation.
+for /f %%p in ('where python') do (
+	%%p --version >NUL 2>&1
+	if !ERRORLEVEL! EQU 0 (
+		echo Python is found at: %%p
+		set "python=%%p"
+		:: Delayed expansion no longer needed, so disable it.
+		setlocal DisableDelayedExpansion
+		goto check_curl
+	)
+)
+
+echo.
+echo Error: no system Python present
+echo.
+echo   Pigweed's bootstrap process requires a local system Python.
+echo   Please install Python on your system, add it to your PATH
+echo   and re-try running bootstrap.
+goto finish
+
 :: Detect curl installation
+:check_curl
 where curl >NUL 2>&1
 if %ERRORLEVEL% NEQ 0 (
 	echo.
