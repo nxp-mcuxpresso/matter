@@ -85,7 +85,7 @@ endif()
 
 chip_configure_data_model(app
     INCLUDE_SERVER
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../laundry-washer-app/nxp/zap/laundry-washer-app-noicd.zap
+    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../laundry-washer-app/nxp/zap/laundry-washer-app-wifi-noicd.zap
 )
 
 if(CONFIG_CHIP_LIB_SHELL)
