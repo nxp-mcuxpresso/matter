@@ -2252,19 +2252,12 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
-    callback attribute registeredClients;
-    callback attribute ICDCounter;
-    callback attribute clientsSupportedPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 2;
-
-    handle command RegisterClient;
-    handle command RegisterClientResponse;
-    handle command UnregisterClient;
   }
 }
 endpoint 1 {
