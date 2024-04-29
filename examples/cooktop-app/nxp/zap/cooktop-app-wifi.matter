@@ -1411,6 +1411,10 @@ cluster IcdManagement = 70 {
     optional octet_string<16> verificationKey = 1;
   }
 
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
+  }
+
   response struct StayActiveResponse = 4 {
     int32u promisedActiveDuration = 0;
   }
@@ -1420,7 +1424,7 @@ cluster IcdManagement = 70 {
   /** Unregister a client from an end device */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
   /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
+  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 endpoint 0 {
@@ -1695,19 +1699,12 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
-    callback attribute registeredClients;
-    callback attribute ICDCounter;
-    callback attribute clientsSupportedPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 2;
-
-    handle command RegisterClient;
-    handle command RegisterClientResponse;
-    handle command UnregisterClient;
   }
 }
 endpoint 1 {
