@@ -31,10 +31,9 @@ setlocal EnableDelayedExpansion
 for /f %%p in ('where python') do (
 	%%p --version >NUL 2>&1
 	if !ERRORLEVEL! EQU 0 (
+		endlocal
 		echo Python is found at: %%p
 		set "python=%%p"
-		:: Delayed expansion no longer needed, so disable it.
-		setlocal DisableDelayedExpansion
 		goto check_curl
 	)
 )
