@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -106,3 +106,8 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #endif
+
+#ifndef CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
+/// Delay between completing a firmware update download and reboot to apply the update
+#define CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS 11000
+#endif // CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
