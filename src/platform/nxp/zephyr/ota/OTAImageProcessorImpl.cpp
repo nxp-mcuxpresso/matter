@@ -96,6 +96,16 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)
     {
+        /*
+         * Restart the device in order to apply the update image.
+         * This should be done with a delay so the device has enough time to send
+         * the state-transition event when applying the update.
+         * Using high interval to report the state transition may lead to not sending
+         * the applying event since the board could reset before the end of this interval
+         *
+         * TODO: Compute the reboot delay based on the interval time requested to report
+         * the state transition.
+         */
         return SystemLayer().StartTimer(
             System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS),
             [](System::Layer *, void * /* context */) {
