@@ -6,10 +6,10 @@
 manifest:
   projects:
     - name: sdk-release
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
-      revision: release/2.15.100_minor_rfp
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
+      revision: MCUX_2.15.100
+      path: core
       import:
-        file: west_2.15.100_minor_RC3_1.yml
         name-allowlist:
           - mcux-sdk
           - FreeRTOS-Kernel
@@ -26,4 +26,3 @@ manifest:
           - mcux-sdk-examples
           - wifi_nxp
         path-prefix: repo/sdk-2.15
-
