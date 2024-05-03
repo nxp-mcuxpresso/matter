@@ -169,13 +169,13 @@ user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt$ west up
     will be lost after running this command.
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/rt_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk/rt/repo/sdk-2.15$ west forall -c "git reset --hard && git clean -xdf" -a
 ```
 
 -   Start building the application
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster/nxp/rt/rt1170/
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-cluster-app/nxp/rt/rt1170/
 ```
 
 ### Building with Matter over Wifi configuration on RT1170 + IWX12
