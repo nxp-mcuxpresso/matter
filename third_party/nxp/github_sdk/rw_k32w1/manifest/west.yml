@@ -5,11 +5,10 @@
 # https://docs.zephyrproject.org/latest/guides/west/index.html
 manifest:
   projects:
-    - name: mcux-sdk-k32w1-rw-2.15
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
-      revision: develop/2.15.000_connectivity
+    - name: core
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
+      revision: MCUX_2.15.000_RW610_K32W1
       import:
-        file: west.yml
         name-allowlist:
           - CMSIS_5
           - fatfs
@@ -18,7 +17,6 @@ manifest:
           - lwip
           - mbedtls
           - mcuboot
-          - mcux-sdk
           - mcux-sdk-examples
           - mcux-sdk-middleware-bluetooth-controller
           - mcux-sdk-middleware-bluetooth-host
@@ -28,6 +26,6 @@ manifest:
           - mcux-sdk-middleware-ieee_802.15.4
           - mcux-sdk-middleware-multicore
           - rpmsg-lite
-          - secure-subsystem
+          - mcux-secure-subsystem
           - wifi_nxp
         path-prefix: repo/sdk-2.15
