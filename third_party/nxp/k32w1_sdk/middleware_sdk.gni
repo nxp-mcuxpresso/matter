@@ -44,6 +44,7 @@ middleware_sdk = {
     # BLE HOST / BLE CONTROLLER directories
     "${BLE_CONTROLLER_DIR_PATH}/interface",
     "${BLE_HOST_DIR_PATH}/application/common",
+    "${BLE_HOST_DIR_PATH}/application/common/matter",
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db",
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/macros",
     "${BLE_HOST_DIR_PATH}/hci_transport/interface",
@@ -94,10 +95,6 @@ middleware_sdk = {
     "${SECURE_SUBSYSTEM_DIR_PATH}/inc/elemu",
     "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1",
   ]
-
-  if (sdk_release) {
-    middleware_include_dirs += ["${BLE_HOST_DIR_PATH}/application/common/matter",]
-  }
 
   if (chip_key_storage == "fwk_nvm") {
     middleware_include_dirs += [
@@ -209,8 +206,8 @@ middleware_sdk = {
     # BLE HOST / BLE CONTROLLER files
     "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
     "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
-
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
+    "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
     "${BLE_HOST_DIR_PATH}/host/config/ble_globals.c",
     "${BLE_HOST_DIR_PATH}/port/fwk_generic_list.c",
@@ -254,13 +251,6 @@ middleware_sdk = {
     "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sss_mgmt.c",
     "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sss_sscp.c",
   ]
-
-  if (sdk_release) {
-    middleware_sources += ["${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",]
-  }
-  else {
-    middleware_sources += ["${BLE_HOST_DIR_PATH}/application/common/ble_init.c",]
-  }
 
   if(is_sdk_2_15) {
     middleware_sources += [
