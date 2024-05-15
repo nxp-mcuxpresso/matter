@@ -339,4 +339,4 @@
 [submodule "third_party/nxp/k32w0_zigbee_bridge"]
 	path = third_party/nxp/k32w0_zigbee_bridge
 	url = https://github.com/nxp-imx-support/k32w0x_zigbee3_controlbridge.git
-	branch = 2023q4
+	branch = 2024q2

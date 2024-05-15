@@ -29,24 +29,6 @@ executable("imx-chip-bridge-app") {
     "main/src/BridgeActions.cpp",
     "main/src/bridged-actions-stub.cpp",
 
-    #Zigbee Control Bridge
-    #"${k32w0_zigbee_bridge_src}/IotCommon/dump.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/fileCreate.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/iotSemaphore.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/iotSleep.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/newDb.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/newLog.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/nibbles.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/parsing.c",
-    #"${k32w0_zigbee_bridge_src}/IotCommon/systemtable.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/cmd.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/Serial.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/SerialLink.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/Utils.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/zcb.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/zcb_main.c",
-    #"${k32w0_zigbee_bridge_src}/ZCB/ZigbeeDevices.c",
-
     "main.cpp",
   ]
 
@@ -67,5 +49,9 @@ executable("imx-chip-bridge-app") {
 }
 
 group("linux") {
+  deps = [ ":imx-chip-bridge-app" ]
+}
+
+group("default") {
   deps = [ ":imx-chip-bridge-app" ]
 }
