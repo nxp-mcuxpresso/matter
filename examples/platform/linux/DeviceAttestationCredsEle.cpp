@@ -39,8 +39,7 @@ EleDACProvider::EleDACProvider()
 
     // open the session
     open_session_args_t open_session_args = {0};
-    open_session_args.session_priority = 0;
-    open_session_args.operating_mode = 0;
+    open_session_args.mu_type = HSM1;
     err = hsm_open_session(&open_session_args, &hsm_session_hdl);
     if (err != HSM_NO_ERROR) {
         ChipLogDetail(Crypto, "ELE device attestation session open failed. ret: 0x%x\n", err);

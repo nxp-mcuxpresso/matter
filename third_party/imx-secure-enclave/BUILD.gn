@@ -55,6 +55,7 @@ config("libele_config") {
     "MT_SAB_GET_INFO=${FMW}",
     "MT_SAB_AUTH_ENC=${FMW}",
     "MT_SAB_DATA_STORAGE=${FMW}",
+    "MT_SAB_DATA_STORAGE_DELETE=${FMW}",
     "MT_SAB_DEBUG_DUMP=${ROM}",
     "MT_SAB_DEV_ATTEST=${ROM}",
     "MT_SAB_DEV_GETINFO=${ROM}",
@@ -100,6 +101,7 @@ config("libele_config") {
     "repo/src/common/include",
     "repo/src/common/sab_msg/include",
     "repo/include",
+    "repo/include/common",
     "repo/include/hsm",
     "repo/include/she",
   ]
