@@ -798,7 +798,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
 
 void AppTask::OnIdentifyStop(Identify * identify)
 {
-    if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
+    if (Function::kIdentify == sAppTask.mFunction)
     {
         K32W_LOG("Identify process has stopped.");
         sAppTask.mFunction = Function::kNoneSelected;
