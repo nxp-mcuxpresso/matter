@@ -26,7 +26,6 @@
 #include "mcuxClHash_Constants.h"
 
 #include "psa/crypto.h"
-#include "psa/crypto_values.h"
 
 #include "mbedtls/ecdh.h"
 #include "mbedtls/entropy.h"
@@ -107,28 +106,6 @@
         PLOG_ERROR(MSG, __VA_ARGS__);                                                                                              \
         goto exit;                                                                                                                 \
     }
-
-// common flags
-#define PSA_KEY_LOCATION_NXP_FLAG 0x400000U
-#define PSA_KEY_LOCATION_EL2GO_FLAG 0x200000U
-#define PSA_KEY_LOCATION_S50_FLAG 0x000001U
-#define PSA_KEY_LOCATION_COMMON_FLAG                                                                                               \
-    (PSA_KEY_LOCATION_VENDOR_FLAG | PSA_KEY_LOCATION_NXP_FLAG | PSA_KEY_LOCATION_EL2GO_FLAG | PSA_KEY_LOCATION_S50_FLAG)
-
-// key/data
-#define PSA_KEY_LOCATION_KEY_FLAG 0x000000
-#define PSA_KEY_LOCATION_DATA_FLAG 0x008000
-
-// blob/encrypted
-#define PSA_KEY_LOCATION_BLOB_STORAGE_FLAG 0x000000
-#define PSA_KEY_LOCATION_ENC_STORAGE_FLAG 0x000100
-#define PSA_KEY_LOCATION_TEMP_STORAGE_FLAG 0x000200
-#define PSA_KEY_LOCATION_KEY_GEN_STORAGE_FLAG 0x000300
-
-#define PSA_KEY_LOCATION_S50_BLOB_STORAGE                                                                                          \
-    ((PSA_KEY_LOCATION_COMMON_FLAG | PSA_KEY_LOCATION_BLOB_STORAGE_FLAG | PSA_KEY_LOCATION_KEY_FLAG))
-#define MCUXCLPSADRIVER_IS_S50_BLOB_STORAGE(location) ((location) == PSA_KEY_LOCATION_S50_BLOB_STORAGE)
-#define PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(persistence, location) ((location) << 8 | (persistence))
 
 #define NXP_DIE_INT_IMPORT_KEK_SK 0x7FFF817CU
 #define NXP_DIE_INT_IMPORT_AUTH_SK 0x7FFF817EU
@@ -229,19 +206,15 @@ bool els_is_active_keyslot(mcuxClEls_KeyIndex_t keyIdx);
 status_t els_enable();
 status_t els_get_key_properties(mcuxClEls_KeyIndex_t key_index, mcuxClEls_KeyProp_t * key_properties);
 mcuxClEls_KeyIndex_t els_get_free_keyslot(uint32_t required_keyslots);
-status_t els_derive_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_KeyProp_t key_prop, const uint8_t * dd,
-                        mcuxClEls_KeyIndex_t * dst_key_index);
 status_t els_delete_key(mcuxClEls_KeyIndex_t key_index);
-status_t els_import_key(const uint8_t * wrapped_key, size_t wrapped_key_size, mcuxClEls_KeyProp_t key_prop,
-                        mcuxClEls_KeyIndex_t unwrap_key_index, mcuxClEls_KeyIndex_t * dst_key_index);
 status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t * public_key_size);
-status_t calculate_psa_import_blob_cmac(uint8_t * psa_import_blob, size_t psa_import_blob_length_before_mac,
-                                        size_t psa_import_blob_size);
-status_t create_psa_import_blob(const uint8_t * els_key_blob, size_t els_key_blob_size, const psa_key_attributes_t * attributes,
-                                uint8_t * output, size_t * output_size);
 status_t import_die_int_wrapped_key_into_els(const uint8_t * wrapped_key, size_t wrapped_key_size,
                                              mcuxClEls_KeyProp_t key_properties, mcuxClEls_KeyIndex_t * index_output);
 status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mcuxClEls_EccSignOption_t * sign_options,
                        mcuxClEls_KeyIndex_t key_index);
+status_t ELS_Cipher_Aes_Ecb_Decrypt(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output);
 
+status_t import_plain_key_into_els(const uint8_t * plain_key, size_t plain_key_size, mcuxClEls_KeyProp_t key_properties,
+                                   mcuxClEls_KeyIndex_t * index_output);
+status_t export_key_from_els(mcuxClEls_KeyIndex_t key_index, uint8_t * output, size_t * output_size);
 #endif
