@@ -706,6 +706,123 @@
             </md-list>
         </div>
 
+        <div layout="column" class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-shadow--2dp mdl-grid" ng-cloak ng-show="menu[8].show">
+          <md-content layout-padding flex="100">
+            <form name="eevseControlForm">
+              <h4>EEVSE Event Trigger</h4>
+              <div layout="row">
+                <md-input-container flex="50">
+                  <label>Node Alias</label>
+                  <md-select required name="nodeAlias" ng-model="selectedNodeAlias" ng-change="onNodeAliasChange()">
+                    <md-option ng-repeat="(nodeAlias, nodeId) in storageStatus.status" value="{{nodeAlias}}"> {{nodeAlias}} </md-option>
+                  </md-select>
+                  <div ng-messages="eevseControlForm.nodeAlias.$error">
+                    <div ng-message="required">Required nodeAlias to delete.</div>
+                  </div>
+                </md-input-container>
+
+                <md-input-container flex="50">
+                  <label>Node ID</label>
+                  <input required name="nodeId" ng-model="selectedNodeId">
+                  <div ng-messages="eevseControlForm.nodeId.$error">
+                    <div ng-message="required">Required nodeId to delete.</div>
+                  </div>
+                </md-input-container>
+              </div>
+
+              <div layout="row">
+                <md-input-container flex="100">
+                  <label>Key</label>
+                  <input required ng-pattern="/^.{32}$/" type="string" ng-model="eevseEvent.key">
+                  <div ng-messages="eevseControlForm.key.$error">
+                    <div ng-message="required">This is the key value which enable on the cluster end devices.</div>
+                  </div>
+                </md-input-container>
+              </div>
+
+              <div>
+                <md-button name="startBasicButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Start Trigger Event</md-button>
+                <md-button name="clearBasicButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Clear Trigger Event</md-button>
+              </div>
+
+              <div>
+                <md-button name="pluggedinButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Trigger PluggedIn</md-button>
+                <md-button name="clearPluggedinButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Clear PluggedIn</md-button>
+              </div>
+
+              <div>
+                <md-button name="chargDemandButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Trigger Charging Demand</md-button>
+                <md-button name="clearChargDemandButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eventTrigger($event)">Clear Charging Demand</md-button>
+              </div>
+
+              <h4>EEVSE Chanrging Enbale</h4>
+              <div layout="row">
+                <md-input-container flex="50">
+                  <label>Minimum Charge Current</label>
+                  <input required name="minimumChargeCurrent" type="string" ng-model="eevse.minimumChargeCurrent">
+                  <div ng-messages="eevseControlForm.minimumChargeCurrent.$error">
+                    <div ng-message="required">This value is the minimum charge current (mA) when charging.</div>
+                  </div>
+                </md-input-container>
+
+                <md-input-container flex="50">
+                  <label>Maximum Charge Current</label>
+                  <input required name="maximumChargeCurrent" type="string" ng-model="eevse.maximumChargeCurrent">
+                  <div ng-messages="eevseControlForm.maximumChargeCurrent.$error">
+                    <div ng-message="required">This value is the maximum charge current (mA) when charging.</div>
+                  </div>
+                </md-input-container>
+              </div>
+
+              <div>
+                <md-button name="enableChargingButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseControl($event)">Enable Charging</md-button>
+              </div>
+
+              <h4>EEVSE Write</h4>
+              <div layout="row">
+                <md-input-container flex="100">
+                  <label>User Maximum Charge Current</label>
+                  <input required name="userMaximumChargeCurrent" type="string" ng-model="eevse.userMaximumChargeCurrent">
+                  <div ng-messages="eevseControlForm.userMaximumChargeCurrent.$error">
+                    <div ng-message="required">This value is the minimum charge current (mA) when charging.</div>
+                  </div>
+                </md-input-container>
+              </div>
+
+              <div>
+                <md-button name="writeButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseControl($event)">Write User Maximum Charge Current</md-button>
+              </div>
+
+              <h4>EEVSE Disable</h4>
+              <div>
+                <md-button name="disableButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseControl($event)">Disable Charging</md-button>
+              </div>
+
+              <h4>EEVSE Status</h4>
+              <div>
+                <md-button name="stateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">State</md-button>
+                <md-button name="supplyStateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Supply State</md-button>
+                <md-button name="faultStateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Fault State</md-button>
+                <md-button name="chargingEnabledUntilButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Charging Enabled Until</md-button>
+                <md-button name="minimumChargeCurrentButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Minimum Charge Current</md-button>
+                <md-button name="maximumChargeCurrentButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Maximum Charge Current</md-button>
+                <md-button name="sessionIdButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Session Id</md-button>
+                <md-button name="sessionDurationButton" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit" ng-click="eevseRead($event)">Session Duration</md-button>
+              </div>
+            </form>
+          </md-content>
+
+          <md-list class="md-dense" flex=100>
+            <md-list-item class="md-3-line" ng-repeat="item in eevseReports">
+              <img ng-src="{{item.icon}}" class="md-avatar" alt="" />
+                <div class="md-list-item-text" layout="column">
+                    <h4><div style="white-space:pre-wrap">{{ item.report }}</div></h4>
+                </div>
+              <md-divider></md-divider>
+            </md-list-item>
+          </md-list>
+      </div>
+
       </div>
     </main>
   </div>
