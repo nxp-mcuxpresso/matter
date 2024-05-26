@@ -117,6 +117,11 @@
                 icon: 'add_circle_outline',
                 show: false,
             },
+            {
+                title: 'EevseControl',
+                icon: 'add_circle_outline',
+                show: false,
+            },
         ];
 
         $scope.onoff = {
@@ -210,11 +215,29 @@
             applicationID: 'exampleid',
         };
 
+        $scope.eevseEvent = {
+            key: '000102030405060708090a0b0c0d0e0f',
+            type_event: 'triggerBasic',
+        };
+
+        $scope.eevse = {
+            endPointId: 1,
+            chargingEnabledUntil: 'null',
+            minimumChargeCurrent: '6000',
+            maximumChargeCurrent: '32000',
+            userMaximumChargeCurrent: '32000',
+            type_enablecharging: 'enablecharging',
+            type_write: 'write',
+            type_disable: 'disable',
+            type_eevseRead: 'state',
+        };
+
         $scope.headerTitle = 'Home';
         $scope.status = [];
         $scope.reports = [];
         $scope.subscribeStatus = [];
         $scope.mediaReports = [];
+        $scope.eevseReports = [];
 
         $scope.selectedNodeAlias = '';
         $scope.selectedNodeId = '';
@@ -223,14 +246,14 @@
 
         $scope.showPanels = function(index) {
             $scope.headerTitle = $scope.menu[index].title;
-            for (var i = 0; i < 8; i++) {
+            for (var i = 0; i < 9; i++) {
                 /* set i as the number of menu*/
                 $scope.menu[i].show = false;
             }
 
             $scope.menu[index].show = true;
 
-            if (index > 1 && index < 8) {
+            if (index > 1 && index < 9) {
                 var httpGetStatusReq = $http({
                     method: 'GET',
                     url: 'get_status',
@@ -855,6 +878,162 @@
                     $scope.mediaReports.reverse();
                 } else {
                     $scope.showAlert(event, 'read operation is success, but get report', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.eventTrigger = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var buttonName = event.currentTarget.name;
+            switch (buttonName) {
+                case 'startBasicButton':
+                    $scope.eevseEvent.type_event = 'triggerBasic';
+                    break;
+                case 'clearBasicButton':
+                    $scope.eevseEvent.type_event = 'triggerBasicClear';
+                    break;
+                case 'pluggedinButton':
+                    $scope.eevseEvent.type_event = 'triggerPluggedin';
+                    break;
+                case 'clearPluggedinButton':
+                    $scope.eevseEvent.type_event = 'triggerPluggedinClear';
+                    break;
+                case 'chargDemandButton':
+                    $scope.eevseEvent.type_event = 'triggerChargeDemand';
+                    break;
+                case 'clearChargDemandButton':
+                    $scope.eevseEvent.type_event = 'triggerChargeDemandClear';
+                    break;
+            }
+            var data = {
+                nodeAlias: $scope.selectedNodeAlias,
+                nodeId: $scope.selectedNodeId,
+                key: $scope.eevseEvent.key,
+                type: $scope.eevseEvent.type_event,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'event_trigger',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'trigger eevse event', 'successfully');
+                } else {
+                    $scope.showAlert(event, 'trigger eevse event', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.eevseControl = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var buttonName = event.currentTarget.name;
+            var data = {
+                nodeAlias: $scope.selectedNodeAlias,
+                nodeId: $scope.selectedNodeId,
+            }
+            switch (buttonName) {
+                case 'enableChargingButton':
+                    data = {
+                        nodeAlias: $scope.selectedNodeAlias,
+                        nodeId: $scope.selectedNodeId,
+                        endPointId: $scope.eevse.endPointId,
+                        chargingEnabledUntil: $scope.eevse.chargingEnabledUntil,
+                        minimumChargeCurrent: $scope.eevse.minimumChargeCurrent,
+                        maximumChargeCurrent: $scope.eevse.maximumChargeCurrent,
+                        type: $scope.eevse.type_enablecharging,
+                    };
+                    break;
+                case 'writeButton':
+                    data = {
+                        nodeAlias: $scope.selectedNodeAlias,
+                        nodeId: $scope.selectedNodeId,
+                        endPointId: $scope.eevse.endPointId,
+                        userMaximumChargeCurrent: $scope.eevse.userMaximumChargeCurrent,
+                        type: $scope.eevse.type_write,
+                    };
+                    break;
+                case 'disableButton':
+                    data = {
+                        nodeAlias: $scope.selectedNodeAlias,
+                        nodeId: $scope.selectedNodeId,
+                        endPointId: $scope.eevse.endPointId,
+                        type: $scope.eevse.type_disable,
+                    };
+                    break;
+            }
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'eevse_control',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'eevse control', 'successfully');
+                } else {
+                    $scope.showAlert(event, 'eevse control', 'failed');
+                }
+                ev.target.disabled = false;
+            });
+        };
+
+        $scope.eevseRead = function(ev) {
+            $scope.showLoadingSpinner = true;
+            var buttonName = event.currentTarget.name;
+            switch (buttonName) {
+                case 'stateButton':
+                    $scope.eevse.type_eevseRead = 'state';
+                    break;
+                case 'supplyStateButton':
+                    $scope.eevse.type_eevseRead = 'supplystate';
+                    break;
+                case 'faultStateButton':
+                    $scope.eevse.type_eevseRead = 'faultstate';
+                    break;
+                case 'chargingEnabledUntilButton':
+                    $scope.eevse.type_eevseRead = 'chargingenableduntil';
+                    break;
+                case 'minimumChargeCurrentButton':
+                    $scope.eevse.type_eevseRead = 'minimumchargecurrent';
+                    break;
+                case 'maximumChargeCurrentButton':
+                    $scope.eevse.type_eevseRead = 'maximumchargecurrent';
+                    break;
+                case 'sessionIdButton':
+                    $scope.eevse.type_eevseRead = 'sessionid';
+                    break;
+                case 'sessionDurationButton':
+                    $scope.eevse.type_eevseRead = 'sessionduration';
+                    break;
+            }
+            var data = {
+                nodeAlias: $scope.selectedNodeAlias,
+                nodeId: $scope.selectedNodeId,
+                endPointId: $scope.eevse.endPointId,
+                type: $scope.eevse.type_eevseRead,
+            };
+            var httpRequest = $http({
+                method: 'POST',
+                url: 'eevse_read',
+                data: data,
+            });
+            httpRequest.then(function successCallback(response) {
+                $scope.showLoadingSpinner = false;
+                if (response.data.result == "successful") {
+                    $scope.showAlert(event, 'get eevse report', 'successfully');
+                    var reportsStr = response.data.report;
+                    $scope.eevseReports.reverse();
+                    $scope.eevseReports.push({
+                        report: reportsStr,
+                        icon: 'res/img/icon-info.png',
+                    });
+                    $scope.eevseReports.reverse();
+                } else {
+                    $scope.showAlert(event, 'get eevse report', 'failed');
                 }
                 ev.target.disabled = false;
             });
