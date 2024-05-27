@@ -27,6 +27,8 @@ typedef websocketpp::client<websocketpp::config::asio_client> WsClient;
 
 static std::queue<Json::Value> reportQueue;
 static std::queue<Json::Value> subscribeReportQueue;
+static std::mutex reportQueueMutex;
+static std::mutex subscribeReportQueueMutex;
 
 class WebSocketClient {
 public:
@@ -100,6 +102,30 @@ public:
         m_client.ping(m_hdl, "");
     }
 
+    void enqueueReport(const Json::Value& report) {
+        std::lock_guard<std::mutex> lock(reportQueueMutex);
+        reportQueue.push(report);
+    }
+
+    void enqueueSubscribeReport(const Json::Value& report) {
+        std::lock_guard<std::mutex> lock(subscribeReportQueueMutex);
+        subscribeReportQueue.push(report);
+    }
+
+    Json::Value dequeueReport() {
+        std::lock_guard<std::mutex> lock(reportQueueMutex);
+        Json::Value report = reportQueue.front();
+        reportQueue.pop();
+        return report;
+    }
+
+    Json::Value dequeueSubscribeReport() {
+        std::lock_guard<std::mutex> lock(subscribeReportQueueMutex);
+        Json::Value report = subscribeReportQueue.front();
+        subscribeReportQueue.pop();
+        return report;
+    }
+
 private:
     WsClient m_client;
     websocketpp::connection_hdl m_hdl;
@@ -130,12 +156,12 @@ private:
             if (recieveMessage.isMember("subscribe_results"))
             {
                 resultsReport = recieveMessage["subscribe_results"];
-                subscribeReportQueue.push(resultsReport);
+                enqueueSubscribeReport(resultsReport);
             }
             else
             {
                 resultsReport = recieveMessage["results"];
-                reportQueue.push(resultsReport);
+                enqueueReport(resultsReport);
             }
         }
     }
