@@ -63,9 +63,6 @@
 using namespace std;
 // Added for the json-example:
 using namespace boost::property_tree;
-// Define a global mutex
-std::mutex g_mutex;
-std::mutex sq_mutex;
 
 #define RESPONSE_SUCCESS "successful"
 #define RESPONSE_FAILURE "failed"
@@ -193,10 +190,8 @@ void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr 
     {
         if(!subscribeReportQueue.empty())
         {
-            Json::Value resultsValue = subscribeReportQueue.front();
-            subscribeReportQueue.pop();
-            Json::Value arryValue;
-            arryValue = resultsValue[0];
+            Json::Value resultsValue = wsClient.dequeueSubscribeReport();
+            Json::Value arryValue = resultsValue[0];
             stringstream report_ss;
             report_ss << "Subscribe Report from " << nodeAlias << " " << nodeId << ": " << arryValue["endpointId"] << ". " << "Cluster: "
                     << arryValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << arryValue["value"];
@@ -247,8 +242,7 @@ void on_message(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
     if (sleepTime == 20) {
         ChipLogError(NotSpecified, "Receive subscribe command to chip-tool ws server overtime!");
     } else {
-        Json::Value resultsValue = reportQueue.front();
-        reportQueue.pop();
+        Json::Value resultsValue = wsClient.dequeueReport();
         Json::Value arryValue = resultsValue[0];
         stringstream report_ss;
         string report_text;
@@ -403,8 +397,7 @@ int main()
                     root.put("result", RESPONSE_FAILURE);
                     ChipLogError(NotSpecified, "Execute pairing command overtime!");
                 } else {
-                    Json::Value resultsReport = reportQueue.front();
-                    reportQueue.pop();
+                    Json::Value resultsReport = wsClient.dequeueReport();
                     int resultsReportSize = resultsReport.size();
                     if (resultsReportSize == 0) {
                         root.put("result", RESPONSE_SUCCESS);
@@ -492,8 +485,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Generated onoff report overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (resultsValue.isMember("error"))
                 {
@@ -553,8 +545,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute onoff command overtime!");
             } else {
-                Json::Value resultsValue = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsValue = wsClient.dequeueReport();
                 int jsonObjectsize = resultsValue.size();
                 if (jsonObjectsize == 0) {
                     root.put("result", RESPONSE_SUCCESS);
@@ -598,8 +589,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute multiadmin command overtime!");
             } else {
-                Json::Value resultsValue = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsValue = wsClient.dequeueReport();
                 int jsonObjectsize = resultsValue.size();
                 if (jsonObjectsize == 0) {
                     root.put("result", RESPONSE_SUCCESS);
@@ -719,8 +709,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute write acl command overtime!");
             } else {
-                Json::Value resultsValue = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsValue = wsClient.dequeueReport();
                 int jsonObjectsize = resultsValue.size();
                 if (jsonObjectsize == 0) {
                     root.put("result", RESPONSE_SUCCESS);
@@ -769,8 +758,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute write binding command overtime!");
             } else {
-                Json::Value resultsValue = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsValue = wsClient.dequeueReport();
                 int jsonObjectsize = resultsValue.size();
                 if (jsonObjectsize == 0) {
                     root.put("result", RESPONSE_SUCCESS);
@@ -822,8 +810,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute launcher command overtime!!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (resultsValue.isMember("error"))
                 {
@@ -884,8 +871,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute media control command overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (resultsValue.isMember("error"))
                 {
@@ -941,8 +927,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute media read command overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (!resultsValue.isMember("error") && resultsValue.isMember("value") )
                 {
@@ -1025,8 +1010,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute general diagnostics event trigger command overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (resultsValue.isMember("error"))
                 {
@@ -1082,8 +1066,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute eevse control command overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (resultsValue.isMember("error"))
                 {
@@ -1145,8 +1128,7 @@ int main()
                 root.put("result", RESPONSE_FAILURE);
                 ChipLogError(NotSpecified, "Execute eevse read command overtime!");
             } else {
-                Json::Value resultsReport = reportQueue.front();
-                reportQueue.pop();
+                Json::Value resultsReport = wsClient.dequeueReport();
                 Json::Value resultsValue = resultsReport[0];
                 if (!resultsValue.isMember("error") && resultsValue.isMember("value") )
                 {
