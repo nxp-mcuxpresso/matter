@@ -792,10 +792,10 @@ int main()
             std::string launchConfString = "'{\"catalogVendorID\": " +  catalogVendorID + ", \"applicationID\": \"" + applicationID + "\"}'";
             std::string command;
             if (type == "launch") {
-                command = "applicationlauncher launch-app " + launchConfString + nodeId + " " + std::to_string(endPointId);
+                command = "applicationlauncher launch-app " + nodeId + " " + std::to_string(endPointId) + " --Application " + launchConfString;
                 ChipLogError(NotSpecified, "Received POST request to Launch App");
             } else if (type == "stop") {
-                command = "applicationlauncher stop-app " + launchConfString + nodeId + " " + std::to_string(endPointId);
+                command = "applicationlauncher stop-app " + nodeId + " " + std::to_string(endPointId) + " --Application " + launchConfString;
                 ChipLogError(NotSpecified, "Received POST request to Stop App");
             }
             wsClient.sendMessage(command);
