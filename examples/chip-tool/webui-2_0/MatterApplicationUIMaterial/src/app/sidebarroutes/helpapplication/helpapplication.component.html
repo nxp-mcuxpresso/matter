@@ -1,0 +1,54 @@
+<!-- <div id="main--application--body--component" style="align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+">
+  <div #containingappcards_component_div style="align-items: center" class="justify-content-center" [style]="
+    'flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;'">
+    <app-cardscomponent
+      #cards_component [cards]="cards"></app-cardscomponent>
+  </div>
+  <div class="d-flex justify-content-center">
+    <div class="line"></div>
+  </div>
+  <app-scrollgallerycomponent></app-scrollgallerycomponent>
+
+
+
+</div> -->
+
+<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+  <div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+      <img src="../../assets/matter-logo-transparent.png" height="60%" width="100%">
+  </div>
+  <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-grid">
+    <h3>What is Matter?</h3>
+    <p>Matter (formerly Project Connected Home over IP or Project CHIP) is an open-source application layer that aims at creating a unified communication standard across smart home devices, mobile applications, and cloud services. It supports a wide range of existing technologies, including Wi-Fi, Thread, and Bluetooth® LE, and uses IPv6-based transport protocols like TCP and UDP to ensure connectivity between different kinds of networks.</p>
+    <p>The goal of the Matter project is to simplify development for manufacturers and increase compatibility for consumers. The project is built around a shared belief that smart home devices should be secure, reliable, and seamless to use. By building upon Internet Protocol (IP), the project aims to enable communication across smart home devices, mobile apps, and cloud services and to define a specific set of IP-based networking technologies for device certification.</p>
+  </div>
+
+  <div class="demo-charts mdl-color--white  mdl-cell mdl-cell--12-col mdl-grid">
+    <h4>What is Matter Controller?</h4>
+    <p>The Matter controller is a role within the Matter development environment. The controller device is used to pair and control the Matter accessory device remotely over a network, interacting with it using Bluetooth LE and the regular IPv6 communication.</p>
+    <p style="text-align: center; display: flex; flex-direction: row;">
+
+    </p>
+  </div>
+  <app-floatingactionarea (buttonPressedEvent)="onButtonPressedEventCatch($any($event))"></app-floatingactionarea>
+  <div class="d-flex justify-content-center"
+    style="display: flex; justify-content: center; align-items: center; flex-direction: row; width: 100%; height: auto;">
+    >
+    <div class="line">
+      <app-scrollgallerycomponent></app-scrollgallerycomponent>
+    </div>
+  </div>
+</div>

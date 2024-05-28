@@ -1,0 +1,39 @@
+<app-loaderoverlay></app-loaderoverlay>
+<div class="wrapper" id="wrapper">
+  <mat-drawer-container class="drawer-container"
+    [ngClass]="{'drawer-container': true, 'drawer-container-open': getIsDrawerOpen()}"
+    [ngStyle]="{'width': '100%', 'height': '100%'}"
+    autosize>
+
+    <!-- Sidebar -->
+      <mat-drawer #drawer id="drawer-id" mode="side">
+          <app-applicationsidebar [isDrawerOpen]="getIsDrawerOpen()" (isCollapsedChange)="onSidebarColapsedEventCatch($event)"></app-applicationsidebar>
+      </mat-drawer>
+
+      <mat-drawer-content class="drawer-content" id="content">
+          <!-- <div class="header row"> -->
+            <app-applicationheader [sidebarStatus]="getIsDrawerOpen()" (SidebarCollapsed)="onSidebarColapsedEventCatch($event)"></app-applicationheader>
+          <!-- </div> -->
+          <!-- <div class="body row scroll-y"> -->
+            <div [style]="{'display': 'flex', 'flex-direction': 'column', 'height': '100%'}" class="body-content">
+              <router-outlet class="body-content"
+                [ngStyle]="{'width': '100%', 'height': '100%'}"
+              ></router-outlet>
+            </div>
+          <!-- </div> -->
+          <div id="footer">
+            <app-footercomponent></app-footercomponent>
+          </div>
+      </mat-drawer-content>
+  </mat-drawer-container>
+  <div *ngIf="isLoading" class="relative">
+    <app-loaderoverlay></app-loaderoverlay>
+  </div>
+</div>
+<!-- <div class="internal-main-div-elem", id='maindiv'>
+  <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="Color selection">
+    @for (chip of availableColors; track chip) {
+      <mat-chip-option selected [color]="chip.color">{{chip.name}}</mat-chip-option>
+    }
+  </mat-chip-listbox>
+</div> -->

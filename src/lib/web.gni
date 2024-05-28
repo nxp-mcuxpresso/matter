@@ -16,4 +16,5 @@
 
 declare_args() {
   chip_with_web = 0
+  chip_with_web2 = 0
 }

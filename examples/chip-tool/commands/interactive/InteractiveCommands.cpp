@@ -71,7 +71,7 @@ struct InteractiveServerResult
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     bool mSubscribeEnabled  = false;
     bool mIsSubscribeReport = false;
     int  mSubscribeStatus   = EXIT_SUCCESS;
@@ -102,7 +102,7 @@ struct InteractiveServerResult
     // protected by a mutex.
     std::mutex mMutex;
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     std::mutex mSubscribeMutex;
     #endif
 
@@ -119,7 +119,7 @@ struct InteractiveServerResult
         }
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     void SubscribeSetup(bool isSubscribeReport)
     {
         auto lock           = ScopedLock(mSubscribeMutex);
@@ -145,7 +145,7 @@ struct InteractiveServerResult
         mLogs.clear();
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     void SubscribeReset()
     {
         auto lock = ScopedLock(mSubscribeMutex);
@@ -162,7 +162,7 @@ struct InteractiveServerResult
         return mIsAsyncReport;
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     bool IsSubscribeReport()
     {
         auto lock = ScopedLock(mSubscribeMutex);
@@ -199,7 +199,7 @@ struct InteractiveServerResult
         mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     void SubscribeMaybeAddLog(const char * module, uint8_t category, const char * base64Message)
     {
         auto lock = ScopedLock(mSubscribeMutex);
@@ -235,7 +235,7 @@ struct InteractiveServerResult
         mResults.push_back(result);
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     bool IsEnabled(){
         auto lock = ScopedLock(mMutex);
         return mEnabled;
@@ -306,7 +306,7 @@ struct InteractiveServerResult
         return content.str();
     }
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     std::string SubscribeAsJsonString()
     {
         auto lock = ScopedLock(mSubscribeMutex);
@@ -481,7 +481,7 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     if(strstr(msg, "subscribe"))
     {
         bool isSubscribeReport = true;
@@ -496,7 +496,7 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 {
     gInteractiveServerResult.MaybeAddResult(json);
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     if (gInteractiveServerResult.IsSubscribeReport() && !gInteractiveServerResult.IsEnabled())
     {
         gInteractiveServerResult.SubscribeMaybeAddResult(json);

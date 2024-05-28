@@ -1,0 +1,110 @@
+<div class="container"
+  [ngClass]="{
+    'material--dialog--content': true,
+    'material--dialog--content--error': dialogType === 'error',
+    'material--dialog--content--warning': dialogType === 'warning',
+    'material--dialog--content--info': dialogType === 'info',
+    'material--dialog--content--success': dialogType === 'success'
+  }"
+  style="max-height: 75%;"
+>
+  <h2 mat-dialog-title>
+    <div class="container">
+      <div class="column" matRipple>
+        <img
+          id="logo"
+          class="card-img-top px-2"
+          src="{{ dialogImageSrc }}"
+          alt="Card image"
+        />
+        <p>{{ dialogTitle }}</p>
+      </div>
+    </div>
+  </h2>
+  <mat-dialog-content style="overflow-y: scroll;">
+    <div class="container-fluid">
+      <div class="row center">
+        <div class="col-md-12">
+          <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+              <mat-form-field appearance="fill" *ngFor="let input_item of getDialogContent().inputFields" style="width:100%; display: inline-block; vertical-align: middle; border-radius: 10px; border-color: #000000;" >
+                <div style="align-items: center;">
+                  <mat-label style="color: #000000; font-size: 16px; font-weight: 500;"
+                  >{{
+                    input_item.inputFieldName
+                  }}</mat-label>
+                  <input
+                    matInput
+                    placeholder="{{
+                      input_item.inputFieldDefaultValue
+                    }}"
+                    [(ngModel)]="input_item.inputFieldContent"
+                  />
+                  <mat-hint style="color: #000000; font-size: 12px; font-weight: 500;"
+                    >{{
+                      input_item.inputFieldDefaultValue
+                    }}</mat-hint>
+                </div>
+              </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="dialogAvailableSelectionItems && dialogAvailableSelectionItems.length > 0" class="container-fluid">
+      <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="option_selection">
+        @for (chip of dialogAvailableSelectionItems; track chip) {
+          <mat-chip-option [color]="chip.color"
+            (click)="onSelectOption(chip.name)"
+          >{{chip.name}}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions *ngIf="dialogButtons.length > 0">
+    <div class="material--dialog--actions--content container-fluid">
+      <mat-chip
+        *ngFor="let button of getDialogButtons()"
+        mat-button
+        [mat-dialog-close]="button"
+        (click)="button.action()"
+        matRipple
+      >
+        <div
+          class="fab-chip-content"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <a class="nav-link active" aria-current="page" href="#">{{
+            button.buttonName
+          }}</a>
+          <mat-icon
+            class="fab-icon"
+            *ngIf="button.icon"
+            style="margin-left: 5px"
+            >{{ button.icon }}</mat-icon
+          >
+        </div>
+      </mat-chip>
+    </div>
+  </mat-dialog-actions>
+
+  <mat-dialog-actions *ngIf="dialogButtons.length === 0">
+    <div class="material--dialog--actions--content container-fluid">
+      <mat-chip mat-button [mat-dialog-close]="true" matRipple>
+        <div
+          class="fab-chip-content"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <a class="nav-link active" aria-current="page" href="#">Close</a>
+          <mat-icon class="fab-icon" style="margin-left: 5px">close</mat-icon>
+        </div>
+      </mat-chip>
+    </div>
+  </mat-dialog-actions>
+</div>

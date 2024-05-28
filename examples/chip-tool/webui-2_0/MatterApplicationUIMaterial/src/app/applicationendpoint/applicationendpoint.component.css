@@ -1,0 +1,67 @@
+.card > mat-card-header > mat-card-title > span {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  background-color: #fff;
+  overflow: hidden;
+  max-width: 300px;
+  margin: 20px;
+  padding: 10px;
+}
+
+.card-group.card-group-scroll {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.card-group.card-group-scroll > .card {
+  flex-basis: 35%;
+}
+
+div.card-group.card-group-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+div.card-group.card-group-scroll > div.card {
+  flex-basis: 100%;
+}
+
+
+div.card {
+  margin: 10px;
+}
+
+* {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+  font-size: small;
+}
+
+.online {
+  color: green;
+}
+
+.offline {
+  color: red;
+}
+
+.mat-mdc-standard-chip {
+  --mdc-chip-elevated-container-color: #e0e0e0;
+  --mdc-chip-elevated-disabled-container-color: #e0e0e0;
+  --mdc-chip-disabled-label-text-color: #212121;
+  --mdc-chip-with-icon-icon-color: #212121;
+  --mdc-chip-with-icon-disabled-icon-color: #212121;
+  --mdc-chip-with-trailing-icon-disabled-trailing-icon-color: #212121;
+  --mdc-chip-with-trailing-icon-trailing-icon-color: #212121;
+  --mdc-chip-with-icon-selected-icon-color: #212121;
+}

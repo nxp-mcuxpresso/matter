@@ -49,6 +49,11 @@ config("config") {
   } else {
     defines += [ "CHIP_WITH_WEBUI=0" ]
   }
+  if (chip_with_web2 == 1) {
+    defines += [ "CHIP_WITH_WEBUI2=1" ]
+  } else {
+    defines += [ "CHIP_WITH_WEBUI2=0" ]
+  }
 
   cflags = [ "-Wconversion" ]
 }
@@ -150,6 +155,11 @@ group("default") {
       ":chip-tool",
       ":chip-tool-web",
     ]
+  } else if (chip_with_web2 == 1) {
+    deps = [
+      ":chip-tool",
+      ":chip-tool-web2",
+    ]
   } else {
     deps = [ ":chip-tool" ]
   }
@@ -170,6 +180,39 @@ if (chip_with_web == 1) {
     ]
 
     deps = [ ":chip-tool-utils" ]
+
+    libs = [
+      "boost_filesystem",
+      "boost_system",
+      "boost_thread",
+      "boost_date_time",
+    ]
+    output_dir = root_out_dir
+  }
+}
+
+if (chip_with_web2 == 1) {
+  executable("chip-tool-web2") {
+    include_dirs = [
+      "webui",
+      "webui/websocketpp",
+      "webui-2_0/MatterApplicationBackend/libs/crow/",
+    ]
+    sources = [
+      "webui-2_0/MatterApplicationBackend/src/chip_tool_web.cpp",
+      "webui/websocketpp/config/asio_no_tls.hpp",
+      "webui/websocketpp/server.hpp",
+      "webui-2_0/MatterApplicationBackend/libs/crow/crow/http_request.h",
+      "webui-2_0/MatterApplicationBackend/libs/crow/crow/http_response.h",
+      "webui-2_0/MatterApplicationBackend/libs/crow/crow/json.h",
+      "webui-2_0/MatterApplicationBackend/libs/crow/crow/app.h",
+      "webui-2_0/MatterApplicationBackend/libs/crow/crow/middlewares/cors.h",
+      "webui/WebSocketClient.h",
+    ]
+
+    deps = [ ":chip-tool-utils" ]
+
+    defines = [ "CROW_USE_BOOST" ]
 
     libs = [
       "boost_filesystem",

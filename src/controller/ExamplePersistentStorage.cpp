@@ -293,7 +293,7 @@ CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId value)
     return SyncSetKeyValue(kLocalNodeIdKey, &nodeId, sizeof(nodeId));
 }
 
-#if CHIP_WITH_WEBUI
+#if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
 NodeId PersistentStorage::GetLocalKeyNodeId(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

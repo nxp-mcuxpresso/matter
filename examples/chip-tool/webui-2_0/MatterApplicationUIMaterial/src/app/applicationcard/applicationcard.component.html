@@ -1,0 +1,75 @@
+<mat-card class="card"
+  [ngClass]="{'offline': !isDeviceOnline, 'subscribed': !isDeviceOnline}"
+  [ngStyle]="{
+    'background-color': isDeviceOnline ? '#4CAF50' : 'grey',
+    'color': isDeviceOnline ? 'white' : 'black'
+  }"
+>
+  <mat-card-header>
+    <mat-card-title>
+      <span style="font-family: 'DM Sans', sans-serif;">{{deviceName}}</span>
+    </mat-card-title>
+    <mat-card-subtitle>
+      Device ID: {{deviceId}}
+    </mat-card-subtitle>
+  </mat-card-header>
+  <div [ngStyle]="{
+    'border-radius': '10px',
+    'padding': '10px',
+    'width': '100%',
+    'align-items': 'center',
+    'justify-content': 'center',
+    'display': 'flex',
+    'height': '100px',
+  }">
+
+  <img mat-card-image [src]="deviceTypeImageURL"
+    style="max-height: 100px;
+    width: auto; border-radius: 10px;" alt="Connection Method Image">
+
+  </div>
+  <mat-card-content style="display: flex; flex-direction: column; justify-content: center;">
+    <div *ngIf="endpoints.length === 0" class="rounded" style="background-color: #8d8d8d; padding: 10px; margin: 10px;
+      border-radius: 20px; text-align: center; color: #ffffff;
+      display: flex; justify-content: center;
+      flex-direction: column;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+      border: 0.05em solid rgb(255, 138, 138);
+    ">
+      <p>Unknown endpoints to interact with for this device</p>
+      <div style="display: flex; justify-content: center;">
+        <img src="../../../../assets/unknown-device.png" alt="unknown" style="width: 100px; height: auto">
+      </div>
+    </div>
+    <div *ngIf="endpoints.length > 0" class="rounded" style="text-align: center; color: #ffffff;
+      justify-content: center; align-items: center; display: flex; flex-direction: column;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+      border: 0.05em solid rgb(255, 138, 138);"
+      >
+    <app-applicationendpoint *ngFor="let endpoint of endpoints" [endpointModel]="endpoint"></app-applicationendpoint>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <mat-chip-listbox class="p-2 app-matchip-listbox" id="mat-chip-listbox-el">
+      <div *ngIf="isDeviceOnline">
+        <mat-chip mat-button (click)="scanDeviceEndpoints(deviceId)" class="app-matchip">
+          Scan Device Endpoints
+        </mat-chip>
+      </div>
+
+      <mat-chip>
+        <button mat-button (click)="forgetDevice(deviceId)">Forget Device</button>
+      </mat-chip>
+      <mat-chip>
+        <button mat-button (click)="interactWithEndpoint(deviceId)">Interact with endpoint</button>
+      </mat-chip>
+
+      <mat-chip *ngIf="withSubscription">
+        <button mat-button (click)="subscribeToDevice(deviceId)">Subscribe to device</button>
+      </mat-chip>
+
+    </mat-chip-listbox>
+
+  </mat-card-actions>
+</mat-card>
+

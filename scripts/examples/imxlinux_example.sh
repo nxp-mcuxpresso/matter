@@ -159,9 +159,13 @@ fi
 
 PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
 chip_with_web=${NXP_CHIPTOOL_WITH_WEB:-0}
+chip_with_web2=${NXP_CHIPTOOL_WITH_WEB2:-0}
 additional_gn_args=""
 if [ "$chip_with_web" = 1 ]; then
     additional_gn_args+=" enable_rtti=true chip_with_web=$chip_with_web"
+fi
+if [ "$chip_with_web2" = 1 ]; then
+    additional_gn_args+=" enable_rtti=true chip_with_web2=$chip_with_web2"
 fi
 gn gen $executable_python --check --fail-on-unused-args --root="$src" "$out" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
 $pregen_arg chip_with_trusty_os=$trusty

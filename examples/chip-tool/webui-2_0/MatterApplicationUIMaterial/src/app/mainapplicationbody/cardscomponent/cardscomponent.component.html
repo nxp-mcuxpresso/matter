@@ -1,0 +1,70 @@
+<!-- If we have cards available  -->
+<div *ngIf="cards.length > 0" class="container-fluid">
+  <div #ngxmasonry_container fxLayoutAlign="center js-masonry masonry-container"
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    "
+    class="mt-4" data-masonry-options='{ "isFitWidth": true }'>
+    <ngx-masonry [options]="{ gutter: 10, fitWidth: true }" style="margin: 10px"
+      fxLayout="row" fxLayoutAlign="center" #masonry_item_container [style]="
+        'flex-direction: row; align-items: center; justify-content: center; width: 100%; height: 100%;'
+      "
+    >
+      <div
+        #card_component_container
+        id="card--component--container--id"
+        *ngFor="let card of cards"
+        class="card pr-3 masonry-item masonry-item--width2"
+        style="
+          box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
+            0 2px 10px 0 rgba(0, 0, 0, 0.12);
+          transition: box-shadow 0.3s;
+          border-radius: 20px;
+          align-items: center;
+          justify-content: center;
+          display: flex;
+        "
+        [ngStyle] = "{
+          'margin': '{{getMasonryLayoutGap(card)}}',
+        }"
+
+        ngxMasonryItem>
+        <app-applicationcard
+          [deviceTypeImageURL]="card.deviceTypeImageURL"
+          [isDeviceOnline]="card.isDeviceOnline"
+          [deviceId]="card.deviceId"
+          [deviceName]="card.deviceName"
+          [endpoints]="card.endpoints"
+          [withSubscription]="cardsHaveSubscriptionOption"
+        ></app-applicationcard>
+      </div>
+
+    </ngx-masonry>
+  </div>
+
+</div>
+
+<div *ngIf="cards.length === 0" class="rounded" style="
+  background-color: #8d8d8d;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 20px;
+  text-align: center;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
+    0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  border: 0.05em solid rgb(255, 138, 138);
+">
+  <p>No devices connected for now</p>
+  <div style="display: flex; justify-content: center;">
+    <img src="../../../assets/unknown-device.png" alt="no-devices" style="width: 100px; height: auto">
+  </div>
+</div>

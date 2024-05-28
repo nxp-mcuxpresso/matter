@@ -54,6 +54,12 @@ config("includes") {
   } else {
     defines += [ "CHIP_WITH_WEBUI=0" ]
   }
+
+  if (chip_with_web2 == 1) {
+    defines += [ "CHIP_WITH_WEBUI2=1" ]
+  } else {
+    defines += [ "CHIP_WITH_WEBUI2=0" ]
+  }
 }
 
 if (chip_build_tests) {
