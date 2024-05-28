@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light modal-header px-2 mt-n1" id="navbar">
+  <div class="container-fluid" id="maindiv">
+    <div class="main-upwards-division" id="top"></div>
+    <p class="navbar-brand">
+      <mat-toolbar [ngStyle]="{'color': 'primary', 'padding': '10px'}">
+        <!-- Create button for  -->
+        <button mat-mini-fab px-2 [ngStyle]="{'margin': '10px'}"
+          [ngClass]="{'float': 'left'}" id="menu-button"
+          class="btn btn-primary" aria-label="menu" (click)="toggleSidebar()"><mat-icon>menu</mat-icon></button>
+        <img id="nxp-logo" ngSrc="../../assets/matter-logo-transparent.png" priority class="px-2" width="100" height="100"
+        />
+      </mat-toolbar>
+    </p>
+    <div class="span container-fluid" id="navbarSupportedContent" [ngStyle]="{'full-width': '100%'}">
+      <app-buttonpanel (buttonPressedEvent)="onButtonPressedEvent($any($event))" [ngStyle]="{'display': 'flex'}"></app-buttonpanel>
+    </div>
+
+    <!-- Image at the bottom
+    <div class="main-downwards-division" id="under">
+      <img id="nxp-logo" ngSrc="../../assets/brand_boarder.png" priority width="400" height="200" class="px-2"/> 
+    </div> -->
+
+    <!-- Avatar -->
+    <!-- <div class="dropdown">
+      <a class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+          <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy" />
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+          <li>
+              <a class="dropdown-item" href="#">My profile</a>
+          </li>
+          <li>
+              <a class="dropdown-item" href="#">Settings</a>
+          </li>
+          <li>
+              <a class="dropdown-item" href="#">Logout</a>
+          </li>
+      </ul>
+    </div> -->
+
+  </div>
+</nav>

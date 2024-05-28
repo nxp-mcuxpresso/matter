@@ -1,0 +1,103 @@
+<div class="container"
+  [ngClass]="{
+    'material--dialog--content': true,
+    'material--dialog--content--error': dialogType === 'error',
+    'material--dialog--content--warning': dialogType === 'warning',
+    'material--dialog--content--info': dialogType === 'info',
+    'material--dialog--content--success': dialogType === 'success'
+  }"
+  style="max-height: 75%;"
+>
+  <h2 mat-dialog-title>
+    <div class="container"
+      style = "display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      margin-left: auto;
+      margin-right: auto;
+      "
+    >
+      <div class="column" matRipple>
+          <img
+            id="logo"
+            class="card-img-top px-2"
+            src="{{ dialogImageSrc }}"
+            alt="Card image"
+            style="width: 100px; height: auto; margin: 0 auto; display: block;
+            margin-left: auto;
+            margin-right: auto;
+            justify-content: center;
+            align-items: center;
+            "
+          />
+          <p>{{ dialogTitle }}</p>
+      </div>
+    </div>
+  </h2>
+  <mat-dialog-content style="overflow-y: scroll;">
+    <div class="container-fluid">
+      <div class="row">
+          <p>{{ dialogContent }}</p>
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions *ngIf="dialogButtons.length > 0">
+    <div class="material--dialog--actions--content container-fluid">
+      <mat-chip
+        *ngFor="let button of getDialogButtons()"
+        mat-button
+        [mat-dialog-close]="button"
+        (click)="button.action()"
+        matRipple
+      >
+        <div
+          class="fab-chip-content"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <a class="nav-link active" aria-current="page" href="#">{{
+            button.buttonName
+          }}</a>
+          <mat-icon
+            class="fab-icon"
+            *ngIf="button.icon"
+            style="margin-left: 5px"
+            >{{ button.icon }}</mat-icon
+          >
+        </div>
+      </mat-chip>
+    </div>
+  </mat-dialog-actions>
+
+  <!-- If there are not buttons available, then we enable the close button in the interface -->
+  <mat-dialog-actions *ngIf="dialogButtons.length === 0">
+    <div class="material--dialog--actions--content container-fluid">
+      <mat-chip
+        mat-button
+        [mat-dialog-close]="true"
+        matRipple
+        (click)="closeDialog()"
+      >
+        <div
+          class="fab-chip-content"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <a class="nav-link active" aria-current="page" href="#">Close</a>
+          <mat-icon
+            class="fab-icon"
+            style="margin-left: 5px"
+            >close</mat-icon
+          >
+        </div>
+      </mat-chip>
+    </div>
+  </mat-dialog-actions>
+</div>

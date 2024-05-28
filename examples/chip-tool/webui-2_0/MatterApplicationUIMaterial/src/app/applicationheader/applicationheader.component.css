@@ -1,0 +1,17 @@
+img {
+  width: 100%;
+  min-width: 100px;
+  max-width: 250px;
+}
+
+#top {
+  z-index: 1;
+}
+#under {
+  z-index: -1;
+}
+#navbar {
+  background-color: #fff;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  padding: 10px;
+}

@@ -1,0 +1,103 @@
+
+* :not(mat-icon) {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+.card {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s;
+}
+
+.card {
+  border-radius: 10px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  padding: 10px;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  padding: 10px;
+  border-color: #cbb001;
+  border-radius: 20px;
+  transition: box-shadow 0.3s;
+  background-color: #fff;
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .container {
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    display: inline-block;
+  }
+
+  .container img {
+    width: 15%;
+    height: auto;
+    padding: 20px;
+  }
+
+  mat-dialog-content {
+    .container-fluid {
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  mat-dialog-actions > #material--dialog--actions--content {
+    padding: 20px;
+    margin: 10px;
+  }
+  mat-chip {
+    padding: 20px;
+    margin: 10px;
+  }
+}
+
+::ng-deep .custom-dialog > mat-dialog-container {
+  background-color: var(--background);
+}
+
+@media screen and (max-width: 600px) {
+  mat-form-field {
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  mat-form-field {
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+  }
+}
+
+::ng-deep .cdk-overlay-pane { max-width: 75vw !important; max-height: 75vh; overflow-y: scroll; }
+::ng-deep .cdk-overlay-pane .mat-dialog-container{
+  background-color:lightgreen;
+  max-width: 75vw;
+  max-height: 75vh;
+}
+::ng-deep .cdk-overlay-pane .mat-dialog-container .mat-dialog-content { max-height: 75%; }

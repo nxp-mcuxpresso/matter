@@ -1,0 +1,38 @@
+@media (min-width: 500px) {
+  main {
+    padding-left: 240px;
+  }
+}
+
+.sidebar .active {
+  border-radius: 10px;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+}
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  padding-top: 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+mat-sidenav-container > mat-sidenav {
+  -webkit-transform: translateX(100%);
+  -moz-transform: translateX(100%);
+  -ms-transform: translateX(100%);
+  -o-transform: translateX(100%);
+  transform: translateX(100%);
+}
+
+.wrapper {
+  display: flex;
+  height: 100%;
+}
+
+.list-group-item {
+  border-radius: 10px;
+  box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+  padding: 10px;
+  margin: 10px;
+}

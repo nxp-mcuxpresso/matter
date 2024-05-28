@@ -1,0 +1,39 @@
+<mat-chip-listbox class="mat-chip-list-stacked" [multiple]="true">
+  <div class="fab-container column">
+    <mat-dialog-actions style="display: flex; align-items: center; flex-direction: column; justify-content: center;
+        position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+        padding: 10px; border-radius: 20px; background-color: white; opacity: 0.9;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12); transition: box-shadow 0.3s;"
+    >
+      <!-- <mat-chip matChipTrailingIcon class="fab-chip" *ngFor="let button of getListOfButtonsAndActions()" class="fab" [ngStyle]="{'background-color': button.color}"
+        [attr.id]="button.buttonName" matRipple
+        style="display: flex; align-items: center; justify-content: center;" (click)="emitButtonPressed(button)"
+        >
+        <div class="fab-chip-content" style=" align-items: center; justify-content: center; display: flex;
+          width: 100%; height: auto;">
+        <a class="nav-link active" aria-current="page" href="#top" style="pointer-events: none;
+          cursor: default;"
+          >{{button.buttonName}}</a>
+        <mat-icon class="fab-icon" style="margin-left: 5px; ">{{button.icon}}</mat-icon>
+        </div>
+      </mat-chip> -->
+
+      <button mat-button *ngFor="let button of getListOfButtonsAndActions()" class="fab" [ngStyle]="{'background-color': button.color}"
+        [attr.id]="button.buttonName" matRipple
+        style="display: flex; align-items: center; justify-content: center;
+          border-radius: 20px; margin: 5px; padding: 10px; width: 100%; height: auto; border-color: grey; border-width: 1px; border-style: solid;
+          box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12); transition: box-shadow 0.3s;
+          "
+        (click)="emitButtonPressed(button)"
+        >
+        <div class="fab-chip-content" style=" align-items: center; justify-content: center; display: flex;
+          width: 100%; height: auto;">
+        <a class="nav-link active" aria-current="page" href="#top" style="pointer-events: none;
+          cursor: default;"
+          >{{button.buttonName}}</a>
+        <mat-icon class="fab-icon" style="margin-left: 5px; ">{{button.icon}}</mat-icon>
+        </div>
+      </button>
+    </mat-dialog-actions>
+  </div>
+</mat-chip-listbox>

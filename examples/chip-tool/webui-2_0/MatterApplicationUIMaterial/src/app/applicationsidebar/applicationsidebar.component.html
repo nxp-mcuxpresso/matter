@@ -1,0 +1,26 @@
+<div ngClass="wrapper">
+    <div class="rounded" id="drawer-id" ngClass="drawer-container">
+    <nav id="sidebarMenu" class="d-lg-block sidebar bg-light">
+      <div class="position-sticky">
+        <div class="list-group list-group-flush mx-3 mt-4" #listgroup_item
+          style = "border-radius: 10px; padding: 10px;" matRipple
+          (click)="onClick(i)" *ngFor="let s of sidebarNavigationItems; let i = index;" [attr.aria-current]="activeItemFromList === i ? 'page' : null"
+        >
+          <div
+            class="list-group-item list-group-item-action py-2 ripple"
+            aria-current="true"
+            [ngClass]="{
+                          'active': activeItemFromList === i,
+                          'background-color': activeItemFromList === i ? 'light-blue' : '',
+                       }"
+          >
+          <div ngIf="s.icon" class="d-flex align-items-center">
+            <i class="material-icons me-2">{{s.icon}}</i>
+            <span>{{s.name}}</span>
+          </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>

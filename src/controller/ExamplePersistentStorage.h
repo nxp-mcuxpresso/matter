@@ -56,7 +56,7 @@ public:
     // Store local node id.
     CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
 
-    #if CHIP_WITH_WEBUI
+    #if (CHIP_WITH_WEBUI || CHIP_WITH_WEBUI2)
     // Return the stored local node id with key.
     chip::NodeId GetLocalKeyNodeId(const char * key);
 

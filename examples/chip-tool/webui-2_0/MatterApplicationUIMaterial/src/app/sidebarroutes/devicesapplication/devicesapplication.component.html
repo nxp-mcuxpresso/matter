@@ -1,0 +1,28 @@
+<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+  <div id="main--application--body--component" style="align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+  ">
+    <div #containingappcards_component_div style="align-items: center" class="justify-content-center" [style]="
+      'flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;'">
+      <app-cardscomponent
+        #cards_component [cards]="cards" [cardsHaveSubscriptionOption]="false"></app-cardscomponent>
+    </div>
+    <div class="d-flex justify-content-center">
+      <div class="line"></div>
+    </div>
+    <app-scrollgallerycomponent></app-scrollgallerycomponent>
+    <app-floatingactionarea (buttonPressedEvent)="onButtonPressedEventCatch($any($event))"></app-floatingactionarea>
+
+  </div>
+</div>
