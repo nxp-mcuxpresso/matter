@@ -1731,12 +1731,10 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 4;
     ram      attribute clusterRevision default = 6;
 
     handle command Off;
-    handle command On;
-    handle command Toggle;
   }
 
   server cluster Descriptor {
