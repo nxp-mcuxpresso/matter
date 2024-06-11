@@ -2116,9 +2116,6 @@ endpoint 1 {
     handle command Off;
     handle command On;
     handle command Toggle;
-    handle command OffWithEffect;
-    handle command OnWithRecallGlobalScene;
-    handle command OnWithTimedOff;
   }
 
   server cluster Descriptor {
@@ -2183,8 +2180,6 @@ endpoint 1 {
     ram      attribute standardNamespace;
     callback attribute supportedModes;
     ram      attribute currentMode;
-    ram      attribute startUpMode;
-    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2198,8 +2193,6 @@ endpoint 1 {
   server cluster LaundryWasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
