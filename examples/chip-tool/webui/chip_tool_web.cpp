@@ -1180,6 +1180,12 @@ int main()
                             default:
                                 value = "Other";
                         }
+                    } else if (type == "chargingenableduntil") {
+                        if (resultsValue["value"].asString().empty()) {
+                            value = "AlwaysEnabled";
+                        } else {
+                            value = resultsValue["value"].asString();
+                        }
                     } else {
                         value = resultsValue["value"].asString();
                     }
