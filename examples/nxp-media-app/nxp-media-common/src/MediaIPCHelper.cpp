@@ -71,6 +71,7 @@ int MediaIPCHelper::Notify(const char* str) {
     }
     write(fd, str, strlen(str)+1);
     close(fd);
+    sleep(1);
     return GetACK();
 }
 
@@ -149,6 +150,7 @@ std::string MediaIPCHelper::Query(const char* str) {
     if (Notify(str)) {
         return std::string("");
     }
+    sleep(1);
 
     char buf[FIFO_BUF_SZ] = {0};
     ssize_t len = 0;
