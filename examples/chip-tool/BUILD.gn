@@ -150,14 +150,20 @@ executable("chip-tool") {
 }
 
 group("default") {
-  if (chip_with_web == 1) {
+  if (chip_with_web == 1 && chip_with_web2 == 0) {
     deps = [
       ":chip-tool",
       ":chip-tool-web",
     ]
-  } else if (chip_with_web2 == 1) {
+  } else if (chip_with_web == 0 && chip_with_web2 == 1) {
     deps = [
       ":chip-tool",
+      ":chip-tool-web2",
+    ]
+  } else if (chip_with_web == 1 && chip_with_web2 == 1) {
+    deps = [
+      ":chip-tool",
+      ":chip-tool-web",
       ":chip-tool-web2",
     ]
   } else {
@@ -168,6 +174,7 @@ group("default") {
 if (chip_with_web == 1) {
   executable("chip-tool-web") {
     include_dirs = [
+      "webui",
       "webui/simpleweb",
       "webui/websocketpp",
     ]
@@ -177,6 +184,7 @@ if (chip_with_web == 1) {
       "webui/simpleweb/server_http.hpp",
       "webui/websocketpp/config/asio_no_tls.hpp",
       "webui/websocketpp/server.hpp",
+      "webui/WebSocketClient.h",
     ]
 
     deps = [ ":chip-tool-utils" ]
