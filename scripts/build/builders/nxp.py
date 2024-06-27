@@ -52,7 +52,7 @@ class NxpBoard(Enum):
         if self == NxpBoard.K32W0:
             return 'k32w/k32w0'
         elif self == NxpBoard.K32W1:
-            return 'k32w/k32w1'
+            return 'k32w1'
         elif self == NxpBoard.RW61X:
             return 'zephyr'
         else:
