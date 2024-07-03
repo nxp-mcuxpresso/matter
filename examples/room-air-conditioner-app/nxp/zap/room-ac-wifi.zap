@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -3586,7 +3586,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4107,22 +4107,6 @@
               "reportableChange": 0
             },
             {
-              "name": "HVACSystemTypeConfiguration",
-              "code": 9,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap8",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "OccupiedCoolingSetpoint",
               "code": 17,
               "mfgCode": null,
@@ -4216,22 +4200,6 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "MinSetpointDeadBand",
-              "code": 25,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8s",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x19",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -4373,14 +4341,16 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }
