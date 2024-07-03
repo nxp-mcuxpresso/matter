@@ -44,6 +44,7 @@ public:
     void PreInitMatterStack(void) override;
     // This returns an instance of this class.
     static AppTask & GetDefaultInstance();
+    void AppMatter_RegisterCustomCliCommands(void) override;
 	
 	static void AlarmSelfTestHandler(void);
 

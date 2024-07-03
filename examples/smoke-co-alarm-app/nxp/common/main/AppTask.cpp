@@ -25,7 +25,34 @@
 #include <app/util/attribute-storage.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
+#ifdef ENABLE_CHIP_SHELL
+#include <lib/shell/Engine.h>
+#include <map>
+using namespace chip::Shell;
+#define MATTER_CLI_LOG(message) (streamer_printf(streamer_get(), message))
+#endif /* ENABLE_CHIP_SHELL */
+
 using namespace chip;
+
+static CHIP_ERROR cliSelfTest(int argc, char * argv[])
+{
+    if ((argc != 1) && (argc != 2))
+    {
+        ChipLogError(Shell, "Invalid Argument");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (!strcmp(argv[0], "start"))
+    {
+        ChipLogDetail(Shell, "Start self test");
+        SmokeCOAlarmApp::AppTask::GetDefaultInstance().AlarmSelfTestHandler();
+    }
+    else
+    {
+        ChipLogError(Shell, "Invalid command");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
 
 
 void SmokeCOAlarmApp::AppTask::PreInitMatterStack()
@@ -40,6 +67,19 @@ void SmokeCOAlarmApp::AppTask::PostInitMatterStack()
     {
         ChipLogError(DeviceLayer, "Init AlarmMgr failed");
     }
+}
+
+void SmokeCOAlarmApp::AppTask::AppMatter_RegisterCustomCliCommands()
+{
+#ifdef ENABLE_CHIP_SHELL
+    /* Register application commands */
+    static const shell_command_t kCommands[] = {
+        { .cmd_func = cliSelfTest,
+          .cmd_name = "selftest",
+          .cmd_help = "start alarm self test, usage: selftest start " },
+    };
+    Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
+#endif
 }
 
 // This returns an instance of this class.
