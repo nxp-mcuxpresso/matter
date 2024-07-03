@@ -89,8 +89,10 @@ J-Link > erase 0x8000000, 0x88a0000
 -   MCUBoot application can be built with SDK installed, using intructions below.
 -   Retrieve the mcuboot directory with :
 ```
-user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/armgcc
+user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc
 ```
+
+`<rw612 board>`: Supported rw612 boards are: `rdrw612bga` or `frdmrw612`
 
 - Build the mcuboot application : 
 ```
@@ -101,7 +103,7 @@ user@ubuntu: ./build_flash_release.sh
 -   Program the generated binary to the target board.
 
 ```
-J-Link > loadbin ~/Desktop/connectedhomeip/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/armgcc/flash_release/mcuboot_opensource.elf
+J-Link > loadbin ~/Desktop/connectedhomeip/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc/flash_release/mcuboot_opensource.elf
 ```
 
 -   If it runs successfully, the following logs
@@ -122,7 +124,7 @@ partitions to be the size of 4.4 MB. If the size is to be changed, the partition
 addresses should be modified in the flash_partitioning.h accordingly. For more
 information about the flash partitioning with mcuboot, please refer to the
 dedicated readme.txt located in
-"`<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/`".
+"`<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/`".
 
 ### Generating and flashing the signed application image
 
@@ -157,7 +159,7 @@ with the adequate files):
 ```
 user@ubuntu: cd ~/Desktop/<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/middleware/mcuboot_opensource/scripts/
 
-user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example_SIGNED.bin
+user@ubuntu: python3 imgtool.py sign --key ~/Desktop/<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem --align 4 --header-size 0x1000 --pad-header --pad --confirm --slot-size 0x440000 --max-sectors 1088 --version "1.0" ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example.bin ~/Desktop/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x/out/debug/chip-rw61x-all-cluster-example_SIGNED.bin
 ```
 
 Notes :
@@ -169,7 +171,7 @@ Notes :
     adjusted accordingly.
 -   In this example, the image is signed with the private key provided by the
     SDK as an example
-    (`<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
+    (`<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
     MCUBoot is built with its corresponding public key which would be used to
     verify the integrity of the image. It is possible to generate a new pair of
     keys using the following commands. This procedure should be done prior to
@@ -188,7 +190,7 @@ user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
 
 -   The extracted public key can then be copied to the
-    `<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
+    `<matter_repo_root>/third_party/nxp/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
     given as a value to the rsa_pub_key[] array.
 
 The resulting output is the signed binary of the application version "1.0".
