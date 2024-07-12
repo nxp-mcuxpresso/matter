@@ -132,6 +132,7 @@ rt_executable("laundry-washer") {
     "../../common/main/include/AppTask.h",
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
+    "../../common/main/DeviceIo.cpp",
     
   ]
 
