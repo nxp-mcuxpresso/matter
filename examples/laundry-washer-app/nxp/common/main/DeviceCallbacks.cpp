@@ -24,6 +24,7 @@
  *
  **/
 #include "DeviceCallbacks.h"
+#include "DeviceIo.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,21 +37,26 @@
 #include <lib/support/CodeUtils.h>
 
 using namespace chip::app;
+using namespace LaundryWasherApp;
 void OnTriggerEffect(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        DeviceIo::GetDefaultInstance().FlashLight(1);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        DeviceIo::GetDefaultInstance().FlashLight(2);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        DeviceIo::GetDefaultInstance().FlashLight(3);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        DeviceIo::GetDefaultInstance().FlashLight(4);
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -131,5 +137,6 @@ LaundryWasherApp::DeviceCallbacks & LaundryWasherApp::DeviceCallbacks::GetDefaul
 
 chip::DeviceManager::CHIPDeviceManagerCallbacks & chip::NXP::App::GetDeviceCallbacks()
 {
+    DeviceIo::GetDefaultInstance().init();
     return LaundryWasherApp::DeviceCallbacks::GetDefaultInstance();
 }
