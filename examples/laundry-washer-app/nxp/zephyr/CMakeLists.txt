@@ -61,6 +61,7 @@ target_sources(app
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/AppTask.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_manager/source/CHIPDeviceManager.cpp
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/DeviceCallbacks.cpp
+    ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/DeviceIo.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/source/CommonDeviceCallbacks.cpp
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
