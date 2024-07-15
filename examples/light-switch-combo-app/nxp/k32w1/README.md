@@ -19,10 +19,11 @@ network.
   - [Introduction](#introduction)
     - [Bluetooth LE Advertising](#bluetooth-le-advertising)
     - [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+    - [Thread Provisioning](#thread-provisioning)
   - [Device UI](#device-ui)
   - [Building](#building)
-    -    [SMU2](#smu2-memory)
--   [Manufacturing data](#manufacturing-data)
+    - [SMU2 Memory](#smu2-memory)
+  - [Manufacturing data](#manufacturing-data)
   - [Flashing](#flashing)
     - [Flashing the NBU image](#flashing-the-nbu-image)
     - [Flashing the host image](#flashing-the-host-image)
@@ -35,7 +36,7 @@ network.
     - [Known issues](#known-issues)
   - [Running demo:](#running-demo)
     - [1 x light-switch-combo, 1 x lighting-app](#1-x-light-switch-combo-1-x-lighting-app)
--   [Running RPC console](#running-rpc-console)
+  - [Running RPC console](#running-rpc-console)
 
 </hr>
 
@@ -124,27 +125,39 @@ second limit.
 
 ## Building
 
-In order to build the Matter example, we recommend using a Linux
-distribution (the demo-application was compiled on Ubuntu 20.04).
+In order to build the Project CHIP example, we recommend using a Linux
+distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Follow instruction in [BUILDING.md](../../../../docs/guides/BUILDING.md) to setup the environment to be able to build Matter
-
--   Download the NXP MCUXpresso git SDK and associated middleware from GitHub using the west tool.
-
+- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+```
+
+-   Step 1: checkout NXP specific submodules only
+```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk$ west init -l manifest --mf west.yml
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk$ west update
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd -
 ```
 
-- In case there are local modification to the already installed git NXP SDK. Use the west forall command instead of the west init to reset the west workspace before running the west update command. Warning: all local changes will be lost after running this command.
+-   Step 2: activate local environment 
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
+```
+
+If the script says the environment is out of date, you can update it by running
+the following command:
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk$ west forall -c "git reset --hard && git clean -xdf" -a
+user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
 ```
+
+-   Step 3: Init NXP SDK(s)
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip$ third_party/nxp/nxp_matter_support/scripts/update_nxp_sdk.py --platform common
+```
+Note: By default update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
 
 -   Start building the application.
 
