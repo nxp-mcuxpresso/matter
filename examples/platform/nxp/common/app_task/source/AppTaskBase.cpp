@@ -123,6 +123,12 @@ static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLe
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
 
+#ifdef SMOKE_CO_ALARM
+static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#endif
+
 #if CONFIG_NET_L2_OPENTHREAD
 void LockOpenThreadTask(void)
 {
