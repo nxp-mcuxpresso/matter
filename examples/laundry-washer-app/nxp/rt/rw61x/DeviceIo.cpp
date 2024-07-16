@@ -47,6 +47,13 @@ static void _BOARD_InitPins(void) {                                /*!< Function
 #define APP_BOARD_TEST_LED_PORT BOARD_LED_BLUE_GPIO_PORT
 #define APP_BOARD_TEST_LED_PIN  BOARD_LED_BLUE_GPIO_PIN
 
+#ifndef os_thread_sleep
+#define os_thread_sleep(ticks) vTaskDelay(ticks)
+#endif
+#ifndef os_msec_to_ticks
+#define os_msec_to_ticks(msecs) ((msecs) / (portTICK_PERIOD_MS))
+#endif
+
 using namespace LaundryWasherApp;
 
 class RW61xDeviceIo : public DeviceIo
