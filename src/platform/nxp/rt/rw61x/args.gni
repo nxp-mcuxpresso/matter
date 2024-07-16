@@ -48,6 +48,9 @@ declare_args() {
 
   # Generate DAC private key blob for factory data, chip_enable_secure_dac_private_key_storage must be set to 1
   chip_convert_dac_private_key = 0
+
+  # Location of the SDK.
+  sdk_repo = "rw_k32w1/repo/sdk-2.15"
 }
 
 # TODO : Enable the OTA Requestor by default.
