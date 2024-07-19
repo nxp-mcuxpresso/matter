@@ -376,7 +376,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    osError = os_setup_idle_function(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
+    osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to setup idle function");
