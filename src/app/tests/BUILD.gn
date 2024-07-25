@@ -220,6 +220,9 @@ chip_test_suite("tests") {
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
+  } else if (!chip_fake_platform) {
+    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
+    public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
 
   if (!chip_fake_platform) {
