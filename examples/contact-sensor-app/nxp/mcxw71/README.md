@@ -15,6 +15,8 @@ please see the [common README](../README.md).
 
 ## Introduction
 
+This is a contact sensor application implemented for an mcxw71 device.
+
 The following board was used when testing this Matter reference app
 for an `mcxw71` device: ![FRDM-MCXW71](../../../platform/nxp/mcxw71_k32w1/doc/images/frdm-mcxw71.jpg)
 
