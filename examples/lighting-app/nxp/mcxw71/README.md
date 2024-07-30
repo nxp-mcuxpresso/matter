@@ -135,14 +135,14 @@ build process.
 
 If debugging is needed then jump directly to the [Debugging](#debugging)
 section. Otherwise, if only flashing is needed then
-[JLink 7.84b or greater](https://www.segger.com/downloads/jlink/) can be used:
+[JLink](https://www.segger.com/downloads/jlink/) can be used:
 
 -   Plug MCXW71 to the USB port (no need to keep the SW4 button pressed while
     doing this, e.g. ISP mode is not needed for host flashing)
 
 -   Connect JLink to the device:
     ```bash
-    JLinkExe -device K32W1480 -if SWD -speed 4000 -autoconnect 1
+    JLinkExe -device MCXW71 -if SWD -speed 4000 -autoconnect 1
     ```
 
 -   Run the following commands:
