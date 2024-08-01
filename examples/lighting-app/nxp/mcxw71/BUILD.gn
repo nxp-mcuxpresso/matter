@@ -59,20 +59,20 @@ mcxw71_k32w1_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
   include_dirs += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C"
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C"
   ]
 
   sources += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/clock_config.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/pin_mux.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_comp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_lp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/hardware_init.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/app_services_init.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_dcdc.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_extflash.c"
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/clock_config.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/pin_mux.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
+    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c"
   ]
 
   if (is_debug) {
