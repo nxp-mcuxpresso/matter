@@ -75,6 +75,17 @@ set _PIGWEED_CIPD_JSON=%PW_PROJECT_ROOT%/third_party/pigweed/repo/pw_env_setup/p
 set _PW_ACTUAL_ENVIRONMENT_ROOT=%PW_ENVIRONMENT_ROOT%
 set _SETUP_BAT=%_PW_ACTUAL_ENVIRONMENT_ROOT%\activate.bat
 
+:: Ensure a similar usage to bootstrap.sh for the --platform
+:: option. The only valid option is the 'nxp' platform, since
+:: this is a custom script.
+set _INSTALL_NXP_REQUIREMENTS=0
+if "%1" == "--platform" (
+	if not "%2" == "nxp" (
+		goto usage
+	)
+	set _INSTALL_NXP_REQUIREMENTS=1
+)
+
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
 	git submodule sync --recursive
 	git submodule update
@@ -87,20 +98,31 @@ call "%python%" "scripts/setup/gen_pigweed_cipd_json.py" -i "%_PIGWEED_CIPD_JSON
 if %ERRORLEVEL% NEQ 0 goto finish
 
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
-	goto pw_check_prerequisites
+	goto check_developer_mode
 ) else (
 	call "%python%" "%PW_ROOT%\pw_env_setup\py\pw_env_setup\windows_env_start.py"
 	if %ERRORLEVEL% NEQ 0 goto finish
 	goto pw_activate
 )
 
-:: Ensure pigweed env prerequisites are OK
-:pw_check_prerequisites
+:usage
+echo Usage: "scripts\bootstrap.bat [--platform nxp]"
+goto pw_cleanup
+
+:: Ensure developer mode is enabled
+:check_developer_mode
+echo Checking if Developer Mode is enabled...
+reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock /v AllowDevelopmentWithoutDevLicense | find "0x1" >NUL 2>&1
+if %ERRORLEVEL% EQU 0 goto pw_check_prerequisites
 set /p ENABLE_DEVELOPER_MODE=This step will enable Windows Developer Mode. Are you sure? (y/n)
 if /i "%ENABLE_DEVELOPER_MODE%" NEQ "y" (
 	echo Developer Mode is a prerequisite for pigweed virtual environment. Cancelling bootstrap.
 	goto finish
 )
+goto pw_check_prerequisites
+
+:: Ensure pigweed env prerequisites are OK
+:pw_check_prerequisites
 curl https://pigweed.googlesource.com/pigweed/examples/+/main/tools/setup_windows_prerequisites.bat?format=TEXT > setup_pigweed_prerequisites.b64
 certutil -decode -f setup_pigweed_prerequisites.b64 setup_pigweed_prerequisites.bat
 del setup_pigweed_prerequisites.b64
@@ -109,10 +131,25 @@ if %ERRORLEVEL% NEQ 0 goto finish
 goto pw_bootstrap
 
 :install_additional_pip_requirements
-pip install ^
-	-q ^
-	-r "%_CHIP_ROOT%\scripts\setup\requirements.all.txt" ^
-	-c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+echo Installing additional Python modules required by Matter
+pip install -q -r "%_CHIP_ROOT%\scripts\setup\requirements.all.txt" -c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+if %_INSTALL_NXP_REQUIREMENTS% NEQ 0 (
+	echo Installing additional Python modules required by NXP
+	pip install -q -r "%_CHIP_ROOT%\scripts\setup\requirements.nxp.txt" -c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+)
+goto setup_sdk_paths
+
+:: Some binaries still have issues with long paths, so temporarily
+:: work around the issue by creating symbolic links for the SDK paths.
+:: This is taken into account by NXP Matter build system.
+:setup_sdk_paths
+set NXP_SYSTEM_ROOT=C:\NXP
+if not exist "%NXP_SYSTEM_ROOT%\" (
+	mkdir "%NXP_SYSTEM_ROOT%"
+)
+if not exist "%NXP_SYSTEM_ROOT%\sdk\" (
+	mklink /D "%NXP_SYSTEM_ROOT%\sdk" "%_CHIP_ROOT%\third_party\nxp\nxp_matter_support\github_sdk"
+)
 goto pw_cleanup
 
 :pw_bootstrap
