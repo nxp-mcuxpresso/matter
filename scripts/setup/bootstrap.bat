@@ -75,6 +75,17 @@ set _PIGWEED_CIPD_JSON=%PW_PROJECT_ROOT%/third_party/pigweed/repo/pw_env_setup/p
 set _PW_ACTUAL_ENVIRONMENT_ROOT=%PW_ENVIRONMENT_ROOT%
 set _SETUP_BAT=%_PW_ACTUAL_ENVIRONMENT_ROOT%\activate.bat
 
+:: Ensure a similar usage to bootstrap.sh for the --platform
+:: option. The only valid option is the 'nxp' platform, since
+:: this is a custom script.
+set _INSTALL_NXP_REQUIREMENTS=0
+if "%1" == "--platform" (
+	if not "%2" == "nxp" (
+		goto usage
+	)
+	set _INSTALL_NXP_REQUIREMENTS=1
+)
+
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
 	git submodule sync --recursive
 	git submodule update
@@ -93,6 +104,10 @@ if "%_BOOTSTRAP_NAME%" == "bootstrap" (
 	if %ERRORLEVEL% NEQ 0 goto finish
 	goto pw_activate
 )
+
+:usage
+echo Usage: "scripts\bootstrap.bat [--platform nxp]"
+goto pw_cleanup
 
 :: Ensure developer mode is enabled
 :check_developer_mode
@@ -116,10 +131,12 @@ if %ERRORLEVEL% NEQ 0 goto finish
 goto pw_bootstrap
 
 :install_additional_pip_requirements
-pip install ^
-	-q ^
-	-r "%_CHIP_ROOT%\scripts\setup\requirements.all.txt" ^
-	-c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+echo Installing additional Python modules required by Matter
+pip install -q -r "%_CHIP_ROOT%\scripts\setup\requirements.all.txt" -c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+if %_INSTALL_NXP_REQUIREMENTS% NEQ 0 (
+	echo Installing additional Python modules required by NXP
+	pip install -q -r "%_CHIP_ROOT%\scripts\setup\requirements.nxp.txt" -c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
+)
 goto pw_cleanup
 
 :pw_bootstrap
