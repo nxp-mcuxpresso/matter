@@ -137,6 +137,19 @@ if %_INSTALL_NXP_REQUIREMENTS% NEQ 0 (
 	echo Installing additional Python modules required by NXP
 	pip install -q -r "%_CHIP_ROOT%\scripts\setup\requirements.nxp.txt" -c "%_CHIP_ROOT%\scripts\setup\constraints.txt"
 )
+goto setup_sdk_paths
+
+:: Some binaries still have issues with long paths, so temporarily
+:: work around the issue by creating symbolic links for the SDK paths.
+:: This is taken into account by NXP Matter build system.
+:setup_sdk_paths
+set NXP_SYSTEM_ROOT=C:\NXP
+if not exist "%NXP_SYSTEM_ROOT%\" (
+	mkdir "%NXP_SYSTEM_ROOT%"
+)
+if not exist "%NXP_SYSTEM_ROOT%\sdk\" (
+	mklink /D "%NXP_SYSTEM_ROOT%\sdk" "%_CHIP_ROOT%\third_party\nxp\nxp_matter_support\github_sdk"
+)
 goto pw_cleanup
 
 :pw_bootstrap
