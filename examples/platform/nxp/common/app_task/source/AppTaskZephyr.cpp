@@ -36,10 +36,6 @@
 #include "AppCLIBase.h"
 #endif
 
-#ifdef CONFIG_CHIP_ETHERNET
-#include <platform/nxp/zephyr/Ethernet/NxpEthDriver.h>
-#endif
-
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nxp/common/factory_data/FactoryDataProvider.h>
 #else
@@ -73,13 +69,7 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskZep
     return static_cast<chip::DeviceLayer::NetworkCommissioning::WiFiDriver *>(
         &(NetworkCommissioning::ZephyrWifiDriver::Instance()));
 }
-#elif defined(CONFIG_CHIP_ETHERNET)
-chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTaskZephyr::GetEthernetDriverInstance()
-{
-    return static_cast<chip::DeviceLayer::NetworkCommissioning::EthernetDriver *>(
-        &(NetworkCommissioning::NxpEthDriver::Instance()));
-}
-#endif
+#endif // CONFIG_CHIP_WIFI
 
 CHIP_ERROR chip::NXP::App::AppTaskZephyr::AppMatter_Register()
 {
