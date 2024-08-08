@@ -98,10 +98,7 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  deps += [ 
-    "${chip_root}/src/platform/logging:headers",
-    "${chip_root}/src/lib/dnssd:constants",
-  ]
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
   if (nxp_nvm_component == "nvm_fwk") {
