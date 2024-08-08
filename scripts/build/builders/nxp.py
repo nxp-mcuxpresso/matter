@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib.util
 import logging
 import os
 from enum import Enum, auto
@@ -39,29 +38,23 @@ class NxpBoard(Enum):
     K32W1 = auto()
     RW61X = auto()
 
-    def Name(self, os_env):
+    def Name(self):
         if self == NxpBoard.K32W0:
             return 'k32w0x'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
         elif self == NxpBoard.RW61X:
-            if os_env == NxpOsUsed.ZEPHYR:
-                return 'rd_rw612_bga'
-            else:
-                return 'rw61x'
+            return 'rd_rw612_bga'
         else:
             raise Exception('Unknown board type: %r' % self)
 
-    def FolderName(self, os_env):
+    def FolderName(self):
         if self == NxpBoard.K32W0:
             return 'k32w/k32w0'
         elif self == NxpBoard.K32W1:
             return 'k32w1'
         elif self == NxpBoard.RW61X:
-            if os_env == NxpOsUsed.ZEPHYR:
-                return 'zephyr'
-            else:
-                return 'rt/rw61x'
+            return 'zephyr'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -101,8 +94,8 @@ class NxpApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root, board, os_env):
-        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
+    def BuildRoot(self, root, board):
+        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName())
 
 
 class NxpBuilder(GnBuilder):
@@ -120,16 +113,9 @@ class NxpBuilder(GnBuilder):
                  use_fro32k: bool = False,
                  enable_lit: bool = False,
                  enable_rotating_id: bool = False,
-                 has_sw_version_2: bool = False,
-                 disable_ble: bool = False,
-                 enable_thread: bool = False,
-                 enable_wifi: bool = False,
-                 disable_ipv4: bool = False,
-                 enable_shell: bool = False,
-                 enable_ota: bool = False,
-                 is_sdk_package: bool = True):
+                 has_sw_version_2: bool = False):
         super(NxpBuilder, self).__init__(
-            root=app.BuildRoot(root, board, os_env),
+            root=app.BuildRoot(root, board),
             runner=runner)
         self.code_root = root
         self.app = app
@@ -143,13 +129,6 @@ class NxpBuilder(GnBuilder):
         self.enable_lit = enable_lit
         self.enable_rotating_id = enable_rotating_id
         self.has_sw_version_2 = has_sw_version_2
-        self.disable_ipv4 = disable_ipv4
-        self.disable_ble = disable_ble
-        self.enable_thread = enable_thread
-        self.enable_wifi = enable_wifi
-        self.enable_ota = enable_ota
-        self.enable_shell = enable_shell
-        self.is_sdk_package = is_sdk_package
 
     def GnBuildArgs(self):
         args = []
@@ -180,30 +159,6 @@ class NxpBuilder(GnBuilder):
         if self.has_sw_version_2:
             args.append('nxp_software_version=2')
 
-        if self.enable_ota:
-            # OTA is enabled by default on kw32
-            if self.board == NxpBoard.RW61X:
-                args.append('chip_enable_ota_requestor=true no_mcuboot=false')
-
-        if self.enable_wifi:
-            args.append('chip_enable_wifi=true')
-
-        if self.disable_ble:
-            args.append('chip_enable_ble=false')
-
-        if self.enable_shell:
-            args.append('chip_enable_matter_cli=true')
-
-        if self.enable_thread:
-            # thread is enabled by default on kw32
-            if self.board == NxpBoard.RW61X:
-                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
-                if self.enable_wifi:
-                    args.append('openthread_root=\\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\\"')
-
-        if self.is_sdk_package:
-            args.append('is_sdk_package=true')
-
         return args
 
     def WestBuildArgs(self):
@@ -231,50 +186,16 @@ class NxpBuilder(GnBuilder):
             cmd += '''
             west build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_args}
             '''.format(
-                board_name=self.board.Name(self.os_env),
+                board_name=self.board.Name(),
                 out_folder=self.output_dir,
-                example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
+                example_folder=self.app.BuildRoot(self.code_root, self.board),
                 build_args=build_args).strip()
             self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
-            cmd = ''
-            # will be used with next sdk version to get sdk path
-            if 'NXP_UPDATE_SDK_SCRIPT_DOCKER' in os.environ:
-                # Dynamic import of a python file to get platforms sdk path
-                spec = importlib.util.spec_from_file_location("None", os.environ['NXP_UPDATE_SDK_SCRIPT_DOCKER'])
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-
-                for p in module.ALL_PLATFORM_SDK:
-                    if p.sdk_name == 'k32w0':
-                        cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-                    elif p.sdk_name == 'common':
-                        cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s' % self.root
-
-            extra_args = []
-
-            if self.options.pw_command_launcher:
-                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-            if self.options.enable_link_map_file:
-                extra_args.append('chip_generate_link_map_file=true')
-
-            if self.options.pregen_dir:
-                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-            extra_args.extend(self.GnBuildArgs() or [])
-            if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
-
-            cmd += self.output_dir
-
-            title = 'Generating ' + self.identifier
-
-            self._Execute(['bash', '-c', cmd], title=title)
+            super(NxpBuilder, self).generate()
 
     def build_outputs(self):
-        name = 'chip-%s-%s' % (self.board.Name(self.os_env), self.app.NameSuffix())
+        name = 'chip-%s-%s' % (self.board.Name(), self.app.NameSuffix())
         if self.os_env == NxpOsUsed.ZEPHYR:
             yield BuilderOutput(
                 os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
