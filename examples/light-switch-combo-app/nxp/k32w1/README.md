@@ -44,7 +44,7 @@ network.
 
 ## Introduction
 
-![K32W1 EVK](../../../platform/nxp/mcxw71_k32w1/doc/images/k32w1-evk.jpg)
+![K32W1 EVK](../../../platform/nxp/k32w1/doc/images/k32w1-evk.jpg)
 
 The K32W1 Light Switch Combo example provides a working demonstration of a dual endpoint application built using the Project CHIP codebase and the NXP K32W1 SDK. The example supports remote access (e.g.: using CHIP Tool from a mobile phone) and control of a light bulb over a low-power, 802.15.4 Thread network. It is capable of being paired into an existing Project CHIP network along with other Project CHIP-enabled devices.
 
@@ -126,9 +126,9 @@ second limit.
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../docs/guides/BUILDING.md)).
+distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../docs/guides/BUILDING.md))
+- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
@@ -246,7 +246,7 @@ One option for debugging would be to use MCUXpresso IDE.
 
 - Drag-and-drop the zip file containing the NXP SDK in the "Installed SDKs" tab:
 
-![Installed SDKs](../../../platform/nxp/mcxw71_k32w1/doc/images/installed_sdks.jpg)
+![Installed SDKs](../../../platform/nxp/k32w1/doc/images/installed_sdks.jpg)
 
 - Import any demo application from the installed SDK:
 
@@ -254,7 +254,7 @@ One option for debugging would be to use MCUXpresso IDE.
 Import SDK example(s).. -> choose a demo app (demo_apps -> hello_world) -> Finish
 ```
 
-![Import demo](../../../platform/nxp/mcxw71_k32w1/doc/images/import_demo.jpg)
+![Import demo](../../../platform/nxp/k32w1/doc/images/import_demo.jpg)
 
 - Flash the previously imported demo application on the board:
 
@@ -272,7 +272,7 @@ be used later on for debugging the application resulted after ot-nxp compilation
 File -> Import -> C/C++ -> Existing Code as Makefile Project
 ```
 
-![New Project](../../../platform/nxp/mcxw71_k32w1/doc/images/new_project.jpg)
+![New Project](../../../platform/nxp/k32w1/doc/images/new_project.jpg)
 
 - Replace the path of the existing demo application with the path of the K32W1 application:
 
@@ -280,7 +280,7 @@ File -> Import -> C/C++ -> Existing Code as Makefile Project
 Run -> Debug Configurations... -> C/C++ Application
 ```
 
-![Debug K32W1](../../../platform/nxp/mcxw71_k32w1/doc/images/debug_k32w1.jpg)
+![Debug K32W1](../../../platform/nxp/k32w1/doc/images/debug_k32w1.jpg)
 
 <a name="ota"></a>
 
@@ -353,7 +353,7 @@ The OTA image used must be updated to include the new factory data.
 The OTA topology used for OTA testing is illustrated in the figure below.
 Topology is similar with the one used for Matter Test Events.
 
-![OTA_TOPOLOGY](../../../platform/nxp/mcxw71_k32w1/doc/images/ota_topology.JPG)
+![OTA_TOPOLOGY](../../../platform/nxp/k32w1/doc/images/ota_topology.JPG)
 
 The concept for OTA is the next one:
 
