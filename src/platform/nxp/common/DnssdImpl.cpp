@@ -820,7 +820,7 @@ static void OtAddressCallback(otInstance * aInstance, const otMdnsAddressResult 
     VerifyOrReturn(mResolveContext != nullptr);
 
     mResolveContext->mMdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-    mResolveContext->mMdnsService.mAddress     = std::optional(ToIPAddress(aResult->mAddresses[0].mAddress));
+    mResolveContext->mMdnsService.mAddress     = MakeOptional(ToIPAddress(aResult->mAddresses[0].mAddress));
 
     DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(mResolveContext));
 }
