@@ -207,11 +207,7 @@
  * Since debug is the lowest importance level, this means all standard, critical, info and
  * debug importance level vi events get logged.
  */
-#if BUILD_RELEASE
-#define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Production
-#else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
-#endif // BUILD_RELEASE
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
