@@ -34,10 +34,6 @@
 #include "AppCLIBase.h"
 #endif
 
-#if CONFIG_ENABLE_FEEDBACK
-#include "UserInterfaceFeedback.h"
-#endif
-
 #include <platform/CHIPDeviceLayer.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -49,18 +45,10 @@
 #ifndef APP_TASK_STACK_SIZE
 #define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
 #endif
-
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
 #endif
-
-#ifndef APP_EVENT_QUEUE_SIZE
 #define APP_EVENT_QUEUE_SIZE 10
-#endif
-
-#ifndef APP_QUEUE_TICKS_TO_WAIT
-#define APP_QUEUE_TICKS_TO_WAIT portMAX_DELAY
-#endif
 
 using namespace chip;
 using namespace chip::TLV;
@@ -88,11 +76,6 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Error during CLI init"));
     AppMatter_RegisterCustomCliCommands();
 #endif
-
-#if CONFIG_ENABLE_FEEDBACK
-    FeedbackMgr().Init();
-#endif
-
     /* Register Matter buttons */
     err = AppMatterButton_registerButtons();
     if (err != CHIP_NO_ERROR)
@@ -116,18 +99,8 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
         assert(err == CHIP_NO_ERROR);
     }
 
-    ticksToWait = APP_QUEUE_TICKS_TO_WAIT;
+    ticksToWait = portMAX_DELAY;
 
-#if FSL_OSA_MAIN_FUNC_ENABLE
-    /* When OSA is used, this code will be called from within the startup_task
-     * and the scheduler will be started at this point. Just call AppTaskMain to
-     * start the main loop instead of creating a task, since we are already in it.
-     * Task parameters are configured through SDK flags:
-     *  - gMainThreadPriority_c
-     *  - gMainThreadStackSize_c
-     */
-    AppTaskFreeRTOS::AppTaskMain(this);
-#else
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
         pdPASS)
@@ -136,7 +109,6 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
         ChipLogError(DeviceLayer, "Failed to start app task");
         assert(err == CHIP_NO_ERROR);
     }
-#endif // FSL_OSA_TASK_ENABLE
 
     return err;
 }
@@ -162,9 +134,8 @@ void chip::NXP::App::AppTaskFreeRTOS::AppTaskMain(void * pvParameter)
             sAppTask->DispatchEvent(event);
             eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, 0);
         }
-#if CONFIG_ENABLE_FEEDBACK
-        FeedbackMgr().DisplayInLoop();
-#endif
+
+        sAppTask->PostEventsProcessedAction();
     }
 }
 
