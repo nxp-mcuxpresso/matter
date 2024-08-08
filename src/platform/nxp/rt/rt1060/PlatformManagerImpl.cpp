@@ -349,6 +349,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    otPlatRadioInitSpinelInterface();
+#endif
+
 /* Currently only IW612 and K32W0 support controller initialization in the connectivity framework */
 #ifdef WIFI_IW612_BOARD_MURATA_2EL_M2
     /* Init the controller by giving as an arg the connectivity supported */
