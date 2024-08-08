@@ -40,10 +40,10 @@ import secrets
 import threading
 import typing
 from ctypes import (CDLL, CFUNCTYPE, POINTER, Structure, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8,
-                    c_uint16, c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
+                    c_uint16, c_uint32, c_uint64, c_void_p, cast, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
-import dacite
+import dacite  # type: ignore
 
 from . import FabricAdmin
 from . import clusters as Clusters
@@ -84,6 +84,16 @@ _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
 
 _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct = CFUNCTYPE(None, c_char_p, c_size_t)
 
+# Defines for the transport payload types to use to select the suitable
+# underlying transport of the session.
+# class TransportPayloadCapability(ctypes.c_int):
+
+
+class TransportPayloadCapability(ctypes.c_int):
+    MRP_PAYLOAD = 0
+    LARGE_PAYLOAD = 1
+    MRP_OR_TCP_PAYLOAD = 2
+
 
 @dataclass
 class CommissioningParameters:
@@ -94,10 +104,10 @@ class CommissioningParameters:
 
 @dataclass
 class NOCChain:
-    nocBytes: bytes
-    icacBytes: bytes
-    rcacBytes: bytes
-    ipkBytes: bytes
+    nocBytes: typing.Optional[bytes]
+    icacBytes: typing.Optional[bytes]
+    rcacBytes: typing.Optional[bytes]
+    ipkBytes: typing.Optional[bytes]
     adminSubject: int
 
 
@@ -107,13 +117,14 @@ class ICDRegistrationParameters:
     checkInNodeId: typing.Optional[int]
     monitoredSubject: typing.Optional[int]
     stayActiveMs: typing.Optional[int]
+    clientType: typing.Optional[Clusters.IcdManagement.Enums.ClientTypeEnum]
 
     class CStruct(Structure):
         _fields_ = [('symmetricKey', c_char_p), ('symmetricKeyLength', c_size_t), ('checkInNodeId',
-                                                                                   c_uint64), ('monitoredSubject', c_uint64), ('stayActiveMsec', c_uint32)]
+                                                                                   c_uint64), ('monitoredSubject', c_uint64), ('stayActiveMsec', c_uint32), ('clientType', c_uint8)]
 
     def to_c(self):
-        return ICDRegistrationParameters.CStruct(self.symmetricKey, len(self.symmetricKey), self.checkInNodeId, self.monitoredSubject, self.stayActiveMs)
+        return ICDRegistrationParameters.CStruct(self.symmetricKey, len(self.symmetricKey), self.checkInNodeId, self.monitoredSubject, self.stayActiveMs, self.clientType.value)
 
 
 @_DeviceAvailableCallbackFunct
@@ -159,7 +170,7 @@ class ScopedNodeId(Structure):
 _OnCheckInCompleteFunct = CFUNCTYPE(None, ScopedNodeId)
 
 _OnCheckInCompleteWaitListLock = threading.Lock()
-_OnCheckInCompleteWaitList = dict()
+_OnCheckInCompleteWaitList: typing.Dict[ScopedNodeId, set] = dict()
 
 
 @_OnCheckInCompleteFunct
@@ -172,7 +183,7 @@ def _OnCheckInComplete(scopedNodeId: ScopedNodeId):
         callback(scopedNodeId)
 
 
-def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
+def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[[ScopedNodeId], None]):
     ''' Registers a callback when the device with given (fabric index, node id) becomes active.
 
     Does nothing if the callback is already registered.
@@ -183,7 +194,7 @@ def RegisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callab
         _OnCheckInCompleteWaitList[scopedNodeId] = waitList
 
 
-def UnregisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[None, [ScopedNodeId]]):
+def UnregisterOnActiveCallback(scopedNodeId: ScopedNodeId, callback: typing.Callable[[ScopedNodeId], None]):
     ''' Unregisters a callback when the device with given (fabric index, node id) becomes active.
 
     Does nothing if the callback has not been registered.
@@ -207,8 +218,7 @@ async def WaitForCheckIn(scopedNodeId: ScopedNodeId, timeoutSeconds: float):
     RegisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
 
     try:
-        async with asyncio.timeout(timeoutSeconds):
-            await future
+        await asyncio.wait_for(future, timeout=timeoutSeconds)
     finally:
         UnregisterOnActiveCallback(scopedNodeId, OnCheckInCallback)
 
@@ -249,7 +259,10 @@ class CallbackContext:
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         if not self._future.done():
-            raise RuntimeError("CallbackContext future not completed")
+            # In case the initial call (which sets up for the callback) fails,
+            # the future will never be used actually. So just cancel it here
+            # for completeness, in case somebody is expecting it to be completed.
+            self._future.cancel()
         self._future = None
         self._lock.release()
 
@@ -260,7 +273,7 @@ class CommissioningContext(CallbackContext):
     This context also resets commissioning related device controller state.
     """
 
-    def __init__(self, devCtrl: ChipDeviceController, lock: asyncio.Lock) -> None:
+    def __init__(self, devCtrl: ChipDeviceControllerBase, lock: asyncio.Lock) -> None:
         super().__init__(lock)
         self._devCtrl = devCtrl
 
@@ -368,18 +381,65 @@ class DeviceProxyWrapper():
 
         return bytes(buf)
 
+    @property
+    def sessionAllowsLargePayload(self) -> bool:
+        self._dmLib.pychip_SessionAllowsLargePayload.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_bool)]
+        self._dmLib.pychip_SessionAllowsLargePayload.restype = PyChipError
+
+        supportsLargePayload = ctypes.c_bool(False)
+
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_SessionAllowsLargePayload(self._deviceProxy, pointer(supportsLargePayload))
+        ).raise_on_error()
+
+        return supportsLargePayload.value
+
+    @property
+    def isSessionOverTCPConnection(self) -> bool:
+        self._dmLib.pychip_IsSessionOverTCPConnection.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_bool)]
+        self._dmLib.pychip_IsSessionOverTCPConnection.restype = PyChipError
+
+        isSessionOverTCP = ctypes.c_bool(False)
+
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_IsSessionOverTCPConnection(self._deviceProxy, pointer(isSessionOverTCP))
+        ).raise_on_error()
+
+        return isSessionOverTCP.value
+
+    @property
+    def isActiveSession(self) -> bool:
+        self._dmLib.pychip_IsActiveSession.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_bool)]
+        self._dmLib.pychip_IsActiveSession.restype = PyChipError
+
+        isActiveSession = ctypes.c_bool(False)
+
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_IsActiveSession(self._deviceProxy, pointer(isActiveSession))
+        ).raise_on_error()
+
+        return isActiveSession.value
+
+    def closeTCPConnectionWithPeer(self):
+        self._dmLib.pychip_CloseTCPConnectionWithPeer.argtypes = [ctypes.c_void_p]
+        self._dmLib.pychip_CloseTCPConnectionWithPeer.restype = PyChipError
+
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_CloseTCPConnectionWithPeer(self._deviceProxy)
+        ).raise_on_error()
+
 
 DiscoveryFilterType = discovery.FilterType
 DiscoveryType = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase():
-    activeList = set()
+    activeList: typing.Set = set()
 
     def __init__(self, name: str = ''):
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
-        self._dmLib = None
+        self._dmLib: typing.Any = None
 
         self._InitLib()
 
@@ -424,8 +484,8 @@ class ChipDeviceControllerBase():
         def HandleFabricCheck(nodeId):
             self._fabricCheckNodeId = nodeId
 
-        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
-                                     setupQRCode: str, err: PyChipError) -> None:
+        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: bytes,
+                                     setupQRCode: bytes, err: PyChipError) -> None:
             if err.is_success:
                 LOGGER.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
                 commissioningParameters = CommissioningParameters(
@@ -517,10 +577,6 @@ class ChipDeviceControllerBase():
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(self.pairingDelegate, value)
 
     @property
-    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
-        return self._fabricAdmin
-
-    @property
     def nodeId(self) -> int:
         return self._nodeId
 
@@ -558,7 +614,7 @@ class ChipDeviceControllerBase():
         ChipDeviceController.activeList.remove(self)
         self._isActive = False
 
-    def ShutdownAll():
+    def ShutdownAll(self):
         ''' Shut down all active controllers and reclaim any used resources.
         '''
         #
@@ -603,11 +659,10 @@ class ChipDeviceControllerBase():
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                     self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -615,11 +670,11 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         async with self._unpair_device_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                     self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
             )
-            res.raise_on_error()
+
             return await asyncio.futures.wrap_future(ctx.future)
 
     def CloseBLEConnection(self):
@@ -656,8 +711,7 @@ class ChipDeviceControllerBase():
 
         async with self._pase_establishment_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(callFunct)
-            res.raise_on_error()
+            await self._ChipStack.CallAsync(callFunct)
             await asyncio.futures.wrap_future(ctx.future)
 
     async def EstablishPASESessionBLE(self, setupPinCode: int, discriminator: int, nodeid: int) -> None:
@@ -756,13 +810,12 @@ class ChipDeviceControllerBase():
         # Discovery is also used during commissioning. Make sure this manual discovery
         # and commissioning attempts do not interfere with each other.
         async with self._commissioning_lock:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes(
                     self.devCtrl, int(filterType), str(filter).encode("utf-8")))
-            res.raise_on_error()
 
             async def _wait_discovery():
-                while not await self._ChipStack.CallAsync(
+                while not await self._ChipStack.CallAsyncWithResult(
                         lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
                     await asyncio.sleep(0.1)
                 return
@@ -776,9 +829,8 @@ class ChipDeviceControllerBase():
                 # Expected timeout, do nothing
                 pass
             finally:
-                res = await self._ChipStack.CallAsync(
+                await self._ChipStack.CallAsync(
                     lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl))
-                res.raise_on_error()
 
             return await self.GetDiscoveredDevices()
 
@@ -796,7 +848,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_IterateDiscoveredCommissionableNodes(devCtrl.devCtrl, HandleDevice)
             return devices
 
-        return await self._ChipStack.CallAsync(lambda: GetDevices(self))
+        return await self._ChipStack.CallAsyncWithResult(lambda: GetDevices(self))
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
         self.CheckIsActive()
@@ -828,11 +880,10 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         async with self._open_window_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                     self.devCtrl, self.pairingDelegate, nodeid, timeout, iteration, discriminator, option)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -892,23 +943,25 @@ class ChipDeviceControllerBase():
 
         return self._Cluster
 
-    async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: int = None) -> typing.Optional[DeviceProxyWrapper]:
+    async def FindOrEstablishPASESession(self, setupCode: str, nodeid: int, timeoutMs: typing.Optional[int] = None) -> typing.Optional[DeviceProxyWrapper]:
         ''' Returns CommissioneeDeviceProxy if we can find or establish a PASE connection to the specified device'''
         self.CheckIsActive()
         returnDevice = c_void_p(None)
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
         await self.EstablishPASESession(setupCode, nodeid)
 
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+        res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
             self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
         if res.is_success:
             return DeviceProxyWrapper(returnDevice, DeviceProxyWrapper.DeviceProxyType.COMMISSIONEE, self._dmLib)
 
-    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
+        return None
+
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: typing.Optional[int] = None, payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         nodeId: Target's Node ID
@@ -921,7 +974,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
-        returnErr = None
+        returnErr: typing.Any = None
         deviceAvailableCV = threading.Condition()
 
         if allowPASE:
@@ -945,7 +998,7 @@ class ChipDeviceControllerBase():
         closure = DeviceAvailableClosure()
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
             timeoutMs).raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
@@ -977,7 +1030,8 @@ class ChipDeviceControllerBase():
         await WaitForCheckIn(ScopedNodeId(nodeid, self._fabricIndex), timeoutSeconds=timeoutSeconds)
         return await self.SendCommand(nodeid, 0, Clusters.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMs))
 
-    async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
+    async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: typing.Optional[int] = None,
+                                 payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
 
         nodeId: Target's Node ID
@@ -991,7 +1045,7 @@ class ChipDeviceControllerBase():
 
         if allowPASE:
             returnDevice = c_void_p(None)
-            res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            res = await self._ChipStack.CallAsyncWithResult(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 LOGGER.info('Using PASE connection')
@@ -1021,10 +1075,9 @@ class ChipDeviceControllerBase():
 
         closure = DeviceAvailableClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
-        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
+        await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback, payloadCapability),
             timeoutMs)
-        res.raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
@@ -1125,9 +1178,10 @@ class ChipDeviceControllerBase():
         return await future
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
-                          timedRequestTimeoutMs: typing.Union[None, int] = None,
-                          interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None,
-                          suppressResponse: typing.Union[None, bool] = None):
+                          timedRequestTimeoutMs: typing.Optional[int] = None,
+                          interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                          suppressResponse: typing.Optional[bool] = None,
+                          payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
         the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1147,7 +1201,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
         res = await ClusterCommand.SendCommand(
             future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
@@ -1161,7 +1215,8 @@ class ChipDeviceControllerBase():
     async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
                                 timedRequestTimeoutMs: typing.Optional[int] = None,
                                 interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
-                                suppressResponse: typing.Optional[bool] = None):
+                                suppressResponse: typing.Optional[bool] = None,
+                                payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
         the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
@@ -1189,7 +1244,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
         res = await ClusterCommand.SendBatchCommands(
             future, eventLoop, device.deviceProxy, commands,
@@ -1198,7 +1253,7 @@ class ChipDeviceControllerBase():
         res.raise_on_error()
         return await future
 
-    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Optional[int] = None):
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future
         that can be awaited upon to get confirmation command was sent.
@@ -1217,8 +1272,9 @@ class ChipDeviceControllerBase():
 
     async def WriteAttribute(self, nodeid: int,
                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
-                             timedRequestTimeoutMs: typing.Union[None, int] = None,
-                             interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
+                             timedRequestTimeoutMs: typing.Optional[int] = None,
+                             interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                             payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Write a list of attributes on a target node.
 
@@ -1240,7 +1296,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
         attrs = []
         for v in attributes:
@@ -1257,7 +1313,7 @@ class ChipDeviceControllerBase():
         return await future
 
     def WriteGroupAttribute(
-            self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
+            self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Optional[int] = None):
         '''
         Write a list of attributes on a target group.
 
@@ -1295,8 +1351,12 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
     ]):
+        if isinstance(pathTuple, ClusterAttribute.AttributePath):
+            return pathTuple
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
             return ClusterAttribute.AttributePath()
@@ -1371,7 +1431,7 @@ class ChipDeviceControllerBase():
                 else:
                     raise ValueError("Unsupported Attribute Path")
 
-    async def Read(self, nodeid: int, attributes: typing.List[typing.Union[
+    async def Read(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
         # Wildcard endpoint, Cluster id present
@@ -1381,10 +1441,12 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]] = None,
-        dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, events: typing.List[
-        typing.Union[
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
+    ]]] = None,
+        dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[typing.List[
+            typing.Union[
             None,  # Empty tuple, all wildcard
             typing.Tuple[str, int],  # all wildcard with urgency set
             typing.Tuple[int, int],  # Endpoint,
@@ -1396,10 +1458,11 @@ class ChipDeviceControllerBase():
             typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
             # Concrete path
             typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-        ]] = None,
+            ]]] = None,
             eventNumberFilter: typing.Optional[int] = None,
-            returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True):
+            returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -1418,6 +1481,8 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ 1 ] ) -- case 4 above.
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
+
+            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
 
         dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
 
@@ -1439,6 +1504,13 @@ class ChipDeviceControllerBase():
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
@@ -1452,7 +1524,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = await self.GetConnectedDevice(nodeid)
+        device = await self.GetConnectedDevice(nodeid, payloadCapability=payloadCapability)
         attributePaths = [self._parseAttributePathTuple(
             v) for v in attributes] if attributes else None
         clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
@@ -1469,7 +1541,7 @@ class ChipDeviceControllerBase():
                               keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
         return await future
 
-    async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
+    async def ReadAttribute(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
         # Wildcard endpoint, Cluster id present
@@ -1479,11 +1551,14 @@ class ChipDeviceControllerBase():
         # Wildcard attribute id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None,
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+        # Directly specified attribute path
+        ClusterAttribute.AttributePath
+    ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
             returnClusterObject: bool = False,
-            reportInterval: typing.Tuple[int, int] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True):
+            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1503,11 +1578,20 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
+            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
+
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        fabricFiltered: If True (default), the read/subscribe is fabric-filtered and will only see things associated with the fabric
+            of the reader/subscriber. Relevant for attributes with fabric-scoped data.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
@@ -1536,7 +1620,8 @@ class ChipDeviceControllerBase():
                               reportInterval=reportInterval,
                               fabricFiltered=fabricFiltered,
                               keepSubscriptions=keepSubscriptions,
-                              autoResubscribe=autoResubscribe)
+                              autoResubscribe=autoResubscribe,
+                              payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -1556,9 +1641,10 @@ class ChipDeviceControllerBase():
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
     ]], eventNumberFilter: typing.Optional[int] = None,
             fabricFiltered: bool = True,
-            reportInterval: typing.Tuple[int, int] = None,
+            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
             keepSubscriptions: bool = False,
-            autoResubscribe: bool = True):
+            autoResubscribe: bool = True,
+            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1584,6 +1670,11 @@ class ChipDeviceControllerBase():
         eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
+        keepSubscriptions: Keep existing subscriptions. If set to False, existing subscriptions with this node will get cancelled
+            and a new one gets setup.
+        autoResubscribe: Automatically resubscribe to the subscription if subscription is lost. The automatic re-subscription only
+            applies if the subscription establishes on first try. If the first subscription establishment attempt fails the function
+            returns right away.
 
         Returns:
             - subscription request: ClusterAttribute.SubscriptionTransaction
@@ -1600,7 +1691,7 @@ class ChipDeviceControllerBase():
         '''
         res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter,
                               fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions,
-                              autoResubscribe=autoResubscribe)
+                              autoResubscribe=autoResubscribe, payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -1748,7 +1839,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
-                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct]
+                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct, c_int]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
 
             self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
@@ -1855,7 +1946,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
-    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None, keypair: p256keypair.P256Keypair = None):
+    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -1875,8 +1966,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
         # TODO(erjiaqing@): Figure out how to control enableServerInteractions for a single device controller (node)
         self._externalKeyPair = keypair
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
-                opCredsContext), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
+            lambda: self._dmLib.pychip_OpCreds_AllocateController(cast(
+                opCredsContext, c_void_p), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
         ).raise_on_error()
 
         self._fabricAdmin = fabricAdmin
@@ -1896,7 +1987,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> FabricAdmin:
+    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
         return self._fabricAdmin
 
     async def Commission(self, nodeid) -> int:
@@ -1917,11 +2008,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(False)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_Commission(
                     self.devCtrl, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2003,7 +2093,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
             secrets.token_bytes(16),
             self._nodeId,
             self._nodeId,
-            30)
+            30,
+            Clusters.IcdManagement.Enums.ClientTypeEnum.kPermanent)
 
     def EnableICDRegistration(self, parameters: ICDRegistrationParameters):
         ''' Enables ICD registration for the following commissioning session.
@@ -2065,11 +2156,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2086,11 +2176,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                     self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2106,11 +2195,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         async with self._commissioning_context as ctx:
             self._enablePairingCompleteCallback(True)
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                     self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
             )
-            res.raise_on_error()
 
             return await asyncio.futures.wrap_future(ctx.future)
 
@@ -2127,11 +2215,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
 
         async with self._issue_node_chain_context as ctx:
-            res = await self._ChipStack.CallAsync(
+            await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                     self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
             )
-            res.raise_on_error()
+
             return await asyncio.futures.wrap_future(ctx.future)
 
 
@@ -2140,7 +2228,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
-                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: str = None):
+                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str] = None):
         '''Creates a controller without AutoCommissioner.
 
         The allocated controller uses the noc, icac, rcac and ipk instead of the default,
@@ -2168,7 +2256,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
-                c_void_p(devCtrl), c_void_p(pairingDelegate), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
+                cast(devCtrl, c_void_p), cast(pairingDelegate, c_void_p), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
         ).raise_on_error()
 
         self._set_dev_ctrl(devCtrl, pairingDelegate)
