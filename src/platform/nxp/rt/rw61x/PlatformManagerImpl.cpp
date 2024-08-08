@@ -204,7 +204,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatLogInit();
     otPlatRadioInit();
     otPlatSetResetFunction(initiateResetInIdle);
-    otPlatRandomInit();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
