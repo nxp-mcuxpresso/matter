@@ -390,12 +390,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.cpp",
           "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.h",
         ]
-      } else if (cluster == "thread-border-router-management-server") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/thread-border-router-management-server.cpp",
-          "${_app_root}/clusters/${cluster}/thread-border-router-management-server.h",
-          "${_app_root}/clusters/${cluster}/thread-br-delegate.h",
-        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
