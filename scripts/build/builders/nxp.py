@@ -126,7 +126,8 @@ class NxpBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
-                 enable_ota: bool = False):
+                 enable_ota: bool = False,
+                 is_sdk_package: bool = True):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -148,6 +149,7 @@ class NxpBuilder(GnBuilder):
         self.enable_wifi = enable_wifi
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
+        self.is_sdk_package = is_sdk_package
 
     def GnBuildArgs(self):
         args = []
@@ -199,6 +201,9 @@ class NxpBuilder(GnBuilder):
                 if self.enable_wifi:
                     args.append('openthread_root=\\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\\"')
 
+        if self.is_sdk_package:
+            args.append('is_sdk_package=true')
+
         return args
 
     def WestBuildArgs(self):
@@ -245,8 +250,7 @@ class NxpBuilder(GnBuilder):
                         cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
                     elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-            # add empty space at the end to avoid concatenation issue when there is no --args
-            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s ' % self.root
+            cmd += 'gn gen --check --fail-on-unused-args --export-compile-commands --root=%s' % self.root
 
             extra_args = []
 
