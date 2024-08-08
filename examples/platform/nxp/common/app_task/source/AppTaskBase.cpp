@@ -22,6 +22,7 @@
 #include "AppFactoryData.h"
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
+#include "OperationalKeystore.h"
 
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
@@ -49,10 +50,6 @@
 
 #if CONFIG_CHIP_TCP_DOWNLOAD
 #include "TcpDownload.h"
-#endif
-
-#if CONFIG_OPERATIONAL_KEYSTORE
-#include "OperationalKeystore.h"
 #endif
 
 #if CONFIG_CHIP_OTA_PROVIDER
@@ -135,7 +132,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CHIP_CRYPTO_PLATFORM
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -151,7 +148,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CHIP_CRYPTO_PLATFORM
     chip::NXP::App::OperationalKeystore::Init(persistentStorage);
 #endif
     gExampleDeviceInfoProvider.SetStorageDelegate(persistentStorage);
