@@ -167,10 +167,7 @@ rt_executable("pump") {
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
   ]
   
-  deps = [
-    "${chip_root}/examples/${app_common_folder}",
-    "${chip_root}/src/platform/logging:default",
-  ]
+  deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
   if (chip_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
