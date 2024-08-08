@@ -295,6 +295,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    otPlatRadioInitSpinelInterface();
+#endif
+
     /* Init the controller by giving as an arg the connectivity supported */
     PLATFORM_InitControllers(connBle_c
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
