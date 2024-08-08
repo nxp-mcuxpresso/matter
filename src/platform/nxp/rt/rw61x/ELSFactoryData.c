@@ -7,6 +7,24 @@
 
 #include "ELSFactoryData.h"
 
+uint8_t * append_u32(uint8_t * pos, uint32_t val)
+{
+    *pos++ = 4;
+    *pos++ = (val >> 24) & 0xFF;
+    *pos++ = (val >> 16) & 0xFF;
+    *pos++ = (val >> 8) & 0xFF;
+    *pos++ = val & 0xFF;
+    return pos;
+}
+
+uint8_t * append_u16(uint8_t * pos, uint32_t val)
+{
+    *pos++ = 2;
+    *pos++ = (val >> 8) & 0xFF;
+    *pos++ = val & 0xFF;
+    return pos;
+}
+
 void write_uint32_msb_first(uint8_t * pos, uint32_t data)
 {
     pos[0] = ((data) >> 24) & 0xFF;
@@ -229,6 +247,157 @@ exit:
     return status;
 }
 
+status_t calculate_psa_import_blob_cmac(uint8_t * psa_import_blob, size_t psa_import_blob_length_before_mac,
+                                        size_t psa_import_blob_size)
+{
+    status_t status                    = STATUS_SUCCESS;
+    mcuxClEls_KeyIndex_t mac_key_index = MCUXCLELS_KEY_SLOTS;
+
+    assert(psa_import_blob_size >= psa_import_blob_length_before_mac + AES_BLOCK_SIZE);
+
+    uint8_t * pos                        = &psa_import_blob[psa_import_blob_length_before_mac];
+    uint8_t mac[AES_BLOCK_SIZE]          = { 0 };
+    uint32_t missing_bytes_to_fill_block = AES_BLOCK_SIZE - (psa_import_blob_length_before_mac % AES_BLOCK_SIZE);
+
+    mcuxClEls_CmacOption_t cmac_options = { 0U };
+    cmac_options.bits.initialize        = MCUXCLELS_CMAC_INITIALIZE_ENABLE;
+    cmac_options.bits.finalize          = MCUXCLELS_CMAC_FINALIZE_ENABLE;
+    cmac_options.bits.extkey            = MCUXCLELS_CMAC_EXTERNAL_KEY_DISABLE;
+    // ELS needs us to pad the message, it does not do that itself :-(
+    if (missing_bytes_to_fill_block != 0)
+    {
+        memset(pos, 0, missing_bytes_to_fill_block);
+        *pos = 0x80;
+    }
+
+    PLOG_INFO("Deriving cmac key for integrity protection on key blob...");
+    status = els_derive_key(DIE_INT_MK_SK_INDEX, mac_key_prop, ckdf_derivation_data_mac, &mac_key_index);
+    STATUS_SUCCESS_OR_EXIT_MSG("derive_key failed: 0x%08x", status);
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
+        result, token,
+        mcuxClEls_Cmac_Async(cmac_options, mac_key_index, NULL, 0, psa_import_blob, psa_import_blob_length_before_mac, mac));
+
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cmac_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
+    {
+        PLOG_ERROR("mcuxClEls_Cmac_Async failed: 0x%08x", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
+    {
+        PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x\n", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    status = els_delete_key(mac_key_index);
+    STATUS_SUCCESS_OR_EXIT_MSG("delete_key failed: 0x%08x", status);
+
+    memcpy(pos, mac, sizeof(mac));
+exit:
+    return status;
+}
+
+status_t create_psa_import_blob(const uint8_t * els_key_blob, size_t els_key_blob_size, const psa_key_attributes_t * attributes,
+                                uint8_t * output, size_t * output_size)
+{
+    assert(els_key_blob_size <= 48);
+    assert(sizeof(key_blob_magic) < 0x80);
+
+    status_t status = STATUS_SUCCESS;
+    // clang-format off
+    size_t required_output_size = 0
+        + 2 + sizeof(key_blob_magic)
+        + 2 + 4                    // key_id
+        + 2 + 4                    // algorithms
+        + 2 + 4                    // usage
+        + 2 + 2                    // type
+        + 2 + 4                    // bits
+        + 2 + 4                    // lifetime
+        + 2 + 4                    // device lifecycle
+        + 2 + 4                    // wrapping key id
+        + 2 + 4                    // wrapping algorithm
+        + 2 + 4                    // signing key id
+        + 2 + 4                    // signing algorithm
+        + 2 + els_key_blob_size    // key blob from S50
+        + 2 + AES_BLOCK_SIZE;      // CMAC
+    // clang-format on
+
+    if (*output_size < required_output_size)
+    {
+        PLOG_ERROR("key blob buffer too small");
+        return STATUS_ERROR_GENERIC;
+    }
+    *output_size = required_output_size;
+
+    uint32_t key_id           = psa_get_key_id(attributes);
+    uint32_t key_alg          = psa_get_key_algorithm(attributes);
+    uint32_t key_usage        = psa_get_key_usage_flags(attributes);
+    uint16_t key_type         = psa_get_key_type(attributes);
+    uint32_t key_bits         = psa_get_key_bits(attributes);
+    uint32_t key_lifetime     = psa_get_key_lifetime(attributes);
+    uint32_t device_lifecycle = 0x1; // 0x01: OPEN, 0x02: CLOSED, 0x04: CLOSED_LOCKED
+    uint32_t wrapping_key_id  = NXP_DIE_INT_IMPORT_KEK_SK;
+    uint32_t signing_key_id   = NXP_DIE_INT_IMPORT_AUTH_SK;
+
+    PLOG_INFO("Creating key blob...");
+    uint8_t * pos = output;
+
+    *pos++ = 0x40;
+    *pos++ = sizeof(key_blob_magic);
+    memcpy(pos, key_blob_magic, sizeof(key_blob_magic));
+    pos += sizeof(key_blob_magic);
+
+    *pos++ = 0x41;
+    pos    = append_u32(pos, key_id);
+
+    *pos++ = 0x42;
+    pos    = append_u32(pos, key_alg);
+
+    *pos++ = 0x43;
+    pos    = append_u32(pos, key_usage);
+
+    *pos++ = 0x44;
+    pos    = append_u16(pos, key_type);
+
+    *pos++ = 0x45;
+    pos    = append_u32(pos, key_bits);
+
+    *pos++ = 0x46;
+    pos    = append_u32(pos, key_lifetime);
+
+    *pos++ = 0x47;
+    pos    = append_u32(pos, device_lifecycle);
+
+    *pos++ = 0x50;
+    pos    = append_u32(pos, wrapping_key_id);
+
+    *pos++ = 0x51;
+    pos    = append_u32(pos, 0x01); // ELS RFC3394 wrapping
+
+    *pos++ = 0x53;
+    pos    = append_u32(pos, signing_key_id);
+
+    *pos++ = 0x54;
+    pos    = append_u32(pos, 0x01); // CMAC
+
+    *pos++ = 0x55;
+    *pos++ = els_key_blob_size;
+    memcpy(pos, els_key_blob, els_key_blob_size);
+    pos += els_key_blob_size;
+
+    // signature
+    *pos++                                   = 0x5E;
+    *pos++                                   = AES_BLOCK_SIZE;
+    size_t psa_import_blob_length_before_mac = pos - output;
+
+    status = calculate_psa_import_blob_cmac(output, psa_import_blob_length_before_mac, *output_size);
+    return status;
+}
+
 status_t import_die_int_wrapped_key_into_els(const uint8_t * wrapped_key, size_t wrapped_key_size,
                                              mcuxClEls_KeyProp_t key_properties, mcuxClEls_KeyIndex_t * index_output)
 {
@@ -281,447 +450,4 @@ status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mc
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
     return STATUS_SUCCESS;
-}
-
-status_t ELS_Cipher_Aes_Ecb_Decrypt(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output)
-{
-    mcuxClEls_CipherOption_t cipher_options = {
-        0U
-    }; // Initialize a new configuration for the planned mcuxClEls_Cipher_Async operation.
-    cipher_options.bits.dcrpt  = MCUXCLELS_CIPHER_DECRYPT;
-    cipher_options.bits.cphmde = MCUXCLELS_CIPHERPARAM_ALGORITHM_AES_ECB;
-    cipher_options.bits.cphsie = MCUXCLELS_CIPHER_STATE_IN_DISABLE;
-    cipher_options.bits.cphsoe = MCUXCLELS_CIPHER_STATE_OUT_DISABLE;
-    cipher_options.bits.extkey = MCUXCLELS_CIPHER_INTERNAL_KEY;
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
-                                     mcuxClEls_Cipher_Async(cipher_options, key_index, NULL, 0, input, input_length, NULL, output));
-
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cipher_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
-    {
-        PRINTF("mcuxClEls_Cipher_Async failed: 0x%x\r\n", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
-    {
-        PRINTF("mcuxClEls_WaitForOperation failed: 0x%x\r\n", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    return STATUS_SUCCESS;
-}
-
-static status_t els_generate_keypair(mcuxClEls_KeyIndex_t * dst_key_index, uint8_t * public_key, size_t * public_key_size)
-{
-    if (*public_key_size < 64)
-    {
-        PLOG_ERROR("insufficient space for public key");
-        return STATUS_ERROR_GENERIC;
-    }
-
-    mcuxClEls_EccKeyGenOption_t options = { 0 };
-    options.bits.kgsrc                  = MCUXCLELS_ECC_OUTPUTKEY_RANDOM;
-    options.bits.kgtypedh               = MCUXCLELS_ECC_OUTPUTKEY_KEYEXCHANGE;
-
-    uint32_t keypair_required_keyslots = get_required_keyslots(keypair_prop);
-    *dst_key_index                     = (mcuxClEls_KeyIndex_t) els_get_free_keyslot(keypair_required_keyslots);
-
-    if (!(*dst_key_index < MCUXCLELS_KEY_SLOTS))
-    {
-        PLOG_ERROR("no free keyslot found");
-        return STATUS_ERROR_GENERIC;
-    }
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
-        result, token,
-        mcuxClEls_EccKeyGen_Async(options, (mcuxClEls_KeyIndex_t) 0U, *dst_key_index, keypair_prop, NULL, public_key));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyGen_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
-    {
-        PLOG_ERROR("mcuxClEls_EccKeyGen_Async failed: 0x%08x", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
-    {
-        PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    *public_key_size = 64;
-    return STATUS_SUCCESS;
-}
-
-static status_t els_get_random(unsigned char * out, size_t out_size)
-{
-    /* Get random IV for sector metadata encryption. */
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClCss_Rng_DrbgRequest_Async(out, out_size));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClCss_Rng_DrbgRequest_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
-    {
-        PRINTF("mcuxClCss_Rng_DrbgRequest_Async failed: 0x%08lx\r\n", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClCss_WaitForOperation(MCUXCLCSS_ERROR_FLAGS_CLEAR));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
-    {
-        PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08lx\r\n", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-    return STATUS_SUCCESS;
-}
-
-static int get_random_mbedtls_callback(void * ctx, unsigned char * out, size_t out_size)
-{
-    status_t status = els_get_random(out, out_size);
-    if (status != STATUS_SUCCESS)
-    {
-        return MBEDTLS_ERR_ENTROPY_SOURCE_FAILED;
-    }
-    return 0;
-}
-
-static status_t host_perform_key_agreement(const uint8_t * public_key, size_t public_key_size, uint8_t * shared_secret,
-                                           size_t * shared_secret_size)
-{
-    assert(public_key != NULL);
-    assert(public_key_size == 64);
-    assert(shared_secret != NULL);
-    assert(*shared_secret_size >= 32);
-
-    status_t status = STATUS_SUCCESS;
-
-    int ret = 0;
-    mbedtls_ecp_group grp;
-    mbedtls_ecp_point qB;
-    mbedtls_mpi dA, zA;
-    mbedtls_ecp_group_init(&grp);
-    mbedtls_ecp_point_init(&qB);
-    mbedtls_mpi_init(&dA);
-    mbedtls_mpi_init(&zA);
-
-    unsigned char strbuf[128] = { 0 };
-    size_t strlen             = sizeof(strbuf);
-
-    uint8_t public_key_compressed[65] = { 0 };
-    public_key_compressed[0]          = 0x04;
-
-    *shared_secret_size = 32;
-    ret                 = mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1);
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_ecp_group_load failed: 0x%08x", ret);
-
-    ret = mbedtls_mpi_read_binary(&dA, import_die_int_ecdh_sk, sizeof(import_die_int_ecdh_sk));
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_mpi_read_binary failed: 0x%08x", ret);
-
-    memcpy(&public_key_compressed[1], public_key, public_key_size);
-
-    ret = mbedtls_ecp_point_read_binary(&grp, &qB, public_key_compressed, sizeof(public_key_compressed));
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_ecp_point_read_binary failed: 0x%08x", ret);
-
-    ret = mbedtls_ecdh_compute_shared(&grp, &zA, &qB, &dA, &get_random_mbedtls_callback, NULL);
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_ecdh_compute_shared failed: 0x%08x", ret);
-
-    mbedtls_ecp_point_write_binary(&grp, &qB, MBEDTLS_ECP_PF_UNCOMPRESSED, &strlen, &strbuf[0], sizeof(strbuf));
-    printf_buffer("public_key", strbuf, strlen);
-
-    mbedtls_mpi_write_binary(&zA, shared_secret, *shared_secret_size);
-    PLOG_DEBUG_BUFFER("shared_secret", shared_secret, *shared_secret_size);
-exit:
-    return status;
-}
-
-static status_t host_derive_key(const uint8_t * input_key, size_t input_key_size, const uint8_t * derivation_data,
-                                size_t derivation_data_size, uint32_t key_properties, uint8_t * output, size_t * output_size)
-{
-    status_t status = STATUS_SUCCESS;
-
-    int ret          = 0;
-    uint32_t counter = 1;
-    mbedtls_cipher_context_t ctx;
-    memset(&ctx, 0, sizeof(ctx));
-    bool ctx_valid = false;
-
-    assert(input_key != NULL);
-    assert(input_key_size == 32);
-    assert(derivation_data != NULL);
-    assert(derivation_data_size == 12);
-    assert(output != NULL);
-    assert(*output_size == 32);
-
-    uint32_t lsbit         = key_properties & 0x01;
-    uint32_t length_blocks = 1 + lsbit;
-    uint32_t length_bytes  = length_blocks * AES_BLOCK_SIZE;
-    assert(*output_size >= length_bytes);
-    *output_size = length_bytes;
-
-    // KDF in counter mode implementation as described in Section 5.1
-    // of NIST SP 800-108, Recommendation for Key Derivation Using Pseudorandom Functions
-    //  Derivation data[191:0](sic!) = software_derivation_data[95:0] || 64'h0 || requested_
-    //  properties[31:0 || length[31:0] || counter[31:0]
-
-    uint8_t dd[32] = { 0 };
-    memcpy(&dd[0], derivation_data, derivation_data_size);
-    memset(&dd[12], 0, 8);
-    write_uint32_msb_first(&dd[20], key_properties);
-    write_uint32_msb_first(&dd[24], length_bytes * 8); // expected in bits!
-    write_uint32_msb_first(&dd[28], counter);
-
-    mbedtls_cipher_type_t mbedtls_cipher_type = MBEDTLS_CIPHER_AES_256_ECB;
-    const mbedtls_cipher_info_t * cipher_info = mbedtls_cipher_info_from_type(mbedtls_cipher_type);
-
-    PLOG_DEBUG_BUFFER("input_key", input_key, input_key_size);
-    PLOG_DEBUG_BUFFER("dd", dd, sizeof(dd));
-
-    uint8_t * pos = output;
-    do
-    {
-        mbedtls_cipher_init(&ctx);
-        ctx_valid = true;
-
-        ret = mbedtls_cipher_setup(&ctx, cipher_info);
-        RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_cipher_setup failed: 0x%08x", ret);
-
-        ret = mbedtls_cipher_cmac_starts(&ctx, input_key, input_key_size * 8);
-        RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_cipher_cmac_starts failed: 0x%08x", ret);
-
-        ret = mbedtls_cipher_cmac_update(&ctx, dd, sizeof(dd));
-        RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_cipher_cmac_update failed: 0x%08x", ret);
-
-        ret = mbedtls_cipher_cmac_finish(&ctx, pos);
-        RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_cipher_cmac_finish failed: 0x%08x", ret);
-
-        mbedtls_cipher_free(&ctx);
-        ctx_valid = false;
-
-        write_uint32_msb_first(&dd[28], ++counter);
-        pos += AES_BLOCK_SIZE;
-    } while (counter * AES_BLOCK_SIZE <= length_bytes);
-
-    PLOG_DEBUG_BUFFER("output", output, length_bytes);
-
-exit:
-    if (ctx_valid)
-    {
-        mbedtls_cipher_free(&ctx);
-        ctx_valid = false;
-    }
-
-    return status;
-}
-
-static status_t host_wrap_key(const uint8_t * data, size_t data_size, const uint8_t * key, size_t key_size, uint8_t * output,
-                              size_t * output_size)
-{
-    status_t status = STATUS_SUCCESS;
-    int ret         = 0;
-    mbedtls_nist_kw_context ctx;
-    mbedtls_nist_kw_init(&ctx);
-    ret = mbedtls_nist_kw_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, key_size * 8, true);
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_nist_kw_setkey failed: 0x%08x", ret);
-    ret = mbedtls_nist_kw_wrap(&ctx, MBEDTLS_KW_MODE_KW, data, data_size, output, output_size, *output_size);
-    RET_MBEDTLS_SUCCESS_OR_EXIT_MSG("mbedtls_nist_kw_wrap failed: 0x%08x", ret);
-    PLOG_DEBUG_BUFFER("wrapped buffer", output, *output_size);
-exit:
-    mbedtls_nist_kw_free(&ctx);
-    return status;
-}
-
-static status_t create_els_import_keyblob(const uint8_t * plain_key, size_t plain_key_size, mcuxClEls_KeyProp_t plain_key_prop,
-                                          const uint8_t * key_wrap_in, size_t key_wrap_in_size, uint8_t * blob, size_t * blob_size)
-{
-    assert(plain_key_size == 16 || plain_key_size == 32);
-    assert(key_wrap_in_size == 16);
-
-    uint8_t buffer[ELS_BLOB_METADATA_SIZE + MAX_ELS_KEY_SIZE] = { 0 };
-    size_t buffer_size                                        = ELS_BLOB_METADATA_SIZE + plain_key_size;
-
-    // Enforce the wrpok bit - the key needs to be re-wrappable!
-    plain_key_prop.bits.wrpok = MCUXCLELS_KEYPROPERTY_WRAP_TRUE;
-
-    // This is what ELS documentation says. It does not work though??
-    // memset(&buffer[0], 0xA6, 8);
-    // write_uint32_msb_first(&buffer[8], plain_key_prop.word.value);
-    // memset(&buffer[12], 0, 4);
-    // memcpy(&buffer[16], plain_key, plain_key_size);
-
-    write_uint32_msb_first(&buffer[0], plain_key_prop.word.value);
-    memset(&buffer[4], 0, 4);
-    memcpy(&buffer[8], plain_key, plain_key_size);
-    PLOG_DEBUG_BUFFER("plain buffer before wrapping for import", buffer, buffer_size);
-
-    status_t status = host_wrap_key(buffer, buffer_size, key_wrap_in, key_wrap_in_size, blob, blob_size);
-    return status;
-}
-
-static status_t els_perform_key_agreement(mcuxClEls_KeyIndex_t keypair_index, mcuxClEls_KeyProp_t shared_secret_prop,
-                                          mcuxClEls_KeyIndex_t * dst_key_index, const uint8_t * public_key, size_t public_key_size)
-{
-    uint32_t shared_secret_required_keyslots = get_required_keyslots(shared_secret_prop);
-    *dst_key_index                           = els_get_free_keyslot(shared_secret_required_keyslots);
-
-    if (!(*dst_key_index < MCUXCLELS_KEY_SLOTS))
-    {
-        PLOG_ERROR("no free keyslot found");
-        return STATUS_ERROR_GENERIC;
-    }
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
-                                     mcuxClEls_EccKeyExchange_Async(keypair_index, public_key, *dst_key_index, shared_secret_prop));
-
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyExchange_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
-    {
-        PLOG_ERROR("mcuxClEls_EccKeyExchange_Async failed: 0x%08x", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
-    {
-        PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    return STATUS_SUCCESS;
-}
-
-static inline uint32_t els_get_key_size(mcuxClEls_KeyIndex_t keyIdx)
-{
-    mcuxClEls_KeyProp_t key_properties;
-    key_properties.word.value = ((const volatile uint32_t *) (&ELS->ELS_KS0))[keyIdx];
-    return (key_properties.bits.ksize == MCUXCLELS_KEYPROPERTY_KEY_SIZE_256) ? (256U / 8U) : (128U / 8U);
-}
-
-static status_t els_export_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_KeyIndex_t wrap_key_index, uint8_t * els_key_out_blob,
-                               size_t * els_key_out_blob_size)
-
-{
-    uint32_t key_size           = els_get_key_size(src_key_index);
-    uint32_t required_blob_size = ELS_BLOB_METADATA_SIZE + key_size + ELS_WRAP_OVERHEAD;
-    assert(required_blob_size <= *els_key_out_blob_size);
-
-    *els_key_out_blob_size = required_blob_size;
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_KeyExport_Async(wrap_key_index, src_key_index, els_key_out_blob));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_KeyExport_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
-    {
-        PLOG_ERROR("mcuxClEls_KeyExport_Async failed: 0x%08lx", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-
-    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
-    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
-    {
-        PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08lx", result);
-        return STATUS_ERROR_GENERIC;
-    }
-    MCUX_CSSL_FP_FUNCTION_CALL_END();
-    return STATUS_SUCCESS;
-}
-
-status_t export_key_from_els(mcuxClEls_KeyIndex_t key_index, uint8_t * output, size_t * output_size)
-{
-    assert(output != NULL);
-    status_t status = STATUS_SUCCESS;
-
-    mcuxClEls_KeyIndex_t key_wrap_out_index = MCUXCLELS_KEY_SLOTS;
-    PLOG_INFO("Deriving wrapping key for export on ELS...");
-    status = els_derive_key(DIE_INT_MK_SK_INDEX, wrap_out_key_prop, ckdf_derivation_data_wrap_out, &key_wrap_out_index);
-    STATUS_SUCCESS_OR_EXIT_MSG("derive_key failed: 0x%08x", status);
-
-    PLOG_INFO("Exporting/wrapping key...");
-    status = els_export_key(key_index, key_wrap_out_index, output, output_size);
-    STATUS_SUCCESS_OR_EXIT_MSG("export_key failed: 0x%08x", status);
-
-    status = els_delete_key(key_wrap_out_index);
-    STATUS_SUCCESS_OR_EXIT_MSG("delete_key failed: 0x%08x", status);
-    key_wrap_out_index = MCUXCLELS_KEY_SLOTS;
-exit:
-    return status;
-}
-
-status_t import_plain_key_into_els(const uint8_t * plain_key, size_t plain_key_size, mcuxClEls_KeyProp_t key_properties,
-                                   mcuxClEls_KeyIndex_t * index_output)
-{
-    status_t status                                       = STATUS_SUCCESS;
-    mcuxClEls_KeyIndex_t index_plain                      = MCUXCLELS_KEY_SLOTS;
-    mcuxClEls_KeyIndex_t index_shared_secret              = MCUXCLELS_KEY_SLOTS;
-    mcuxClEls_KeyIndex_t index_unwrap                     = MCUXCLELS_KEY_SLOTS;
-    mcuxClEls_KeyIndex_t * potentially_used_key_indices[] = { &index_plain, &index_shared_secret, &index_unwrap };
-
-    uint8_t els_key_in_blob[ELS_BLOB_METADATA_SIZE + MAX_ELS_KEY_SIZE + ELS_WRAP_OVERHEAD];
-    size_t els_key_in_blob_size = sizeof(els_key_in_blob);
-
-    uint8_t shared_secret[32] = { 0 };
-    size_t shared_secret_len  = sizeof(shared_secret);
-
-    uint8_t key_wrap_in[32];
-    size_t key_wrap_in_size = sizeof(key_wrap_in);
-
-    PLOG_INFO("Generating random ECC keypair...");
-    uint8_t public_key[64] = { 0u };
-    size_t public_key_size = sizeof(public_key);
-    status                 = els_generate_keypair(&index_plain, &public_key[0], &public_key_size);
-    STATUS_SUCCESS_OR_EXIT_MSG("generate_keypair failed: 0x%08x", status);
-
-    PLOG_INFO("Calculating shared secret on host...");
-    status = host_perform_key_agreement(public_key, public_key_size, &shared_secret[0], &shared_secret_len);
-    STATUS_SUCCESS_OR_EXIT_MSG("perform_key_agreement_host failed: 0x%08x", status);
-
-    PLOG_INFO("Deriving wrapping key for import on host...");
-    status = host_derive_key(shared_secret, shared_secret_len, ckdf_derivation_data_wrap_in, sizeof(ckdf_derivation_data_wrap_in),
-                             wrap_in_key_prop.word.value, &key_wrap_in[0], &key_wrap_in_size);
-    STATUS_SUCCESS_OR_EXIT_MSG("ckdf_host failed: 0x%08x", status);
-
-    PLOG_INFO("Creating ELS keyblob for import...");
-
-    status = create_els_import_keyblob(plain_key, plain_key_size, key_properties, key_wrap_in, key_wrap_in_size,
-                                       &els_key_in_blob[0], &els_key_in_blob_size);
-    STATUS_SUCCESS_OR_EXIT_MSG("create_els_import_keyblob failed: 0x%08x", status);
-
-    PLOG_INFO("Calculating shared secret on ELS...");
-    status = els_perform_key_agreement(index_plain, shared_secret_prop, &index_shared_secret, import_die_int_ecdh_pk,
-                                       sizeof(import_die_int_ecdh_pk));
-    STATUS_SUCCESS_OR_EXIT_MSG("perform_key_agreement failed: 0x%08x", status);
-
-    status = els_delete_key(index_plain);
-    STATUS_SUCCESS_OR_EXIT_MSG("delete_key failed: 0x%08x", status);
-    index_plain = MCUXCLELS_KEY_SLOTS;
-
-    PLOG_INFO("Deriving wrapping key for import on ELS...");
-    status = els_derive_key(index_shared_secret, wrap_in_key_prop, ckdf_derivation_data_wrap_in, &index_unwrap);
-    STATUS_SUCCESS_OR_EXIT_MSG("derive_key failed: 0x%08x", status);
-
-    status = els_delete_key(index_shared_secret);
-    STATUS_SUCCESS_OR_EXIT_MSG("delete_key failed: 0x%08x", status);
-    index_shared_secret = MCUXCLELS_KEY_SLOTS;
-
-    PLOG_INFO("Importing wrapped key...");
-    status = els_import_key(els_key_in_blob, els_key_in_blob_size, key_properties, index_unwrap, index_output);
-    STATUS_SUCCESS_OR_EXIT_MSG("import_wrapped_key failed: 0x%08x", status);
-
-    status = els_delete_key(index_unwrap);
-    STATUS_SUCCESS_OR_EXIT_MSG("delete_key failed: 0x%08x", status);
-    index_unwrap = MCUXCLELS_KEY_SLOTS;
-
-exit:
-    for (size_t i = 0; i < ARRAY_SIZE(potentially_used_key_indices); i++)
-    {
-        mcuxClEls_KeyIndex_t key_index = *(potentially_used_key_indices[i]);
-        if (key_index < MCUXCLELS_KEY_SLOTS)
-        {
-            (void) els_delete_key(key_index);
-        }
-    }
-    return status;
 }
