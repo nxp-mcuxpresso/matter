@@ -117,6 +117,12 @@ To build, select the project from the projects window and press the
 
 ![](images/mcuxpresso_build_project.png)
 
+By default, the build will use the configuration specified through the
+`args.gni` of the application. This means additional gn args should be added
+manually by creating a `gnArgs` field inside the project `tasks.json` file:
+
+![](images/mcuxpresso_add_gnargs.png)
+
 ### Flash and debug
 
 For these actions, please refer to the official wiki:
