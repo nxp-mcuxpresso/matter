@@ -700,6 +700,9 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
         mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
 
+    // All mDNS replies come from the External Netif
+    mdnsService.mInterface = ConnectivityManagerImpl().GetExternalInterface();
+
     return CHIP_NO_ERROR;
 }
 
