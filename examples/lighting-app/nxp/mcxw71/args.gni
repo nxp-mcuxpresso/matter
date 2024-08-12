@@ -34,6 +34,3 @@ chip_with_ot_cli = 0
 chip_system_config_provide_statistics = false
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
-
-use_smu2_static = true
-use_smu2_dynamic = true
