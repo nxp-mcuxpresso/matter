@@ -58,20 +58,20 @@ mcxw71_k32w1_sdk("sdk") {
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
   include_dirs += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C"
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C"
   ]
 
   sources += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/clock_config.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/pin_mux.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_comp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_lp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/hardware_init.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/app_services_init.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_dcdc.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_extflash.c"
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/clock_config.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/MCXW716C/pin_mux.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_comp.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_lp.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/hardware_init.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/app_services_init.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_dcdc.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/boards/frdmmcxw7x/board_extflash.c"
   ]
 
   if (is_debug) {
@@ -229,9 +229,9 @@ mcxw71_k32w1_executable("light-switch-combo_app") {
 
   if (use_smu2_static) {
     ldscript = "${example_platform_dir}/app/ldscripts/k32w1_app.ld"
-    base_ldscript_dir = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
+    base_ldscript_dir = "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
   } else {
-    ldscript = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
+    ldscript = "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
   }
 
   inputs = [ ldscript ]
