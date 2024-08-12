@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/clusters/identify-server/identify-server.h>
-#include <src/system/SystemLayer.h>
 
 namespace chip::NXP::App {
 
