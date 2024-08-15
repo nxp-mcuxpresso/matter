@@ -157,7 +157,7 @@ else
     pregen_arg=""
 fi
 
-PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
+PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"'
 chip_with_web=${NXP_CHIPTOOL_WITH_WEB:-0}
 chip_with_web2=${NXP_CHIPTOOL_WITH_WEB2:-0}
 additional_gn_args=""
