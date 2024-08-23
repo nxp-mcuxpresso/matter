@@ -131,7 +131,8 @@ class NxpBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  disable_ipv4: bool = False,
                  enable_shell: bool = False,
-                 enable_ota: bool = False):
+                 enable_ota: bool = False,
+                 is_sdk_package: bool = True):
         super(NxpBuilder, self).__init__(
             root=app.BuildRoot(root, board, os_env),
             runner=runner)
@@ -153,6 +154,7 @@ class NxpBuilder(GnBuilder):
         self.enable_wifi = enable_wifi
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
+        self.is_sdk_package = is_sdk_package
 
     def GnBuildArgs(self):
         args = []
@@ -203,6 +205,9 @@ class NxpBuilder(GnBuilder):
                 args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
                 if self.enable_wifi:
                     args.append('openthread_root=\\"//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-br\\"')
+
+        if self.is_sdk_package:
+            args.append('is_sdk_package=true')
 
         return args
 
