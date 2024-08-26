@@ -13,19 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
-
-# If external SDK is used, do not import ${nxp_sdk_name}.gni
-if (!nxp_external_sdk) {
-  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
-}
-
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
-
 assert(chip_device_platform == "nxp")
 
 source_set("nxp_factory_data") {
@@ -64,10 +57,7 @@ config("nxp_platform_config") {
 
 static_library("nxp_platform") {
   output_name = "libCHIP_NXP_Port_RW61x"
-  cflags = [
-    "-Wno-conversion",
-    "-Wno-sign-compare",
-  ]
+  cflags = [ "-Wconversion" ]
   deps = []
   defines = []
   sources = [
@@ -106,7 +96,7 @@ static_library("nxp_platform") {
   if (chip_enable_ble) {
     sources += [
       # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
-      "${nxp_sdk_build_root}/rt_sdk/sdk_hook/zephyr/random/random.cpp",
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/random.cpp",
       "../../common/ble_zephyr/BLEAdvertisingArbiter.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.h",
