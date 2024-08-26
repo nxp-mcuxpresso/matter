@@ -58,38 +58,24 @@ For Matter over Wi-Fi with OpenThread Border Router :
 ## Building
 
 In order to build the Project CHIP example, we recommend using a Linux
-distribution (supported Operating Systems are listed in [BUILDING.md](../../../../../docs/guides/BUILDING.md)).
+distribution (the demo-application was compiled on Ubuntu 20.04).
 
-- Make sure that below prerequisites are correctly installed (as described in [BUILDING.md](../../../../../docs/guides/BUILDING.md)))
-```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
-     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
-```
+-   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
+    to setup the environment to be able to build Matter.
 
--   Step 1: checkout NXP specific submodules only
+-   Download the NXP MCUXpresso git SDK and associated middleware using the west
+    tool.
+
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/bootstrap.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/github_sdk/
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk$ west init -l manifest --mf west.yml
+user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/github_sdk$ west update
 ```
 
--   Step 2: activate local environment 
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/activate.sh
-```
-
-If the script says the environment is out of date, you can update it by running
-the following command:
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ source scripts/bootstrap.sh
-```
-
--   Step 3: Init NXP SDK(s)
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/setup/nxp/update_nxp_sdk.py --platform common_sdk
-```
-Note: By default setup/nxp/update_nxp_sdk.py will try to initialize all NXP SDKs. Arg "-- help" could be used to view all available options.
+-   Start building the application.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
