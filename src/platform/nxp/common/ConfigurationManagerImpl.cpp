@@ -106,6 +106,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
+    bool failSafeArmed;
 
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
     uint8_t rebootCause = POWER_GetResetCause();

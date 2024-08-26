@@ -324,6 +324,7 @@ int ConnectivityManagerImpl::_WlanEventCallback(enum wlan_event_reason wlanEvent
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
+    CHIP_ERROR err;
     ChipDeviceEvent event;
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -336,6 +337,7 @@ void ConnectivityManagerImpl::OnStationConnected()
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
+    CHIP_ERROR err;
     ChipDeviceEvent event;
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -466,6 +468,7 @@ void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
     struct netif * netif = nullptr;
+    EventBits_t bits;
     int32_t result;
 
     LOCK_TCPIP_CORE();
@@ -534,6 +537,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret                     = CHIP_NO_ERROR;
     struct wlan_network * pNetworkData = (struct wlan_network *) malloc(sizeof(struct wlan_network));
+    int result;
 
     VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
