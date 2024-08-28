@@ -27,6 +27,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Zephyr/InetUtils.h>
 
+#include <zephyr/net/net_if.h>
+
 namespace chip {
 namespace DeviceLayer {
 
