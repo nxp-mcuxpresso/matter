@@ -710,8 +710,8 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxPressure */       \
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxSpeed */          \
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* MaxFlow */           \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000003, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstPressure */  \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000004, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstPressure */  \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000003, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstPressure */  \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000004, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstPressure */  \
             { ZAP_EMPTY_DEFAULT(), 0x00000011, 1, ZAP_TYPE(ENUM8), 0 },                             /* EffectiveOperationMode */   \
             { ZAP_EMPTY_DEFAULT(), 0x00000012, 1, ZAP_TYPE(ENUM8), 0 },                             /* EffectiveControlMode */     \
             { ZAP_EMPTY_DEFAULT(), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */                 \

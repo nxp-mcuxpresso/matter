@@ -97,8 +97,6 @@
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
-    0x0000002D, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -116,8 +114,6 @@
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
-    0x00000000, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -135,8 +131,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -159,14 +153,8 @@
     0x00000030, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
-    0x00000031, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
-    0x00000031, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
-    0x00000031, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
-    0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
-    0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
@@ -193,14 +181,8 @@
     0x00000000, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000002, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000004, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
-    0x00000000, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
-    0x00000002, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
-    0x00000004, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
-    0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
-    0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
     0x00000000, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    0x00000001, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x00000002, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     0x00000002, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \
@@ -227,14 +209,8 @@
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ScanNetworks, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: AddOrUpdateWiFiNetwork, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: RemoveNetwork, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Command: AttestationRequest, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Command: CertificateChainRequest, Privilege: administer */ \

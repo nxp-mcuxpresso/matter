@@ -232,7 +232,7 @@
             { ZAP_SIMPLE_DEFAULT(5), 0x00000010, 2, ZAP_TYPE(BITMAP16), 0 },                              /* PumpStatus */         \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000011, 1, ZAP_TYPE(ENUM8), 0 }, /* EffectiveOperationMode */                             \
             { ZAP_SIMPLE_DEFAULT(5), 0x00000012, 1, ZAP_TYPE(ENUM8), 0 }, /* EffectiveControlMode */                               \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */          \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */          \
             { ZAP_SIMPLE_DEFAULT(1000), 0x00000014, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) },   /* Speed */             \
             { ZAP_MIN_MAX_DEFAULTS_INDEX(0), 0x00000020, 1, ZAP_TYPE(ENUM8),                                                       \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OperationMode */                                    \
