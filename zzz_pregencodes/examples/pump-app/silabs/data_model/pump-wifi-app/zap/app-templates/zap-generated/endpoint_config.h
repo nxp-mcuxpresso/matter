@@ -282,23 +282,23 @@
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },           /* ClusterRevision */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxPressure */       \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxPressure */       \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000001, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxSpeed */          \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000002, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxFlow */           \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000003, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstPressure */  \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000004, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstPressure */  \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000005, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinCompPressure */   \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000006, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxCompPressure */   \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000003, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstPressure */  \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000004, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstPressure */  \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000005, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinCompPressure */   \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000006, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxCompPressure */   \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000007, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstSpeed */     \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000008, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstSpeed */     \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000009, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstFlow */      \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x0000000A, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstFlow */      \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x0000000B, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstTemp */      \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x0000000C, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstTemp */      \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x0000000B, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinConstTemp */      \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x0000000C, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MaxConstTemp */      \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000010, 2, ZAP_TYPE(BITMAP16), 0 },                               /* PumpStatus */        \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000011, 1, ZAP_TYPE(ENUM8), 0 }, /* EffectiveOperationMode */                             \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000012, 1, ZAP_TYPE(ENUM8), 0 }, /* EffectiveControlMode */                               \
-            { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */          \
+            { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000013, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Capacity */          \
             { ZAP_SIMPLE_DEFAULT(0xFFFF), 0x00000014, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Speed */             \
             { ZAP_SIMPLE_DEFAULT(0x000000), 0x00000015, 3, ZAP_TYPE(INT24U),                                                       \
               ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LifetimeRunningHours */                            \
