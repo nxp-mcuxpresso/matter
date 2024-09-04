@@ -55,10 +55,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         ChipLogError(DeviceLayer, "KVS, failed to read key!");
     }
 
-    if (read_bytes_size)
-    {
-        *read_bytes_size = read_bytes;
-    }
+    *read_bytes_size = read_bytes;
 
 exit:
     ConvertError(err);
