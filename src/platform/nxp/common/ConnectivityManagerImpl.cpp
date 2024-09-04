@@ -48,7 +48,6 @@
 extern "C" {
 #include "wlan.h"
 #include "wm_net.h"
-#include <wm_os.h>
 }
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
