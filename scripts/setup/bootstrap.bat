@@ -87,27 +87,20 @@ call "%python%" "scripts/setup/gen_pigweed_cipd_json.py" -i "%_PIGWEED_CIPD_JSON
 if %ERRORLEVEL% NEQ 0 goto finish
 
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
-	goto check_developer_mode
+	goto pw_check_prerequisites
 ) else (
 	call "%python%" "%PW_ROOT%\pw_env_setup\py\pw_env_setup\windows_env_start.py"
 	if %ERRORLEVEL% NEQ 0 goto finish
 	goto pw_activate
 )
 
-:: Ensure developer mode is enabled
-:check_developer_mode
-echo Checking if Developer Mode is enabled...
-reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock /v AllowDevelopmentWithoutDevLicense | find "0x1" >NUL 2>&1
-if %ERRORLEVEL% EQU 0 goto pw_check_prerequisites
+:: Ensure pigweed env prerequisites are OK
+:pw_check_prerequisites
 set /p ENABLE_DEVELOPER_MODE=This step will enable Windows Developer Mode. Are you sure? (y/n)
 if /i "%ENABLE_DEVELOPER_MODE%" NEQ "y" (
 	echo Developer Mode is a prerequisite for pigweed virtual environment. Cancelling bootstrap.
 	goto finish
 )
-goto pw_check_prerequisites
-
-:: Ensure pigweed env prerequisites are OK
-:pw_check_prerequisites
 curl https://pigweed.googlesource.com/pigweed/examples/+/main/tools/setup_windows_prerequisites.bat?format=TEXT > setup_pigweed_prerequisites.b64
 certutil -decode -f setup_pigweed_prerequisites.b64 setup_pigweed_prerequisites.bat
 del setup_pigweed_prerequisites.b64
