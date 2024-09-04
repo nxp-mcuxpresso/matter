@@ -22,7 +22,6 @@
 #include "AppFactoryData.h"
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
-#include "OperationalKeystore.h"
 
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
@@ -68,19 +67,6 @@
 #include <lib/shell/commands/WiFi.h>
 #endif
 
-#ifdef SMOKE_CO_ALARM
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
-#endif
-
-/**
- * \brief This flag can be set in build system to overwrite the default value.
- *
- */
-#ifndef CONFIG_THREAD_DEVICE_TYPE
-#define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
-#endif
-
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -104,14 +90,12 @@ static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLe
 #if CONFIG_NET_L2_OPENTHREAD
 void LockOpenThreadTask(void)
 {
-    chip::NXP::App::GetAppTask().AppMatter_DisallowDeviceToSleep();
     chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
 }
 
 void UnlockOpenThreadTask(void)
 {
     chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
-    chip::NXP::App::GetAppTask().AppMatter_AllowDeviceToSleep();
 }
 #endif
 
@@ -123,20 +107,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 #endif
-
-#ifdef SMOKE_CO_ALARM
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler) == CHIP_NO_ERROR);
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif
-
-#if CHIP_CRYPTO_PLATFORM
-    initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
-#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
 #if CONFIG_NET_L2_OPENTHREAD
     // Init ZCL Data Model and start server
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
@@ -147,11 +118,8 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-#if CHIP_CRYPTO_PLATFORM
-    chip::NXP::App::OperationalKeystore::Init(persistentStorage);
-#endif
-    gExampleDeviceInfoProvider.SetStorageDelegate(persistentStorage);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     GetAppTask().PostInitMatterServerInstance();
@@ -220,7 +188,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         return err;
     }
 
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -261,7 +229,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingInfo();
+#if CONFIG_NETWORK_LAYER_BLE
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
 
     /* Start a task to run the CHIP Device event loop. */
     err = PlatformMgr().StartEventLoopTask();
@@ -362,13 +334,4 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();
-}
-
-void chip::NXP::App::AppTaskBase::PrintOnboardingInfo()
-{
-#if CONFIG_NETWORK_LAYER_BLE
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
-#endif /* CONFIG_NETWORK_LAYER_BLE */
 }
