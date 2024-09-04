@@ -75,7 +75,7 @@ void PlatformManagerImpl::CleanReset()
 {
     StopEventLoopTask();
     Shutdown();
-#if (CHIP_PLAT_NVM_SUPPORT == 1)
+#if CHIP_PLAT_NVM_SUPPORT
     NvCompletePendingOperations();
 #endif
     HAL_ResetMCU();
@@ -99,7 +99,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Initialize the configuration system.
-    err = Internal::NXPConfig::Init();
+    err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
