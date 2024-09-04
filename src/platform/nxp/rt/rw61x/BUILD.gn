@@ -195,16 +195,11 @@ static_library("nxp_platform") {
     ]
     if (chip_enable_secure_dac_private_key_storage) {
       sources += [
-        # TO BE MOVED TO THE SDK
-        "ELSFactoryData.c",
-        "ELSFactoryData.h",
         "FactoryDataProviderImpl.cpp",
         "FactoryDataProviderImpl.h",
       ]
     } else if (chip_enable_secure_whole_factory_data) {
       sources += [
-          "ELSFactoryData.c",
-          "ELSFactoryData.h",
           "FactoryDataProviderEncImpl.cpp",
           "FactoryDataProviderEncImpl.h",
         ]
