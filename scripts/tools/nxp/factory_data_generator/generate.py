@@ -105,7 +105,7 @@ class KlvGenerator:
 
         return data
 
-    def to_bin(self, klv, out, aes_key):
+    def to_bin(self, klv, out, aes128_key):
         fullContent = bytearray()
         with open(out, "wb") as file:
             for entry in klv:
@@ -114,7 +114,7 @@ class KlvGenerator:
                 fullContent += entry[2]
             size = len(fullContent)
 
-            if (aes_key is None):
+            if (aes128_key is None):
                 # Calculate 4 bytes of hashing
                 hashing = hashlib.sha256(fullContent).hexdigest()
                 hashing = hashing[0:8]
@@ -136,7 +136,7 @@ class KlvGenerator:
                 logging.info("Size of final generated binary is: {} bytes".format(size))
                 file.write(fullContent)
             else:
-                # In case a aes_key is given the data will be encrypted
+                # In case a aes128_key is given the data will be encrypted
                 # Always add a padding to be 16 bytes aligned
                 padding_len = size % 16
                 padding_len = 16 - padding_len
@@ -146,7 +146,7 @@ class KlvGenerator:
                 size = len(fullContent)
                 logging.info("(After padding) Size of generated binary is: {} bytes".format(size))
                 from Crypto.Cipher import AES
-                cipher = AES.new(bytes.fromhex(aes_key), AES.MODE_ECB)
+                cipher = AES.new(bytes.fromhex(aes128_key), AES.MODE_ECB)
                 fullContentCipher = cipher.encrypt(fullContent)
 
                 # Add 4 bytes of hashing to generated binary to check for integrity
@@ -219,8 +219,6 @@ def main():
                           help="[base64 str] Already generated spake2p verifier")
     optional.add_argument("--aes128_key",
                           help="[hex] AES 128 bits key used to encrypt the whole dataset")
-    optional.add_argument("--aes256_key",
-                          help="[hex] AES 256 bits key used to encrypt the whole dataset")
     optional.add_argument("--date", type=ManufacturingDate,
                           help="[str] Manufacturing Date (YYYY-MM-DD)")
     optional.add_argument("--part_number", type=PartNumber,
@@ -242,12 +240,7 @@ def main():
 
     klv = KlvGenerator(args)
     data = klv.generate()
-    aes_key = None
-    if args.aes256_key:
-        aes_key = args.aes256_key
-    elif args.aes128_key:
-        aes_key = args.aes128_key
-    klv.to_bin(data, args.out, aes_key)
+    klv.to_bin(data, args.out, args.aes128_key)
 
 
 if __name__ == "__main__":
