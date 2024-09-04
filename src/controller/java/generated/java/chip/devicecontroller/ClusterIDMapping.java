@@ -4543,7 +4543,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum KeepActiveCommandField {StayActiveDuration(0),;
+        }public enum KeepActiveCommandField {StayActiveDuration(0),TimeoutMs(1),;
                     private final int id;
                     KeepActiveCommandField(int id) {
                         this.id = id;
@@ -9415,7 +9415,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            BoostStarted(0L),
+            BoostEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9455,7 +9457,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum BoostCommandField {Duration(0),OneShot(1),EmergencyBoost(2),TemporarySetpoint(3),TargetPercentage(4),TargetReheat(5),;
+        }public enum BoostCommandField {BoostInfo(0),;
                     private final int id;
                     BoostCommandField(int id) {
                         this.id = id;
@@ -13591,7 +13593,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OccupancyChanged(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -17235,9 +17238,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            RemovedOn(0L),
-            DeviceDirectory(1L),
-            LocationDirectory(2L),
+            DeviceDirectory(0L),
+            LocationDirectory(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -17422,7 +17424,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),IpAddress(2),Port(3),;
+                }public enum CommissionNodeCommandField {RequestId(0),ResponseTimeoutSeconds(1),;
                     private final int id;
                     CommissionNodeCommandField(int id) {
                         this.id = id;

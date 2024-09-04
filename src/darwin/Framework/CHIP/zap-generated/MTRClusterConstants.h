@@ -4897,9 +4897,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster EcosystemInformation attributes
-    MTRAttributeIDTypeClusterEcosystemInformationAttributeRemovedOnID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterEcosystemInformationAttributeLocationDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterEcosystemInformationAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterEcosystemInformationAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterEcosystemInformationAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -7372,6 +7371,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterElectricalEnergyMeasurementEventCumulativeEnergyMeasuredID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000000,
     MTREventIDTypeClusterElectricalEnergyMeasurementEventPeriodicEnergyMeasuredID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000001,
 
+    // Cluster WaterHeaterManagement events
+    MTREventIDTypeClusterWaterHeaterManagementEventBoostStartedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterWaterHeaterManagementEventBoostEndedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
     // Cluster DemandResponseLoadControl events
     MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
@@ -7489,6 +7492,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterPumpConfigurationAndControlEventLeakageID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000E,
     MTREventIDTypeClusterPumpConfigurationAndControlEventAirDetectionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000F,
     MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000010,
+
+    // Cluster OccupancySensing deprecated event names
+
+    // Cluster OccupancySensing events
+    MTREventIDTypeClusterOccupancySensingEventOccupancyChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster TargetNavigator deprecated event names
 

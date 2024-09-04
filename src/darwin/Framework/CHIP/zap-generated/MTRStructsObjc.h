@@ -1236,6 +1236,25 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable oneShot MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable emergencyBoost MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable temporarySetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable targetPercentage MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable targetReheat MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWaterHeaterManagementClusterBoostStartedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRWaterHeaterManagementClusterWaterHeaterBoostInfoStruct * _Nonnull boostInfo MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRWaterHeaterManagementClusterBoostEndedEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDemandResponseLoadControlClusterHeatingSourceControlStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull heatingSource MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -1596,7 +1615,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterLandmarkInfoStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull landmarkTag MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable positionTag MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable relativePositionTag MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1609,7 +1628,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRServiceAreaClusterAreaStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull areaID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable mapID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) MTRServiceAreaClusterAreaInfoStruct * _Nonnull areaDesc MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRServiceAreaClusterAreaInfoStruct * _Nonnull areaInfo MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1757,6 +1776,11 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMin MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMax MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeDefault MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTROccupancySensingClusterOccupancyChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull occupancy MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
