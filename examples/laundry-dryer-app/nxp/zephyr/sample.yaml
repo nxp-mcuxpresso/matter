@@ -30,3 +30,43 @@ tests:
       - EXTRA_CONF_FILE="prj_ota.conf"
     extra_configs:
       - CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
+  sample.matter.laundry_dryer_app_no_factorydata_a1:
+    platform_allow:
+      - rd_rw612_bga
+    build_only: true
+    tags: matter
+    extra_configs:
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A2=n
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A1=y
+  sample.matter.laundry_dryer_app_factorydata_a1:
+    platform_allow:
+      - rd_rw612_bga
+    build_only: true
+    tags: matter
+    extra_args: FILE_SUFFIX="fdata"
+    extra_configs:
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A2=n
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A1=y
+  sample.matter.laundry_dryer_app_factorydata_ota_v0_a1:
+    platform_allow:
+      - rd_rw612_bga
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE="prj_ota.conf"
+    extra_configs:
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A2=n
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A1=y
+  sample.matter.laundry_dryer_app_factorydata_ota_v1_a1:
+    platform_allow:
+      - rd_rw612_bga
+    build_only: true
+    tags: matter
+    extra_args:
+      - FILE_SUFFIX="fdata"
+      - EXTRA_CONF_FILE="prj_ota.conf"
+    extra_configs:
+      - CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A2=n
+      - CONFIG_SOC_SERIES_RW6XX_REVISION_A1=y
