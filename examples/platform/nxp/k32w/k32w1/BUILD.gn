@@ -13,17 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
 
-# SDK target. This is overridden to add our SDK app_config.h & defines.
-k32w1_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-chip_config_dimmable_led = false
-chip_enable_ota_requestor = true
-chip_stack_lock_tracking = "fatal"
-chip_enable_ble = true
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
-is_debug = false
+config("chip_examples_project_config") {
+  include_dirs = [
+    "app/project_include",
+    "${chip_root}",
+  ]
+}
 
-chip_crypto = "platform"
-chip_openthread_ftd = true
-chip_with_ot_cli = 0
+source_set("openthread_core_config_k32w1_chip_examples") {
+  sources = [ "app/project_include/OpenThreadConfig.h" ]
+
+  public_deps = [ "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w1:openthread_core_config_k32w1" ]
+
+  public_configs = [ ":chip_examples_project_config" ]
+}
