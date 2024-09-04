@@ -56,7 +56,7 @@ Prerequisites:
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v3.7.0
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr zsdk_lts3
 ```
 
 > **Note**: While some of NXP platforms are supported in Zephyr upstream, we
@@ -65,7 +65,7 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > While you can decide to use nxp-zsdk top of tree, we recommend using
 > a proper release tag delivered by NXP. This will ensure a certain level
 > of quality of the nxp-zsdk in use. Currently, we highly recommend using
-> the `nxp-v3.7.0` tag, based on Zephyr 3.7 LTS release.
+> the `zsdk_lts3` tag, based on Zephyr 3.7 LTS release.
 > Reach to your NXP contact for more details.
 
 Steps to build the example, targeting `rd_rw612_bga` board:
