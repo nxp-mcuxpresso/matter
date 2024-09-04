@@ -1,7 +1,6 @@
 /*
- *
  *    Copyright (c) 2024 Project CHIP Authors
- *    Copyright 2024 NXP
+ *    Copyright (c) 2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,24 +15,40 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include "EthManager.h"
+#ifndef MBEDTLS_PK_WRITE_C
+#define MBEDTLS_PK_WRITE_C
+#endif
 
-#include <inet/InetInterface.h>
-#include <inet/UDPEndPointImplSockets.h>
+#ifndef MBEDTLS_X509_CREATE_C
+#define MBEDTLS_X509_CREATE_C
+#endif
 
-#include <lib/support/logging/CHIPLogging.h>
+#ifndef MBEDTLS_X509_CSR_WRITE_C
+#define MBEDTLS_X509_CSR_WRITE_C
+#endif
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/Zephyr/InetUtils.h>
+#ifndef MBEDTLS_X509_CRL_PARSE_C
+#define MBEDTLS_X509_CRL_PARSE_C
+#endif
 
-namespace chip {
-namespace DeviceLayer {
+#ifndef MBEDTLS_X509_CRT_PARSE_C
+#define MBEDTLS_X509_CRT_PARSE_C
+#endif
 
-CHIP_ERROR EthManager::Init()
-{
-    ChipLogDetail(DeviceLayer, "EthManager has been initialized");
-    return CHIP_NO_ERROR;
-}
-} // namespace DeviceLayer
-} // namespace chip
+#ifndef MBEDTLS_X509_CSR_PARSE_C
+#define MBEDTLS_X509_CSR_PARSE_C
+#endif
+
+#ifndef MBEDTLS_X509_USE_C
+#define MBEDTLS_X509_USE_C
+#endif
+
+#ifndef MBEDTLS_PLATFORM_SNPRINTF_ALT
+#define MBEDTLS_PLATFORM_SNPRINTF_ALT
+#endif
+
+#ifndef MBEDTLS_ECDH_C
+#define MBEDTLS_ECDH_C
+#endif

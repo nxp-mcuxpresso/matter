@@ -330,14 +330,6 @@ endchoice
 
 endif
 
-if CHIP_ETHERNET
-
-choice NXP_ENET_DRIVER
-	default ETH_NXP_ENET
-endchoice
-
-endif
-
 # Configure MBEDTLS lib
 config MBEDTLS
 	default y

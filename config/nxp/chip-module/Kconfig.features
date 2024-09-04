@@ -82,21 +82,21 @@ config CHIP_ETHERNET
 	depends on !CHIP_WIFI
 	select NET_MGMT_EVENT
 	select NET_MGMT_EVENT_INFO
-	select NET_L2_ETHERNET
 	select NET_L2_ETHERNET_MGMT
+	select ETH_MCUX_PROMISCUOUS_MODE
 	select NET_UDP
-	select NET_IP
-	select NET_CONFIG_SETTINGS
-	select NET_MGMT
 	select NET_IPV4
 	select NET_DHCPV4
 	select NET_NATIVE_IPV4
+	select NET_IP
 	select NET_NATIVE
 	select NET_TCP
+	select NET_CONFIG_SETTINGS
+	select ETH_MCUX
 	select DNS_RESOLVER
 	select MDNS_RESOLVER
 	select MBEDTLS_PKCS5_C
 	select MBEDTLS_HKDF_C
 	select MBEDTLS_ECDSA_C
-	select PSA_CRYPTO_ENABLE_ALL
+	imply NET_MGMT
 endif # CHIP
