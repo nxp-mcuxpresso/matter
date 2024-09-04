@@ -257,9 +257,7 @@ In this configuration, the device can be commissioned over Wi-Fi with the
 
 ### NVM
 
-By default the file system used by the application is littlefs.
-The `rt_nvm_component=\"nvs\"` argument must be added to the _gn
-gen_ command to enable NVS/settings file system.
+By default the file system used by the application is NVS.
 
 ### Testing the all-clusters application without Matter CLI:
 
