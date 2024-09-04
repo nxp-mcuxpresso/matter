@@ -32,6 +32,35 @@ namespace DeviceLayer {
 
 CHIP_ERROR EthManager::Init()
 {
+    // TODO: consider moving these to ConnectivityManagerImpl to be prepared for handling multiple interfaces on a single device.
+    Inet::UDPEndPointImplSockets::SetMulticastGroupHandler([](Inet::InterfaceId interfaceId, const Inet::IPAddress & address,
+                                                              Inet::UDPEndPointImplSockets::MulticastOperation operation) {
+        const in6_addr addr = InetUtils::ToZephyrAddr(address);
+        net_if * iface      = InetUtils::GetInterface(interfaceId);
+        VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+        if (operation == Inet::UDPEndPointImplSockets::MulticastOperation::kJoin)
+        {
+            net_if_mcast_addr * maddr = net_if_ipv6_maddr_add(iface, &addr);
+
+            if (maddr && !net_if_ipv6_maddr_is_joined(maddr) && !net_ipv6_is_addr_mcast_link_all_nodes(&addr))
+            {
+                net_if_ipv6_maddr_join(iface, maddr);
+            }
+        }
+        else if (operation == Inet::UDPEndPointImplSockets::MulticastOperation::kLeave)
+        {
+            VerifyOrReturnError(net_ipv6_is_addr_mcast_link_all_nodes(&addr) || net_if_ipv6_maddr_rm(iface, &addr),
+                                CHIP_ERROR_INVALID_ADDRESS);
+        }
+        else
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        return CHIP_NO_ERROR;
+    });
+
     ChipLogDetail(DeviceLayer, "EthManager has been initialized");
     return CHIP_NO_ERROR;
 }
