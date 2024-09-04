@@ -72,7 +72,10 @@ void LightingManager::Init()
 void LightingManager::DisplayInLoop()
 {
 #if LIGHTING_MANAGER_ENABLE_STATUS_LED
-    UpdateStatus();
+    if (AppTask::sFunction != AppTask::Function::kFactoryReset && AppTask::sFunction != AppTask::Function::kIdentify)
+    {
+        UpdateStatus();
+    }
     statusLed.Animate();
 #endif
     lightLed.Animate();
