@@ -15,8 +15,6 @@ please see the [common README](../README.md).
 
 ## Introduction
 
-This is a contact sensor application implemented for a k32w1 device.
-
 The following board was used when testing this Matter reference app
 for a `k32w1` device: ![K32W1 EVK](../../../platform/nxp/mcxw71_k32w1/doc/images/k32w1-evk.jpg)
 
