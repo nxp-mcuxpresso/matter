@@ -82,7 +82,7 @@ the UART console.
 
 The example application provides a simple UI that depicts the state of the
 device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in the FRDM-MCXW71 board.
+general-purpose LEDs and buttons built in the K32W1 EVK board.
 
 **LED 2** shows the overall state of the device and its connectivity. Four
 states are depicted:
@@ -103,7 +103,7 @@ states are depicted:
 
 NOTE:
     LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is enabled.
-    On FRDM-MCXW71 board, PTB0 is wired to LED2 also is wired to CS (Chip Select) 
+    On MCXW71 EVK board, PTB0 is wired to LED2 also is wired to CS (Chip Select) 
     External Flash Memory. OTA image is stored in external memory because of it's size.
     If LED2 is enabled then it will affect External Memory CS and OTA will not work.
 
@@ -204,7 +204,7 @@ NBU image should be written only when a new NXP-SDK is released.
 
 Host image is the one found under `out/debug/`. It should be written after each build process. 
 
-If debugging is needed then jump directly to the [Debugging](#debugging) section. Otherwise, if only flashing is needed then [JLink](https://www.segger.com/downloads/jlink/) can be used:
+If debugging is needed then jump directly to the [Debugging](#debugging) section. Otherwise, if only flashing is needed then [JLink 7.84b](https://www.segger.com/downloads/jlink/) can be used:
 
 - Plug MCXW71 to the USB port (no need to keep the SW4 button pressed while doing this)
 
@@ -222,7 +222,7 @@ quit
 - copy the application and `commands_script` in the same folder that JLink executable is placed. Execute:
 
 ```bash
-$  jlink -device MCXW71 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
+$  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
 ```
 
 <a name="debugging"></a>
