@@ -48,9 +48,10 @@ MCUBoot is an open-source secure bootloader used by RW61x to apply the
 self-upgrade. For more details, please refer to the
 [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
 
-For RW61x platform, the bootloader is configured to use the flash remapping
-mechanism by default, in order to perform the image upgrade. This is achieved by
-using the MCUBoot DIRECT-XIP upgrade mode.
+In our use case, the bootloader runs the application residing in the primary
+partition. In order to run the OTA update image, the bootloader will swap the
+content of the primary and the secondary partitions. This type of upgrade is
+called swap-move and is the default upgrade configured by MCUBoot.
 
 ## OTA Software Update process for RW61x example application
 
@@ -85,32 +86,28 @@ J-Link > exec EnableEraseAllFlashBanks
 J-Link > erase 0x8000000, 0x88a0000
 ```
 
--   MCUBoot application can be built with SDK installed, using intructions
-    below.
+-   MCUBoot application can be built with SDK installed, using intructions below.
 -   Retrieve the mcuboot directory with :
-
 ```
 user@ubuntu: cd ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc
 ```
 
 `<rw612 board>`: Supported rw612 boards are: `rdrw612bga` or `frdmrw612`
 
--   Build the mcuboot application :
-
+- Build the mcuboot application : 
 ```
 user@ubuntu: chmod +x build_flash_release.sh
 user@ubuntu: export ARMGCC_DIR=/opt/gcc-arm-none-eabi-10.3-2021.10   # with ARMGCC_DIR referencing the compiler path
-user@ubuntu: ./build_flash_release.sh
+user@ubuntu: ./build_flash_release.sh 
 ```
-
 -   Program the generated binary to the target board.
 
 ```
 J-Link > loadbin ~/Desktop/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/common_sdk/repo/examples/<rw612 board>/ota_examples/mcuboot_opensource/armgcc/flash_release/mcuboot_opensource.elf
 ```
 
--   If it runs successfully, the following logs will be displayed on the
-    terminal :
+-   If it runs successfully, the following logs
+    will be displayed on the terminal :
 
 ```
 hello sbl.
@@ -212,13 +209,7 @@ application and run it.
 
 To generate the OTA update image the same procedure can be followed from the
 [Generating and flashing the signed application image](#generating-and-flashing-the-signed-application-image)
-sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
-(recent version of the update), without arguments "--pad" "--confirm" when
-running imgtool script during OTA Update Image generation.
-
-Note : When building the update image, the build arguments
-nxp_software_version=2 nxp_sofware_version_string=\"2.0\" can be added to the gn
-gen command in order to specify the upgraded version.
+sub-section, replacing the "--version "1.0"" argument with "--version "2.0"" (recent version of the update), without arguments "--pad" "--confirm" when running imgtool script during OTA Update Image generation.
 
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be
@@ -235,8 +226,8 @@ instructions below describe the procedure step-by-step.
 
 Setup example :
 
--   [Chip-tool](../../../examples/chip-tool/README.md) application running on
-    the RPi.
+-   [Chip-tool](../../../examples/chip-tool/README.md) application running on the
+    RPi.
 -   OTA Provider application built on the same RPi (as explained below).
 -   RW61x board programmed with the example application (with the instructions
     above).
