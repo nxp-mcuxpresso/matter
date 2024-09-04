@@ -30,7 +30,6 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
-
 #include <platform/CommissionableDataProvider.h>
 
 #include "lib/core/ErrorStr.h"
@@ -98,11 +97,6 @@
 #include <app/TestEventTriggerDelegate.h>
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-#include "platform/OpenThread/GenericThreadBorderRouterDelegate.h"
-#include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
-#endif
-
 #ifndef CONFIG_THREAD_DEVICE_TYPE
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
 #endif
@@ -124,11 +118,6 @@ app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
 #elif CONFIG_CHIP_ETHERNET
 app::Clusters::NetworkCommissioning::Instance
     sNetworkCommissioningInstance(0, chip::NXP::App::GetAppTask().GetEthernetDriverInstance());
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
-static CharSpan sBrName("NXP-BR", strlen("NXP-BR"));
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -460,19 +449,3 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 
     ChipLogProgress(DeviceLayer, "Current Software Version: %s, %d", currentSoftwareVer, static_cast<int>(currentVersion));
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
-{
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-
-    static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
-    static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
-                                                                              Server::GetInstance().GetFailSafeContext());
-
-    // Initialize TBR name
-    sThreadBRDelegate.SetThreadBorderRouterName(sBrName);
-    // Initialize TBR cluster
-    sThreadBRMgmtInstance.Init();
-}
-#endif
