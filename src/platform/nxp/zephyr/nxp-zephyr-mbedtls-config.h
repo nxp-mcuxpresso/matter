@@ -28,10 +28,6 @@
 #include "wpa_supp_els_pkc_mbedtls_config.h"
 #endif /* CONFIG_WIFI_NXP && CONFIG_WPA_SUPP */
 
-#if CONFIG_CHIP_ETHERNET
-#include "nxp-zephyr-ethernet-mbedtls-config.h"
-#endif /* CONFIG_CHIP_ETHERNET */
-
 #if CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
 #define PSA_CRYPTO_DRIVER_ELS_PKC
 #endif /* CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC */
