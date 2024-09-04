@@ -71,6 +71,6 @@ ubuntu@ubuntu:~$ ./chip-tool pairing ble-thread node-id hex:<active-dataset> 202
 
 ## Using the Thread credential sharing mechanism
 
-The details about using the credential sharing mechanism are in the ot-nxp repo border router application [readme](../../../third_party/openthread/ot-nxp/examples/br/README-OTBR.md). See `Ephemeral Key functionality` section.
+The details about using the credential sharing mechanism are in the ot-nxp repo border router application [readme](https://github.com/NXP/ot-nxp/blob/v1.4.0-pvw1/examples/br/README-OTBR.md). See `Ephemeral Key functionality` section.
 
 Note that all OpenThread commands executed from then Matter CLI must have `otcli` prepended before the command.
