@@ -18,6 +18,7 @@
 
 #include "LockManager.h"
 
+#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <memory>
 
