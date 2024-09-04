@@ -21,9 +21,8 @@
 
 #include "AppTaskBase.h"
 
-namespace chip {
-namespace NXP {
-namespace App {
+namespace chip::NXP::App {
+
 class AppTaskZephyr : public AppTaskBase
 {
 public:
@@ -67,6 +66,5 @@ public:
 private:
     void DispatchEvent(const AppEvent & event);
 };
-} // namespace App
-} // namespace NXP
-} // namespace chip
+
+} // namespace chip::NXP::App
