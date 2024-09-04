@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-#include "LedManager.h"
+#include "LightingManager.h"
 
 #include "AppConfig.h"
 #include "AppTask.h"
@@ -28,7 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 
-LedManager LedManager::sLedManager;
+LightingManager LightingManager::sLightingManager;
 
 #if CONFIG_ENABLE_FEEDBACK
 UserInterfaceFeedback & FeedbackMgr()
@@ -37,44 +37,48 @@ UserInterfaceFeedback & FeedbackMgr()
 }
 #endif
 
-void LedManager::ApplyTurnOn()
+void LightingManager::ApplyTurnOn()
 {
     if (!lightLed.IsTurnedOff())
         return;
 
+    ChipLogProgress(DeviceLayer, "Turn on action has been initiated");
     lightLed.Set(true);
+    ChipLogProgress(DeviceLayer, "Turn on action has been completed")
 }
 
-void LedManager::ApplyTurnOff()
+void LightingManager::ApplyTurnOff()
 {
     if (lightLed.IsTurnedOff())
         return;
 
+    ChipLogProgress(DeviceLayer, "Turn off action has been initiated");
     lightLed.Set(false);
+    ChipLogProgress(DeviceLayer, "Turn off action has been completed")
 }
 
-void LedManager::Init()
+void LightingManager::Init()
 {
     /* start with all LEDS turned off */
-#if LED_MANAGER_ENABLE_STATUS_LED
-    statusLed.Init(LED_MANAGER_STATUS_LED_INDEX, false);
+#if LIGHTING_MANAGER_ENABLE_STATUS_LED
+    statusLed.Init(LIGHTING_MANAGER_STATUS_LED_INDEX, false);
 #endif
     /* The parameters will not be used by the dimmer init. */
-    lightLed.Init(LED_MANAGER_LIGHT_LED_INDEX, false);
+    lightLed.Init(LIGHTING_MANAGER_LIGHT_LED_INDEX, false);
 
     RestoreState();
 }
 
-void LedManager::DisplayInLoop()
+void LightingManager::DisplayInLoop()
 {
-#if LED_MANAGER_ENABLE_STATUS_LED
+#if LIGHTING_MANAGER_ENABLE_STATUS_LED
     UpdateStatus();
     statusLed.Animate();
 #endif
     lightLed.Animate();
 }
 
-void LedManager::DisplayOnAction(Action action)
+void LightingManager::DisplayOnAction(Action action)
 {
     switch (action)
     {
@@ -90,14 +94,14 @@ void LedManager::DisplayOnAction(Action action)
     }
 }
 
-void LedManager::RestoreState()
+void LightingManager::RestoreState()
 {
     /* restore initial state for the LED indicating Lighting state */
     lightLed.Set(false);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t arg) {
         bool val = false;
-        APP_CLUSTER_ATTRIBUTE::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+        LIGHTING_MANAGER_APP_CLUSTER_ATTRIBUTE::Get(LIGHTING_MANAGER_APP_DEVICE_TYPE_ENDPOINT, &val);
         if (val)
             LightingMgr().ApplyTurnOn();
         else
@@ -105,9 +109,25 @@ void LedManager::RestoreState()
     });
 }
 
-void LedManager::AnimateOnAction(uint32_t onTimeMS, uint32_t offTimeMS)
+void LightingManager::UpdateState()
 {
-#if LED_MANAGER_ENABLE_STATUS_LED
+    uint8_t newValue = static_cast<uint8_t>(lightLed.IsTurnedOff());
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t arg) {
+            // write the new on/off value
+            auto status = LIGHTING_MANAGER_APP_CLUSTER_ATTRIBUTE::Set(LIGHTING_MANAGER_APP_DEVICE_TYPE_ENDPOINT, (bool) arg);
+            if (status != chip::Protocols::InteractionModel::Status::Success)
+            {
+                ChipLogProgress(DeviceLayer, "Error when updating cluster attribute");
+            }
+        },
+        (intptr_t) newValue);
+}
+
+void LightingManager::AnimateOnAction(uint32_t onTimeMS, uint32_t offTimeMS)
+{
+#if LIGHTING_MANAGER_ENABLE_STATUS_LED
     statusLed.Set(false);
     statusLed.Animate(onTimeMS, offTimeMS);
 #endif
@@ -116,8 +136,8 @@ void LedManager::AnimateOnAction(uint32_t onTimeMS, uint32_t offTimeMS)
     lightLed.Animate(onTimeMS, offTimeMS);
 }
 
-#if LED_MANAGER_ENABLE_STATUS_LED
-void LedManager::UpdateStatus()
+#if LIGHTING_MANAGER_ENABLE_STATUS_LED
+void LightingManager::UpdateStatus()
 {
     bool isThreadProvisioned = false;
     uint16_t bleConnections  = 0;
