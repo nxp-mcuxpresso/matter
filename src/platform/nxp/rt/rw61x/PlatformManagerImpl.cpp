@@ -112,7 +112,6 @@ void PlatformManagerImpl::HardwareInit(void)
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
     status_t status;
-    hal_rng_status_t rngStatus;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
     status = CRYPTO_InitHardware();
