@@ -140,10 +140,8 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   By default, the RW612 A1 board revision will be chosen. To switch to an A2
-    revision, the argument `board_version=\"A2\"` must be added to the _gn gen_
-    command. To switch to a FRDM board revision, the argument `board_version=\"frdm\"` must be added to the _gn gen_
-    command.
+-   By default, the `NXP RD-RW612-BGA` board revision will be chosen. To switch to `NXP FRDM-RW612` board revision, the argument
+    `board_version=\"frdm\"` must be added to the _gn gen_ command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
 -   To build with the option to have Matter certificates/keys pre-loaded in a
