@@ -27,8 +27,9 @@
 #include <app/server/Server.h>
 #include <platform/NetworkCommissioning.h>
 
-namespace chip::NXP::App {
-
+namespace chip {
+namespace NXP {
+namespace App {
 class AppTaskBase
 {
 public:
@@ -97,44 +98,6 @@ public:
     virtual void AppMatter_RegisterCustomCliCommands(void){};
 
     /**
-     * \brief Disallow entering low power mode.
-     *
-     * This function can be overridden in order to implement a specific disallow mechanism.
-     *
-     */
-    virtual void AppMatter_DisallowDeviceToSleep(void) {}
-
-    /**
-     * \brief Allow entering low power mode.
-     *
-     * This function can be overridden in order to implement a specific allow mechanism.
-     *
-     */
-    virtual void AppMatter_AllowDeviceToSleep(void) {}
-
-    /**
-     * \brief Print onboarding information.
-     *
-     * It can be overwritten by derived classes for custom information,
-     * such as setting the commissioning flow to kUserActionRequired.
-     *
-     */
-    virtual void PrintOnboardingInfo();
-
-    /**
-     * \brief Print current software version string and software version.
-     *
-     * It uses the ConfigurationManager API to extract the information.
-     */
-    virtual void PrintCurrentVersion();
-
-    /**
-     * \brief Send event to the event queue.
-     *
-     */
-    virtual void PostEvent(const AppEvent & event){};
-
-    /**
      * \brief This function could be overridden in order to dispatch event.
      *
      * Example of usage: FreeRtos dispatch event using the event handler.
@@ -181,7 +144,6 @@ public:
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
-
     /* Functions used by the public commisioning handlers */
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
@@ -194,5 +156,6 @@ private:
  * Applications can use this to gain access to features of the AppTaskBase.
  */
 extern AppTaskBase & GetAppTask();
-
-} // namespace chip::NXP::App
+} // namespace App
+} // namespace NXP
+} // namespace chip

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AppRpc.h"
+#include "AppTask.h"
 #include "FreeRTOS.h"
 #include "PigweedLogger.h"
 #include "PigweedLoggerMutex.h"
@@ -43,14 +43,8 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
-#ifndef RPC_TASK_STACK_SIZE
 #define RPC_TASK_STACK_SIZE 2048
-#endif
-
-#ifndef RPC_TASK_PRIORITY
 #define RPC_TASK_PRIORITY 1
-#endif
-
 TaskHandle_t RpcTaskHandle;
 
 namespace chip {
@@ -62,7 +56,7 @@ class NxpButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        chip::NXP::App::Rpc::ButtonHandler(request);
+        GetAppTask().ButtonEventHandler(request.idx, request.idx);
         return pw::OkStatus();
     }
 };
@@ -83,7 +77,7 @@ private:
     static constexpr TickType_t kRebootTimerPeriodTicks = 300;
     TimerHandle_t mRebootTimer;
 
-    static void RebootHandler(TimerHandle_t) { chip::NXP::App::Rpc::Reboot(); }
+    static void RebootHandler(TimerHandle_t) { NVIC_SystemReset(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
