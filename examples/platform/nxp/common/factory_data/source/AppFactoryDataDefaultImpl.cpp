@@ -24,10 +24,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#ifndef EXTERNAL_FACTORY_DATA_PROVIDER_HEADER
-#define EXTERNAL_FACTORY_DATA_PROVIDER_HEADER "platform/nxp/common/factory_data/FactoryDataProvider.h"
-#endif
-#include EXTERNAL_FACTORY_DATA_PROVIDER_HEADER
+#include "FactoryDataProvider.h"
 #if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
 /*
  * Test key used to encrypt factory data before storing it to the flash.
