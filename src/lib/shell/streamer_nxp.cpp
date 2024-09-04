@@ -66,7 +66,7 @@
 #endif
 
 // pw RPC uses UART DMA by default
-#ifdef CONFIG_ENABLE_PW_RPC
+#ifdef PW_RPC_ENABLED
 #define CONSUMER_TASK_HANDLE RpcTaskHandle
 #ifndef STREAMER_UART_USE_DMA
 #define STREAMER_UART_USE_DMA 1
@@ -76,7 +76,7 @@
 #ifndef STREAMER_UART_USE_DMA
 #define STREAMER_UART_USE_DMA 0
 #endif
-#endif // CONFIG_ENABLE_PW_RPC
+#endif // PW_RPC_ENABLED
 
 #if STREAMER_UART_USE_DMA
 typedef serial_port_uart_dma_config_t streamer_serial_port_uart_config_t;
