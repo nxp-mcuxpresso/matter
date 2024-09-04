@@ -255,6 +255,12 @@ using the matter shell, follow instructions from
 In this configuration, the device can be commissioned over Wi-Fi with the
 'ble-wifi' pairing method.
 
+### NVM
+
+By default the file system used by the application is littlefs.
+The `rt_nvm_component=\"nvs\"` argument must be added to the _gn
+gen_ command to enable NVS/settings file system.
+
 ### Testing the all-clusters application without Matter CLI:
 
 1. Prepare the board with the flashed `All-cluster application` (as shown
