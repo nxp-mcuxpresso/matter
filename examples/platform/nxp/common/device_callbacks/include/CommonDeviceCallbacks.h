@@ -40,9 +40,11 @@ public:
     virtual void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
     virtual void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     virtual void OnInterfaceIpAddressChanged(const chip::DeviceLayer::ChipDeviceEvent * event);
-#if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
+#if CHIP_ENABLE_OPENTHREAD
     virtual void OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
 #endif
+private:
+    bool bIsTbrClusterInit = false;
 };
 
 class DeviceCallbacksDelegate
