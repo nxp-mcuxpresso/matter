@@ -79,16 +79,16 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.cpp",
   ]
 
-  if (rt_nvm_component == "nvm_fwk" || rt_nvm_component == "littlefs") {
+  if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
       "../../common/NXPConfig.cpp",
       "../../common/ram_storage.c",
       "../../common/ram_storage.h",
     ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
   }
-  else if(rt_nvm_component == "nvs") {
+  else if(nxp_nvm_component == "nvs") {
     sources += [ "../../common/NXPConfigNVS.cpp" ]
   }
 
@@ -107,11 +107,11 @@ static_library("nxp_platform") {
   deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   # define CHIP_PLAT_NVM_SUPPORT - See NXPConfig.cpp for definition
-  if (rt_nvm_component == "nvm_fwk") {
+  if (nxp_nvm_component == "nvm_fwk") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
-  } else if (rt_nvm_component == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=2" ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=3" ]
   }
 

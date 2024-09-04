@@ -102,14 +102,14 @@ source_set("libopenthread-rw61x") {
     ]
   }
 
-  if (rt_nvm_component == "nvm_fwk") {
+  if (nxp_nvm_component == "nvm_fwk") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
-  } else if (rt_nvm_component == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
-  } else if (rt_nvm_component == "key_storage") {
+  } else if (nxp_nvm_component == "key_storage") {
     sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
   }
-  else if (rt_nvm_component == "nvs") {
+  else if (nxp_nvm_component == "nvs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 
