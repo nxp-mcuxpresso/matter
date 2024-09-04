@@ -124,7 +124,7 @@ rt_executable("lock-app") {
     "../../common/main/include/AppTask.h",
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
-    "../../common/main/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/LockEndpoint.cpp",
     "${chip_root}/examples/lock-app/lock-common/src/LockManager.cpp",
   ]
 
@@ -191,7 +191,10 @@ rt_executable("lock-app") {
     sources += ["${common_example_dir}/app_assert/source/AppAssert.cpp"]
   }
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+    "-Wno-error=format="
+  ]
 
   ldscript =
       "${example_platform_dir}/app/ldscripts/MIMXRT1176xxxxx_cm7_flexspi_nor.ld"
