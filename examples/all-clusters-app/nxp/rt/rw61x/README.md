@@ -38,20 +38,18 @@ The example supports:
 
 For Matter over Thread configuration :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
 
 For Matter over WiFi configuration :
 
--   [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board
--   BLE antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board: BLE antenna (to plug in Ant1) + Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
 
 For Matter over Wi-Fi with OpenThread Border Router :
 
--   [`NXP RD-RW612-BGA`] board
--   BLE/15.4 antenna (to plug in Ant1)
--   Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP RD-RW612-BGA`] board: BLE/15.4 antenna (to plug in Ant1) + Wi-Fi antenna (to plug in Ant2)
+-   For [`NXP FRDM-RW612`] board: no external antenna needed (embedded PCB antenna)
 
 <a name="building"></a>
 
@@ -333,7 +331,7 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 
 3. The All-cluster example uses UART2 (`FlexComm0`) to print logs while running
    the server. To view raw UART output, a pin should be plugged to an USB to
-   UART adapter (connector `HD2 pin 03`), then start a terminal emulator like
+   UART adapter (connector `HD2 pin 03` for [`NXP RD-RW612-BGA`] board and `J5 pin 4` (mikroBUS: TX) for [`NXP FRDM-RW612`] board), then start a terminal emulator like
    PuTTY and connect to the used COM port with the following UART settings:
 
     - Baud rate: 115200
