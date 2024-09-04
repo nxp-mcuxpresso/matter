@@ -130,6 +130,7 @@ Optional GN options that can be added when building an application:
     command.
 -   By default, the RW612 A1 board revision will be chosen. To switch to an A2
     revision, the argument `board_version=\"A2\"` must be added to the _gn gen_
+    command. To switch to a FRDM board revision, the argument `board_version=\"frdm\"` must be added to the _gn gen_
     command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
