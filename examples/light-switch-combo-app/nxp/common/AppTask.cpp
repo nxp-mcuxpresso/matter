@@ -20,6 +20,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#ifndef APP_DEVICE_TYPE_ENDPOINT
+#define APP_DEVICE_TYPE_ENDPOINT 1
+#endif
+
+using namespace chip::app::Clusters;
+
 void LightSwitchComboApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP Light Switch Combo Demo App");
@@ -29,6 +35,24 @@ LightSwitchComboApp::AppTask & LightSwitchComboApp::AppTask::GetDefaultInstance(
 {
     static LightSwitchComboApp::AppTask sAppTask;
     return sAppTask;
+}
+
+bool LightSwitchComboApp::AppTask::CheckStateClusterHandler(void)
+{
+    bool val = false;
+    OnOff::Attributes::OnOff::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+    return val;
+}
+
+CHIP_ERROR LightSwitchComboApp::AppTask::ProcessSetStateClusterHandler(void)
+{
+    bool val = false;
+    OnOff::Attributes::OnOff::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+    auto status = OnOff::Attributes::OnOff::Set(APP_DEVICE_TYPE_ENDPOINT, (bool) !val);
+
+    VerifyOrReturnError(status == chip::Protocols::InteractionModel::Status::Success, CHIP_ERROR_WRITE_FAILED);
+
+    return CHIP_NO_ERROR;
 }
 
 chip::NXP::App::AppTaskBase & chip::NXP::App::GetAppTask()
