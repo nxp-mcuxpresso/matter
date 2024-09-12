@@ -137,6 +137,7 @@ rt_executable("lock-app") {
     "${common_example_dir}/device_callbacks/include",
     "${common_example_dir}/factory_data/include",
     "${common_example_dir}/app_task/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
@@ -147,6 +148,7 @@ rt_executable("lock-app") {
     "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
   ]
 
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
