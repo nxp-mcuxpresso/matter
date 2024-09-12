@@ -144,6 +144,7 @@ mcxw71_k32w1_executable("light-switch-combo_app") {
     "${common_example_dir}/operational_keystore/include",
     "${common_example_dir}/rpc/include",
     "${common_example_dir}/ui_feedback/include",
+    "${common_example_dir}/app_ble/include",
   ]
 
   sources += [
@@ -153,12 +154,13 @@ mcxw71_k32w1_executable("light-switch-combo_app") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp",
+    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
     "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp"
   ]
 
   if (chip_enable_ota_requestor) {
     defines += [
-      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/factory_data/legacy/OTAImageProcessorImpl.h\"",
+      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"",
       # The status LED and the external flash CS pin are wired together. The OTA image writing may fail if used together.
       "LED_MANAGER_ENABLE_STATUS_LED=0",
     ]
