@@ -1,82 +1,53 @@
 /*
- *  Copyright 2023-2024 NXP
- *  All rights reserved.
  *
- *  SPDX-License-Identifier: BSD-3-Clause
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 #include "WifiConnect.h"
 #include <lib/support/Span.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/NetworkCommissioning.h>
-#include <platform/PlatformManager.h>
-#include <platform/nxp/common/NetworkCommissioningDriver.h>
 
-using namespace ::chip::DeviceLayer;
+namespace chip {
+namespace NXP {
+namespace App {
 
-static void WifiConnectPostConnectivityLostEvent(void)
+CHIP_ERROR WifiConnectAtboot(chip::DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver)
 {
-    CHIP_ERROR err;
-    ChipDeviceEvent event;
+    VerifyOrReturnError(wifiDriver != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
-    event.WiFiConnectivityChange.Result = kConnectivity_Lost;
-    (void) PlatformMgr().PostEvent(&event);
-}
+    /* In case WiFi connect at boot is enabled try to set SSID to the predefined value */
+    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(CONFIG_CHIP_APP_WIFI_SSID), strlen(CONFIG_CHIP_APP_WIFI_SSID));
+    ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(CONFIG_CHIP_APP_WIFI_PASSWORD), strlen(CONFIG_CHIP_APP_WIFI_PASSWORD));
+    VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
 
-/* Creates a dedicated Task responsible for connecting to a WiFi network */
-void chip::NXP::App::WifiConnectAtboot(void)
-{
-    NetworkCommissioning::NetworkIterator * networks;
-    NetworkCommissioning::Network currentNetwork;
-    CHIP_ERROR chip_err;
-    NetworkCommissioning::Status status;
-    chip::MutableCharSpan debugText;
-    uint8_t networkIndex;
-    int len_ssid, len_pass;
-    chip::ByteSpan ssid;
-    chip::ByteSpan password;
-
-    networks = NetworkCommissioning::NXPWiFiDriver::GetInstance().GetNetworks();
+    chip::DeviceLayer::NetworkCommissioning::NetworkIterator * networks = wifiDriver->GetNetworks();
+    /* In case Wi-Fi driver has already Wi-Fi network information, skip the connect stage */
     if (networks == nullptr || networks->Count() == 0)
     {
-#ifdef CONFIG_CHIP_APP_WIFI_SSID
-        /* If SSID and PASSWORD are entered at build time, they can be used */
-        ssid = chip::ByteSpan(reinterpret_cast<const uint8_t *>(CONFIG_CHIP_APP_WIFI_SSID), strlen(CONFIG_CHIP_APP_WIFI_SSID));
-        ChipLogProgress(DeviceLayer, "Info: Using the default SSID %s", ssid.data());
-#endif
-
-#ifdef CONFIG_CHIP_APP_WIFI_PASSWORD
-        /* If SSID and PASSWORD are entered at build time, they can be used */
-        password =
-            chip::ByteSpan(reinterpret_cast<const uint8_t *>(CONFIG_CHIP_APP_WIFI_PASSWORD), strlen(CONFIG_CHIP_APP_WIFI_PASSWORD));
-        ChipLogProgress(DeviceLayer, "Info: Using the default password %s", password.data());
-#endif
-
-        /* If SSID and Password are filled, WiFi can be automatically started */
-        if (IsSpanUsable(ssid) && IsSpanUsable(password))
-        {
-            ChipLogProgress(DeviceLayer, "Connecting to Wi-Fi network: SSID = %s and PASSWORD = %s", ssid.data(), password.data());
-
-            status = NetworkCommissioning::NXPWiFiDriver::GetInstance().AddOrUpdateNetwork(ssid, password, debugText, networkIndex);
-
-            if (status != NetworkCommissioning::Status::kSuccess)
-            {
-                WifiConnectPostConnectivityLostEvent();
-                ChipLogError(DeviceLayer, "Error: AddOrUpdateNetwork: %u", (uint8_t) status);
-            }
-
-            /* Connection event will be returned in OnWiFiConnectivityChange from DeviceCallbacks.cpp */
-            NetworkCommissioning::NXPWiFiDriver::GetInstance().ConnectNetwork(ssid, nullptr);
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Wrong SSID and password");
-            WifiConnectPostConnectivityLostEvent();
-        }
+        uint8_t networkIndex;
+        chip::MutableCharSpan debugText;
+        chip::DeviceLayer::NetworkCommissioning::Status status =
+            wifiDriver->AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, networkIndex);
+        VerifyOrReturnError(status == chip::DeviceLayer::NetworkCommissioning::Status::kSuccess, CHIP_ERROR_CONNECTION_ABORTED);
+        wifiDriver->ConnectNetwork(ssidSpan, nullptr);
     }
-    else
-    {
-        networks->Release();
-    }
+    return CHIP_NO_ERROR;
 }
+
+} // namespace App
+} // namespace NXP
+} // namespace chip
