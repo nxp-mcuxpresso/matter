@@ -11,7 +11,6 @@ The build system has been tested on the following Operating Systems:
 -   macOS 10.15
 -   Debian 11 (64 bit required)
 -   Ubuntu 22.04 LTS
--   Windows 10 (experimental)
 
 ## Build system features
 
@@ -73,16 +72,6 @@ For Darwin host example:
 Please note that in the above commands, you should replace platform1,platform2
 with the specific platform names you wish to check out.
 
-For Windows, all commands shall be run in a terminal with administrator rights.
-The terminal shall be native command line, not git bash or PowerShell, since
-these were not tested and most likely will not work. Before cloning, to preserve
-the correctness of symbolic links, the user has to set `core.symlinks` to
-`true`:
-
-```
-git config --global core.symlinks true
-```
-
 ## Updating Matter code
 
 If you already have the Matter code checked out, run the following commands to
@@ -127,10 +116,6 @@ If building `-with-ui` variant, also install SDL2:
 ```
 brew install sdl2
 ```
-
-### Installing prerequisites on Windows
-
-On Windows, please follow the [instructions](https://pigweed.dev/docs/get_started/first_time_setup.html#install-prerequisites) from official pigweed docs.
 
 ### Installing prerequisites on Raspberry Pi 4
 
@@ -285,30 +270,6 @@ Run the following command:
 ```
 source scripts/activate.sh
 ```
-
-## Prepare for building on Windows
-
-When using Windows, the user can cross-compile applications in a similar way to
-building on Linux. The shell scripts are replaced with equivalent batch scripts
-to set up the environment.
-
-Run the following command to set up the environment:
-
-```
-scripts\bootstrap.bat
-```
-
-Run the following command to activate the environment:
-
-```
-scripts\activate.bat
-```
-
-Note: Due to some limitations, the pigweed environment does not support
-deactivation on Windows. Instead, the user should open another terminal and
-activate it again. The environment variables are set only during the lifetime of
-the current terminal. Running the activate script multiple times will cause the
-`PATH` variable to contain duplicated environment paths.
 
 ### Updating the environment
 
