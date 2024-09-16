@@ -25,7 +25,7 @@
 #include "ble_host_task_config.h"
 #include "controller_interface.h"
 
-#include <src/platform/nxp/common/ble/BLEManagerCommon.h>
+#include <src/platform/nxp/common/legacy/BLEManagerCommon.h>
 
 /* host task configuration */
 #define HOST_TASK_PRIORITY (4U)

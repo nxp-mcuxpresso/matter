@@ -24,7 +24,7 @@
 #include "AppEvent.h"
 #include "LightingManager.h"
 
-#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/legacy/FactoryDataProvider.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
