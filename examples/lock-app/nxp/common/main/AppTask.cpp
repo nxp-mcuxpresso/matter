@@ -24,9 +24,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <app/data-model/Nullable.h>
 #include "LockManager.h"
-#include "BLEApplicationManager.h"
+#include <app/data-model/Nullable.h>
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
@@ -102,9 +101,6 @@ exit:
 void LockApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP Lock Demo App");
-
-    /* BLEApplicationManager implemented per platform or left blank */
-    chip::NXP::App::BleAppMgr().Init();
 }
 
 void LockApp::AppTask::PostInitMatterStack()
