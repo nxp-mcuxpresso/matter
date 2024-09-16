@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 struct AppEvent;
 using EventHandler = void (*)(const AppEvent &);
 

@@ -34,10 +34,6 @@ class AppTask : public chip::NXP::App::AppTaskZephyr
 #endif
 {
 public:
-    // AppTaskBase virtual methods
-    bool CheckStateClusterHandler(void) override;
-    CHIP_ERROR ProcessSetStateClusterHandler(void) override;
-
     ~AppTask() override{};
     void PostInitMatterStack(void) override;
     void PreInitMatterStack(void) override;
