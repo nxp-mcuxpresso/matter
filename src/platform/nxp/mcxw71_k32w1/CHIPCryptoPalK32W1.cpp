@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      mbedTLS and S200 based implementation of CHIP crypto primitives
+ *      mbedTLS based implementation of CHIP crypto primitives
  */
 
 #include <crypto/CHIPCryptoPAL.h>
