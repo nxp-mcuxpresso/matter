@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright 2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +21,9 @@
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
-#include <platform/nxp/common/legacy/OTATlvProcessor.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #include PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER
 
 namespace chip {

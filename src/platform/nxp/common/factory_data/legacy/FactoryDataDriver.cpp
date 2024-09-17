@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2024 Project CHIP Authors
- *    Copyright 2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,8 +17,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
-#include <platform/nxp/common/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {

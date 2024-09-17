@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +21,7 @@
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <src/lib/core/CHIPError.h>
 
-#include <platform/nxp/common/legacy/FactoryDataDriver.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
 
 #include <vector>
 
