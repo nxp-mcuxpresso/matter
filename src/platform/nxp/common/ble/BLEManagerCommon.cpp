@@ -139,13 +139,13 @@ CHIP_ERROR BLEManagerCommon::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EventBits_t eventBits;
-    mWriteNotificationHandle[mWriteHandleSize++] = (uint16_t) value_chipoble_rx;
+    uint16_t attChipRxHandle[1] = { (uint16_t) value_chipoble_rx };
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    mReadNotificationHandle[mReadHandleSize++] = (uint16_t) value_chipoble_c3;
+    uint16_t attChipC3Handle[1] = { (uint16_t) value_chipoble_c3 };
 #endif
 
-    mServiceMode = kCHIPoBLE_Enabled;
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Check if BLE stack is initialized
     VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
@@ -196,9 +196,9 @@ CHIP_ERROR BLEManagerCommon::_Init()
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
 #endif
 
-    GattServer_RegisterHandlesForWriteNotifications(mWriteHandleSize, mWriteNotificationHandle);
+    GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    VerifyOrExit(GattServer_RegisterHandlesForReadNotifications(mReadHandleSize, mReadNotificationHandle) == gBleSuccess_c,
+    VerifyOrExit(GattServer_RegisterHandlesForReadNotifications(1, attChipC3Handle) == gBleSuccess_c,
                  err = CHIP_ERROR_INCORRECT_STATE);
 #endif
 
@@ -221,7 +221,7 @@ exit:
 
 uint16_t BLEManagerCommon::_NumConnections(void)
 {
-    return mDeviceIds.size();
+    return static_cast<uint16_t>(mDeviceConnected == true);
 }
 
 bool BLEManagerCommon::_IsAdvertisingEnabled(void)
@@ -238,8 +238,7 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit((mServiceMode == kCHIPoBLE_Enabled) || (mServiceMode == kMultipleBLE_Enabled),
-                 err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
@@ -285,6 +284,10 @@ CHIP_ERROR BLEManagerCommon::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerCommon::_SetDeviceName(const char * deviceName)
 {
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
     if (deviceName != NULL && deviceName[0] != 0)
     {
         if (strlen(deviceName) >= kMaxDeviceNameLength)
@@ -764,7 +767,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Clear(Flags::kRestartAdvertising);
 
-        if (mDeviceIds.size())
+        if (!mDeviceConnected)
         {
             ble_err_t err = blekw_stop_advertising();
             VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
@@ -791,7 +794,7 @@ void BLEManagerCommon::DriveBLEState(void)
     VerifyOrExit(mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Start advertising if needed...
-    if (((mServiceMode == kCHIPoBLE_Enabled) || (mServiceMode == kMultipleBLE_Enabled)) && mFlags.Has(Flags::kAdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
@@ -814,7 +817,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = kCHIPoBLE_Disabled;
+        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
 
@@ -860,9 +863,7 @@ void BLEManagerCommon::DoBleProcessing(void)
         }
         else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
         {
-            if (mServiceMode == kCHIPoBLE_Enabled)
-                blekw_start_connection_timeout();
-
+            blekw_start_connection_timeout();
             ChipLogProgress(DeviceLayer, "BLE MTU size has been changed to %d.", msg->data.u16);
         }
         else if (msg->type == BLE_KW_MSG_ATT_WRITTEN || msg->type == BLE_KW_MSG_ATT_LONG_WRITTEN ||
@@ -896,32 +897,6 @@ void BLEManagerCommon::RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallb
     callbackDelegate.gattCallback = gattCallback;
 }
 
-CHIP_ERROR BLEManagerCommon::AddWriteNotificationHandle(uint16_t name)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // This function should be called before calling  BLEManagerCommon::_Init
-    VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
-
-    mWriteNotificationHandle[mWriteHandleSize++] = name;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR BLEManagerCommon::AddReadNotificationHandle(uint16_t name)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // This function should be called before calling  BLEManagerCommon::_Init
-    VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
-
-    mReadNotificationHandle[mReadHandleSize++] = name;
-
-exit:
-    return err;
-}
-
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
@@ -931,17 +906,10 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     PWR_DisallowDeviceToSleep();
 #endif
 
-    mDeviceIds.insert(deviceId);
+    mDeviceId        = deviceId;
+    mDeviceConnected = true;
 
-    if (mServiceMode == kCHIPoBLE_Enabled)
-        blekw_start_connection_timeout();
-
-    if (mServiceMode == kMultipleBLE_Enabled)
-    {
-        _SetAdvertisingEnabled(false);
-        mServiceMode = kMultipleBLE_Disabled;
-    }
-
+    blekw_start_connection_timeout();
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -954,7 +922,7 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     PWR_AllowDeviceToSleep();
 #endif
 
-    mDeviceIds.erase(deviceId);
+    mDeviceConnected = false;
 
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kCHIPoBLEConnectionClosed;
@@ -978,8 +946,7 @@ void BLEManagerCommon::HandleWriteEvent(blekw_msg_t * msg)
     ChipLogProgress(DeviceLayer, "Attribute write request(device: %d,handle: %d).", att_wr_data->device_id, att_wr_data->handle);
 #endif
 
-    if (mServiceMode == kCHIPoBLE_Enabled)
-        blekw_start_connection_timeout();
+    blekw_start_connection_timeout();
 
     if (value_chipoble_rx == att_wr_data->handle)
     {
@@ -1080,12 +1047,9 @@ void BLEManagerCommon::HandleForceDisconnect()
     ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
 
     /* Set the advertising parameters */
-    for (auto & id : mDeviceIds)
+    if (Gap_Disconnect(mDeviceId) != gBleSuccess_c)
     {
-        if (Gap_Disconnect(id) != gBleSuccess_c)
-        {
-            ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-        }
+        ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
     }
 
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
