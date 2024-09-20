@@ -29,8 +29,6 @@ is_sdk_package = true
 treat_warnings_as_errors = false
 
 chip_crypto = "platform"
-use_hw_aes = true
-use_hw_sha256 = true
 chip_openthread_ftd = true
 chip_with_ot_cli = 0
 chip_enable_matter_cli = true
