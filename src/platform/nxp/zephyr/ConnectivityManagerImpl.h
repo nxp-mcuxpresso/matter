@@ -41,10 +41,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-#include "Ethernet/ConnectivityManagerImplEth.h"
-#endif
-
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -74,9 +70,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-                                      public ConnectivityManagerImplEth,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public ConnectivityManagerImplWiFi
