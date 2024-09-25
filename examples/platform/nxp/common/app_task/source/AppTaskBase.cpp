@@ -57,8 +57,8 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #endif
 
-#if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
-#include "WifiConnect.h"
+#if CONFIG_CHIP_TCP_DOWNLOAD
+#include "TcpDownload.h"
 #endif
 
 #if CONFIG_OPERATIONAL_KEYSTORE
@@ -208,10 +208,6 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_OTA_PROVIDER
     InitOTAServer();
 #endif
-
-#if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
-    WifiConnectAtboot();
-#endif
 }
 
 CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
@@ -339,6 +335,10 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
     }
+#endif
+
+#if CONFIG_CHIP_TCP_DOWNLOAD
+    EnableTcpDownloadComponent();
 #endif
 
 exit:
