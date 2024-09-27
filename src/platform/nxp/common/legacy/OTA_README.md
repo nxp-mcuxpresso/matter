@@ -1,4 +1,4 @@
-# Multi-image OTA
+# K32W OTA
 
 The OTA processing is now delegated to instances of `OTATlvProcessor` derived
 classes. These instances are registered with the `OTAImageProcessorImpl`

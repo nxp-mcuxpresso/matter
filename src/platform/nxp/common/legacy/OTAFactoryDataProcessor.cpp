@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright 2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@
 #include <app/server/Server.h>
 #include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
+#include <platform/nxp/common/legacy/OTAFactoryDataProcessor.h>
 
 namespace chip {
 

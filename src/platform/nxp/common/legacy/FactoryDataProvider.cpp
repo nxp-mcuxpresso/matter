@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright 2024 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,7 +30,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
+#include <platform/nxp/common/legacy/FactoryDataProvider.h>
 
 #include <cctype>
 

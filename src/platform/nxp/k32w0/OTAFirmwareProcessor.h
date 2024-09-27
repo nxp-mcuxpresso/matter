@@ -19,7 +19,7 @@
 #pragma once
 
 #include <lib/support/Span.h>
-#include <platform/nxp/common/ota/OTATlvProcessor.h>
+#include <platform/nxp/common/legacy/OTATlvProcessor.h>
 
 namespace chip {
 
