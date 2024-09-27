@@ -53,8 +53,6 @@ readonly INCLUDE_DIRS=(
     examples/lighting-app/nxp/k32w0
     examples/lighting-app/nxp/k32w1
     examples/lighting-app/nxp/mcxw71
-    examples/lock-app/nxp/k32w1
-    examples/lock-app/nxp/mcxw71
     examples/platform/nxp/common
     examples/platform/nxp/k32w0
     examples/platform/nxp/mcxw71_k32w1
