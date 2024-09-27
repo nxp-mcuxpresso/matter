@@ -21,18 +21,14 @@
 #include "AppConfig.h"
 #include "AppTaskFreeRTOS.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
+
 
 namespace LightSwitchComboApp {
 
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
 {
 public:
-    // AppTaskBase virtual methods
-    bool CheckStateClusterHandler(void) override;
-    CHIP_ERROR ProcessSetStateClusterHandler(void) override;
-
     // AppTaskFreeRTOS virtual methods
     void PreInitMatterStack() override;
 
