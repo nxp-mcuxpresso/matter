@@ -32,20 +32,14 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 
 using namespace ::chip::DeviceLayer;
 
-#if FSL_OSA_MAIN_FUNC_ENABLE
-extern "C" void main_task(void const * argument)
-{
-    chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
-}
-#else
 extern "C" int main(int argc, char * argv[])
 {
-    chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
+    TaskHandle_t taskHandle;
+
+    PlatformMgrImpl().HardwareInit();
     chip::NXP::App::GetAppTask().Start();
     vTaskStartScheduler();
 }
-#endif
 
 #if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
