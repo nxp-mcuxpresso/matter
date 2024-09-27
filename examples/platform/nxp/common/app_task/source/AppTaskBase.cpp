@@ -212,6 +212,10 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     WifiConnectAtboot();
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+    GetAppTask().EnableTbrManagementCluster();
+#endif
 }
 
 CHIP_ERROR chip::NXP::App::AppTaskBase::Init()

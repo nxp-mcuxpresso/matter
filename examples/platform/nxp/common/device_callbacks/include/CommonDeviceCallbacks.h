@@ -43,8 +43,6 @@ public:
 #if CHIP_ENABLE_OPENTHREAD
     virtual void OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
 #endif
-private:
-    bool bIsTbrClusterInit = false;
 };
 
 class DeviceCallbacksDelegate
