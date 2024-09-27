@@ -95,10 +95,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    StartWiFiManagement();
-#endif
-
     SuccessOrExit(err);
 
 exit:
@@ -161,6 +157,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
         NetworkCommissioning::NXPWiFiDriver::GetInstance().ScanWiFINetworkDoneFromMatterTaskContext(
             event->Platform.ScanWiFiNetworkCount);
+    }
+    else if (event->Type == kPlatformNxpStartWlanInitWaitTimerEvent)
+    {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler,
+                                              (void *) event->Platform.pNetworkDataEvent);
     }
 #endif
 }
@@ -609,6 +610,11 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mWiFiStationState != kWiFiStationState_Connecting, ret = CHIP_ERROR_BUSY);
 
+    // Need to enable the WIFI interface here when Thread is enabled as a secondary network interface. We don't want to enable
+    // WIFI from the init phase anymore and we will only do it in case the commissioner is provisioning the device with
+    // the WIFI credentials.
+    StartWiFiManagement();
+
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 
     if (ssidLen < WLAN_NETWORK_NAME_MAX_LENGTH)
@@ -662,10 +668,10 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     }
     else
     {
-        PlatformMgr().LockChipStack();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL),
-                                              ConnectNetworkTimerHandler, context);
-        PlatformMgr().UnlockChipStack();
+        /* Post an event to start a delay timer asynchronously in the Matter task context */
+        event.Type                       = DeviceEventType::kPlatformNxpStartWlanInitWaitTimerEvent;
+        event.Platform.pNetworkDataEvent = (struct wlan_network *) context;
+        (void) PlatformMgr().PostEvent(&event);
     }
 }
 

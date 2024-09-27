@@ -50,6 +50,24 @@ class DeviceConformanceTests(BasicCompositionTests):
         self.xml_device_types, problems = build_xml_device_types()
         self.problems.extend(problems)
 
+    def _get_device_type_id(self, device_type_name: str) -> int:
+        id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+        if len(id) != 1:
+            self.fail_current_test(f"Unable to find {device_type_name} device type")
+        return id[0]
+
+    def _has_device_type_supporting_macl(self):
+        # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
+        # but these are not currently exposed directly by the device.
+        allowed_ids = [self._get_device_type_id('network infrastructure manager')]
+        for endpoint in self.endpoints_tlv.values():
+            desc = Clusters.Descriptor
+            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            if set(allowed_ids).intersection(set(device_types)):
+                # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
+                return True
+        return False
+
     def check_conformance(self, ignore_in_progress: bool, is_ci: bool, allow_provisional: bool):
         problems = []
         success = True
@@ -120,6 +138,13 @@ class DeviceConformanceTests(BasicCompositionTests):
                 for f in feature_masks:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
+                    if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
+                        # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
+                        if not self._has_device_type_supporting_macl():
+                            record_error(
+                                location=location, problem="MACL feature is disallowed if the a supported device type is not present")
+                        continue
+
                     if f not in self.xml_clusters[cluster_id].features.keys():
                         record_error(location=location, problem=f'Unknown feature with mask 0x{f:02x}')
                         continue
@@ -141,7 +166,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
-                            # manufacturer attribute
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
@@ -168,9 +192,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         if command_id not in xml_commands_dict:
                             # TODO: Consolidate range checks with IDM-10.1 once that lands
                             if command_id <= 0xFF:
-                                # manufacturer command
-                                continue
-                            record_error(location=location, problem='Standard command found on device, but not in spec')
+                                record_error(location=location, problem='Standard command found on device, but not in spec')
                             continue
                         xml_command = xml_commands_dict[command_id]
                         conformance_decision_with_choice = xml_command.conformance(feature_map, attribute_list, all_command_list)
