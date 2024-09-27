@@ -21,6 +21,7 @@
 #include "AppConfig.h"
 #include "AppMatterButton.h"
 #include "AppTask.h"
+#include "BLEApplicationManager.h"
 #include "UserInterfaceFeedback.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -186,6 +187,8 @@ void ButtonManager::BleHandler(const AppEvent & event)
 #endif
 
     chip::NXP::App::GetAppTask().SwitchCommissioningStateHandler();
+
+    chip::NXP::App::BleAppMgr().EnableMultipleConnectionsHandler();
 }
 
 void ButtonManager::CancelTimer()
