@@ -31,7 +31,6 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "fwk_file_cache.h"
-#include "fwk_fs_abstraction.h"
 #include "fwk_key_storage.h"
 #include "fwk_lfs_mflash.h"
 
@@ -420,26 +419,26 @@ bool NXPConfig::ConfigValueExists(Key key)
     found       = false;
     readValue_p = NULL;
     outLen      = 0;
-    bufSize     = 0;
+    /* Max number of bytes read when getting a value */
+    bufSize = 256;
 
     if (ValidConfigKey(key))
     {
         /* Get the first occurence */
         status = KS_GetKeyInt(ks_handle_p, (int) key, (char *) NS_INT, readValue_p, bufSize, &outLen);
-        found  = (status != KS_ERROR_KEY_NOT_FOUND);
+        found  = (status == KS_ERROR_NONE && outLen != 0);
     }
     return found;
 }
 
 CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 {
-    /*
-     * When a factory reset is required, shut down the KeyStorage (which
-     * also flushes the FileCache) and then execute a simple format of the
-     * the file system partition.
-     */
-    KS_DeInit(ks_handle_p);
-    FSA_Format();
+    /*for (Key key = kMinConfigKey_ChipConfig; key <= kMaxConfigKey_ChipConfig; key++)
+    {
+        ClearConfigValue(key);
+    }*/
+
+    KS_Reset(ks_handle_p);
 
     DBG_PRINTF("FactoryResetConfig done\r\n");
 
