@@ -124,6 +124,18 @@ void chip::NXP::App::CommonDeviceCallbacks::OnInternetConnectivityChange(const C
         ChipLogProgress(DeviceLayer, "IPv6 Server ready at: [%s]:%d", ip_addr, CHIP_PORT);
 
         chip::app::DnssdServer::Instance().StartServer();
+
+        // This event will signal that the device is connected (both WIFI or ethernet) and then we
+        // can enable the TBR management cluster. This cluster should only be enabled if the device is
+        // not commissioned over Thread. The bIsTbrClusterInit flag is added to only
+        // init the cluster once in case we get disconnected/reconnected to the network.
+#if CHIP_DEVICE_CONFIG_ENABLE_TBR
+        if (!bIsTbrClusterInit)
+        {
+            chip::NXP::App::GetAppTask().EnableTbrManagementCluster();
+            bIsTbrClusterInit = true;
+        }
+#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
