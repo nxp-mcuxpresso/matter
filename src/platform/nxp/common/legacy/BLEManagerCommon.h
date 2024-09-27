@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager singleton object
- *          for NXP platforms.
+ *          for the K32W platforms.
  */
 
 #pragma once
