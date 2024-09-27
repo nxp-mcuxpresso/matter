@@ -73,7 +73,6 @@ public:
     CHIP_ERROR SelectProcessor(ByteSpan & block);
     CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
     Optional<ProviderLocation> & GetBackupProvider() { return mBackupProviderLocation; }
-    void SetRebootDelaySec(uint16_t rebootDelay);
 
     static void FetchNextData(uint32_t context);
     static OTAImageProcessorImpl & GetDefaultInstance();
@@ -110,7 +109,6 @@ private:
     OTADataAccumulator mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
     Optional<ProviderLocation> mBackupProviderLocation;
-    uint16_t mDelayBeforeRebootSec = 0;
 };
 
 } // namespace chip

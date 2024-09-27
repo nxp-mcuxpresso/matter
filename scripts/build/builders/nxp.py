@@ -77,7 +77,6 @@ class NxpApp(Enum):
     ALLCLUSTERS = auto()
     LAUNDRYWASHER = auto()
     THERMOSTAT = auto()
-    LOCK_APP = auto()
 
     def ExampleName(self):
         if self == NxpApp.LIGHTING:
@@ -90,8 +89,6 @@ class NxpApp(Enum):
             return "laundry-washer-app"
         elif self == NxpApp.THERMOSTAT:
             return "thermostat"
-        elif self == NxpApp.LOCK_APP:
-            return "lock-app"
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -106,8 +103,6 @@ class NxpApp(Enum):
             return "laundry-washer-example"
         elif self == NxpApp.THERMOSTAT:
             return "thermostat-example"
-        elif self == NxpApp.LOCK_APP:
-            return "lock-example"
         else:
             raise Exception('Unknown app type: %r' % self)
 

@@ -144,8 +144,10 @@ void ButtonManager::AppActionEventHandler(const AppEvent & event)
 {
     chip::DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
-            auto status = chip::NXP::App::GetAppTask().ProcessSetStateClusterHandler();
-            if (status != CHIP_NO_ERROR)
+            bool val = false;
+            APP_CLUSTER_ATTRIBUTE::Get(APP_DEVICE_TYPE_ENDPOINT, &val);
+            auto status = APP_CLUSTER_ATTRIBUTE::Set(APP_DEVICE_TYPE_ENDPOINT, (bool) !val);
+            if (status != chip::Protocols::InteractionModel::Status::Success)
             {
                 ChipLogProgress(DeviceLayer, "Error when updating cluster attribute");
             }
