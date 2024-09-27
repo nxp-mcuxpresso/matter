@@ -29,7 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/SafePointerCast.h>
 
-#include "PersistentStorageOpKeystoreS200.h"
+#include "K32W1PersistentStorageOpKeystore.h"
 
 #include "sss_crypto.h"
 
@@ -82,7 +82,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-bool PersistentStorageOpKeystoreS200::HasOpKeypairForFabric(FabricIndex fabricIndex) const
+bool K32W1PersistentStorageOpKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) const
 {
     VerifyOrReturnError(mStorage != nullptr, false);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), false);
@@ -102,7 +102,7 @@ bool PersistentStorageOpKeystoreS200::HasOpKeypairForFabric(FabricIndex fabricIn
     return (err == CHIP_NO_ERROR && (keySize == SSS_KEY_PAIR_BLOB_SIZE));
 }
 
-CHIP_ERROR PersistentStorageOpKeystoreS200::NewOpKeypairForFabric(FabricIndex fabricIndex,
+CHIP_ERROR K32W1PersistentStorageOpKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex,
                                                                    MutableByteSpan & outCertificateSigningRequest)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -135,7 +135,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::NewOpKeypairForFabric(FabricIndex fa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PersistentStorageOpKeystoreS200::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
+CHIP_ERROR K32W1PersistentStorageOpKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
                                                                         const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -149,7 +149,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::ActivateOpKeypairForFabric(FabricInd
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR PersistentStorageOpKeystoreS200::CommitOpKeypairForFabric(FabricIndex fabricIndex)
+CHIP_ERROR K32W1PersistentStorageOpKeystore::CommitOpKeypairForFabric(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -168,7 +168,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::CommitOpKeypairForFabric(FabricIndex
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PersistentStorageOpKeystoreS200::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
+CHIP_ERROR K32W1PersistentStorageOpKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -188,7 +188,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::RemoveOpKeypairForFabric(FabricIndex
     return err;
 }
 
-void PersistentStorageOpKeystoreS200::RevertPendingKeypair()
+void K32W1PersistentStorageOpKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(mStorage != nullptr);
 
@@ -196,7 +196,7 @@ void PersistentStorageOpKeystoreS200::RevertPendingKeypair()
     ResetPendingKey();
 }
 
-CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+CHIP_ERROR K32W1PersistentStorageOpKeystore::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                                                Crypto::P256ECDSASignature & outSignature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -239,7 +239,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabric
     return mCachedKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
 }
 
-Crypto::P256Keypair * PersistentStorageOpKeystoreS200::AllocateEphemeralKeypairForCASE()
+Crypto::P256Keypair * K32W1PersistentStorageOpKeystore::AllocateEphemeralKeypairForCASE()
 {
     // DO NOT CUT AND PASTE without considering the ReleaseEphemeralKeypair().
     // If allocating a derived class, then `ReleaseEphemeralKeypair` MUST
@@ -247,7 +247,7 @@ Crypto::P256Keypair * PersistentStorageOpKeystoreS200::AllocateEphemeralKeypairF
     return Platform::New<Crypto::P256Keypair>();
 }
 
-void PersistentStorageOpKeystoreS200::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
+void K32W1PersistentStorageOpKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
     // DO NOT CUT AND PASTE without considering the AllocateEphemeralKeypairForCASE().
     // This must delete the same concrete class as allocated in `AllocateEphemeralKeypairForCASE`
