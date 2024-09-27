@@ -23,23 +23,16 @@ chip_config_dimmable_led = false
 chip_enable_ota_requestor = false
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
-chip_generate_link_map_file = true
-
-chip_system_config_provide_statistics = false
-chip_system_config_use_open_thread_inet_endpoints = true
-chip_with_lwip = false
-
-chip_enable_icd_server = true
-chip_enable_icd_lit = false
-icd_enforce_sit_slow_poll_limit = true
-chip_persist_subscriptions = true
-chip_subscription_timeout_resumption = true
 
 is_debug = true
 is_sdk_package = true
 treat_warnings_as_errors = false
 
 chip_crypto = "platform"
-chip_openthread_ftd = false
+chip_openthread_ftd = true
 chip_with_ot_cli = 0
 chip_enable_matter_cli = true
+
+chip_system_config_provide_statistics = false
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
