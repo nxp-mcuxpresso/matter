@@ -20,7 +20,7 @@
 #include <app/server/Server.h>
 #include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
+#include <platform/nxp/common/legacy/OTAFactoryDataProcessor.h>
 
 namespace chip {
 
