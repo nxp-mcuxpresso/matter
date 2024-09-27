@@ -53,8 +53,6 @@ public:
     CHIP_ERROR ServiceInit(void);
     void CleanReset();
     void StopBLEConnectivity() {}
-    void ScheduleResetInIdle(void);
-    bool GetResetInIdleValue(void);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -70,7 +68,6 @@ private:
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    bool resetInIdle = false;
     static PlatformManagerImpl sInstance;
 
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
