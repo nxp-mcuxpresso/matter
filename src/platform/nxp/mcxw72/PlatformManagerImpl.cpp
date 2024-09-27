@@ -47,9 +47,11 @@
 #include "fwk_platform_ot.h"
 #endif
 
+extern "C" void otPlatSetResetFunction(void (*fp)(void));
+extern "C" void initiateResetInIdle(void);
 extern "C" status_t CRYPTO_InitHardware(void);
-extern "C" void BOARD_InitAppConsole();
 
+extern "C" void BOARD_InitAppConsole();
 extern "C" void vApplicationMallocFailedHook(void)
 {
     ChipLogError(DeviceLayer, "Malloc Failure");
@@ -137,6 +139,9 @@ exit:
 
 void PlatformManagerImpl::SaveSettings(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    //otPlatSaveSettingsIdle();
+#endif
 }
 
 void PlatformManagerImpl::IdleHook(void)
@@ -152,6 +157,10 @@ void PlatformManagerImpl::IdleHook(void)
     }
 
     chip::DeviceLayer::Internal::NXPConfig::RunSystemIdleTask();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    SaveSettings();
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     /* Resume OTA Transactions in Idle task */
@@ -170,6 +179,7 @@ void PlatformManagerImpl::IdleHook(void)
 
 void PlatformManagerImpl::Reset(void)
 {
+    ChipLogProgress(DeviceLayer, "System restarting");
     // Restart the system.
     NVIC_SystemReset();
     while (1)
@@ -185,6 +195,22 @@ void PlatformManagerImpl::ScheduleResetInIdle(void)
 bool PlatformManagerImpl::GetResetInIdleValue(void)
 {
     return resetInIdle;
+}
+
+extern "C" void initiateResetInIdle(void)
+{
+    PlatformMgr().Shutdown();
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" void scheduleResetInIdle(void)
+{
+    PlatformMgrImpl().ScheduleResetInIdle();
+}
+
+extern "C" bool getResetInIdleValue(void)
+{
+    return PlatformMgrImpl().GetResetInIdleValue();
 }
 
 void PlatformManagerImpl::StopBLEConnectivity(void) {}
@@ -219,3 +245,8 @@ void PlatformManagerImpl::_Shutdown()
 
 } // namespace DeviceLayer
 } // namespace chip
+
+extern "C" void mt_wipe(void)
+{
+    chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
+}
