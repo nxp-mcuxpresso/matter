@@ -147,7 +147,7 @@ Optional GN options that can be added when building an application:
 
 -   To enable the
     [secondary network commissioning interface](../../../../../docs/guides/nxp/nxp_otbr_guide.md#using-the-secondary-network-commissioning-interface),
-    the arguments `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=3` must be added to the _gn gen_ command. Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now.
+    the arguments `chip_enable_secondary_nwk_if=true` and `chip_device_config_thread_network_endpoint_id=2` must be added to the _gn gen_ command. Note that this is only supported when building the Matter over Wifi + OpenThread Border Router configuration. Note that is only supported on the on the thermostat application for now.
 -   To enable the
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
