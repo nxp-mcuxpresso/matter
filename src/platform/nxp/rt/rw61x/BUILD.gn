@@ -34,7 +34,7 @@ source_set("nxp_ota") {
 }
 
 config("nxp_platform_config") {
-  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"", "CONFIG_BOOT_REASON_SDK_SUPPORT=1" ]
+  defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/common/ble_zephyr/BLEManagerImpl.h\"" ]
   include_dirs = [
     ".",
     "../../common",
@@ -67,7 +67,6 @@ config("nxp_platform_config") {
     # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
     defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
-
 }
 
 static_library("nxp_platform") {
