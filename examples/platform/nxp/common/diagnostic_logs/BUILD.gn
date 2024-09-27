@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,11 @@
 
 import("//build_overrides/chip.gni")
 
-# SDK target definitions
-nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-nxp_sdk_driver_target = get_label_info(":sdk_driver", "label_no_toolchain")
+source_set("nxp_diagnostic_logs") {
+  sources = [
+    "DiagnosticLogsProviderDelegateImpl.cpp",
+    "DiagnosticLogsProviderDelegateImpl.h",
+  ]
+
+  include_dirs = [ "${chip_root}/src" ]
+}
