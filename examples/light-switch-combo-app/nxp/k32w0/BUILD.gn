@@ -159,6 +159,11 @@ action("binsign") {
   script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
   output_name = "bignsign.log"
   outputs = [ "${root_build_dir}/${output_name}" ]
+
+  args = [
+    "--sdk-root",
+    rebase_path(k32w0_sdk_root),
+  ]
 }
 
 group("default") {
