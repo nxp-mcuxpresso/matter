@@ -25,7 +25,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include "binding-handler.h"
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -39,11 +38,6 @@ void LightSwitchComboApp::DeviceCallbacks::PostAttributeChangeCallback(chip::End
             ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
             return;
         }
-
-        BindingCommandData * data = Platform::New<BindingCommandData>();
-        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
-        data->clusterId           = chip::app::Clusters::OnOff::Id;
-        DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 
 #if CONFIG_ENABLE_FEEDBACK
         FeedbackMgr().RestoreState();
