@@ -121,12 +121,15 @@ static_library("nxp_platform") {
 
   if (chip_enable_openthread) {
     sources += [
+      "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.cpp",
       "../../../OpenThread/GenericThreadBorderRouterDelegate.h",
     ]
+
+    deps += [ "${chip_root}/src/app/common:ids" ]
 
     if (!nxp_build_matter_standalone_lib) {
       deps += [ "${chip_root}/third_party/openthread:openthread" ]
@@ -152,8 +155,8 @@ static_library("nxp_platform") {
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
         ]
-        deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
       }
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
