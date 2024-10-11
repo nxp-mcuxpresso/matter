@@ -14,6 +14,7 @@ please see the [common README](../README.md).
     - [Flashing the host image](#flashing-the-host-image)
   - [Factory data](#factory-data)
   - [OTA](#ota)
+  - [Multiple BLE connections](#multiple-ble-connections)
 
 ## Introduction
 
@@ -204,3 +205,15 @@ data binary.
 
 Please see
 [OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
+
+## Multiple BLE connections
+
+To compile with the Multiple BLE connections support demo example add the gn
+argument `nxp_multiple_ble_connections=true`.
+
+The application will accept multiple BLE connections after commissioning, by
+pressing the BLE advertise button again. Once discovered by a BLE central, a
+custom GATT service will be visible on the device.
+
+The user can change the default behavior by implementing the class defined in
+[BLEApplicationManager.h](../../../platform/nxp/common/app_ble/include/BLEApplicationManager.h)
