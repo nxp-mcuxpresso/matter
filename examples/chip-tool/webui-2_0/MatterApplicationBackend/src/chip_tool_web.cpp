@@ -47,6 +47,7 @@
 
 #include "commands/clusters/ReportCommand.h"
 #include "commands/discover/Commands.h"
+#include "commands/icd/ICDCommand.h"
 #include "commands/group/Commands.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
@@ -107,6 +108,7 @@ int chipToolInit()
 
     initialized = true;
     registerCommandsDiscover(commands, &credIssuerCommands);
+    registerCommandsICD(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);
