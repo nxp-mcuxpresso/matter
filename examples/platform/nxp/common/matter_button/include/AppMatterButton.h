@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +17,29 @@
  *    limitations under the License.
  */
 
-#include "ButtonManager.h"
-#include "ButtonRegistration.h"
+#ifndef _MATTER_BUTTON_H_
+#define _MATTER_BUTTON_H_
 
-#include "ButtonApp.h"
-#include "ButtonBle.h"
+#include <lib/core/CHIPError.h>
 
-#include <lib/support/CodeUtils.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static chip::NXP::App::ButtonApp sAppButton;
-static chip::NXP::App::ButtonBle sBleButton;
+namespace chip {
+namespace NXP {
+namespace App {
+/**
+ * API allowing to register matter buttons
+ */
+CHIP_ERROR AppMatterButton_registerButtons(void);
 
-CHIP_ERROR chip::NXP::App::RegisterButtons(void)
-{
-    ReturnErrorOnFailure(ButtonMgr().Init());
-    ReturnErrorOnFailure(ButtonMgr().RegisterButton(sBleButton));
-    ReturnErrorOnFailure(ButtonMgr().RegisterButton(sAppButton));
+} // namespace App
+} // namespace NXP
+} // namespace chip
 
-    return CHIP_NO_ERROR;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _MATTER_BUTTON_H_ */

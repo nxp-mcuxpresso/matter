@@ -16,18 +16,11 @@
  */
 
 #include "AppRpc.h"
-#include "ButtonApp.h"
-#include "ButtonBle.h"
 #include "ButtonManager.h"
 #include "clock_config.h"
 #include "pin_mux.h"
 
 #include "Rpc.h"
-
-// These instances do not need to be initialized, since the RPC
-// code only simulates the press of a button.
-static chip::NXP::App::ButtonApp sAppButton;
-static chip::NXP::App::ButtonBle sBleButton;
 
 CHIP_ERROR chip::NXP::App::Rpc::Init()
 {
@@ -59,19 +52,19 @@ void chip::NXP::App::Rpc::ButtonHandler(const chip_rpc_ButtonEvent & request)
     {
     case 0:
         message->event = kBUTTON_EventShortPress;
-        ButtonManager::HandleCallbacks(nullptr, message, &sBleButton);
+        ButtonMgr().BleCallback(nullptr, message, nullptr);
         break;
     case 1:
         message->event = kBUTTON_EventLongPress;
-        ButtonManager::HandleCallbacks(nullptr, message, &sBleButton);
+        ButtonMgr().BleCallback(nullptr, message, nullptr);
         break;
     case 2:
         message->event = kBUTTON_EventShortPress;
-        ButtonManager::HandleCallbacks(nullptr, message, &sAppButton);
+        ButtonMgr().AppActionCallback(nullptr, message, nullptr);
         break;
     case 3:
         message->event = kBUTTON_EventLongPress;
-        ButtonManager::HandleCallbacks(nullptr, message, &sAppButton);
+        ButtonMgr().AppActionCallback(nullptr, message, nullptr);
         break;
     default:
         break;

@@ -21,7 +21,7 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include "ButtonRegistration.h"
+#include "AppMatterButton.h"
 
 #include "CHIPDeviceManager.h"
 #include <app/server/Server.h>
@@ -98,10 +98,10 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 #endif
 
     /* Register Matter buttons */
-    err = chip::NXP::App::RegisterButtons();
+    err = AppMatterButton_registerButtons();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error during button registration");
+        ChipLogError(DeviceLayer, "Error during AppMatterButton_registerButtons");
         return err;
     }
     return err;

@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +17,10 @@
  *    limitations under the License.
  */
 
-#include "ButtonDefault.h"
-#include "ButtonManager.h"
-#include "ButtonRegistration.h"
+#include "AppMatterButton.h"
 
-#include <lib/support/CodeUtils.h>
-
-static chip::NXP::App::ButtonDefault sButton;
-
-CHIP_ERROR chip::NXP::App::RegisterButtons()
+CHIP_ERROR chip::NXP::App::AppMatterButton_registerButtons(void)
 {
-    ReturnErrorOnFailure(ButtonMgr().Init());
-    ReturnErrorOnFailure(ButtonMgr().RegisterButton(sButton));
-
+    /* Empty content could be re-defined in a dedicated platform AppMatterButton_registerButtons function */
     return CHIP_NO_ERROR;
 }
