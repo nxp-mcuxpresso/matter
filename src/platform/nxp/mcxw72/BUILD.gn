@@ -49,32 +49,7 @@ source_set("nxp_factory_data") {
   ]
 }
 
-source_set("nxp_ota") {
-  public = [ "../common/ota/OTAImageProcessorImpl.h" ]
-
-  sources = [
-    "../common/ota/OTAImageProcessorImpl.cpp",
-    "../common/ota/OTAImageProcessorImpl.h",
-    "../common/ota/OTATlvProcessor.cpp",
-    "../common/ota/OTATlvProcessor.h",
-    "../common/ota/OTAFirmwareProcessor.cpp",
-    "../common/ota/OTAFirmwareProcessor.h",
-    "../common/ota/OTAHooks.cpp",
-  ]
-
-  if (chip_with_factory_data == 1 &&
-      chip_enable_ota_factory_data_processor == 1) {
-    sources += [
-      "../common/ota/OTAFactoryDataProcessor.cpp",
-      "../common/ota/OTAFactoryDataProcessor.h",
-    ]
-  }
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/platform:platform",
-  ]
-}
+source_set("nxp_ota") {}
 
 config("nxp_platform_config") {
   include_dirs = [
@@ -82,8 +57,7 @@ config("nxp_platform_config") {
     "../common",
     "../common/ble",
     "../common/crypto",
-    "../common/factory_data/legacy",
-    "../common/ota",
+    "../common/factory_data/legacy"
   ]
 
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/${nxp_platform}/BLEManagerImpl.h\"" ]
