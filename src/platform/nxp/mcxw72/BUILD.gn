@@ -28,27 +28,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
 
-source_set("nxp_factory_data") {
-  sources = [
-    "../common/factory_data/legacy/FactoryDataDriver.cpp",
-    "../common/factory_data/legacy/FactoryDataDriverImpl.cpp",
-    "../common/factory_data/legacy/FactoryDataProvider.cpp",
-    "../common/factory_data/legacy/FactoryDataProviderImpl.cpp",
-  ]
-
-  public = [
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/CertificationDeclaration.h",
-  ]
-
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
-
-  deps = [
-    ":nxp_platform",
-    "${chip_root}/src/credentials:credentials",
-  ]
-}
-
+source_set("nxp_factory_data") {}
 source_set("nxp_ota") {}
 
 config("nxp_platform_config") {
@@ -56,8 +36,7 @@ config("nxp_platform_config") {
     ".",
     "../common",
     "../common/ble",
-    "../common/crypto",
-    "../common/factory_data/legacy"
+    "../common/crypto"
   ]
 
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/${nxp_platform}/BLEManagerImpl.h\"" ]
