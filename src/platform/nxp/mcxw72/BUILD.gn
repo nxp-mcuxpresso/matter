@@ -96,7 +96,7 @@ static_library("nxp_platform") {
     "-Wno-sign-compare",
   ]
   deps = []
-  defines = [ "NXP_USE_MML=1" ]
+  defines = []
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
