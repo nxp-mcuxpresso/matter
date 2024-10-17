@@ -105,8 +105,6 @@ mcxw72_executable("light_app") {
   defines += [
     "CONFIG_NET_L2_OPENTHREAD=1",
     "CONFIG_NETWORK_LAYER_BLE=1",
-    "CONFIG_ENABLE_FEEDBACK=1",
-    "LED_MANAGER_ENABLE_STATUS_LED=1",
     "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
   ]
@@ -114,7 +112,6 @@ mcxw72_executable("light_app") {
   # App common files
   include_dirs += [
     "${common_example_dir}/app_task/include",
-    "${common_example_dir}/app_ble/include",
     "${common_example_dir}/matter_button/include",
     "${common_example_dir}/clusters/include",
     "${common_example_dir}/device_callbacks/include",
@@ -130,12 +127,7 @@ mcxw72_executable("light_app") {
   sources += [
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
-    "${common_example_dir}/app_ble/source/BLEApplicationManagerEmpty.cpp",
-    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
-    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
-    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
-    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
-    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
     "${common_example_dir}/clusters/source/ZclCallbacks.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
@@ -172,19 +164,10 @@ mcxw72_executable("light_app") {
     "../common/main.cpp",
   ]
 
-  sources += [
-    "${common_example_dir}/ui_feedback/source/LedManager.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/clusters/Identify.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/util/LedOnOff.cpp",
-  ]
-
   include_dirs += [
     "../common",
     "../common/include",
     "include/config",
-    "${common_example_dir}/../mcxw71_k32w1/util",
-    "${common_example_dir}/../mcxw71_k32w1/app/support",
-    "${common_example_dir}/../mcxw71_k32w1/button",
   ]
 
   deps += [

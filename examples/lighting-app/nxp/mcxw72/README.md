@@ -53,30 +53,6 @@ The pin configuration is the following:
 -  `J3 pin 34` (UART1 RX)
 -  `J18 pin 4` (GND)
 
-The state feedback is also provided through LED effects:
-
-| widget  | effect                              | description                                                                                           |
-| ------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| LED2    | short flash on (50ms on/950ms off)  | The device is in an unprovisioned (unpaired) state and is waiting for a commissioner to connect.      |
-| LED2    | rapid even flashing (100ms period)  | The device is in an unprovisioned state and a commissioner is connected via BLE.                      |
-| LED2    | short flash off (950ms on/50ms off) | The device is fully provisioned, but does not yet have full network (Thread) or service connectivity. |
-| LED2    | solid on                            | The device is fully provisioned and has full network and service connectivity.                        |
-| RGB LED | on                                  | The `OnOff` attribute of the `On/Off` cluster is `true` (simulating device turned on).                |
-| RGB LED | off                                 | The `OnOff` attribute of the `On/Off` cluster is `false` (simulating device turned off).              |
-
-The user actions are summarized below:
-
-| button | action      | output                                                                                                                                 |
-| ------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| SW2    | short press | Enable BLE advertising                                                                                                                 |
-| SW2    | long press  | Initiate a factory reset (can be cancelled by pressing the button again within the factory reset timeout limit - 6 seconds by default) |
-| SW3    | short press | Toggle attribute `OnOff` value                                                                                                         |
-| SW3    | long press  | Clean soft reset of the device (takes into account proper Matter shutdown procedure)                                                   |
-
-The example application provides a simple UI that depicts the state of the
-device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in the MCXW72 EVK board.
-
 ## Building
 
 Manually building requires running the following commands:

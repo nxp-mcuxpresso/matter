@@ -108,8 +108,6 @@ mcxw72_executable("lock_app") {
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_APP_FREERTOS_OS=1",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
-    "CONFIG_ENABLE_FEEDBACK=1",
-    "LED_MANAGER_ENABLE_STATUS_LED=1",
   ]
 
   if (chip_with_diag_logs_demo) {
@@ -136,11 +134,7 @@ mcxw72_executable("lock_app") {
   sources += [
     "${common_example_dir}/app_task/source/AppTaskBase.cpp",
     "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
-    "${common_example_dir}/matter_button/source/ButtonApp.cpp",
-    "${common_example_dir}/matter_button/source/ButtonBle.cpp",
-    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
-    "${common_example_dir}/matter_button/source/ButtonRegistrationAppAndBle.cpp",
-    "${common_example_dir}/matter_button/source/ButtonWithTimer.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
@@ -196,9 +190,6 @@ mcxw72_executable("lock_app") {
     "../common/main",
     "../common/main/include",
     "${chip_root}/examples/lock-app/lock-common/include",
-    "${common_example_dir}/../mcxw71_k32w1/util",
-    "${common_example_dir}/../mcxw71_k32w1/app/support",
-    "${common_example_dir}/../mcxw71_k32w1/button",
   ]
 
   sources += [
@@ -208,12 +199,6 @@ mcxw72_executable("lock_app") {
     "../common/main/DeviceCallbacks.cpp",
     "../common/main/ZclCallbacks.cpp",
     "../common/main/main.cpp",
-  ]
-
-  sources += [
-    "${common_example_dir}/ui_feedback/source/LedManager.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/clusters/Identify.cpp",
-    "${common_example_dir}/../mcxw71_k32w1/util/LedOnOff.cpp",
   ]
 
   deps += [

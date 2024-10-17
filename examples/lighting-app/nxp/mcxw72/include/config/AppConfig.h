@@ -27,3 +27,11 @@
 /* ---- LED Manager Config ---- */
 #define LED_MANAGER_STATUS_LED_INDEX 0
 #define LED_MANAGER_LIGHT_LED_INDEX 1
+
+/*
+ * The status LED and the external flash CS pin are wired together.
+ * The OTA image writing may fail if used together.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#define LED_MANAGER_ENABLE_STATUS_LED 1
+#endif
