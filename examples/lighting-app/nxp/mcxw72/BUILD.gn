@@ -135,23 +135,22 @@ mcxw72_executable("light_app") {
   ]
 
   if (chip_enable_ota_requestor) {
-    defines += [
-      "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\""
-    ]
-    include_dirs += [
-      "${common_example_dir}/ota_requestor/include"
-    ]
-    sources += [
-      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp",
-      "${common_example_dir}/../mcxw71_k32w1/ota/OtaUtils.cpp"
-    ]
-    deps += [ "${chip_root}/src/platform/nxp:nxp_ota" ]
+    defines += [ "CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER=\"platform/nxp/common/ota/OTAImageProcessorImpl.h\"" ]
+
+    include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
+    sources += [ "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp" ]
   }
 
   # Platform specific files
   if (chip_crypto == "platform") {
     defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
     sources += [ "${common_example_dir}/operational_keystore/source/OperationalKeystoreS200.cpp" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "${common_example_dir}/../mcxw71_k32w1/ota/OtaUtils.cpp"
+    ]
   }
 
   if (chip_with_factory_data == 1) {

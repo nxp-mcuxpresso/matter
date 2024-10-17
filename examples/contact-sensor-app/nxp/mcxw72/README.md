@@ -13,7 +13,6 @@ please see the [common README](../README.md).
     - [Flashing the `NBU` image with `JLink`](#flashing-the-nbu-image-with-jlink)
     - [Flashing the host image](#flashing-the-host-image)
   - [Factory data](#factory-data)
-  - [OTA](#ota)
 
 ## Introduction
 
@@ -179,8 +178,3 @@ blhost --port <serial_port> write-memory 0x2002680 <factory_data_bin>
 where `<serial_port>` is the OS assigned port, `<factory_data_len>` the length
 of factory data binary in bytes and `<factory_data_bin>` the path to the factory
 data binary.
-
-## OTA
-
-Please see
-[OTA guide](../../../../docs/guides/nxp/nxp_mcxw71_ota_guide.md).
