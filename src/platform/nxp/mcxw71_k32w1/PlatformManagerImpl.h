@@ -51,7 +51,7 @@ public:
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
     void HardwareInit(void);
     CHIP_ERROR ServiceInit(void);
-    void Reset();
+    void CleanReset();
     void StopBLEConnectivity() {}
     void ScheduleResetInIdle(void);
     bool GetResetInIdleValue(void);

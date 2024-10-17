@@ -48,6 +48,7 @@
 
 #include <mbedtls/platform.h>
 
+extern "C" void HAL_ResetMCU(void);
 extern "C" void freertos_mbedtls_mutex_init(void);
 
 extern uint8_t __data_end__[], m_data0_end[];
@@ -92,16 +93,14 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     return CHIP_NO_ERROR;
 }
 
-void PlatformManagerImpl::Reset()
+void PlatformManagerImpl::CleanReset()
 {
+    StopEventLoopTask();
+    Shutdown();
 #if (CHIP_PLAT_NVM_SUPPORT == 1)
     NvCompletePendingOperations();
 #endif
-    // Restart the system.
-    NVIC_SystemReset();
-    while (1)
-    {
-    }
+    HAL_ResetMCU();
 }
 
 void PlatformManagerImpl::ScheduleResetInIdle(void)
@@ -201,10 +200,6 @@ void PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    /* Handle the server shutting down & emit the ShutDown event */
-    /* Make sure to call this function from Matter Task */
-    PlatformMgr().HandleServerShuttingDown();
-    /* Shutdown all layers */
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
