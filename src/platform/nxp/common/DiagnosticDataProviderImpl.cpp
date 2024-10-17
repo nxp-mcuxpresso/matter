@@ -26,7 +26,6 @@
 
 #include "DiagnosticDataProviderImpl.h"
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #include <inet/InetInterface.h>
