@@ -105,8 +105,7 @@ mcxw72_executable("light_app") {
   defines += [
     "CONFIG_NET_L2_OPENTHREAD=1",
     "CONFIG_NETWORK_LAYER_BLE=1",
-    "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+    "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)"
   ]
 
   # App common files
@@ -151,10 +150,6 @@ mcxw72_executable("light_app") {
     sources += [
       "${common_example_dir}/../mcxw71_k32w1/ota/OtaUtils.cpp"
     ]
-  }
-
-  if (chip_with_factory_data == 1) {
-    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
   sources += [

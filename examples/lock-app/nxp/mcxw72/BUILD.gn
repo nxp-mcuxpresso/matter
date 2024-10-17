@@ -107,7 +107,6 @@ mcxw72_executable("lock_app") {
     "CONFIG_NETWORK_LAYER_BLE=1",
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_APP_FREERTOS_OS=1",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
   ]
 
   if (chip_with_diag_logs_demo) {
@@ -178,10 +177,6 @@ mcxw72_executable("lock_app") {
     sources += [
       "${common_example_dir}/../mcxw71_k32w1/ota/OtaUtils.cpp"
     ]
-  }
-
-  if (chip_with_factory_data == 1) {
-    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
   include_dirs += [

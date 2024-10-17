@@ -106,8 +106,7 @@ mcxw72_executable("contact_sensor_app") {
     "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
     "CONFIG_NET_L2_OPENTHREAD=1",
     "CONFIG_NETWORK_LAYER_BLE=1",
-    "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
-    "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+    "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice"
   ]
 
   if (chip_with_diag_logs_demo) {
@@ -151,10 +150,6 @@ mcxw72_executable("contact_sensor_app") {
       "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
       "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsProviderDelegateImpl.cpp",
     ]
-  }
-
-  if (chip_with_factory_data == 1) {
-    deps += [ "${chip_root}/src/platform/nxp:nxp_factory_data" ]
   }
 
   # Platform specific files

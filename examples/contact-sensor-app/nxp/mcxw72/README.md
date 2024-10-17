@@ -12,7 +12,6 @@ please see the [common README](../README.md).
     - [Flashing the `NBU` image with `blhost`](#flashing-the-nbu-image-with-blhost)
     - [Flashing the `NBU` image with `JLink`](#flashing-the-nbu-image-with-jlink)
     - [Flashing the host image](#flashing-the-host-image)
-  - [Factory data](#factory-data)
 
 ## Introduction
 
@@ -164,17 +163,3 @@ Steps:
     go
     quit
     ```
-
-## Factory data
-
-Factory data is written in `IFR0, sector 1` at a predefined offset,
-using `blhost`. The expanded address is `0x2002680`:
-
-```
-blhost --port <serial_port> flash-erase-region 0x2002680 <factory_data_len>
-blhost --port <serial_port> write-memory 0x2002680 <factory_data_bin>
-```
-
-where `<serial_port>` is the OS assigned port, `<factory_data_len>` the length
-of factory data binary in bytes and `<factory_data_bin>` the path to the factory
-data binary.
