@@ -145,7 +145,6 @@ static_library("nxp_platform") {
           "../../common/DnssdImpl.cpp",
           "../../common/DnssdImplBr.cpp",
           "../../common/DnssdImplBr.h",
-          "../../../OpenThread/DnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.cpp",
           "../../../OpenThread/OpenThreadDnssdImpl.h",
         ]
