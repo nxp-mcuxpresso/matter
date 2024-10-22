@@ -18,8 +18,6 @@
 #include <access/SubjectDescriptor.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/MessageDef/InvokeRequestMessage.h>
-#include <app/MessageDef/InvokeResponseMessage.h>
 
 namespace chip {
 
@@ -57,7 +55,7 @@ public:
     ///
     /// Returning an error here will prevent the command to be dispatched further
     virtual CHIP_ERROR PreCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
-                                          const chip::Access::SubjectDescriptor & subjectDescriptor, chip::app::CommandDataIB::Parser & aCommandElement)
+                                          const chip::Access::SubjectDescriptor & subjectDescriptor)
     {
         return CHIP_NO_ERROR;
     }
@@ -69,7 +67,7 @@ public:
     /// in the case of batch invoke, where a single `InvokeRequestMessage` may contain several
     /// CommandDataIB entries).
     virtual void PostCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
-                                     const chip::Access::SubjectDescriptor & subjectDescriptor, chip::app::CommandDataIB::Parser & aCommandElement)
+                                     const chip::Access::SubjectDescriptor & subjectDescriptor)
     {}
 
     static DataModelCallbacks * GetInstance();
