@@ -211,42 +211,43 @@ void m2z_schedule_request_close_network()
 
 void m2z_request_bdb_start_commissioning(zb_bufid_t param)
 {
-  WCS_TRACE_DBGREL(">> %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG(">> %s param: %d", __FUNCTION__, param);
 
   bdb_start_top_level_commissioning(ZB_BDB_NETWORK_STEERING);
 
-  WCS_TRACE_DBGREL("<< %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG("<< %s param: %d", __FUNCTION__, param);
 }
 
 void m2z_request_open_network(zb_bufid_t param)
 {
   zb_nlme_permit_joining_request_t *req;
 
-  WCS_TRACE_DBGREL(">> %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG(">> %s param: %d", __FUNCTION__, param);
 
   req = zb_buf_initial_alloc(param, sizeof(zb_nlme_permit_joining_request_t));
   req->permit_duration = 180;
   zb_nlme_permit_joining_request(param);
 
-  WCS_TRACE_DBGREL("<< %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG("<< %s param: %d", __FUNCTION__, param);
 }
 
 void m2z_request_close_network(zb_bufid_t param)
 {
   zb_nlme_permit_joining_request_t *req;
 
-  WCS_TRACE_DBGREL(">> %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG(">> %s param: %d", __FUNCTION__, param);
 
   req = zb_buf_initial_alloc(param, sizeof(zb_nlme_permit_joining_request_t));
   req->permit_duration = 0;
   zb_nlme_permit_joining_request(param);
 
-  WCS_TRACE_DBGREL("<< %s param: %d", __FUNCTION__, param);
+  WCS_TRACE_DEBUG("<< %s param: %d", __FUNCTION__, param);
 }
+
 
 void m2z_impl_init()
 {
-/* Global device context initialization */
+    /* Global device context initialization */
     ZB_MEMSET(&g_device_ctx, 0, sizeof(g_device_ctx));
 
     /* Trace enable */
@@ -291,10 +292,10 @@ void m2z_impl_init()
 
 void * m2z_impl_ZigbeeRcpMonitor(void * context)
 {
-    WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : BridgeDevMgr::ZigbeeRcpMonitor is running !!!\n");
+    WCS_TRACE_DEBUG(" ---> matter-zigbee-bridge : BridgeDevMgr::ZigbeeRcpMonitor is running !!!\n");
     if (zboss_start_no_autostart() != RET_OK)
     {
-        WCS_TRACE_DBGREL("zboss_start failed");
+        WCS_TRACE_DEBUG("zboss_start failed");
     }
     else
     {
@@ -309,7 +310,7 @@ int m2z_impl_start_threads()
     int res = pthread_create(&ZigbeeRcpMonitor_thread, NULL, m2z_impl_ZigbeeRcpMonitor, NULL);
     if (res)
     {
-        WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : Error creating polling thread: %d\n", res);
+        WCS_TRACE_DEBUG(" ---> matter-zigbee-bridge : Error creating polling thread: %d\n", res);
         return -1;
     }
 
@@ -331,7 +332,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
     zb_uint16_t dst_addr = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr;
     zb_uint8_t dst_ep = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint;
 
-    WCS_TRACE_DBGREL(">>  %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG(">>  %s ", __FUNCTION__);
 
     ///* Uncomment to use destination address and destination endpoint of the incoming ZCL packet. */
     ///* g_dst_addr = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr; */
@@ -339,7 +340,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
 
     if( cmd_info -> cmd_direction == ZB_ZCL_FRAME_DIRECTION_TO_SRV )
     {
-        WCS_TRACE_DBGREL("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_SRV from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %d:(%s)"
+        WCS_TRACE_DEBUG("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_SRV from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %d:(%s)"
             , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->cmd_id));
         switch( cmd_info->cmd_id)
         {
@@ -375,13 +376,13 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
             break;
 
             default:
-                WCS_TRACE_DBGREL("ZB_ZCL_FRAME_DIRECTION_TO_SRV: Skip general command %hd", cmd_info->cmd_id);
+                WCS_TRACE_DEBUG("ZB_ZCL_FRAME_DIRECTION_TO_SRV: Skip general command %hd", cmd_info->cmd_id);
             break;
             }
     }
     else if (cmd_info->cmd_direction == ZB_ZCL_FRAME_DIRECTION_TO_CLI)
     {
-        WCS_TRACE_DBGREL("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_CLI from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %hd:(%s)"
+        WCS_TRACE_DEBUG("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_CLI from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %hd:(%s)"
             , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->cmd_id));
         switch( cmd_info->cmd_id)
         {
@@ -399,7 +400,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                   {
                       zb_uint8_t attr_size = zb_zcl_get_attribute_size(read_attr_resp->attr_type, &(read_attr_resp->attr_value[0]));
                       zb_uint8_t attr_array[32];
-                      WCS_TRACE_DBGREL("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: %d attr_type: 0x%04x attr_size: %d attr_value[0]: 0x%x"
+                      WCS_TRACE_DEBUG("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: %d attr_type: 0x%04x attr_size: %d attr_value[0]: 0x%x"
                         , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), read_attr_resp->attr_id, read_attr_resp->status, read_attr_resp->attr_type, attr_size, read_attr_resp->attr_value[0]);
                       dev_idx = m2z_dev_get_index_by_short_addr(dst_addr);
                       ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(dst_addr, dst_ep);
@@ -415,7 +416,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                 }
                 else
                 {
-                  WCS_TRACE_DBGREL("ERROR, No info on attribute(s) read");
+                  WCS_TRACE_DEBUG("ERROR, No info on attribute(s) read");
                 }
                 
                 if(g_device_ctx.devices[dev_idx].dev_state == ANNOUNCE_COMPLETED)
@@ -437,7 +438,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                                 if(attribute->attr_state == REQUESTED_VALUE_READ_ATTR)
                                 {
                                     read_attrs_done=0;
-                                    //WCS_TRACE_DBGREL("%s: Endpoint: %d Cluster: %d attr_id: %d attr_state: %d", __FUNCTION__, ep_idx, cluster_idx, attr_idx, attribute->attr_state);
+                                    //WCS_TRACE_DEBUG("%s: Endpoint: %d Cluster: %d attr_id: %d attr_state: %d", __FUNCTION__, ep_idx, cluster_idx, attr_idx, attribute->attr_state);
                                     break;
                                 }
                             }
@@ -468,7 +469,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                 TRACE_MSG(TRACE_APP3, "write_attr_resp %p", (FMT__P, write_attr_resp));
                 if (write_attr_resp)
                 {
-                    WCS_TRACE_DBGREL("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: 0x%x "
+                    WCS_TRACE_DEBUG("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: 0x%x "
                     , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), write_attr_resp->attr_id, write_attr_resp->status);
                     dev_idx = m2z_dev_get_index_by_short_addr(dst_addr);
                     ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(dst_addr, dst_ep);
@@ -479,13 +480,13 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
 
                     if (ZB_ZCL_STATUS_SUCCESS != write_attr_resp->status)
                     {
-                        WCS_TRACE_DBGREL("%s: -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) attr_id: 0x%04x status: 0x%x -> IMPOSSIBLE TO BE WRITTEN !!!"
+                        WCS_TRACE_DEBUG("%s: -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) attr_id: 0x%04x status: 0x%x -> IMPOSSIBLE TO BE WRITTEN !!!"
                             , __FUNCTION__, dev_idx, ep_idx, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), write_attr_resp->attr_id, write_attr_resp->status);
                     }
                 }
                 else
                 {
-                  WCS_TRACE_DBGREL("ERROR, No info on attribute(s) write");
+                  WCS_TRACE_DEBUG("ERROR, No info on attribute(s) write");
                 }
 
             case ZB_ZCL_CMD_WRITE_ATTRIB_NO_RESP:
@@ -508,7 +509,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                 cluster_idx = m2z_dev_get_cluster_idx_by_short_addr_and_ep_id_and_cluster_id(dst_addr, dst_ep, cmd_info->cluster_id);
                 g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].pending_command = false;
 
-                WCS_TRACE_DBGREL("%s: Got %s -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) command_id 0x%x status: 0x%x"
+                WCS_TRACE_DEBUG("%s: Got %s -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) command_id 0x%x status: 0x%x"
                     , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), dev_idx, ep_idx, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), default_resp->command_id, default_resp->status);
                 
             break;
@@ -527,18 +528,18 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                     cluster_idx = m2z_dev_get_cluster_idx_by_short_addr_and_ep_id_and_cluster_id(dst_addr, dst_ep, cmd_info->cluster_id);
                     g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].pending_command = false;
 
-                    WCS_TRACE_DBGREL("%s: Got CLUSTER-SPECIFIC Command Response -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) command_id 0x%x"
+                    WCS_TRACE_DEBUG("%s: Got CLUSTER-SPECIFIC Command Response -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) command_id 0x%x"
                         , __FUNCTION__, dev_idx, ep_idx, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id);
                 }
                 else
                 {
-                    WCS_TRACE_DBGREL("ZB_ZCL_FRAME_DIRECTION_TO_CLI: Skip general command %hd", cmd_info->cmd_id);
+                    WCS_TRACE_DEBUG("ZB_ZCL_FRAME_DIRECTION_TO_CLI: Skip general command %hd", cmd_info->cmd_id);
                 }
             break;
             }
     }
 
-    WCS_TRACE_DBGREL("< zcl_specific_cluster_cmd_handler");
+    WCS_TRACE_DEBUG("< zcl_specific_cluster_cmd_handler");
     return cmd_processed;
 }
 
@@ -551,7 +552,7 @@ void zboss_signal_handler(zb_uint8_t param)
     zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
   if (status == 0)
   {
-    WCS_TRACE_DBGREL(">> %s param %hd ", __FUNCTION__, param);
+    WCS_TRACE_DEBUG(">> %s param %hd ", __FUNCTION__, param);
     switch(sig)
     {
 #ifdef DEBUG
@@ -563,7 +564,7 @@ void zboss_signal_handler(zb_uint8_t param)
       break;
 #endif
       case ZB_ZDO_SIGNAL_SKIP_STARTUP:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_SKIP_STARTUP", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_SKIP_STARTUP", __FUNCTION__, sig);
 #ifndef ZB_MACSPLIT_HOST
         zboss_start_continue();
 #endif /* ZB_MACSPLIT_HOST */
@@ -571,36 +572,36 @@ void zboss_signal_handler(zb_uint8_t param)
 
 #ifdef ZB_MACSPLIT_HOST
       case ZB_MACSPLIT_DEVICE_BOOT:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_MACSPLIT_DEVICE_BOOT", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_MACSPLIT_DEVICE_BOOT", __FUNCTION__, sig);
           zb_zdo_signal_macsplit_dev_boot_params_t *boot_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_macsplit_dev_boot_params_t);
-          WCS_TRACE_DBGREL("%s: ZB_MACSPLIT_DEVICE_BOOT dev version %d", __FUNCTION__, boot_params->dev_version);
+          WCS_TRACE_DEBUG("%s: ZB_MACSPLIT_DEVICE_BOOT dev version %d", __FUNCTION__, boot_params->dev_version);
         break;
 #endif /* ZB_MACSPLIT_HOST */
 
       case ZB_ZDO_SIGNAL_DEFAULT_START:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_DEFAULT_START", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_DEFAULT_START", __FUNCTION__, sig);
       case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_BDB_SIGNAL_DEVICE_FIRST_START", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_BDB_SIGNAL_DEVICE_FIRST_START", __FUNCTION__, sig);
       case ZB_BDB_SIGNAL_DEVICE_REBOOT:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_BDB_SIGNAL_DEVICE_REBOOT", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_BDB_SIGNAL_DEVICE_REBOOT", __FUNCTION__, sig);
         break;
 
       case ZB_BDB_SIGNAL_STEERING:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_BDB_SIGNAL_STEERING: Successful steering", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_BDB_SIGNAL_STEERING: Successful steering", __FUNCTION__, sig);
         break;
 
       case ZB_BDB_SIGNAL_FORMATION:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_BDB_SIGNAL_FORMATION: Successful formation", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_BDB_SIGNAL_FORMATION: Successful formation", __FUNCTION__, sig);
         break;
 
       case ZB_TCSWAP_DB_BACKUP_REQUIRED_SIGNAL:
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_TCSWAP_DB_BACKUP_REQUIRED_SIGNAL", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_TCSWAP_DB_BACKUP_REQUIRED_SIGNAL", __FUNCTION__, sig);
         break;
 
       case ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS:
       {
         zb_uint8_t *permit_duration = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_uint8_t);
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS: Duration: %hd", __FUNCTION__, sig, (*permit_duration));
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS: Duration: %hd", __FUNCTION__, sig, (*permit_duration));
         WCS_TRACE_NOTICE("Permit Join Received. Duration: %hd", (*permit_duration));
         //zb_uint8_t *permit_duration = ZB_ZDO_SIGNAL_GET_PARAMS((zb_zdo_app_signal_hdr_t *)p_sg_p, zb_uint8_t);
         //WCS_TRACE_NOTICE("NWK PERMIT_JOIN_STATUS, duration: %d",  *permit_duration);
@@ -610,7 +611,7 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_leave_ind] */
       case ZB_ZDO_SIGNAL_LEAVE_INDICATION:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_LEAVE_INDICATION", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_LEAVE_INDICATION", __FUNCTION__, sig);
         zb_zdo_signal_leave_indication_params_t *leave_ind_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_leave_indication_params_t);
         if (!leave_ind_params->rejoin)
         {
@@ -621,7 +622,7 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_device_annce] */
       case ZB_ZDO_SIGNAL_DEVICE_ANNCE:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_ANNCE", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_ANNCE", __FUNCTION__, sig);
         zb_zdo_signal_device_annce_params_t *dev_annce_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_device_annce_params_t);
         m2z_callback_dev_annce(dev_annce_params);
       }
@@ -629,7 +630,7 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_device_authorized] */
       case ZB_ZDO_SIGNAL_DEVICE_AUTHORIZED:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_AUTHORIZED", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_AUTHORIZED", __FUNCTION__, sig);
         zb_zdo_signal_device_authorized_params_t *dev_authorized_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_device_authorized_params_t);
         m2z_callback_dev_authorized(dev_authorized_params);
       }
@@ -637,7 +638,7 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_device_associated] */
       case ZB_NWK_SIGNAL_DEVICE_ASSOCIATED:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_NWK_SIGNAL_DEVICE_ASSOCIATED", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_NWK_SIGNAL_DEVICE_ASSOCIATED", __FUNCTION__, sig);
         zb_nwk_signal_device_associated_params_t *dev_associated_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_nwk_signal_device_associated_params_t);
         m2z_callback_dev_associated(dev_associated_params);
       }
@@ -645,7 +646,7 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_device_update] */
       case ZB_ZDO_SIGNAL_DEVICE_UPDATE:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_UPDATE", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_ZDO_SIGNAL_DEVICE_UPDATE", __FUNCTION__, sig);
         zb_zdo_signal_device_update_params_t *dev_update_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_device_update_params_t);
         m2z_callback_dev_updated(dev_update_params);
       }
@@ -653,30 +654,30 @@ void zboss_signal_handler(zb_uint8_t param)
 /* [signal_device_update] */
       case ZB_NLME_STATUS_INDICATION:
       {
-        WCS_TRACE_DBGREL("%s: signal %02u -> ZB_NLME_STATUS_INDICATION", __FUNCTION__, sig);
+        WCS_TRACE_DEBUG("%s: signal %02u -> ZB_NLME_STATUS_INDICATION", __FUNCTION__, sig);
         zb_zdo_signal_nlme_status_indication_params_t *dev_status_indication_params = ZB_ZDO_SIGNAL_GET_PARAMS(p_sg_p, zb_zdo_signal_nlme_status_indication_params_t);
         //m2z_dev_status_indication_cb(dev_status_indication_params);
       }
       break;
 /* [not implemented] */
       default:
-        WCS_TRACE_DBGREL("Not Implemented signal: %02u", sig);
+        WCS_TRACE_DEBUG("Not Implemented signal: %02u", sig);
     }
   }
   else if (sig == ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY)
   {
-    WCS_TRACE_DBGREL("Production config is not present or invalid");
+    WCS_TRACE_DEBUG("Production config is not present or invalid");
   }
   else
   {
-    WCS_TRACE_DBGREL("Device started FAILED status %d", ZB_GET_APP_SIGNAL_STATUS(param));
+    WCS_TRACE_DEBUG("Device started FAILED status %d", ZB_GET_APP_SIGNAL_STATUS(param));
   }
 
   if (param)
   {
     zb_buf_free(param);
   }
-  WCS_TRACE_DBGREL("<< %s param %hd ", __FUNCTION__, param);
+  WCS_TRACE_DEBUG("<< %s param %hd ", __FUNCTION__, param);
 }
 
 void m2z_remove_device(zb_uint8_t idx)
@@ -706,7 +707,7 @@ void m2z_request_active_ep_leave(zb_bufid_t param, zb_uint16_t short_addr, zb_bo
     }
     else
     {
-      WCS_TRACE_DBGREL("tried to remove 0x%xd, but device is already left", short_addr);
+      WCS_TRACE_DEBUG("tried to remove 0x%xd, but device is already left", short_addr);
       zb_buf_free(buf);
     }
   }
@@ -715,7 +716,7 @@ void m2z_request_active_ep_leave(zb_bufid_t param, zb_uint16_t short_addr, zb_bo
 
 void m2z_leave_and_rejoin_device(zb_uint8_t param, zb_uint16_t short_addr)
 {
-  WCS_TRACE_DBGREL(">> %s param %hd short_addr %d",__FUNCTION__, param, short_addr);
+  WCS_TRACE_DEBUG(">> %s param %hd short_addr %d",__FUNCTION__, param, short_addr);
 
   if (!param)
   {
@@ -726,13 +727,13 @@ void m2z_leave_and_rejoin_device(zb_uint8_t param, zb_uint16_t short_addr)
     m2z_request_active_ep_leave(param, short_addr, ZB_TRUE);
   }
 
-  WCS_TRACE_DBGREL("<< %s",__FUNCTION__);
+  WCS_TRACE_DEBUG("<< %s",__FUNCTION__);
 }
 
 
 void m2z_remove_and_rejoin_device_delayed(zb_uint8_t idx)
 {
-  WCS_TRACE_DBGREL("%s: short_addr 0x%x",__FUNCTION__,  g_device_ctx.devices[idx].short_addr);
+  WCS_TRACE_DEBUG("%s: short_addr 0x%x",__FUNCTION__,  g_device_ctx.devices[idx].short_addr);
 
   zb_buf_get_out_delayed_ext(m2z_leave_and_rejoin_device, g_device_ctx.devices[idx].short_addr, 0);
   m2z_remove_device(idx);
@@ -741,15 +742,15 @@ void m2z_remove_and_rejoin_device_delayed(zb_uint8_t idx)
 /* Callback which will be called on Device Associated packet. */
 void m2z_callback_dev_associated(zb_nwk_signal_device_associated_params_t *dev_associated_params)
 {
-    WCS_TRACE_DBGREL(">> %s ", __FUNCTION__);
-    WCS_TRACE_DBGREL("<<  %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG(">> %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("<<  %s ", __FUNCTION__);
 }
 
 /* Callback which will be called on Device Updated packet. */
 void m2z_callback_dev_updated(zb_zdo_signal_device_update_params_t *dev_updated_params)
 {
-    WCS_TRACE_DBGREL(">> %s ", __FUNCTION__);
-    WCS_TRACE_DBGREL("Short Addr: %d Status: %d tc_action: %d parent_short: %d", dev_updated_params->short_addr \
+    WCS_TRACE_DEBUG(">> %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("Short Addr: %d Status: %d tc_action: %d parent_short: %d", dev_updated_params->short_addr \
                                     , dev_updated_params->status \
                                     , dev_updated_params->tc_action \
                                     , dev_updated_params->parent_short \
@@ -757,20 +758,20 @@ void m2z_callback_dev_updated(zb_zdo_signal_device_update_params_t *dev_updated_
     zb_uint16_t idx = m2z_dev_get_index_by_ieee_addr(dev_updated_params->long_addr);
     if (idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX)
     {
-        WCS_TRACE_DBGREL("It is known device, §,,,,");
+        WCS_TRACE_DEBUG("It is known device, §,,,,");
     }
-    WCS_TRACE_DBGREL("<<  %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("<<  %s ", __FUNCTION__);
 }
 
 /* Callback which will be called on incoming Device Announce packet. */
 void m2z_callback_dev_annce(zb_zdo_signal_device_annce_params_t *device_annce_params)
 {
-    WCS_TRACE_DBGREL(">> %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG(">> %s ", __FUNCTION__);
 
     zb_uint16_t idx = m2z_dev_get_index_by_ieee_addr(device_annce_params->ieee_addr);
     if (idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX)
     {
-        WCS_TRACE_DBGREL("It is known device, but it attempts to associate, strange...");
+        WCS_TRACE_DEBUG("It is known device, but it attempts to associate, strange...");
     }
     else
     {
@@ -784,18 +785,18 @@ void m2z_callback_dev_annce(zb_zdo_signal_device_annce_params_t *device_annce_pa
             g_device_ctx.devices[idx].dev_state = SHORT_ADDR_DISCOVERY;
         }
     }
-    WCS_TRACE_DBGREL("<<  %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("<<  %s ", __FUNCTION__);
 }
 
 /* Callback which will be called on Device Authorized packet. */
 void m2z_callback_dev_authorized(zb_zdo_signal_device_authorized_params_t *dev_authorized_params)
 {
-    WCS_TRACE_DBGREL(">> %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG(">> %s ", __FUNCTION__);
     zb_uint16_t idx = m2z_dev_get_index_by_ieee_addr(dev_authorized_params->long_addr);
 
     if (idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX)
     {
-        WCS_TRACE_DBGREL("It is known device, but it attempts to associate, strange...");
+        WCS_TRACE_DEBUG("It is known device, but it attempts to associate, strange...");
         ZB_IEEE_ADDR_COPY(g_device_ctx.devices[idx].ieee_addr, dev_authorized_params->long_addr);
         g_device_ctx.devices[idx].short_addr = dev_authorized_params->short_addr;
         g_device_ctx.devices[idx].authorization_type = dev_authorized_params->authorization_type;
@@ -805,7 +806,7 @@ void m2z_callback_dev_authorized(zb_zdo_signal_device_authorized_params_t *dev_a
         g_device_ctx.devices[idx].dev_state = SHORT_ADDR_DISCOVERY;
         g_device_ctx.devices[idx].announced_to_bridge = 0;
     }
-    WCS_TRACE_DBGREL("<<  %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("<<  %s ", __FUNCTION__);
 }
 
 void m2z_callback_dev_ieee_addr(zb_uint8_t param)
@@ -816,10 +817,10 @@ void m2z_callback_dev_ieee_addr(zb_uint8_t param)
   zb_uint16_t nwk_addr;
   zb_uint16_t dev_idx;
 
-  WCS_TRACE_DBGREL(">> %s param %hd", __FUNCTION__, param);
+  WCS_TRACE_DEBUG(">> %s param %hd", __FUNCTION__, param);
 
   resp = (zb_zdo_nwk_addr_resp_head_t*)zb_buf_begin(buf);
-  WCS_TRACE_DBGREL("resp status %hd, nwk addr %d", resp->status, resp->nwk_addr);
+  WCS_TRACE_DEBUG("resp status %hd, nwk addr %d", resp->status, resp->nwk_addr);
 
   if (resp->status == ZB_ZDP_STATUS_SUCCESS)
   {
@@ -838,7 +839,7 @@ void m2z_callback_dev_ieee_addr(zb_uint8_t param)
     }
     else
     {
-      WCS_TRACE_DBGREL("This resp is not for our device");
+      WCS_TRACE_DEBUG("This resp is not for our device");
     }
   }
 
@@ -847,7 +848,7 @@ void m2z_callback_dev_ieee_addr(zb_uint8_t param)
     zb_buf_free(buf);
   }
 
-  WCS_TRACE_DBGREL("<< %s", __FUNCTION__);
+  WCS_TRACE_DEBUG("<< %s", __FUNCTION__);
 }
 
 void m2z_schedule_request_ieee_addr(zb_uint16_t dev_idx) {
@@ -857,7 +858,7 @@ void m2z_request_ieee_addr(zb_bufid_t param, zb_uint16_t dev_idx)
 {
   zb_bufid_t  buf = param;
   zb_zdo_ieee_addr_req_param_t *req_param;
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 
   if (!param){
     zb_buf_get_out_delayed_ext((zb_callback2_t)m2z_request_ieee_addr, dev_idx, 0);
@@ -875,11 +876,11 @@ void m2z_request_ieee_addr(zb_bufid_t param, zb_uint16_t dev_idx)
     }
     else
     {
-      WCS_TRACE_DBGREL("No devices in discovery state were found!");
+      WCS_TRACE_DEBUG("No devices in discovery state were found!");
       zb_buf_free(buf);
     }
   }
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 }
 
 void m2z_handler_disc_attr_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
@@ -892,7 +893,7 @@ void m2z_handler_disc_attr_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
     zb_uint16_t ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
                                                                    ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint);
 
-    WCS_TRACE_DBGREL(">> %s", __FUNCTION__);
+    WCS_TRACE_DEBUG(">> %s", __FUNCTION__);
     if (dev_idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX && ep_idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_EP_INDEX)
     {
         ep = (m2z_device_ep_t *)(&(g_device_ctx.devices[dev_idx].endpoints[ep_idx]));
@@ -909,12 +910,12 @@ void m2z_handler_disc_attr_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
         if(ep_cluster)
         {
             ZB_ZCL_GENERAL_GET_COMPLETE_DISC_RES(param, complete);
-            WCS_TRACE_DBGREL(">> %s complete: %d", __FUNCTION__, complete);
+            WCS_TRACE_DEBUG(">> %s complete: %d", __FUNCTION__, complete);
 
             ZB_ZCL_GENERAL_GET_NEXT_DISC_ATTR_RES(param, disc_attr_info);
             while(disc_attr_info)
             {
-                WCS_TRACE_DBGREL("-> Id: 0x%x - Data Type: 0x%x", disc_attr_info->attr_id, disc_attr_info->data_type);
+                WCS_TRACE_DEBUG("-> Id: 0x%x - Data Type: 0x%x", disc_attr_info->attr_id, disc_attr_info->data_type);
 
                 if (ep_cluster->num_attrs < ZB_ARRAY_SIZE(ep_cluster->attribute))
                 {
@@ -943,7 +944,7 @@ void m2z_handler_disc_attr_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
 
         }
     }
-    WCS_TRACE_DBGREL("<< %s", __FUNCTION__);
+    WCS_TRACE_DEBUG("<< %s", __FUNCTION__);
 }
 
 void m2z_schedule_read_attribute(m2z_device_params_t *dev, zb_uint16_t cluster_id, zb_uint16_t attr_id)
@@ -998,7 +999,7 @@ void m2z_schedule_write_attribute(m2z_device_params_t *dev, zb_uint16_t cluster_
 
 void m2z_schedule_send_command(m2z_device_params_t *dev, zb_uint16_t cluster_id, zb_uint16_t cmd_id, zb_uint8_t *cmd_data, zb_uint8_t cmd_size)
 {
-    WCS_TRACE_DBGREL(">> %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG(">> %s ", __FUNCTION__);
     zb_uint16_t dev_idx = m2z_dev_get_index_by_short_addr(dev->short_addr);
     zb_uint16_t ep_id = m2z_dev_get_ep_id_by_short_addr_and_cluster_id(dev->short_addr, cluster_id);
     zb_uint16_t ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(dev->short_addr, ep_id);
@@ -1019,14 +1020,14 @@ void m2z_schedule_send_command(m2z_device_params_t *dev, zb_uint16_t cluster_id,
         usleep(100);
     };
     usleep(COMMAND_COMPLETED_TIME_MS * 1000);
-    WCS_TRACE_DBGREL("<< %s ", __FUNCTION__);
+    WCS_TRACE_DEBUG("<< %s ", __FUNCTION__);
 
 }
 
 /* Send_read_attribute_req */
 void m2z_request_read_attribute(zb_bufid_t param, zb_uint16_t dev_index)
 {
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
     
     m2z_device_ep_t *endpoint = NULL;
     m2z_device_cluster_t *cluster = NULL;
@@ -1043,7 +1044,7 @@ void m2z_request_read_attribute(zb_bufid_t param, zb_uint16_t dev_index)
                 attribute = &(cluster->attribute[attr_idx]);
                 if(attribute->attr_state == SCHEDULED_VALUE_READ_ATTR)
                 {
-                    WCS_TRACE_DBGREL(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) attr_id: %d ", __FUNCTION__, dev_index, attribute->read_req.zc_ep
+                    WCS_TRACE_DEBUG(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) attr_id: %d ", __FUNCTION__, dev_index, attribute->read_req.zc_ep
                     , attribute->read_req.zed_ep, attribute->read_req.cluster_id, get_cluster_id_str(attribute->read_req.cluster_id), attribute->read_req.attr_id);
                     attribute->attr_state = REQUESTED_VALUE_READ_ATTR;
                     
@@ -1060,12 +1061,12 @@ void m2z_request_read_attribute(zb_bufid_t param, zb_uint16_t dev_index)
     }
 
     
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
 }
 
 void m2z_request_write_attribute(zb_bufid_t param, zb_uint16_t dev_index)
 {
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
     
     m2z_device_ep_t *endpoint = NULL;
     m2z_device_cluster_t *cluster = NULL;
@@ -1082,7 +1083,7 @@ void m2z_request_write_attribute(zb_bufid_t param, zb_uint16_t dev_index)
                 attribute = &(cluster->attribute[attr_idx]);
                 if(attribute->pending_write)
                 {
-                    WCS_TRACE_DBGREL(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) attr_id: %d ", __FUNCTION__, dev_index, attribute->read_req.zc_ep
+                    WCS_TRACE_DEBUG(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) attr_id: %d ", __FUNCTION__, dev_index, attribute->read_req.zc_ep
                     , attribute->read_req.zed_ep, attribute->read_req.cluster_id, get_cluster_id_str(attribute->read_req.cluster_id), attribute->read_req.attr_id);
                     zb_uint8_t *cmd_ptr;
                     ZB_ZCL_GENERAL_INIT_WRITE_ATTR_REQ((param), cmd_ptr, ZB_ZCL_DISABLE_DEFAULT_RESPONSE);
@@ -1096,7 +1097,7 @@ void m2z_request_write_attribute(zb_bufid_t param, zb_uint16_t dev_index)
             }
         }
     }
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
 }
 
 void m2z_get_attribute_zb_status(m2z_device_params_t *dev, zb_uint16_t cluster_id, zb_uint16_t attr_id, zb_uint8_t *attr_zb_status)
@@ -1111,13 +1112,13 @@ void m2z_get_attribute_zb_status(m2z_device_params_t *dev, zb_uint16_t cluster_i
     {
         memcpy(attr_zb_status, &(g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].attribute[attr_idx].attr_zb_status), sizeof(zb_uint8_t));
     }
-    WCS_TRACE_DBGREL("<< %s attribute_zb_status: %d attribute[attr_idx].attr_zb_status: %d", __FUNCTION__, *attr_zb_status, g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].attribute[attr_idx].attr_zb_status);
+    WCS_TRACE_DEBUG("<< %s attribute_zb_status: %d attribute[attr_idx].attr_zb_status: %d", __FUNCTION__, *attr_zb_status, g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].attribute[attr_idx].attr_zb_status);
     
 }
 
 void m2z_request_send_command(zb_bufid_t param, zb_uint16_t dev_index)
 {
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
     
     m2z_device_ep_t *endpoint = NULL;
     m2z_device_cluster_t *cluster = NULL;
@@ -1131,7 +1132,7 @@ void m2z_request_send_command(zb_bufid_t param, zb_uint16_t dev_index)
             cluster = &(endpoint->ep_cluster[cluster_idx]);
             if(cluster->pending_command)
             {
-                WCS_TRACE_DBGREL(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) cmd_id 0x%x", __FUNCTION__, dev_index, cluster->command_req.zc_ep
+                WCS_TRACE_DEBUG(">> %s -> dev_idx: %d zc_ep: %d zed_ep: %d cluster 0x%04x:(%s) cmd_id 0x%x", __FUNCTION__, dev_index, cluster->command_req.zc_ep
                 , cluster->command_req.zed_ep, cluster->command_req.cluster_id, get_cluster_id_str(cluster->command_req.cluster_id), cluster->command_req.cmd_id);                
                 // send a generic command
                 zb_uint8_t* ptr = ZB_ZCL_START_PACKET_REQ(param)
@@ -1149,7 +1150,7 @@ void m2z_request_send_command(zb_bufid_t param, zb_uint16_t dev_index)
         }
     }
 
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_index);
     return;
 }
 
@@ -1163,7 +1164,7 @@ void m2z_callback_dev_attr_disc(zb_uint8_t param)
   zb_zcl_command_send_status_t *cmd_send_status = ZB_BUF_GET_PARAM(param, zb_zcl_command_send_status_t);
   zb_uint16_t dev_idx = MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX;
 
-  WCS_TRACE_DBGREL(">> %s: param %hd status %hd", __FUNCTION__, param, cmd_send_status->status);
+  WCS_TRACE_DEBUG(">> %s: param %hd status %hd", __FUNCTION__, param, cmd_send_status->status);
 
   if (cmd_send_status->dst_addr.addr_type == ZB_ZCL_ADDR_TYPE_SHORT)
   {
@@ -1177,7 +1178,7 @@ void m2z_callback_dev_attr_disc(zb_uint8_t param)
 
   zb_buf_free(param);
 
-  WCS_TRACE_DBGREL("<< %s", __FUNCTION__);
+  WCS_TRACE_DEBUG("<< %s", __FUNCTION__);
 }
 
 void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
@@ -1187,7 +1188,7 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
   zb_bool_t found_cluster_ep = 0;
   m2z_device_params_t *dev = (m2z_device_params_t *)(&g_device_ctx.devices[dev_idx]);
 
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 
   /* Cluster is not known, search in all EPs of the device for clusters without known attributes */
   for (zb_uint16_t i = 0; i < dev->endpoint; i++ )
@@ -1202,11 +1203,6 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
         found_cluster_ep = 1;
         break;
       }
-      if(j == (dev->endpoints[i].num_in_clusters + dev->endpoints[i].num_out_clusters - 1) )
-      {
-          // this cluster has no more attributes to be discovered
-          dev->endpoints[i].ep_cluster[j].disc_attrs_state = KNOWN_DISC_ATTRS;
-      }
 
     }
     if(found_cluster_ep)
@@ -1215,7 +1211,7 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
 
   if(found_cluster_ep)
   {
-    WCS_TRACE_DBGREL("%s: Request Discover Attributes to 0x%x (Zb dev index: %d) -> Endpoint: %d Cluster 0x%04x:(%s)"
+    WCS_TRACE_DEBUG("%s: Request Discover Attributes to 0x%x (Zb dev index: %d) -> Endpoint: %d Cluster 0x%04x:(%s)"
         , __FUNCTION__,dev->short_addr, dev_idx, dev->endpoints[ep_idx].ep_id, dev->endpoints[ep_idx].ep_cluster[ep_cluster_idx].cluster_id, get_cluster_id_str(dev->endpoints[ep_idx].ep_cluster[ep_cluster_idx].cluster_id));
 
     dev->endpoints[ep_idx].ep_cluster[ep_cluster_idx].disc_attrs_state = REQUESTED_DISC_ATTRS_INFO;
@@ -1233,13 +1229,14 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
   }
   else
   {
-        WCS_TRACE_DBGREL("%s: No more endpoints without known attributes from 0x%x (Zb dev index: %d) -> dev->announced_to_bridge = %d"
+        dev->endpoints[ep_idx].ep_cluster[ep_cluster_idx].disc_attrs_state = KNOWN_DISC_ATTRS;
+        WCS_TRACE_DEBUG("%s: No more endpoints without known attributes from 0x%x (Zb dev index: %d) -> dev->announced_to_bridge = %d"
         , __FUNCTION__,dev->short_addr, dev_idx, dev->announced_to_bridge);
         if(dev->announced_to_bridge == 0)
         {
             dev->announced_to_bridge = 1;
-            WCS_TRACE_DBGREL("%s: All Discover Attributes of 0x%x were queried for Discover Attributes, Announce this device to BridgeMgr "
-                , __FUNCTION__,dev->short_addr);
+            WCS_TRACE_DEBUG("%s: All Discover Attributes of 0x%x -> Endpoint: %d were queried for Discover Attributes, Announce this device to BridgeMgr "
+                , __FUNCTION__,dev->short_addr, dev->endpoints[ep_idx].ep_id);
             // all endpoint Simple Descriptors were received for that device
             // Announce it to BridgeMgr
             int MsgType = BRIDGE_ADD_DEV;
@@ -1247,7 +1244,7 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
             (*ZigbeeRcp_msg_callback)(MsgType, (m2z_device_params_t *)(&(g_device_ctx.devices[dev_idx])), &dev_idx);
         }
   }
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 }
 
 void m2z_update_endpoint_supported_clusters(m2z_device_params_t *device, uint16_t zcl_cluster_id)
@@ -1476,12 +1473,12 @@ void m2z_callback_dev_simple_desc(zb_bufid_t param)
     zb_uint16_t dev_idx = m2z_dev_get_index_by_short_addr(resp->hdr.nwk_addr);
     zb_uint16_t ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(resp->hdr.nwk_addr, resp->simple_desc.endpoint);
 
-    WCS_TRACE_DBGREL(">> %s: status %hd, addr 0x%x",
+    WCS_TRACE_DEBUG(">> %s: status %hd, addr 0x%x",
             __FUNCTION__, resp->hdr.status, resp->hdr.nwk_addr);
 
     if (resp->hdr.status != ZB_ZDP_STATUS_SUCCESS)
     {
-        WCS_TRACE_DBGREL("Error incorrect status");
+        WCS_TRACE_DEBUG("Error incorrect status");
     }
     else
     {
@@ -1489,16 +1486,16 @@ void m2z_callback_dev_simple_desc(zb_bufid_t param)
         if ( ZB_ARRAY_SIZE(g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster) <
               (resp->simple_desc.app_input_cluster_count + resp->simple_desc.app_output_cluster_count))
         {
-            WCS_TRACE_DBGREL("No memory to store all Clusters of this EP");
+            WCS_TRACE_DEBUG("No memory to store all Clusters of this EP");
         }
         else
         {
-            WCS_TRACE_DBGREL("%s: ep %hd, profile_id %d, dev id %d, dev ver %hd, input count 0x%hx, output count 0x%hx",
+            WCS_TRACE_DEBUG("%s: ep %hd, profile_id %d, dev id %d, dev ver %hd, input count 0x%hx, output count 0x%hx",
                     __FUNCTION__, resp->simple_desc.endpoint, resp->simple_desc.app_profile_id,
                     resp->simple_desc.app_device_id, resp->simple_desc.app_device_version,
                   resp->simple_desc.app_input_cluster_count, resp->simple_desc.app_output_cluster_count);
 
-            WCS_TRACE_DBGREL("%s: clusters:", __FUNCTION__);
+            WCS_TRACE_DEBUG("%s: clusters:", __FUNCTION__);
 
             /* Fill EP information relative to clusters*/
             g_device_ctx.devices[dev_idx].endpoints[ep_idx].clusters_state = KNOWN_CLUSTER;
@@ -1512,7 +1509,7 @@ void m2z_callback_dev_simple_desc(zb_bufid_t param)
             {
               g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[i].cluster_id = *(resp->simple_desc.app_cluster_list + i);
               m2z_update_endpoint_supported_clusters((m2z_device_params_t *)(&(g_device_ctx.devices[dev_idx])), *(resp->simple_desc.app_cluster_list + i));
-              WCS_TRACE_DBGREL("%s: 0x%hx -> %s",__FUNCTION__,  *(resp->simple_desc.app_cluster_list + i), get_cluster_id_str(*(resp->simple_desc.app_cluster_list + i)));
+              WCS_TRACE_DEBUG("%s: 0x%hx -> %s",__FUNCTION__,  *(resp->simple_desc.app_cluster_list + i), get_cluster_id_str(*(resp->simple_desc.app_cluster_list + i)));
             }
 
             /* For each cluster request info of their attributes */
@@ -1520,14 +1517,14 @@ void m2z_callback_dev_simple_desc(zb_bufid_t param)
         }
     }
     zb_buf_free(param);
-    WCS_TRACE_DBGREL("<< %s", __FUNCTION__);
+    WCS_TRACE_DEBUG("<< %s", __FUNCTION__);
 }
 
 /* Send_simple_desc_req */
 void m2z_request_simple_desc(zb_bufid_t param, zb_uint16_t dev_idx)
 {
   zb_zdo_simple_desc_req_t *req;
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 
   if (!param)
   {
@@ -1535,7 +1532,7 @@ void m2z_request_simple_desc(zb_bufid_t param, zb_uint16_t dev_idx)
   }
   else
   {
-      WCS_TRACE_DBGREL(">> %s", __FUNCTION__);
+      WCS_TRACE_DEBUG(">> %s", __FUNCTION__);
 
       req = zb_buf_initial_alloc(param, sizeof(zb_zdo_simple_desc_req_t));
       req->nwk_addr = g_device_ctx.devices[dev_idx].short_addr;
@@ -1552,7 +1549,7 @@ void m2z_request_simple_desc(zb_bufid_t param, zb_uint16_t dev_idx)
       zb_zdo_simple_desc_req(param, m2z_callback_dev_simple_desc);
 
   }
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 }
 
 void m2z_schedule_request_simple_desc(zb_uint16_t dev_idx) {
@@ -1568,29 +1565,29 @@ void m2z_callback_dev_active_ep(zb_bufid_t param)
 
   zb_uint16_t dev_idx = m2z_dev_get_index_by_short_addr(resp->nwk_addr);
 
-  WCS_TRACE_DBGREL("%s: status %hd, addr 0x%x",
+  WCS_TRACE_DEBUG("%s: status %hd, addr 0x%x",
             __FUNCTION__, resp->status, resp->nwk_addr);
 
   if (dev_idx != MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX)
   {
     if (resp->status != ZB_ZDP_STATUS_SUCCESS)
     {
-        WCS_TRACE_DBGREL("active_ep_resp: Error incorrect status");
+        WCS_TRACE_DEBUG("active_ep_resp: Error incorrect status");
     } else
     {
       /*Ensure the endpoints array has space for the Eps received */
       if (ZB_ARRAY_SIZE(g_device_ctx.devices[dev_idx].endpoints) < resp->ep_count)
       {
-        WCS_TRACE_DBGREL("No memory to store all EndPoints");
+        WCS_TRACE_DEBUG("No memory to store all EndPoints");
       } else
       {
         g_device_ctx.devices[dev_idx].endpoint = resp->ep_count;
-        WCS_TRACE_DBGREL("%s: ep count %hd, ep numbers:", __FUNCTION__, resp->ep_count);
+        WCS_TRACE_DEBUG("%s: ep count %hd, ep numbers:", __FUNCTION__, resp->ep_count);
         /* Add all received EPs to the EP array */
         for (int i = 0; i < resp->ep_count; i++)
         {
           g_device_ctx.devices[dev_idx].endpoints[i].ep_id = *(ep_list + i);
-          WCS_TRACE_DBGREL("%s: ep %hd", __FUNCTION__, *(ep_list + i));
+          WCS_TRACE_DEBUG("%s: ep %hd", __FUNCTION__, *(ep_list + i));
           /*Send a simple_dec_req per active EP received*/
           ZB_SCHEDULE_APP_ALARM(m2z_schedule_request_simple_desc, (uint8_t)dev_idx, 2 * ZB_TIME_ONE_SECOND);
         }
@@ -1609,7 +1606,7 @@ void m2z_callback_dev_active_ep(zb_bufid_t param)
 /* Send active_ep_req */
 void m2z_request_active_ep(zb_bufid_t param, zb_uint16_t dev_idx)
 {
-  WCS_TRACE_DBGREL(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG(">> %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
   if (!param)
   {
     zb_buf_get_out_delayed_ext(m2z_request_active_ep, dev_idx, 0);
@@ -1622,7 +1619,7 @@ void m2z_request_active_ep(zb_bufid_t param, zb_uint16_t dev_idx)
       req->nwk_addr = g_device_ctx.devices[dev_idx].short_addr;
       zb_zdo_active_ep_req(param, m2z_callback_dev_active_ep);
   }
-  WCS_TRACE_DBGREL("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
+  WCS_TRACE_DEBUG("<< %s param %hd dev_idx %hd", __FUNCTION__, param, dev_idx);
 }
 
 void m2z_schedule_request_active_ep(zb_uint16_t dev_idx) {
@@ -1634,7 +1631,7 @@ void m2z_callback_dev_leave_indication(zb_ieee_addr_t dev_addr)
 {
   zb_uint16_t dev_idx;
 
-  WCS_TRACE_DBGREL("> m2z_leave_indication device_addr ieee", TRACE_ARG_64(dev_addr));
+  WCS_TRACE_DEBUG("> m2z_leave_indication device_addr ieee", TRACE_ARG_64(dev_addr));
 
   dev_idx = m2z_dev_get_index_by_ieee_addr(dev_addr);
 
@@ -1647,13 +1644,13 @@ void m2z_callback_dev_leave_indication(zb_ieee_addr_t dev_addr)
     ZB_MEMSET(&g_device_ctx.devices[dev_idx], 0, sizeof(m2z_device_params_t));
   }
 
-  WCS_TRACE_DBGREL("< m2z_leave_indication");
+  WCS_TRACE_DEBUG("< m2z_leave_indication");
 }
 
 #ifdef ZB_USE_NVRAM
 zb_uint16_t m2z_get_nvram_data_size(void)
 {
-  WCS_TRACE_DBGREL("m2z_get_nvram_data_size, ret %hd", sizeof(m2z_device_nvram_dataset_t));
+  WCS_TRACE_DEBUG("m2z_get_nvram_data_size, ret %hd", sizeof(m2z_device_nvram_dataset_t));
   return ((zb_uint16_t)sizeof(m2z_device_nvram_dataset_t));
 }
 
@@ -1663,7 +1660,7 @@ void m2z_nvram_read_app_data(zb_uint8_t page, zb_uint32_t pos, zb_uint16_t paylo
   zb_ret_t ret;
   zb_uint8_t i;
 
-  WCS_TRACE_DBGREL(">> m2z_nvram_read_app_data page %hd pos %d", page, pos);
+  WCS_TRACE_DEBUG(">> m2z_nvram_read_app_data page %hd pos %d", page, pos);
 
   ret = zb_nvram_read_data(page, pos, (zb_uint8_t*)&ds, (zb_uint16_t)sizeof(ds));
 
@@ -1681,7 +1678,7 @@ void m2z_nvram_read_app_data(zb_uint8_t page, zb_uint32_t pos, zb_uint16_t paylo
     }
   }
 
-  WCS_TRACE_DBGREL("<< m2z_nvram_read_app_data ret %d", ret);
+  WCS_TRACE_DEBUG("<< m2z_nvram_read_app_data ret %d", ret);
 }
 
 zb_ret_t m2z_nvram_write_app_data(zb_uint8_t page, zb_uint32_t pos)
@@ -1689,13 +1686,13 @@ zb_ret_t m2z_nvram_write_app_data(zb_uint8_t page, zb_uint32_t pos)
   zb_ret_t ret;
   m2z_device_nvram_dataset_t ds;
 
-  WCS_TRACE_DBGREL(">> m2z_nvram_write_app_data, page %hd, pos %d", page, pos);
+  WCS_TRACE_DEBUG(">> m2z_nvram_write_app_data, page %hd, pos %d", page, pos);
 
   ZB_MEMCPY(&ds, g_device_ctx.devices, sizeof(m2z_device_nvram_dataset_t));
 
   ret = zb_nvram_write_data(page, pos, (zb_uint8_t*)&ds, (zb_uint16_t)sizeof(ds));
 
-  WCS_TRACE_DBGREL("<< m2z_nvram_write_app_data, ret %d", ret);
+  WCS_TRACE_DEBUG("<< m2z_nvram_write_app_data, ret %d", ret);
 
   return ret;
 }

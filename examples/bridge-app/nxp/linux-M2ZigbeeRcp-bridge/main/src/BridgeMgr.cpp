@@ -603,7 +603,7 @@ void * BridgeDevMgr::ZigbeeRcpComm_handler(void * context)
 {
     BridgeDevMgr * ThisMgr = (BridgeDevMgr *) context;
     m2z_device_params_t *ZigbeeRcp_device;
-    WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : BridgeDevMgr::ZigbeeRcpMonitor is running !!!\n");
+    WCS_TRACE_DEBUG(" ---> matter-zigbee-bridge : BridgeDevMgr::ZigbeeRcpMonitor is running !!!\n");
     while (1)
     {
         pthread_mutex_lock(&ZigbeeRcpMsg.bridge_mutex);
@@ -611,7 +611,7 @@ void * BridgeDevMgr::ZigbeeRcpComm_handler(void * context)
         {
             if (pthread_cond_wait(&ZigbeeRcpMsg.bridge_cond, &ZigbeeRcpMsg.bridge_mutex) == 0)
             {
-                WCS_TRACE_DBGREL(" ---> ZigbeeRcpComm_handler RECEIVED A MESSAGE\n");
+                WCS_TRACE_DEBUG(" ---> ZigbeeRcpComm_handler RECEIVED A MESSAGE\n");
                 ZigbeeRcp_device = (m2z_device_params_t *)ZigbeeRcpMsg.ZigbeeRcp_dev;
                 
                 switch (ZigbeeRcpMsg.msg_type)
@@ -626,7 +626,7 @@ void * BridgeDevMgr::ZigbeeRcpComm_handler(void * context)
                         {
                             sleep(1);
                         }
-                        WCS_TRACE_DBGREL(" ---> all attributes were read !!!\n");
+                        WCS_TRACE_DEBUG(" ---> all attributes were read !!!\n");
                         //ThisMgr->AddNewZigbeeNode(ZigbeeRcp_device);
                     }
                     break;
@@ -680,7 +680,7 @@ int BridgeDevMgr::start_ZigbeeRcp_comm_thread()
     int res = pthread_create(&ZigbeeRcpComm_thread, NULL, ZigbeeRcpComm_handler, (void *) this);
     if (res)
     {
-        WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : Error creating polling thread: %d\n", res);
+        WCS_TRACE_DEBUG(" ---> matter-zigbee-bridge : Error creating polling thread: %d\n", res);
         return -1;
     }
 
@@ -698,7 +698,7 @@ void send_message_to_comm_thread(int MsgType, m2z_device_params_t* ZigbeeRcp_dev
         ZigbeeRcpMsg.ZigbeeRcp_dev = ZigbeeRcp_dev;
         ZigbeeRcpMsg.msg_type = MsgType;
         ZigbeeRcpMsg.msg_data = data;
-        WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : type: %d", ZigbeeRcpMsg.msg_type);
+        WCS_TRACE_DEBUG(" ---> matter-zigbee-bridge : type: %d", ZigbeeRcpMsg.msg_type);
     } else {
         ZigbeeRcpMsg.msg_type = MsgType;
     }
@@ -861,7 +861,7 @@ void GetAttributeReadOnlyStatus(ClusterId clusterId, chip::AttributeId attribute
         break;
     }
     
-    WCS_TRACE_DBGREL("<< %s attribute_zb_status: %d ", __FUNCTION__, *attr_zb_status);
+    WCS_TRACE_DEBUG("<< %s attribute_zb_status: %d ", __FUNCTION__, *attr_zb_status);
     
 }
 
