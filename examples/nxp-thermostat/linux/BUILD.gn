@@ -17,8 +17,7 @@ import("//build_overrides/chip.gni")
 
 executable("nxp-thermostat-app") {
   sources = [
-#    "include/low-power/LowPowerManager.cpp",
-#    "include/low-power/LowPowerManager.h",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "include/CHIPProjectConfig.h",
     "main.cpp",
   ]
@@ -27,6 +26,11 @@ executable("nxp-thermostat-app") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/nxp-thermostat/nxp-thermostat-common",
     "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/nxp-thermostat/nxp-thermostat-common/include",
   ]
 
   cflags = [ "-Wconversion" ]
