@@ -19,14 +19,6 @@
 
 using namespace chip;
 
-namespace {
-enum class DeviceTypeClass {
-    Utility,
-    Simple,
-    Node, // Might not be a real class, but we have it for Root Node for now.
-    // If new classes get added, plase audit MTRIsKnownUtilityDeviceType below.
-};
-
 struct DeviceTypeData {
     DeviceTypeId id;
     DeviceTypeClass deviceClass;
@@ -97,6 +89,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000307, DeviceTypeClass::Simple, "Matter Humidity Sensor" },
     { 0x0000050C, DeviceTypeClass::Simple, "Matter EVSE" },
     { 0x0000050D, DeviceTypeClass::Simple, "Matter Device Energy Management" },
+    { 0x0000050F, MTRDeviceTypeClass::Simple, "Water Heater" },
     { 0x00000510, DeviceTypeClass::Utility, "Matter Electrical Sensor" },
     { 0x00000840, DeviceTypeClass::Simple, "Matter Control Bridge" },
     { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
