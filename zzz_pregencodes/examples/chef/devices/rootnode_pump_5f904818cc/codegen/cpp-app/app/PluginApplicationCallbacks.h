@@ -8,14 +8,12 @@ void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterPressureMeasurementPluginServerInitCallback();
 void MatterPumpConfigurationAndControlPluginServerInitCallback();
 void MatterTemperatureMeasurementPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
@@ -28,13 +26,11 @@ void MatterUnitLocalizationPluginServerInitCallback();
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterPressureMeasurementPluginServerInitCallback(); \
     MatterPumpConfigurationAndControlPluginServerInitCallback(); \
     MatterTemperatureMeasurementPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback();
 

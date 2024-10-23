@@ -11,7 +11,6 @@ void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterGroupsPluginServerInitCallback();
 void MatterIcdManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
@@ -19,7 +18,6 @@ void MatterPowerSourcePluginServerInitCallback();
 void MatterSmokeCoAlarmPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
@@ -35,7 +33,6 @@ void MatterUserLabelPluginServerInitCallback();
     MatterGroupsPluginServerInitCallback(); \
     MatterIcdManagementPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
@@ -43,6 +40,5 @@ void MatterUserLabelPluginServerInitCallback();
     MatterSmokeCoAlarmPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUserLabelPluginServerInitCallback();
 

@@ -21,7 +21,7 @@
 #pragma once
 
 /**** Cluster endpoint counts ****/
-#define MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (3)
+#define MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define MATTER_DM_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (3)
 #define MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -192,7 +192,7 @@
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
 
-// Use this macro to check if the server side of the WiFi Network Diagnostics cluster is included
+// Use this macro to check if the server side of the Wi-Fi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS

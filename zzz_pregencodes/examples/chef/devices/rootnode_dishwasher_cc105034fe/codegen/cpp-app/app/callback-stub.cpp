@@ -21,6 +21,16 @@ void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpo
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfDishwasherAlarmClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDishwasherModeClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -51,6 +61,11 @@ void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(Endpoi
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -61,7 +76,7 @@ void __attribute__((weak)) emberAfOperationalStateClusterInitCallback(EndpointId
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

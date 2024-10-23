@@ -31,23 +31,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::GroupKeyManagement::Id:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Identify::Id:
-        emberAfIdentifyClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::RefrigeratorAlarm::Id:
+        emberAfRefrigeratorAlarmClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
+        emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TemperatureControl::Id:
         emberAfTemperatureControlClusterInitCallback(endpoint);
         break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
+    case app::Clusters::TemperatureMeasurement::Id:
+        emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
     case app::Clusters::UnitLocalization::Id:
         emberAfUnitLocalizationClusterInitCallback(endpoint);

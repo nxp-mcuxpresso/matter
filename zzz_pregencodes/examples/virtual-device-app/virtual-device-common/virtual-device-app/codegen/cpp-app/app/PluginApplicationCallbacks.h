@@ -27,6 +27,7 @@ void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+void MatterWindowCoveringPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
@@ -56,5 +57,6 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \
     MatterUserLabelPluginServerInitCallback(); \
-    MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+    MatterWiFiNetworkDiagnosticsPluginServerInitCallback(); \
+    MatterWindowCoveringPluginServerInitCallback();
 

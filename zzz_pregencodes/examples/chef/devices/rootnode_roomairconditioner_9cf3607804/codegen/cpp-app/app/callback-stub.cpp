@@ -71,6 +71,16 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning

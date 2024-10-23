@@ -46,11 +46,6 @@ void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -77,11 +72,6 @@ void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

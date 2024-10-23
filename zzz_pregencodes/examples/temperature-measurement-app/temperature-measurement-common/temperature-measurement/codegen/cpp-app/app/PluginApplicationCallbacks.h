@@ -9,13 +9,11 @@ void MatterFixedLabelPluginServerInitCallback();
 void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterTemperatureMeasurementPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
@@ -31,13 +29,11 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterGeneralCommissioningPluginServerInitCallback(); \
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterTemperatureMeasurementPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \
     MatterUserLabelPluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

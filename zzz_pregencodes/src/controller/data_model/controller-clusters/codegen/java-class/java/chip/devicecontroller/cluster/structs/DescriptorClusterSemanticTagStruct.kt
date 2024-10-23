@@ -48,7 +48,7 @@ class DescriptorClusterSemanticTagStruct (
     } else {
       putNull(ContextSpecificTag(TAG_MFG_CODE))
     }
-      put(ContextSpecificTag(TAG_NAMESPACE_I_D), namespaceID)
+      put(ContextSpecificTag(TAG_NAMESPACE_ID), namespaceID)
       put(ContextSpecificTag(TAG_TAG), tag)
       if (label != null) {
       if (label.isPresent) {
@@ -64,7 +64,7 @@ class DescriptorClusterSemanticTagStruct (
 
   companion object {
     private const val TAG_MFG_CODE = 0
-    private const val TAG_NAMESPACE_I_D = 1
+    private const val TAG_NAMESPACE_ID = 1
     private const val TAG_TAG = 2
     private const val TAG_LABEL = 3
 
@@ -76,7 +76,7 @@ class DescriptorClusterSemanticTagStruct (
       tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
       null
     }
-      val namespaceID = tlvReader.getUInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
+      val namespaceID = tlvReader.getUInt(ContextSpecificTag(TAG_NAMESPACE_ID))
       val tag = tlvReader.getUInt(ContextSpecificTag(TAG_TAG))
       val label = if (!tlvReader.isNull()) {
       if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {

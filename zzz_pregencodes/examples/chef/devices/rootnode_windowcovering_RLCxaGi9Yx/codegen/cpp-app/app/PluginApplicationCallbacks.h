@@ -10,12 +10,10 @@ void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterGroupsPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterWindowCoveringPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
@@ -30,11 +28,9 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterGroupsPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterWindowCoveringPluginServerInitCallback();
 

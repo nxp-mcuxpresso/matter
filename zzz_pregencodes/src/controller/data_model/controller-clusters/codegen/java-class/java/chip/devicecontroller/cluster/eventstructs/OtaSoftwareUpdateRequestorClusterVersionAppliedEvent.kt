@@ -40,19 +40,19 @@ class OtaSoftwareUpdateRequestorClusterVersionAppliedEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
-      put(ContextSpecificTag(TAG_PRODUCT_I_D), productID)
+      put(ContextSpecificTag(TAG_PRODUCT_ID), productID)
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_SOFTWARE_VERSION = 0
-    private const val TAG_PRODUCT_I_D = 1
+    private const val TAG_PRODUCT_ID = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OtaSoftwareUpdateRequestorClusterVersionAppliedEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val productID = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_I_D))
+      val productID = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_ID))
       
       tlvReader.exitContainer()
 

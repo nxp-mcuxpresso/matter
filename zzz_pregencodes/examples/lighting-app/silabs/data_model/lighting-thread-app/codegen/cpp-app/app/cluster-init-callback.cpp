@@ -25,12 +25,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Descriptor::Id:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
-    case app::Clusters::DiagnosticLogs::Id:
-        emberAfDiagnosticLogsClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::FixedLabel::Id:
-        emberAfFixedLabelClusterInitCallback(endpoint);
-        break;
     case app::Clusters::GeneralCommissioning::Id:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -49,9 +43,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
@@ -64,23 +55,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::OtaSoftwareUpdateRequestor::Id:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
-    case app::Clusters::PowerSource::Id:
-        emberAfPowerSourceClusterInitCallback(endpoint);
-        break;
     case app::Clusters::ScenesManagement::Id:
         emberAfScenesManagementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::SoftwareDiagnostics::Id:
-        emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
-        break;
     case app::Clusters::ThreadNetworkDiagnostics::Id:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::UserLabel::Id:
-        emberAfUserLabelClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID

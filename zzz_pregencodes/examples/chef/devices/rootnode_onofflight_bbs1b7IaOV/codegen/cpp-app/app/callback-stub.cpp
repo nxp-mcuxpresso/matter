@@ -61,11 +61,6 @@ void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId end
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -87,11 +82,6 @@ void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterInitCallback(
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

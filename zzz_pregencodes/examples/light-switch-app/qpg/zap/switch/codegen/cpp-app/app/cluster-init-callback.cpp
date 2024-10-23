@@ -40,6 +40,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::GroupKeyManagement::Id:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Groups::Id:
+        emberAfGroupsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::IcdManagement::Id:
         emberAfIcdManagementClusterInitCallback(endpoint);
         break;
@@ -54,6 +57,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::OtaSoftwareUpdateRequestor::Id:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::PowerSource::Id:
+        emberAfPowerSourceClusterInitCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);

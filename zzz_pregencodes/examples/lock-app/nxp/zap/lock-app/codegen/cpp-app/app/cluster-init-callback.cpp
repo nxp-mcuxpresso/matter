@@ -22,6 +22,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Descriptor::Id:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
+    case app::Clusters::DiagnosticLogs::Id:
+        emberAfDiagnosticLogsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::DoorLock::Id:
         emberAfDoorLockClusterInitCallback(endpoint);
         break;
@@ -34,14 +37,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::GroupKeyManagement::Id:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::IcdManagement::Id:
+        emberAfIcdManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Identify::Id:
         emberAfIdentifyClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
         break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::OtaSoftwareUpdateRequestor::Id:
+        emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);

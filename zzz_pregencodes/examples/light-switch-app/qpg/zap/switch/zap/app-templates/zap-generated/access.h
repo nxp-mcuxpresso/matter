@@ -31,9 +31,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -56,9 +53,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -81,9 +75,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -155,6 +146,10 @@
 #define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
     0x00000003, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     0x00000003, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -190,6 +185,10 @@
 #define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
     0x00000000, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     0x00000040, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    0x00000000, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    0x00000003, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    0x00000005, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000002, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000004, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -225,6 +224,10 @@
 #define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
     chip::Access::Privilege::kManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -262,18 +265,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

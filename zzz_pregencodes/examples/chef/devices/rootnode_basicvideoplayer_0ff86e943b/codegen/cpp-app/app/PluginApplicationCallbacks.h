@@ -13,7 +13,6 @@ void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterKeypadInputPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterLowPowerPluginServerInitCallback();
 void MatterMediaInputPluginServerInitCallback();
 void MatterMediaPlaybackPluginServerInitCallback();
@@ -40,7 +39,6 @@ void MatterWakeOnLanPluginServerInitCallback();
     MatterIdentifyPluginServerInitCallback(); \
     MatterKeypadInputPluginServerInitCallback(); \
     MatterLevelControlPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterLowPowerPluginServerInitCallback(); \
     MatterMediaInputPluginServerInitCallback(); \
     MatterMediaPlaybackPluginServerInitCallback(); \

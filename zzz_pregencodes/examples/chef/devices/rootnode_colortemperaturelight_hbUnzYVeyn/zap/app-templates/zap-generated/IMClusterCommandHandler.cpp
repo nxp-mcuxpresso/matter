@@ -104,111 +104,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::MoveToHue::Id: {
-            Commands::MoveToHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveToHueCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveHue::Id: {
-            Commands::MoveHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveHueCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::StepHue::Id: {
-            Commands::StepHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterStepHueCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveToSaturation::Id: {
-            Commands::MoveToSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveToSaturationCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveSaturation::Id: {
-            Commands::MoveSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveSaturationCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::StepSaturation::Id: {
-            Commands::StepSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterStepSaturationCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveToHueAndSaturation::Id: {
-            Commands::MoveToHueAndSaturation::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveToHueAndSaturationCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveToColor::Id: {
-            Commands::MoveToColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveToColorCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::MoveColor::Id: {
-            Commands::MoveColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterMoveColorCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::StepColor::Id: {
-            Commands::StepColor::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterStepColorCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::MoveToColorTemperature::Id: {
             Commands::MoveToColorTemperature::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfColorControlClusterMoveToColorTemperatureCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::EnhancedMoveToHue::Id: {
-            Commands::EnhancedMoveToHue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfColorControlClusterEnhancedMoveToHueCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

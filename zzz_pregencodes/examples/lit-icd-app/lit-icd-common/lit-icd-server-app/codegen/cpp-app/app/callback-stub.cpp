@@ -16,6 +16,11 @@ void __attribute__((weak)) emberAfBasicInformationClusterInitCallback(EndpointId
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfBooleanStateClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning

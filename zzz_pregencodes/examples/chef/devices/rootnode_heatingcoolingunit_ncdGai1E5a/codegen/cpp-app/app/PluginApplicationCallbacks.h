@@ -12,13 +12,11 @@ void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterGroupsPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
@@ -34,11 +32,9 @@ void MatterTimeFormatLocalizationPluginServerInitCallback();
     MatterGroupsPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
     MatterLevelControlPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
-    MatterSoftwareDiagnosticsPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback();
+    MatterSoftwareDiagnosticsPluginServerInitCallback();
 

@@ -31,9 +31,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -52,9 +49,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -73,9 +67,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -99,8 +90,6 @@
     0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x0000002D, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -114,8 +103,6 @@
     0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x00000000, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -129,8 +116,6 @@
     chip::Access::Privilege::kManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
@@ -229,18 +214,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

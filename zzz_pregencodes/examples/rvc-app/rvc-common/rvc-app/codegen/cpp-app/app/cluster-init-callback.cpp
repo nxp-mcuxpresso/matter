@@ -52,6 +52,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::RvcRunMode::Id:
         emberAfRvcRunModeClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ServiceArea::Id:
+        emberAfServiceAreaClusterInitCallback(endpoint);
+        break;
     default:
         // Unrecognized cluster ID
         break;

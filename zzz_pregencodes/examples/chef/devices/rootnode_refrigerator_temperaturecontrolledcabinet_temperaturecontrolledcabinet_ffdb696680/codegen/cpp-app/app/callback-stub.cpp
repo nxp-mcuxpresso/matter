@@ -36,16 +36,6 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -56,12 +46,22 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfRefrigeratorAlarmClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

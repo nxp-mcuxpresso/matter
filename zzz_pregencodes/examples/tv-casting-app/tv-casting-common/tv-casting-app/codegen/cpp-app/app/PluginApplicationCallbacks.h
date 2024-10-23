@@ -2,7 +2,6 @@
 void MatterAccessControlPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
-void MatterBinaryInputBasicPluginServerInitCallback();
 void MatterBindingPluginServerInitCallback();
 void MatterContentAppObserverPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
@@ -25,7 +24,6 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterAccessControlPluginServerInitCallback(); \
     MatterAdministratorCommissioningPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
-    MatterBinaryInputBasicPluginServerInitCallback(); \
     MatterBindingPluginServerInitCallback(); \
     MatterContentAppObserverPluginServerInitCallback(); \
     MatterDescriptorPluginServerInitCallback(); \

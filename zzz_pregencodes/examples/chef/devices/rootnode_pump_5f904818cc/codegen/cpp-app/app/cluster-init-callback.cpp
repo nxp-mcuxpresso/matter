@@ -37,9 +37,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Identify::Id:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
@@ -57,9 +54,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::TemperatureMeasurement::Id:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     case app::Clusters::UnitLocalization::Id:
         emberAfUnitLocalizationClusterInitCallback(endpoint);

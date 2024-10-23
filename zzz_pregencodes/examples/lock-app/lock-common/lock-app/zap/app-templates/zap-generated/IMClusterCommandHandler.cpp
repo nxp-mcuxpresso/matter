@@ -302,6 +302,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::SetAliroReaderConfig::Id: {
+            Commands::SetAliroReaderConfig::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterSetAliroReaderConfigCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::ClearAliroReaderConfig::Id: {
+            Commands::ClearAliroReaderConfig::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterClearAliroReaderConfigCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);

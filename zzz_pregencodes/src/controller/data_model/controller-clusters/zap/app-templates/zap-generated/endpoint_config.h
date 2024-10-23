@@ -28,11 +28,13 @@
 // Separate block is generated for big-endian and little-endian cases.
 #if CHIP_CONFIG_BIG_ENDIAN_TARGET
 #define GENERATED_DEFAULTS                                                                                                         \
-    {}
+    {                                                                                                                              \
+    }
 
 #else // !CHIP_CONFIG_BIG_ENDIAN_TARGET
 #define GENERATED_DEFAULTS                                                                                                         \
-    {}
+    {                                                                                                                              \
+    }
 
 #endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
 
@@ -41,12 +43,14 @@
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {}
+    {                                                                                                                              \
+    }
 
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 0
 #define GENERATED_ATTRIBUTES                                                                                                       \
-    {}
+    {                                                                                                                              \
+    }
 
 // clang-format off
 #define GENERATED_EVENT_COUNT 0
@@ -102,34 +106,8 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: On/off Switch Configuration (client) */ \
-      .clusterId = 0x00000007, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
       /* Endpoint: 1, Cluster: Level Control (client) */ \
       .clusterId = 0x00000008, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Binary Input (Basic) (client) */ \
-      .clusterId = 0x0000000F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
@@ -375,7 +353,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: WiFi Network Diagnostics (client) */ \
+      /* Endpoint: 1, Cluster: Wi-Fi Network Diagnostics (client) */ \
       .clusterId = 0x00000036, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -856,6 +834,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Water Heater Management (client) */ \
+      .clusterId = 0x00000094, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Device Energy Management (client) */ \
       .clusterId = 0x00000098, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -908,6 +899,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Water Heater Mode (client) */ \
+      .clusterId = 0x0000009E, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Device Energy Management Mode (client) */ \
       .clusterId = 0x0000009F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -936,19 +940,6 @@
   { \
       /* Endpoint: 1, Cluster: Window Covering (client) */ \
       .clusterId = 0x00000102, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Barrier Control (client) */ \
-      .clusterId = 0x00000103, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
@@ -1246,6 +1237,32 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Thread Border Router Management (client) */ \
+      .clusterId = 0x00000452, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Thread Network Directory (client) */ \
+      .clusterId = 0x00000453, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Wake on LAN (client) */ \
       .clusterId = 0x00000503, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -1402,19 +1419,6 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Electrical Measurement (client) */ \
-      .clusterId = 0x00000B04, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
       /* Endpoint: 1, Cluster: Unit Testing (client) */ \
       .clusterId = 0xFFF1FC05, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -1468,16 +1472,10 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY                                                                                                       \
-    {                                                                                                                              \
-        0x0001                                                                                                                     \
-    }
+#define FIXED_ENDPOINT_ARRAY { 0x0001 }
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS                                                                                                          \
-    {                                                                                                                              \
-        0x0103                                                                                                                     \
-    }
+#define FIXED_PROFILE_IDS { 0x0103 }
 
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
@@ -1488,25 +1486,13 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
     }
 
 // Array of device type offsets
-#define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_OFFSETS { 0 }
 
 // Array of device type lengths
-#define FIXED_DEVICE_TYPE_LENGTHS                                                                                                  \
-    {                                                                                                                              \
-        1                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_LENGTHS { 1 }
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES                                                                                                       \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_ENDPOINT_TYPES { 0 }
 
 // Array of parent endpoints for each endpoint
-#define FIXED_PARENT_ENDPOINTS                                                                                                     \
-    {                                                                                                                              \
-        kInvalidEndpointId                                                                                                         \
-    }
+#define FIXED_PARENT_ENDPOINTS { kInvalidEndpointId }

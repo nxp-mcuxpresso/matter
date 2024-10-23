@@ -11,6 +11,7 @@ void MatterGroupsPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
+void MatterPowerSourcePluginServerInitCallback();
 void MatterRvcCleanModePluginServerInitCallback();
 void MatterRvcOperationalStatePluginServerInitCallback();
 void MatterRvcRunModePluginServerInitCallback();
@@ -28,6 +29,7 @@ void MatterRvcRunModePluginServerInitCallback();
     MatterIdentifyPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
+    MatterPowerSourcePluginServerInitCallback(); \
     MatterRvcCleanModePluginServerInitCallback(); \
     MatterRvcOperationalStatePluginServerInitCallback(); \
     MatterRvcRunModePluginServerInitCallback();

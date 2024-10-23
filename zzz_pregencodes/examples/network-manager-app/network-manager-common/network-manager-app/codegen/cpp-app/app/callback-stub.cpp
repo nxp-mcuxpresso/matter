@@ -41,11 +41,6 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -56,12 +51,27 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfThreadNetworkDirectoryClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

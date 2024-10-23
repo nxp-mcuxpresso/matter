@@ -48,6 +48,7 @@
 #define MATTER_DM_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
@@ -142,7 +143,7 @@
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
 
-// Use this macro to check if the server side of the WiFi Network Diagnostics cluster is included
+// Use this macro to check if the server side of the Wi-Fi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS
@@ -197,6 +198,11 @@
 #define ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #define MATTER_DM_PLUGIN_DOOR_LOCK
+
+// Use this macro to check if the server side of the Window Covering cluster is included
+#define ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
+#define MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+#define MATTER_DM_PLUGIN_WINDOW_COVERING
 
 // Use this macro to check if the server side of the Color Control cluster is included
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER

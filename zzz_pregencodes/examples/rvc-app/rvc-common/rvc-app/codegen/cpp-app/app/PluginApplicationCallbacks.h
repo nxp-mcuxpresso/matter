@@ -13,6 +13,7 @@ void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterRvcCleanModePluginServerInitCallback();
 void MatterRvcOperationalStatePluginServerInitCallback();
 void MatterRvcRunModePluginServerInitCallback();
+void MatterServiceAreaPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
@@ -28,5 +29,6 @@ void MatterRvcRunModePluginServerInitCallback();
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterRvcCleanModePluginServerInitCallback(); \
     MatterRvcOperationalStatePluginServerInitCallback(); \
-    MatterRvcRunModePluginServerInitCallback();
+    MatterRvcRunModePluginServerInitCallback(); \
+    MatterServiceAreaPluginServerInitCallback();
 

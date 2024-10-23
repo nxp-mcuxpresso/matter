@@ -31,9 +31,6 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -57,15 +54,19 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroReaderVerificationKey, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroReaderGroupIdentifier, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroReaderGroupSubIdentifier, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroExpeditedTransactionSupportedProtocolVersions, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroGroupResolvingKey, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroSupportedBLEUWBProtocolVersions, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: AliroBLEAdvertisingVersion, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -89,15 +90,19 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    0x00000080, /* Cluster: Door Lock, Attribute: AliroReaderVerificationKey, Privilege: administer */ \
+    0x00000081, /* Cluster: Door Lock, Attribute: AliroReaderGroupIdentifier, Privilege: administer */ \
+    0x00000082, /* Cluster: Door Lock, Attribute: AliroReaderGroupSubIdentifier, Privilege: administer */ \
+    0x00000083, /* Cluster: Door Lock, Attribute: AliroExpeditedTransactionSupportedProtocolVersions, Privilege: administer */ \
+    0x00000084, /* Cluster: Door Lock, Attribute: AliroGroupResolvingKey, Privilege: administer */ \
+    0x00000085, /* Cluster: Door Lock, Attribute: AliroSupportedBLEUWBProtocolVersions, Privilege: administer */ \
+    0x00000086, /* Cluster: Door Lock, Attribute: AliroBLEAdvertisingVersion, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -121,6 +126,13 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroReaderVerificationKey, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroReaderGroupIdentifier, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroReaderGroupSubIdentifier, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroExpeditedTransactionSupportedProtocolVersions, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroGroupResolvingKey, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroSupportedBLEUWBProtocolVersions, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: AliroBLEAdvertisingVersion, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +145,6 @@
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x0000002A, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -157,7 +168,6 @@
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x00000000, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -181,7 +191,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    chip::Access::Privilege::kManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -245,6 +254,8 @@
     0x00000101, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Command: SetAliroReaderConfig, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Command: ClearAliroReaderConfig, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -293,6 +304,8 @@
     0x00000022, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000024, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000026, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000028, /* Cluster: Door Lock, Command: SetAliroReaderConfig, Privilege: administer */ \
+    0x00000029, /* Cluster: Door Lock, Command: ClearAliroReaderConfig, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -341,6 +354,8 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: SetAliroReaderConfig, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: ClearAliroReaderConfig, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -349,18 +364,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

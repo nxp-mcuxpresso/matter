@@ -4,25 +4,18 @@ void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
 void MatterColorControlPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
-void MatterDiagnosticLogsPluginServerInitCallback();
-void MatterFixedLabelPluginServerInitCallback();
 void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterGroupsPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
-void MatterPowerSourcePluginServerInitCallback();
 void MatterScenesManagementPluginServerInitCallback();
-void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
-void MatterUserLabelPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
@@ -30,23 +23,16 @@ void MatterUserLabelPluginServerInitCallback();
     MatterBasicInformationPluginServerInitCallback(); \
     MatterColorControlPluginServerInitCallback(); \
     MatterDescriptorPluginServerInitCallback(); \
-    MatterDiagnosticLogsPluginServerInitCallback(); \
-    MatterFixedLabelPluginServerInitCallback(); \
     MatterGeneralCommissioningPluginServerInitCallback(); \
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterGroupsPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
     MatterLevelControlPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
-    MatterPowerSourcePluginServerInitCallback(); \
     MatterScenesManagementPluginServerInitCallback(); \
-    MatterSoftwareDiagnosticsPluginServerInitCallback(); \
-    MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
-    MatterUserLabelPluginServerInitCallback();
+    MatterThreadNetworkDiagnosticsPluginServerInitCallback();
 

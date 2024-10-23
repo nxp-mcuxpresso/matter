@@ -33,9 +33,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -72,7 +69,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -105,9 +101,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -144,7 +137,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -177,9 +169,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -216,7 +205,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: HVACSystemTypeConfiguration, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -676,18 +664,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

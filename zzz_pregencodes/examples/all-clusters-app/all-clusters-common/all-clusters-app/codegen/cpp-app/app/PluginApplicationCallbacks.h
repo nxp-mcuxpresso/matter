@@ -5,9 +5,7 @@ void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterAirQualityPluginServerInitCallback();
 void MatterBallastConfigurationPluginServerInitCallback();
-void MatterBarrierControlPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
-void MatterBinaryInputBasicPluginServerInitCallback();
 void MatterBindingPluginServerInitCallback();
 void MatterBooleanStatePluginServerInitCallback();
 void MatterBooleanStateConfigurationPluginServerInitCallback();
@@ -21,7 +19,6 @@ void MatterDiagnosticLogsPluginServerInitCallback();
 void MatterDishwasherAlarmPluginServerInitCallback();
 void MatterDishwasherModePluginServerInitCallback();
 void MatterElectricalEnergyMeasurementPluginServerInitCallback();
-void MatterElectricalMeasurementPluginServerInitCallback();
 void MatterElectricalPowerMeasurementPluginServerInitCallback();
 void MatterEnergyEvsePluginServerInitCallback();
 void MatterEnergyEvseModePluginServerInitCallback();
@@ -51,7 +48,6 @@ void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback();
 void MatterOccupancySensingPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
-void MatterOnOffSwitchConfigurationPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOperationalStatePluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
@@ -90,6 +86,8 @@ void MatterUnitTestingPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 void MatterValveConfigurationAndControlPluginServerInitCallback();
 void MatterWakeOnLanPluginServerInitCallback();
+void MatterWaterHeaterManagementPluginServerInitCallback();
+void MatterWaterHeaterModePluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 void MatterWindowCoveringPluginServerInitCallback();
 
@@ -100,9 +98,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterAdministratorCommissioningPluginServerInitCallback(); \
     MatterAirQualityPluginServerInitCallback(); \
     MatterBallastConfigurationPluginServerInitCallback(); \
-    MatterBarrierControlPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
-    MatterBinaryInputBasicPluginServerInitCallback(); \
     MatterBindingPluginServerInitCallback(); \
     MatterBooleanStatePluginServerInitCallback(); \
     MatterBooleanStateConfigurationPluginServerInitCallback(); \
@@ -116,7 +112,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterDishwasherAlarmPluginServerInitCallback(); \
     MatterDishwasherModePluginServerInitCallback(); \
     MatterElectricalEnergyMeasurementPluginServerInitCallback(); \
-    MatterElectricalMeasurementPluginServerInitCallback(); \
     MatterElectricalPowerMeasurementPluginServerInitCallback(); \
     MatterEnergyEvsePluginServerInitCallback(); \
     MatterEnergyEvseModePluginServerInitCallback(); \
@@ -146,7 +141,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback(); \
     MatterOccupancySensingPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
-    MatterOnOffSwitchConfigurationPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOperationalStatePluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
@@ -185,6 +179,8 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterUserLabelPluginServerInitCallback(); \
     MatterValveConfigurationAndControlPluginServerInitCallback(); \
     MatterWakeOnLanPluginServerInitCallback(); \
+    MatterWaterHeaterManagementPluginServerInitCallback(); \
+    MatterWaterHeaterModePluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback(); \
     MatterWindowCoveringPluginServerInitCallback();
 

@@ -19,9 +19,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BasicInformation::Id:
         emberAfBasicInformationClusterInitCallback(endpoint);
         break;
-    case app::Clusters::BinaryInputBasic::Id:
-        emberAfBinaryInputBasicClusterInitCallback(endpoint);
-        break;
     case app::Clusters::Binding::Id:
         emberAfBindingClusterInitCallback(endpoint);
         break;

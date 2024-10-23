@@ -13,7 +13,6 @@ void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
@@ -22,11 +21,11 @@ void MatterOzoneConcentrationMeasurementPluginServerInitCallback();
 void MatterPm10ConcentrationMeasurementPluginServerInitCallback();
 void MatterPm1ConcentrationMeasurementPluginServerInitCallback();
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback();
+void MatterPowerSourcePluginServerInitCallback();
 void MatterRadonConcentrationMeasurementPluginServerInitCallback();
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterTemperatureMeasurementPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
@@ -44,7 +43,6 @@ void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInit
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
@@ -53,10 +51,10 @@ void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInit
     MatterPm10ConcentrationMeasurementPluginServerInitCallback(); \
     MatterPm1ConcentrationMeasurementPluginServerInitCallback(); \
     MatterPm25ConcentrationMeasurementPluginServerInitCallback(); \
+    MatterPowerSourcePluginServerInitCallback(); \
     MatterRadonConcentrationMeasurementPluginServerInitCallback(); \
     MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterTemperatureMeasurementPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback();
 

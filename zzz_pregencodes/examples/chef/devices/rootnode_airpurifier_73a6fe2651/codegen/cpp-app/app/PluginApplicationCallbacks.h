@@ -13,6 +13,7 @@ void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterHepaFilterMonitoringPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
+void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
@@ -32,6 +33,7 @@ void MatterSoftwareDiagnosticsPluginServerInitCallback();
     MatterHepaFilterMonitoringPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
+    MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback();

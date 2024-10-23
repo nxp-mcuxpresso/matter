@@ -46,6 +46,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PowerSource::Id:
+        emberAfPowerSourceClusterInitCallback(endpoint);
+        break;
     case app::Clusters::RvcCleanMode::Id:
         emberAfRvcCleanModeClusterInitCallback(endpoint);
         break;

@@ -12,7 +12,6 @@ void MatterGroupsPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterLaundryWasherControlsPluginServerInitCallback();
 void MatterLaundryWasherModePluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterModeSelectPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
@@ -21,7 +20,6 @@ void MatterOperationalStatePluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterPowerSourcePluginServerInitCallback();
 void MatterTemperatureControlPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
@@ -40,7 +38,6 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterIdentifyPluginServerInitCallback(); \
     MatterLaundryWasherControlsPluginServerInitCallback(); \
     MatterLaundryWasherModePluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterModeSelectPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
@@ -49,7 +46,6 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterPowerSourcePluginServerInitCallback(); \
     MatterTemperatureControlPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \
     MatterUserLabelPluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

@@ -51,6 +51,11 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfIcdManagementClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -72,6 +77,11 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfPowerSourceClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

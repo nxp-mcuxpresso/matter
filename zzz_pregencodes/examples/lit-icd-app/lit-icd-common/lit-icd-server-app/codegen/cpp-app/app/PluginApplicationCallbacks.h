@@ -2,6 +2,7 @@
 void MatterAccessControlPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
+void MatterBooleanStatePluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
 void MatterFixedLabelPluginServerInitCallback();
@@ -22,6 +23,7 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterAccessControlPluginServerInitCallback(); \
     MatterAdministratorCommissioningPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
+    MatterBooleanStatePluginServerInitCallback(); \
     MatterDescriptorPluginServerInitCallback(); \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback(); \
     MatterFixedLabelPluginServerInitCallback(); \

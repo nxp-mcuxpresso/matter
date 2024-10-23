@@ -32,9 +32,6 @@
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -57,6 +54,7 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -64,9 +62,6 @@
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -89,6 +84,7 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -96,9 +92,6 @@
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -121,6 +114,7 @@
     /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
+    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,6 +145,7 @@
     0x00000101, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    0x00000102, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -179,6 +174,7 @@
     0x00000030, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     0x00000031, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     0x00000033, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    0x00000017, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -207,6 +203,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
+    chip::Access::Privilege::kManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,18 +370,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

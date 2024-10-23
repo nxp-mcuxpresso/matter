@@ -46,9 +46,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
@@ -63,9 +60,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID

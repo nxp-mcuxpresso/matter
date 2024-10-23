@@ -3,15 +3,18 @@ void MatterAccessControlPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
+void MatterDishwasherAlarmPluginServerInitCallback();
+void MatterDishwasherModePluginServerInitCallback();
 void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
 void MatterIdentifyPluginServerInitCallback();
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
+void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOperationalStatePluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
+void MatterTemperatureControlPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 
@@ -20,15 +23,18 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterAdministratorCommissioningPluginServerInitCallback(); \
     MatterBasicInformationPluginServerInitCallback(); \
     MatterDescriptorPluginServerInitCallback(); \
+    MatterDishwasherAlarmPluginServerInitCallback(); \
+    MatterDishwasherModePluginServerInitCallback(); \
     MatterGeneralCommissioningPluginServerInitCallback(); \
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
     MatterIdentifyPluginServerInitCallback(); \
     MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
+    MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOperationalStatePluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
+    MatterTemperatureControlPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 

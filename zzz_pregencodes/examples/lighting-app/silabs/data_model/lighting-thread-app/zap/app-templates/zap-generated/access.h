@@ -33,9 +33,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -49,7 +46,6 @@
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
@@ -59,9 +55,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -75,7 +68,6 @@
     0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
@@ -85,9 +77,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -101,7 +90,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
@@ -117,13 +105,9 @@
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x0000002A, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x00000300, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
 }
 
@@ -137,13 +121,9 @@
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x00000000, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x00004010, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
 }
 
@@ -157,13 +137,9 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
-    chip::Access::Privilege::kManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
 }
 
@@ -187,7 +163,6 @@
     0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
-    0x00000034, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     0x00000035, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -227,7 +202,6 @@
     0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
-    0x00000000, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     0x00000000, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x00000000, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x00000002, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -267,7 +241,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -295,18 +268,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

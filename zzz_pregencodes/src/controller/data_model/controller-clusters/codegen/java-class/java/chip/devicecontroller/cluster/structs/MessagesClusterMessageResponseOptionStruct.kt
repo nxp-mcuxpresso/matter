@@ -41,7 +41,7 @@ class MessagesClusterMessageResponseOptionStruct (
       startStructure(tlvTag)
       if (messageResponseID.isPresent) {
       val optmessageResponseID = messageResponseID.get()
-      put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D), optmessageResponseID)
+      put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID), optmessageResponseID)
     }
       if (label.isPresent) {
       val optlabel = label.get()
@@ -52,13 +52,13 @@ class MessagesClusterMessageResponseOptionStruct (
   }
 
   companion object {
-    private const val TAG_MESSAGE_RESPONSE_I_D = 0
+    private const val TAG_MESSAGE_RESPONSE_ID = 0
     private const val TAG_LABEL = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageResponseOptionStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageResponseID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D)))
+      val messageResponseID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID)))
     } else {
       Optional.empty()
     }

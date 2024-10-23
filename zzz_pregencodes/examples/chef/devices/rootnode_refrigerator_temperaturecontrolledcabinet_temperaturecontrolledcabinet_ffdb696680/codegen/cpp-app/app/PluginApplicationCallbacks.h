@@ -6,12 +6,12 @@ void MatterDescriptorPluginServerInitCallback();
 void MatterGeneralCommissioningPluginServerInitCallback();
 void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
-void MatterIdentifyPluginServerInitCallback();
-void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
+void MatterRefrigeratorAlarmPluginServerInitCallback();
+void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback();
 void MatterTemperatureControlPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
+void MatterTemperatureMeasurementPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 
@@ -23,12 +23,12 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
     MatterGeneralCommissioningPluginServerInitCallback(); \
     MatterGeneralDiagnosticsPluginServerInitCallback(); \
     MatterGroupKeyManagementPluginServerInitCallback(); \
-    MatterIdentifyPluginServerInitCallback(); \
-    MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
+    MatterRefrigeratorAlarmPluginServerInitCallback(); \
+    MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback(); \
     MatterTemperatureControlPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
+    MatterTemperatureMeasurementPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 

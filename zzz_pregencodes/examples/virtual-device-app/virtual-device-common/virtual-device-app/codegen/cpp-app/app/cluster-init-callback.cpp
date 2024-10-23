@@ -94,6 +94,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::WindowCovering::Id:
+        emberAfWindowCoveringClusterInitCallback(endpoint);
+        break;
     default:
         // Unrecognized cluster ID
         break;

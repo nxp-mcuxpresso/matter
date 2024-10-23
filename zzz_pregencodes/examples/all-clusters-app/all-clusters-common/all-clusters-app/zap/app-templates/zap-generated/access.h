@@ -33,9 +33,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -71,6 +68,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -79,9 +77,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -117,6 +112,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -125,9 +121,6 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
@@ -163,6 +156,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,6 +191,7 @@
     0x00000200, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     0x00000200, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     0x00000200, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
+    0x00000201, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
     0x00000201, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     0x00000201, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     0x00000201, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -230,6 +225,8 @@
     0x00000301, /* Cluster: Ballast Configuration, Attribute: LampBurnHours, Privilege: manage */ \
     0x00000301, /* Cluster: Ballast Configuration, Attribute: LampAlarmMode, Privilege: manage */ \
     0x00000301, /* Cluster: Ballast Configuration, Attribute: LampBurnHoursTripPoint, Privilege: manage */ \
+    0x00000406, /* Cluster: Occupancy Sensing, Attribute: HoldTime, Privilege: manage */ \
+    0x00000406, /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -262,6 +259,7 @@
     0x00000017, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     0x00000020, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     0x00000021, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
+    0x00000010, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
     0x00000015, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     0x00000016, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     0x00000017, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -295,6 +293,8 @@
     0x00000033, /* Cluster: Ballast Configuration, Attribute: LampBurnHours, Privilege: manage */ \
     0x00000034, /* Cluster: Ballast Configuration, Attribute: LampAlarmMode, Privilege: manage */ \
     0x00000035, /* Cluster: Ballast Configuration, Attribute: LampBurnHoursTripPoint, Privilege: manage */ \
+    0x00000003, /* Cluster: Occupancy Sensing, Attribute: HoldTime, Privilege: manage */ \
+    0x00000010, /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -327,6 +327,7 @@
     chip::Access::Privilege::kManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Thermostat, Attribute: LocalTemperatureCalibration, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: manage */ \
@@ -360,6 +361,8 @@
     chip::Access::Privilege::kManage, /* Cluster: Ballast Configuration, Attribute: LampBurnHours, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Ballast Configuration, Attribute: LampAlarmMode, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Ballast Configuration, Attribute: LampBurnHoursTripPoint, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Occupancy Sensing, Attribute: HoldTime, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Occupancy Sensing, Attribute: PIROccupiedToUnoccupiedDelay, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -409,6 +412,9 @@
     0x00000062, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    0x00000094, /* Cluster: Water Heater Management, Command: Boost, Privilege: manage */ \
+    0x00000094, /* Cluster: Water Heater Management, Command: CancelBoost, Privilege: manage */ \
+    0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -458,6 +464,9 @@
     0x00000002, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     0x00000003, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    0x00000000, /* Cluster: Water Heater Management, Command: Boost, Privilege: manage */ \
+    0x00000001, /* Cluster: Water Heater Management, Command: CancelBoost, Privilege: manage */ \
+    0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -507,6 +516,9 @@
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Water Heater Management, Command: Boost, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Water Heater Management, Command: CancelBoost, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -517,18 +529,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

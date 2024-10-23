@@ -51,7 +51,7 @@ class GroupKeyManagementClusterGroupKeySetStruct (
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
+      put(ContextSpecificTag(TAG_GROUP_KEY_SET_ID), groupKeySetID)
       put(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY), groupKeySecurityPolicy)
       if (epochKey0 != null) {
       put(ContextSpecificTag(TAG_EPOCH_KEY0), epochKey0)
@@ -88,7 +88,7 @@ class GroupKeyManagementClusterGroupKeySetStruct (
   }
 
   companion object {
-    private const val TAG_GROUP_KEY_SET_I_D = 0
+    private const val TAG_GROUP_KEY_SET_ID = 0
     private const val TAG_GROUP_KEY_SECURITY_POLICY = 1
     private const val TAG_EPOCH_KEY0 = 2
     private const val TAG_EPOCH_START_TIME0 = 3
@@ -99,7 +99,7 @@ class GroupKeyManagementClusterGroupKeySetStruct (
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeySetStruct {
       tlvReader.enterStructure(tlvTag)
-      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
       val groupKeySecurityPolicy = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
       val epochKey0 = if (!tlvReader.isNull()) {
       tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))

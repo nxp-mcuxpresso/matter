@@ -52,9 +52,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Identify::Id:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
@@ -79,6 +76,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Pm25ConcentrationMeasurement::Id:
         emberAfPm25ConcentrationMeasurementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PowerSource::Id:
+        emberAfPowerSourceClusterInitCallback(endpoint);
+        break;
     case app::Clusters::RadonConcentrationMeasurement::Id:
         emberAfRadonConcentrationMeasurementClusterInitCallback(endpoint);
         break;
@@ -90,9 +90,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::TemperatureMeasurement::Id:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     case app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
         emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(endpoint);

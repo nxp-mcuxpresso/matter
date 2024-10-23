@@ -73,6 +73,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::UnitLocalization::Id:
         emberAfUnitLocalizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::WaterHeaterManagement::Id:
+        emberAfWaterHeaterManagementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::WaterHeaterMode::Id:
+        emberAfWaterHeaterModeClusterInitCallback(endpoint);
+        break;
     default:
         // Unrecognized cluster ID
         break;

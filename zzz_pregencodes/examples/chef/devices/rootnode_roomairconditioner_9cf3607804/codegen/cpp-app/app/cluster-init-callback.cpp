@@ -52,6 +52,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::RelativeHumidityMeasurement::Id:
+        emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::TemperatureMeasurement::Id:
+        emberAfTemperatureMeasurementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Thermostat::Id:
         emberAfThermostatClusterInitCallback(endpoint);
         break;

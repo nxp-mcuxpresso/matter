@@ -28,14 +28,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BallastConfiguration::Id:
         emberAfBallastConfigurationClusterInitCallback(endpoint);
         break;
-    case app::Clusters::BarrierControl::Id:
-        emberAfBarrierControlClusterInitCallback(endpoint);
-        break;
     case app::Clusters::BasicInformation::Id:
         emberAfBasicInformationClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::BinaryInputBasic::Id:
-        emberAfBinaryInputBasicClusterInitCallback(endpoint);
         break;
     case app::Clusters::Binding::Id:
         emberAfBindingClusterInitCallback(endpoint);
@@ -75,9 +69,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::ElectricalEnergyMeasurement::Id:
         emberAfElectricalEnergyMeasurementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::ElectricalMeasurement::Id:
-        emberAfElectricalMeasurementClusterInitCallback(endpoint);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         emberAfElectricalPowerMeasurementClusterInitCallback(endpoint);
@@ -165,9 +156,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::OnOff::Id:
         emberAfOnOffClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::OnOffSwitchConfiguration::Id:
-        emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
         break;
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
@@ -282,6 +270,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::WakeOnLan::Id:
         emberAfWakeOnLanClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::WaterHeaterManagement::Id:
+        emberAfWaterHeaterManagementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::WaterHeaterMode::Id:
+        emberAfWaterHeaterModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);

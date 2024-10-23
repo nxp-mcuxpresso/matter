@@ -49,7 +49,7 @@ class MessagesClusterMessageStruct (
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MESSAGE_I_D), messageID)
+      put(ContextSpecificTag(TAG_MESSAGE_ID), messageID)
       put(ContextSpecificTag(TAG_PRIORITY), priority)
       put(ContextSpecificTag(TAG_MESSAGE_CONTROL), messageControl)
       if (startTime != null) {
@@ -76,7 +76,7 @@ class MessagesClusterMessageStruct (
   }
 
   companion object {
-    private const val TAG_MESSAGE_I_D = 0
+    private const val TAG_MESSAGE_ID = 0
     private const val TAG_PRIORITY = 1
     private const val TAG_MESSAGE_CONTROL = 2
     private const val TAG_START_TIME = 3
@@ -86,7 +86,7 @@ class MessagesClusterMessageStruct (
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
+      val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_ID))
       val priority = tlvReader.getUInt(ContextSpecificTag(TAG_PRIORITY))
       val messageControl = tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_CONTROL))
       val startTime = if (!tlvReader.isNull()) {

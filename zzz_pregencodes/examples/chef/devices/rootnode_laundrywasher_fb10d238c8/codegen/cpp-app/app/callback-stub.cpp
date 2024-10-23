@@ -36,12 +36,12 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfLaundryWasherModeClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -57,11 +57,6 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfOperationalStateClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -226,6 +226,11 @@ void __attribute__((weak)) emberAfThermostatUserInterfaceConfigurationClusterIni
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning

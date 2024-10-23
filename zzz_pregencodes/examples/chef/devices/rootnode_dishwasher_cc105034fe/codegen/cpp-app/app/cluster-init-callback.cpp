@@ -22,6 +22,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Descriptor::Id:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
+    case app::Clusters::DishwasherAlarm::Id:
+        emberAfDishwasherAlarmClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::DishwasherMode::Id:
+        emberAfDishwasherModeClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GeneralCommissioning::Id:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -40,14 +46,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
+    case app::Clusters::OnOff::Id:
+        emberAfOnOffClusterInitCallback(endpoint);
+        break;
     case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
     case app::Clusters::OperationalState::Id:
         emberAfOperationalStateClusterInitCallback(endpoint);
         break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
+    case app::Clusters::TemperatureControl::Id:
+        emberAfTemperatureControlClusterInitCallback(endpoint);
         break;
     case app::Clusters::UnitLocalization::Id:
         emberAfUnitLocalizationClusterInitCallback(endpoint);

@@ -145,6 +145,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::ThermostatUserInterfaceConfiguration::Id:
         emberAfThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ThreadBorderRouterManagement::Id:
+        emberAfThreadBorderRouterManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ThreadNetworkDiagnostics::Id:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;

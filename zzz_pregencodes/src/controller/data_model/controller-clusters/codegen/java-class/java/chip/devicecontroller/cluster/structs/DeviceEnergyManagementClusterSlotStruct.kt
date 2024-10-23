@@ -32,7 +32,7 @@ class DeviceEnergyManagementClusterSlotStruct (
     val defaultDuration: ULong,
     val elapsedSlotTime: ULong,
     val remainingSlotTime: ULong,
-    val slotIsPauseable: Optional<Boolean>,
+    val slotIsPausable: Optional<Boolean>,
     val minPauseDuration: Optional<ULong>,
     val maxPauseDuration: Optional<ULong>,
     val manufacturerESAState: Optional<UInt>,
@@ -52,7 +52,7 @@ class DeviceEnergyManagementClusterSlotStruct (
     append("\tdefaultDuration : $defaultDuration\n")
     append("\telapsedSlotTime : $elapsedSlotTime\n")
     append("\tremainingSlotTime : $remainingSlotTime\n")
-    append("\tslotIsPauseable : $slotIsPauseable\n")
+    append("\tslotIsPausable : $slotIsPausable\n")
     append("\tminPauseDuration : $minPauseDuration\n")
     append("\tmaxPauseDuration : $maxPauseDuration\n")
     append("\tmanufacturerESAState : $manufacturerESAState\n")
@@ -76,9 +76,9 @@ class DeviceEnergyManagementClusterSlotStruct (
       put(ContextSpecificTag(TAG_DEFAULT_DURATION), defaultDuration)
       put(ContextSpecificTag(TAG_ELAPSED_SLOT_TIME), elapsedSlotTime)
       put(ContextSpecificTag(TAG_REMAINING_SLOT_TIME), remainingSlotTime)
-      if (slotIsPauseable.isPresent) {
-      val optslotIsPauseable = slotIsPauseable.get()
-      put(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE), optslotIsPauseable)
+      if (slotIsPausable.isPresent) {
+      val optslotIsPausable = slotIsPausable.get()
+      put(ContextSpecificTag(TAG_SLOT_IS_PAUSABLE), optslotIsPausable)
     }
       if (minPauseDuration.isPresent) {
       val optminPauseDuration = minPauseDuration.get()
@@ -90,7 +90,7 @@ class DeviceEnergyManagementClusterSlotStruct (
     }
       if (manufacturerESAState.isPresent) {
       val optmanufacturerESAState = manufacturerESAState.get()
-      put(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE), optmanufacturerESAState)
+      put(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE), optmanufacturerESAState)
     }
       if (nominalPower.isPresent) {
       val optnominalPower = nominalPower.get()
@@ -142,10 +142,10 @@ class DeviceEnergyManagementClusterSlotStruct (
     private const val TAG_DEFAULT_DURATION = 2
     private const val TAG_ELAPSED_SLOT_TIME = 3
     private const val TAG_REMAINING_SLOT_TIME = 4
-    private const val TAG_SLOT_IS_PAUSEABLE = 5
+    private const val TAG_SLOT_IS_PAUSABLE = 5
     private const val TAG_MIN_PAUSE_DURATION = 6
     private const val TAG_MAX_PAUSE_DURATION = 7
-    private const val TAG_MANUFACTURER_E_S_A_STATE = 8
+    private const val TAG_MANUFACTURER_ESA_STATE = 8
     private const val TAG_NOMINAL_POWER = 9
     private const val TAG_MIN_POWER = 10
     private const val TAG_MAX_POWER = 11
@@ -163,8 +163,8 @@ class DeviceEnergyManagementClusterSlotStruct (
       val defaultDuration = tlvReader.getULong(ContextSpecificTag(TAG_DEFAULT_DURATION))
       val elapsedSlotTime = tlvReader.getULong(ContextSpecificTag(TAG_ELAPSED_SLOT_TIME))
       val remainingSlotTime = tlvReader.getULong(ContextSpecificTag(TAG_REMAINING_SLOT_TIME))
-      val slotIsPauseable = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE)))
+      val slotIsPausable = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SLOT_IS_PAUSABLE))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSABLE)))
     } else {
       Optional.empty()
     }
@@ -178,8 +178,8 @@ class DeviceEnergyManagementClusterSlotStruct (
     } else {
       Optional.empty()
     }
-      val manufacturerESAState = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE)))
+      val manufacturerESAState = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MANUFACTURER_ESA_STATE)))
     } else {
       Optional.empty()
     }
@@ -237,7 +237,7 @@ class DeviceEnergyManagementClusterSlotStruct (
       
       tlvReader.exitContainer()
 
-      return DeviceEnergyManagementClusterSlotStruct(minDuration, maxDuration, defaultDuration, elapsedSlotTime, remainingSlotTime, slotIsPauseable, minPauseDuration, maxPauseDuration, manufacturerESAState, nominalPower, minPower, maxPower, nominalEnergy, costs, minPowerAdjustment, maxPowerAdjustment, minDurationAdjustment, maxDurationAdjustment)
+      return DeviceEnergyManagementClusterSlotStruct(minDuration, maxDuration, defaultDuration, elapsedSlotTime, remainingSlotTime, slotIsPausable, minPauseDuration, maxPauseDuration, manufacturerESAState, nominalPower, minPower, maxPower, nominalEnergy, costs, minPowerAdjustment, maxPowerAdjustment, minDurationAdjustment, maxDurationAdjustment)
     }
   }
 }

@@ -71,3 +71,8 @@ void __attribute__((weak)) emberAfRvcRunModeClusterInitCallback(EndpointId endpo
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfServiceAreaClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}

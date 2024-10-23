@@ -44,6 +44,7 @@ void MatterTargetNavigatorPluginServerInitCallback();
 void MatterTemperatureMeasurementPluginServerInitCallback();
 void MatterThermostatPluginServerInitCallback();
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();
+void MatterThreadBorderRouterManagementPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
 void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
@@ -97,6 +98,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterTemperatureMeasurementPluginServerInitCallback(); \
     MatterThermostatPluginServerInitCallback(); \
     MatterThermostatUserInterfaceConfigurationPluginServerInitCallback(); \
+    MatterThreadBorderRouterManagementPluginServerInitCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
     MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUnitLocalizationPluginServerInitCallback(); \

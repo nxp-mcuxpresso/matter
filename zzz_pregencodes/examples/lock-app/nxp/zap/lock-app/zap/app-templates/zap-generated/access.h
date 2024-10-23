@@ -30,11 +30,10 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -46,17 +45,20 @@
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
+    0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -68,17 +70,20 @@
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
-    /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -90,7 +95,11 @@
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: view */ \
-    /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: view */ \
+    /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,40 +107,61 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    0x0000002A, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
+    0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     0x00000101, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
     0x00000101, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    0x00000101, /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    0x00000101, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    0x00000000, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
+    0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     0x00000023, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
     0x00000025, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    0x00000035, /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: administer */ \
+    0x00000029, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
+    0x0000002B, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
+    0x00000030, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
+    0x00000031, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    0x00000033, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
+    chip::Access::Privilege::kManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Door Lock, Attribute: AutoRelockTime, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Door Lock, Attribute: OperatingMode, Privilege: manage */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: ExpiringUserTimeout, Privilege: administer */ \
+    chip::Access::Privilege::kManage, /* Cluster: Door Lock, Attribute: EnableOneTouchLocking, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Door Lock, Attribute: EnablePrivacyModeButton, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: WrongCodeEntryLimit, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: UserCodeTemporaryDisableTime, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Attribute: RequirePINforRemoteOperation, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +195,6 @@
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    0x00000101, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    0x00000101, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    0x00000101, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    0x00000101, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    0x00000101, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -201,11 +226,6 @@
     0x00000001, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     0x00000003, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     0x00000004, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    0x0000001A, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    0x0000001B, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    0x0000001D, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    0x00000022, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    0x00000024, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -237,11 +257,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,18 +265,21 @@
 #define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
 #define GENERATED_ACCESS_READ_EVENT__EVENT { \
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
 #define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

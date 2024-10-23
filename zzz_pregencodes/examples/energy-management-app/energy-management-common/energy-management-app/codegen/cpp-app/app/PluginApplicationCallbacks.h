@@ -20,6 +20,8 @@ void MatterPowerSourcePluginServerInitCallback();
 void MatterPowerTopologyPluginServerInitCallback();
 void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUnitLocalizationPluginServerInitCallback();
+void MatterWaterHeaterManagementPluginServerInitCallback();
+void MatterWaterHeaterModePluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
@@ -42,5 +44,7 @@ void MatterUnitLocalizationPluginServerInitCallback();
     MatterPowerSourcePluginServerInitCallback(); \
     MatterPowerTopologyPluginServerInitCallback(); \
     MatterTimeFormatLocalizationPluginServerInitCallback(); \
-    MatterUnitLocalizationPluginServerInitCallback();
+    MatterUnitLocalizationPluginServerInitCallback(); \
+    MatterWaterHeaterManagementPluginServerInitCallback(); \
+    MatterWaterHeaterModePluginServerInitCallback();
 

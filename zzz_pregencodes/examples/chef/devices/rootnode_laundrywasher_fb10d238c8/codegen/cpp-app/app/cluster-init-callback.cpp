@@ -31,11 +31,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::GroupKeyManagement::Id:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Identify::Id:
-        emberAfIdentifyClusterInitCallback(endpoint);
+    case app::Clusters::LaundryWasherControls::Id:
+        emberAfLaundryWasherControlsClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
+    case app::Clusters::LaundryWasherMode::Id:
+        emberAfLaundryWasherModeClusterInitCallback(endpoint);
         break;
     case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
@@ -45,9 +45,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::OperationalState::Id:
         emberAfOperationalStateClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::TimeFormatLocalization::Id:
-        emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
     case app::Clusters::UnitLocalization::Id:
         emberAfUnitLocalizationClusterInitCallback(endpoint);

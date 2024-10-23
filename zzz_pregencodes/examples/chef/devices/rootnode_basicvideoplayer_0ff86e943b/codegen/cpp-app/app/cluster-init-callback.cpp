@@ -52,9 +52,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-    case app::Clusters::LocalizationConfiguration::Id:
-        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
-        break;
     case app::Clusters::LowPower::Id:
         emberAfLowPowerClusterInitCallback(endpoint);
         break;

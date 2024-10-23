@@ -141,3 +141,8 @@ void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfWindowCoveringClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}

@@ -25,7 +25,6 @@
 #define MATTER_DM_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define MATTER_DM_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define MATTER_DM_LEVEL_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define MATTER_DM_BINARY_INPUT_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define MATTER_DM_DESCRIPTOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define MATTER_DM_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define MATTER_DM_BINDING_CLUSTER_SERVER_ENDPOINT_COUNT (2)
@@ -79,11 +78,6 @@
 // Use this macro to check if the client side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_CLIENT
-
-// Use this macro to check if the server side of the Binary Input (Basic) cluster is included
-#define ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_SERVER
-#define MATTER_DM_PLUGIN_BINARY_INPUT_BASIC_SERVER
-#define MATTER_DM_PLUGIN_BINARY_INPUT_BASIC
 
 // Use this macro to check if the client side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_CLIENT
@@ -144,7 +138,7 @@
 #define MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS
 
-// Use this macro to check if the server side of the WiFi Network Diagnostics cluster is included
+// Use this macro to check if the server side of the Wi-Fi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS

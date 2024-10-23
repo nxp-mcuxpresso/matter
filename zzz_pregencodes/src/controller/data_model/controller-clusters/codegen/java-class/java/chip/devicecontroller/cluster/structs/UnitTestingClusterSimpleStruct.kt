@@ -34,7 +34,8 @@ class UnitTestingClusterSimpleStruct (
     val e: String,
     val f: UInt,
     val g: Float,
-    val h: Double) {
+    val h: Double,
+    val i: Optional<UInt>) {
   override fun toString(): String  = buildString {
     append("UnitTestingClusterSimpleStruct {\n")
     append("\ta : $a\n")
@@ -45,6 +46,7 @@ class UnitTestingClusterSimpleStruct (
     append("\tf : $f\n")
     append("\tg : $g\n")
     append("\th : $h\n")
+    append("\ti : $i\n")
     append("}\n")
   }
 
@@ -59,6 +61,10 @@ class UnitTestingClusterSimpleStruct (
       put(ContextSpecificTag(TAG_F), f)
       put(ContextSpecificTag(TAG_G), g)
       put(ContextSpecificTag(TAG_H), h)
+      if (i.isPresent) {
+      val opti = i.get()
+      put(ContextSpecificTag(TAG_I), opti)
+    }
       endStructure()
     }
   }
@@ -72,6 +78,7 @@ class UnitTestingClusterSimpleStruct (
     private const val TAG_F = 5
     private const val TAG_G = 6
     private const val TAG_H = 7
+    private const val TAG_I = 8
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterSimpleStruct {
       tlvReader.enterStructure(tlvTag)
@@ -83,10 +90,15 @@ class UnitTestingClusterSimpleStruct (
       val f = tlvReader.getUInt(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
+      val i = if (tlvReader.isNextTag(ContextSpecificTag(TAG_I))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_I)))
+    } else {
+      Optional.empty()
+    }
       
       tlvReader.exitContainer()
 
-      return UnitTestingClusterSimpleStruct(a, b, c, d, e, f, g, h)
+      return UnitTestingClusterSimpleStruct(a, b, c, d, e, f, g, h, i)
     }
   }
 }

@@ -1551,6 +1551,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::StringEchoRequest::Id: {
+            Commands::StringEchoRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterStringEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::GlobalEchoRequest::Id: {
+            Commands::GlobalEchoRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterGlobalEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestDifferentVendorMeiRequest::Id: {
             Commands::TestDifferentVendorMeiRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
