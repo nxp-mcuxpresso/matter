@@ -72,6 +72,7 @@ source_set("callbacks") {
 
   deps = [
     "${chip_root}/src/access",
+    "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app:paths",
   ]
 }
