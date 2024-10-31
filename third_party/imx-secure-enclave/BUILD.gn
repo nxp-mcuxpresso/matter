@@ -54,6 +54,7 @@ config("libele_config") {
     "MT_SAB_KEY_RECOVERY=${FMW}",
     "MT_SAB_GET_INFO=${FMW}",
     "MT_SAB_AUTH_ENC=${FMW}",
+    "MT_SAB_AUTH_ENC_NEW=${FMW}",
     "MT_SAB_DATA_STORAGE=${FMW}",
     "MT_SAB_DATA_STORAGE_DELETE=${FMW}",
     "MT_SAB_DEBUG_DUMP=${ROM}",
