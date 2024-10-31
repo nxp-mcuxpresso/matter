@@ -547,6 +547,7 @@ CHIP_ERROR PersistentStorageOperationalKeystoreEle::CommitOpKeypairForFabric(Fab
 CHIP_ERROR PersistentStorageOperationalKeystoreEle::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
     hsm_err_t hsmret = HSM_NO_ERROR;
+    op_get_key_attr_args_t keyattr_args;
 
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
@@ -557,9 +558,18 @@ CHIP_ERROR PersistentStorageOperationalKeystoreEle::RemoveOpKeypairForFabric(Fab
         return CHIP_NO_ERROR;
     }
 
-    hsmret = EleDeleteKey(fabricIndex);
-    if (hsmret != HSM_NO_ERROR)
-        return CHIP_ERROR_HSM;
+    // get the key attributes, it shall fail if no such key.
+    memset(&keyattr_args, 0, sizeof(keyattr_args));
+    keyattr_args.key_identifier = fabricIndex;
+    hsmret = hsm_get_key_attr(key_mgmt_hdl, &keyattr_args);
+    if (hsmret != HSM_NO_ERROR) {
+        ChipLogDetail(Crypto, "No keypair for fabric: %d found. No need to delete\n", fabricIndex);
+        return CHIP_NO_ERROR;
+    } else {
+        hsmret = EleDeleteKey(fabricIndex);
+        if (hsmret != HSM_NO_ERROR)
+            return CHIP_ERROR_HSM;
+    }
 
     return CHIP_NO_ERROR;
 }
