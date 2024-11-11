@@ -148,7 +148,11 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
     CHECKRESULT(gMediaIPCHelper->Notify("c 1"));
     mCurrentState = gMediaIPCHelper->GetCurrentStatus();
 
-    CHECKRESULT(gMediaIPCHelper->Notify("p"));
+    if (mCurrentState == chip::app::Clusters::MediaPlayback::PlaybackStateEnum::kPaused) {
+       CHECKRESULT(gMediaIPCHelper->Notify("a"));
+    }else {
+       CHECKRESULT(gMediaIPCHelper->Notify("p"));
+    }
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
