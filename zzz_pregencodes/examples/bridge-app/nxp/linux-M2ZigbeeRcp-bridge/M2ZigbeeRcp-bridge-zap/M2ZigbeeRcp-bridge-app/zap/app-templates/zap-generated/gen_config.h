@@ -97,18 +97,15 @@
 #define MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #define MATTER_DM_PLUGIN_IDENTIFY
 
-
 // Use this macro to check if the server side of the Groups cluster is included
 #define ZCL_USING_GROUPS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_GROUPS_SERVER
 #define MATTER_DM_PLUGIN_GROUPS
 
-
 // Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ON_OFF_SERVER
 #define MATTER_DM_PLUGIN_ON_OFF
-
 
 // Use this macro to check if the server side of the Level Control cluster is included
 #define ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
@@ -119,215 +116,178 @@
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE 0
 
-
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_DESCRIPTOR_SERVER
 #define MATTER_DM_PLUGIN_DESCRIPTOR
 
-
 // Use this macro to check if the client side of the Binding cluster is included
 #define ZCL_USING_BINDING_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_BINDING_CLIENT
-
 
 // Use this macro to check if the server side of the Binding cluster is included
 #define ZCL_USING_BINDING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_BINDING_SERVER
 #define MATTER_DM_PLUGIN_BINDING
 
-
 // Use this macro to check if the client side of the Access Control cluster is included
 #define ZCL_USING_ACCESS_CONTROL_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_ACCESS_CONTROL_CLIENT
-
 
 // Use this macro to check if the server side of the Access Control cluster is included
 #define ZCL_USING_ACCESS_CONTROL_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ACCESS_CONTROL_SERVER
 #define MATTER_DM_PLUGIN_ACCESS_CONTROL
 
-
 // Use this macro to check if the server side of the Actions cluster is included
 #define ZCL_USING_ACTIONS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ACTIONS_SERVER
 #define MATTER_DM_PLUGIN_ACTIONS
 
-
 // Use this macro to check if the client side of the Basic Information cluster is included
 #define ZCL_USING_BASIC_INFORMATION_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_BASIC_INFORMATION_CLIENT
-
 
 // Use this macro to check if the server side of the Basic Information cluster is included
 #define ZCL_USING_BASIC_INFORMATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_BASIC_INFORMATION_SERVER
 #define MATTER_DM_PLUGIN_BASIC_INFORMATION
 
-
 // Use this macro to check if the client side of the OTA Software Update Provider cluster is included
 #define ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_OTA_SOFTWARE_UPDATE_PROVIDER_CLIENT
-
 
 // Use this macro to check if the server side of the OTA Software Update Requestor cluster is included
 #define ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_SERVER
 #define MATTER_DM_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR
 
-
 // Use this macro to check if the server side of the Localization Configuration cluster is included
 #define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
 #define MATTER_DM_PLUGIN_LOCALIZATION_CONFIGURATION
-
 
 // Use this macro to check if the server side of the Time Format Localization cluster is included
 #define ZCL_USING_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_TIME_FORMAT_LOCALIZATION_SERVER
 #define MATTER_DM_PLUGIN_TIME_FORMAT_LOCALIZATION
 
-
 // Use this macro to check if the server side of the Unit Localization cluster is included
 #define ZCL_USING_UNIT_LOCALIZATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_UNIT_LOCALIZATION_SERVER
 #define MATTER_DM_PLUGIN_UNIT_LOCALIZATION
-
 
 // Use this macro to check if the server side of the Power Source Configuration cluster is included
 #define ZCL_USING_POWER_SOURCE_CONFIGURATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_POWER_SOURCE_CONFIGURATION_SERVER
 #define MATTER_DM_PLUGIN_POWER_SOURCE_CONFIGURATION
 
-
 // Use this macro to check if the server side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_GENERAL_COMMISSIONING_SERVER
 #define MATTER_DM_PLUGIN_GENERAL_COMMISSIONING
-
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_NETWORK_COMMISSIONING_SERVER
 #define MATTER_DM_PLUGIN_NETWORK_COMMISSIONING
 
-
 // Use this macro to check if the server side of the Diagnostic Logs cluster is included
 #define ZCL_USING_DIAGNOSTIC_LOGS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_DIAGNOSTIC_LOGS_SERVER
 #define MATTER_DM_PLUGIN_DIAGNOSTIC_LOGS
-
 
 // Use this macro to check if the server side of the General Diagnostics cluster is included
 #define ZCL_USING_GENERAL_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_GENERAL_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_GENERAL_DIAGNOSTICS
 
-
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS
-
 
 // Use this macro to check if the server side of the Thread Network Diagnostics cluster is included
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_THREAD_NETWORK_DIAGNOSTICS
 
-
 // Use this macro to check if the server side of the Wi-Fi Network Diagnostics cluster is included
 #define ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_WI_FI_NETWORK_DIAGNOSTICS
-
 
 // Use this macro to check if the server side of the Ethernet Network Diagnostics cluster is included
 #define ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ETHERNET_NETWORK_DIAGNOSTICS_SERVER
 #define MATTER_DM_PLUGIN_ETHERNET_NETWORK_DIAGNOSTICS
 
-
 // Use this macro to check if the server side of the Bridged Device Basic Information cluster is included
 #define ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_BRIDGED_DEVICE_BASIC_INFORMATION_SERVER
 #define MATTER_DM_PLUGIN_BRIDGED_DEVICE_BASIC_INFORMATION
-
 
 // Use this macro to check if the server side of the Administrator Commissioning cluster is included
 #define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
 #define MATTER_DM_PLUGIN_ADMINISTRATOR_COMMISSIONING
 
-
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define MATTER_DM_PLUGIN_OPERATIONAL_CREDENTIALS
-
 
 // Use this macro to check if the server side of the Group Key Management cluster is included
 #define ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_GROUP_KEY_MANAGEMENT_SERVER
 #define MATTER_DM_PLUGIN_GROUP_KEY_MANAGEMENT
 
-
 // Use this macro to check if the server side of the User Label cluster is included
 #define ZCL_USING_USER_LABEL_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_USER_LABEL_SERVER
 #define MATTER_DM_PLUGIN_USER_LABEL
 
-
 // Use this macro to check if the client side of the Laundry Washer Mode cluster is included
 #define ZCL_USING_LAUNDRY_WASHER_MODE_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_CLIENT
 
-
 // Use this macro to check if the client side of the Refrigerator And Temperature Controlled Cabinet Mode cluster is included
 #define ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLIENT
-
 
 // Use this macro to check if the server side of the Laundry Washer Controls cluster is included
 #define ZCL_USING_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS_SERVER
 #define MATTER_DM_PLUGIN_LAUNDRY_WASHER_CONTROLS
 
-
 // Use this macro to check if the server side of the Temperature Control cluster is included
 #define ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #define MATTER_DM_PLUGIN_TEMPERATURE_CONTROL
-
 
 // Use this macro to check if the server side of the Refrigerator Alarm cluster is included
 #define ZCL_USING_REFRIGERATOR_ALARM_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
 #define MATTER_DM_PLUGIN_REFRIGERATOR_ALARM
 
-
 // Use this macro to check if the client side of the Dishwasher Mode cluster is included
 #define ZCL_USING_DISHWASHER_MODE_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_DISHWASHER_MODE_CLIENT
-
 
 // Use this macro to check if the server side of the Air Quality cluster is included
 #define ZCL_USING_AIR_QUALITY_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
 #define MATTER_DM_PLUGIN_AIR_QUALITY
 
-
 // Use this macro to check if the server side of the Smoke CO Alarm cluster is included
 #define ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_SMOKE_CO_ALARM_SERVER
 #define MATTER_DM_PLUGIN_SMOKE_CO_ALARM
 
-
 // Use this macro to check if the server side of the Dishwasher Alarm cluster is included
 #define ZCL_USING_DISHWASHER_ALARM_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 #define MATTER_DM_PLUGIN_DISHWASHER_ALARM
-
 
 // Use this macro to check if the server side of the Scenes Management cluster is included
 #define ZCL_USING_SCENES_CLUSTER_SERVER
@@ -345,59 +305,49 @@
 #define MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK 0x0001
 #define MATTER_CLUSTER_TABLE_SIZE_SUPPORT (0x0000 & MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK)
 
-
 // Use this macro to check if the server side of the HEPA Filter Monitoring cluster is included
 #define ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING_SERVER
 #define MATTER_DM_PLUGIN_HEPA_FILTER_MONITORING
-
 
 // Use this macro to check if the server side of the Activated Carbon Filter Monitoring cluster is included
 #define ZCL_USING_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_SERVER
 #define MATTER_DM_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING
 
-
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT
 #define MATTER_DM_PLUGIN_DOOR_LOCK_CLIENT
-
 
 // Use this macro to check if the server side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #define MATTER_DM_PLUGIN_DOOR_LOCK
 
-
 // Use this macro to check if the server side of the Window Covering cluster is included
 #define ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 #define MATTER_DM_PLUGIN_WINDOW_COVERING
-
 
 // Use this macro to check if the server side of the Pump Configuration and Control cluster is included
 #define ZCL_USING_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #define MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL
 
-
 // Use this macro to check if the server side of the Thermostat cluster is included
 #define ZCL_USING_THERMOSTAT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_THERMOSTAT_SERVER
 #define MATTER_DM_PLUGIN_THERMOSTAT
-
 
 // Use this macro to check if the server side of the Fan Control cluster is included
 #define ZCL_USING_FAN_CONTROL_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
 #define MATTER_DM_PLUGIN_FAN_CONTROL
 
-
 // Use this macro to check if the server side of the Thermostat User Interface Configuration cluster is included
 #define ZCL_USING_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_THERMOSTAT_USER_INTERFACE_CONFIGURATION_SERVER
 #define MATTER_DM_PLUGIN_THERMOSTAT_USER_INTERFACE_CONFIGURATION
-
 
 // Use this macro to check if the server side of the Color Control cluster is included
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
@@ -408,105 +358,87 @@
 #define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 #define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-
 // Use this macro to check if the server side of the Ballast Configuration cluster is included
 #define ZCL_USING_BALLAST_CONFIGURATION_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_BALLAST_CONFIGURATION_SERVER
 #define MATTER_DM_PLUGIN_BALLAST_CONFIGURATION
-
 
 // Use this macro to check if the server side of the Illuminance Measurement cluster is included
 #define ZCL_USING_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_ILLUMINANCE_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_ILLUMINANCE_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Temperature Measurement cluster is included
 #define ZCL_USING_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_TEMPERATURE_MEASUREMENT
-
 
 // Use this macro to check if the server side of the Pressure Measurement cluster is included
 #define ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_PRESSURE_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Flow Measurement cluster is included
 #define ZCL_USING_FLOW_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_FLOW_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_FLOW_MEASUREMENT
-
 
 // Use this macro to check if the server side of the Relative Humidity Measurement cluster is included
 #define ZCL_USING_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_RELATIVE_HUMIDITY_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Occupancy Sensing cluster is included
 #define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_OCCUPANCY_SENSING_SERVER
 #define MATTER_DM_PLUGIN_OCCUPANCY_SENSING
-
 
 // Use this macro to check if the server side of the Carbon Monoxide Concentration Measurement cluster is included
 #define ZCL_USING_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Carbon Dioxide Concentration Measurement cluster is included
 #define ZCL_USING_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT
-
 
 // Use this macro to check if the server side of the Nitrogen Dioxide Concentration Measurement cluster is included
 #define ZCL_USING_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Ozone Concentration Measurement cluster is included
 #define ZCL_USING_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT
-
 
 // Use this macro to check if the server side of the PM2.5 Concentration Measurement cluster is included
 #define ZCL_USING_PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Formaldehyde Concentration Measurement cluster is included
 #define ZCL_USING_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT
-
 
 // Use this macro to check if the server side of the PM1 Concentration Measurement cluster is included
 #define ZCL_USING_PM1_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT
 
-
 // Use this macro to check if the server side of the PM10 Concentration Measurement cluster is included
 #define ZCL_USING_PM10_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT
-
 
 // Use this macro to check if the server side of the Total Volatile Organic Compounds Concentration Measurement cluster is included
 #define ZCL_USING_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT
 
-
 // Use this macro to check if the server side of the Radon Concentration Measurement cluster is included
 #define ZCL_USING_RADON_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER
 #define MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER
 #define MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT
-

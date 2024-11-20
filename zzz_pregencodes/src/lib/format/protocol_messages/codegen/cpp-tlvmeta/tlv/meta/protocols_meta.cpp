@@ -149,11 +149,11 @@ const Entry<ItemInfo> _IMProtocol_StatusResponseMessage[] = {
 };
 
 const Entry<ItemInfo> _IMProtocol_ReadRequestMessage[] = {
-  { { ContextTag(0), "attribute_requests", ItemType::kList }, 52 }, // IMProtocol::AttributePathIB[]
-  { { ContextTag(1), "event_requests", ItemType::kList }, 47 }, // IMProtocol::EventPathIB[]
-  { { ContextTag(2), "event_filters", ItemType::kList }, 49 }, // IMProtocol::EventFilterIB[]
+  { { ContextTag(0), "attribute_requests", ItemType::kList }, 51 }, // IMProtocol::AttributePathIB[]
+  { { ContextTag(1), "event_requests", ItemType::kList }, 54 }, // IMProtocol::EventPathIB[]
+  { { ContextTag(2), "event_filters", ItemType::kList }, 45 }, // IMProtocol::EventFilterIB[]
   { { ContextTag(3), "fabric_filtered", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(4), "data_version_filters", ItemType::kList }, 51 }, // IMProtocol::DataVersionFilterIB[]
+  { { ContextTag(4), "data_version_filters", ItemType::kList }, 53 }, // IMProtocol::DataVersionFilterIB[]
   { { ContextTag(5), "include_attribution_data", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
@@ -162,11 +162,11 @@ const Entry<ItemInfo> _IMProtocol_SubscribeRequestMessage[] = {
   { { ContextTag(0), "keep_subscriptions", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(1), "min_minterval_floor", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int16u
   { { ContextTag(2), "max_minterval_ceiling", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int16u
-  { { ContextTag(3), "attribute_requests", ItemType::kList }, 52 }, // IMProtocol::AttributePathIB[]
-  { { ContextTag(4), "event_requests", ItemType::kList }, 47 }, // IMProtocol::EventPathIB[]
-  { { ContextTag(5), "event_filters", ItemType::kList }, 49 }, // IMProtocol::EventFilterIB[]
+  { { ContextTag(3), "attribute_requests", ItemType::kList }, 51 }, // IMProtocol::AttributePathIB[]
+  { { ContextTag(4), "event_requests", ItemType::kList }, 54 }, // IMProtocol::EventPathIB[]
+  { { ContextTag(5), "event_filters", ItemType::kList }, 45 }, // IMProtocol::EventFilterIB[]
   { { ContextTag(7), "fabric_filtered", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(8), "data_version_filters", ItemType::kList }, 51 }, // IMProtocol::DataVersionFilterIB[]
+  { { ContextTag(8), "data_version_filters", ItemType::kList }, 53 }, // IMProtocol::DataVersionFilterIB[]
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
 
@@ -231,8 +231,8 @@ const Entry<ItemInfo> _IMProtocol_EventReportIB[] = {
 
 const Entry<ItemInfo> _IMProtocol_ReportDataMessage[] = {
   { { ContextTag(0), "subscription_id", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int32u
-  { { ContextTag(1), "attribute_reports", ItemType::kList }, 48 }, // IMProtocol::AttributeReportIB[]
-  { { ContextTag(2), "event_reports", ItemType::kList }, 54 }, // IMProtocol::EventReportIB[]
+  { { ContextTag(1), "attribute_reports", ItemType::kList }, 50 }, // IMProtocol::AttributeReportIB[]
+  { { ContextTag(2), "event_reports", ItemType::kList }, 49 }, // IMProtocol::EventReportIB[]
   { { ContextTag(3), "more_cunked_messages", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(4), "suppress_response", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
@@ -259,7 +259,7 @@ const Entry<ItemInfo> _IMProtocol_AttributeStatusIB[] = {
 };
 
 const Entry<ItemInfo> _IMProtocol_WriteResponseMessage[] = {
-  { { ContextTag(0), "write_responses", ItemType::kList }, 53 }, // IMProtocol::AttributeStatusIB[]
+  { { ContextTag(0), "write_responses", ItemType::kList }, 52 }, // IMProtocol::AttributeStatusIB[]
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
 
@@ -285,7 +285,7 @@ const Entry<ItemInfo> _IMProtocol_SuppliedAttribution[] = {
 const Entry<ItemInfo> _IMProtocol_InvokeRequestMessage[] = {
   { { ContextTag(0), "suppress_response", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(1), "timed_request", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(2), "invoke_requests", ItemType::kList }, 45 }, // IMProtocol::CommandDataIB[]
+  { { ContextTag(2), "invoke_requests", ItemType::kList }, 47 }, // IMProtocol::CommandDataIB[]
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
 
@@ -301,7 +301,7 @@ const Entry<ItemInfo> _IMProtocol_InvokeResponseIB[] = {
 
 const Entry<ItemInfo> _IMProtocol_InvokeResponseMessage[] = {
   { { ContextTag(0), "suppress_response", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(1), "invoke_responses", ItemType::kList }, 50 }, // IMProtocol::InvokeResponseIB[]
+  { { ContextTag(1), "invoke_responses", ItemType::kList }, 48 }, // IMProtocol::InvokeResponseIB[]
   { { ContextTag(2), "more_chunked_messages", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
@@ -311,32 +311,28 @@ const Entry<ItemInfo> _IMProtocol_TimedRequestMessage[] = {
   { { ContextTag(255), "interaction_model_revison", ItemType::kDefault }, kInvalidNodeIndex }, // IMProtocol::int8u
 };
 
-const Entry<ItemInfo> _IMProtocol_CommandDataIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 38 }, // IMProtocol_CommandDataIB[]
+const Entry<ItemInfo> _IMProtocol_EventFilterIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 17 }, // IMProtocol_EventFilterIB[]
 };
 
 const Entry<ItemInfo> _IMProtocol_AttributeDataIB_list_[] = {
   { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 33 }, // IMProtocol_AttributeDataIB[]
 };
 
-const Entry<ItemInfo> _IMProtocol_EventPathIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 16 }, // IMProtocol_EventPathIB[]
-};
-
-const Entry<ItemInfo> _IMProtocol_AttributeReportIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 28 }, // IMProtocol_AttributeReportIB[]
-};
-
-const Entry<ItemInfo> _IMProtocol_EventFilterIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 17 }, // IMProtocol_EventFilterIB[]
+const Entry<ItemInfo> _IMProtocol_CommandDataIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 38 }, // IMProtocol_CommandDataIB[]
 };
 
 const Entry<ItemInfo> _IMProtocol_InvokeResponseIB_list_[] = {
   { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 42 }, // IMProtocol_InvokeResponseIB[]
 };
 
-const Entry<ItemInfo> _IMProtocol_DataVersionFilterIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 19 }, // IMProtocol_DataVersionFilterIB[]
+const Entry<ItemInfo> _IMProtocol_EventReportIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 31 }, // IMProtocol_EventReportIB[]
+};
+
+const Entry<ItemInfo> _IMProtocol_AttributeReportIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 28 }, // IMProtocol_AttributeReportIB[]
 };
 
 const Entry<ItemInfo> _IMProtocol_AttributePathIB_list_[] = {
@@ -347,8 +343,12 @@ const Entry<ItemInfo> _IMProtocol_AttributeStatusIB_list_[] = {
   { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 35 }, // IMProtocol_AttributeStatusIB[]
 };
 
-const Entry<ItemInfo> _IMProtocol_EventReportIB_list_[] = {
-  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 31 }, // IMProtocol_EventReportIB[]
+const Entry<ItemInfo> _IMProtocol_DataVersionFilterIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 19 }, // IMProtocol_DataVersionFilterIB[]
+};
+
+const Entry<ItemInfo> _IMProtocol_EventPathIB_list_[] = {
+  { { AnonymousTag(), "Anonymous<>", ItemType::kDefault }, 16 }, // IMProtocol_EventPathIB[]
 };
 
 const Entry<ItemInfo> _IMProtocol_StatusCodeEnum[] = {
@@ -475,16 +475,16 @@ const std::array<const Node<ItemInfo>, 58 + 2> protocols_meta = { {
   _ENTRY(_IMProtocol_InvokeResponseIB), // 42
   _ENTRY(_IMProtocol_InvokeResponseMessage), // 43
   _ENTRY(_IMProtocol_TimedRequestMessage), // 44
-  _ENTRY(_IMProtocol_CommandDataIB_list_), // 45
+  _ENTRY(_IMProtocol_EventFilterIB_list_), // 45
   _ENTRY(_IMProtocol_AttributeDataIB_list_), // 46
-  _ENTRY(_IMProtocol_EventPathIB_list_), // 47
-  _ENTRY(_IMProtocol_AttributeReportIB_list_), // 48
-  _ENTRY(_IMProtocol_EventFilterIB_list_), // 49
-  _ENTRY(_IMProtocol_InvokeResponseIB_list_), // 50
-  _ENTRY(_IMProtocol_DataVersionFilterIB_list_), // 51
-  _ENTRY(_IMProtocol_AttributePathIB_list_), // 52
-  _ENTRY(_IMProtocol_AttributeStatusIB_list_), // 53
-  _ENTRY(_IMProtocol_EventReportIB_list_), // 54
+  _ENTRY(_IMProtocol_CommandDataIB_list_), // 47
+  _ENTRY(_IMProtocol_InvokeResponseIB_list_), // 48
+  _ENTRY(_IMProtocol_EventReportIB_list_), // 49
+  _ENTRY(_IMProtocol_AttributeReportIB_list_), // 50
+  _ENTRY(_IMProtocol_AttributePathIB_list_), // 51
+  _ENTRY(_IMProtocol_AttributeStatusIB_list_), // 52
+  _ENTRY(_IMProtocol_DataVersionFilterIB_list_), // 53
+  _ENTRY(_IMProtocol_EventPathIB_list_), // 54
   _ENTRY(_IMProtocol_StatusCodeEnum), // 55
   _ENTRY(_IMProtocol_SuppliedAttributionContextInformation), // 56
   _ENTRY(_BdxProtocol), // 57
