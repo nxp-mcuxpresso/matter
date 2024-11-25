@@ -41,6 +41,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <mutex>
+#include <filesystem>
 
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
@@ -64,6 +65,7 @@
 #include <crow/http_response.h>
 #include <crow/json.h>
 #include <crow/app.h>
+#include <crow/multipart.h>
 #include "crow/middlewares/cors.h"
 
 // For file reading by the server
@@ -223,58 +225,219 @@ void generateMessages(WsServer* s, websocketpp::connection_hdl hdl, message_ptr 
     }
 }
 
-// Define a callback to handle incoming messages
-void on_message(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
+bool killProcesses(const std::string & processName)
 {
-    ChipLogError(NotSpecified, "WebSocket server for subscription receive msg: %s", msg->get_payload().c_str());
-    std::string command;
-    command = msg->get_payload();
-    Json::Value jsonObject;
-    Json::Reader reader;
-    std::string minInterval, maxInterval, nodeId, endPointId, nodeAlias;
-    ChipLogError(NotSpecified, "Received WebSockets request for subscribe with command: %s", command.c_str());
-    if (reader.parse(command, jsonObject))
-    {
-        minInterval  = jsonObject["minInterval"].asString();
-        maxInterval  = jsonObject["maxInterval"].asString();
-        nodeAlias = jsonObject["nodeAlias"].asString();
-        nodeId = jsonObject["nodeId"].asString();
-        endPointId = jsonObject["endPointId"].asString();
+    char buffer[128];
+    std::string result = "";
+    std::string cmd = "ps -aux | grep \"" + processName + "\" | grep -v grep | awk '{print $2}'";
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) {
+        ChipLogError(NotSpecified, "Error: popen() failed!");
     }
-    ChipLogError(NotSpecified, "Received WebSockets request for subscribe with Node ID: %s, Endpoint ID: %s", nodeId.c_str(), endPointId.c_str());
-    std::string subscribeCommand;
-    subscribeCommand = "onoff subscribe on-off " + minInterval + " " + maxInterval + " " + nodeId + " " + endPointId;
-    wsClient.sendMessage(subscribeCommand);
-    ChipLogError(NotSpecified, "Send subscribe command to chip-tool ws server.");
-    int sleepTime = 0;
-    while (reportQueue.empty() && sleepTime < 20)
-    {
-        this_thread::sleep_for(chrono::seconds(1));
-        sleepTime++;
+    if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        result = buffer;
     }
-    if (sleepTime == 20) {
-        ChipLogError(NotSpecified, "Receive subscribe command to chip-tool ws server overtime!");
+    pclose(pipe);
+
+    ChipLogError(NotSpecified, "Get the pid number: %s of processName: %s", result.c_str(), processName.c_str());
+    int pid = std::stoi(result);
+    if (pid <= 0 ) {
+        return false;
+    }
+    std::string command = "kill " + std::to_string(pid);
+    if (system(command.c_str())) {
+        ChipLogError(NotSpecified, "Failed to kill process.");
+        return false;
     } else {
-        Json::Value resultsValue = wsClient.dequeueReport();
-        Json::Value arryValue = resultsValue[0];
-        stringstream report_ss;
-        string report_text;
-        ChipLogError(NotSpecified, "Received subscribe report from chip-tool ws server: %s", arryValue.toStyledString().c_str());
-        report_ss << "Subscribe Report from " << nodeAlias << " " << nodeId << ": " << arryValue["endpointId"] << ". " << "Cluster: "
-                << arryValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << arryValue["value"];
-        report_text = report_ss.str();
-        ChipLogError(NotSpecified, "Generated report successfully: %s", report_text.c_str());
+        this_thread::sleep_for(chrono::seconds(1));
+        ChipLogError(NotSpecified, "Successfully killed process.");
+        return true;
+    }
+}
+
+void generateOtaMessage(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg, string cmd)
+{
+    char buffer[128];
+    std::string result = "";
+    std::string otaReport = "";
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe) {
+        otaReport = "OTA Report: chip-ota-provider-app start failed";
         try
         {
-            s->send(hdl, report_text, msg->get_opcode());
-            ChipLogError(NotSpecified, "WebSocket server send subscribe report msg: %s", report_text.c_str());
+            s->send(hdl, otaReport, msg->get_opcode());
         }
         catch (websocketpp::exception const & e)
         {
-            ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
+            ChipLogError(NotSpecified, "WebSocket server send ota report msg failed because %s", e.what());
         }
-        std::thread generator(generateMessages, s, hdl, msg, nodeId, nodeAlias);
-        generator.detach();
+        return;
+    }
+
+    auto start_time = std::chrono::steady_clock::now();
+    const std::string expectedStartLog = "Updating services using commissioning mode 1";
+
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+    {
+        result = buffer;
+        auto end_time = std::chrono::steady_clock::now();
+        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+        if (elapsed_seconds > 5)
+        {
+            ChipLogError(NotSpecified, "Run chip-ota-provider-app command: %s failed.", cmd.c_str());
+            otaReport = "OTA Report: chip-ota-provider-app start failed";
+            try
+            {
+                s->send(hdl, otaReport, msg->get_opcode());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send ota report msg failed because %s", e.what());
+            }
+            if (killProcesses(cmd)) {
+                pclose(pipe);
+            }
+            return;
+        }
+        if (result.find(expectedStartLog) != std::string::npos)
+        {
+            ChipLogError(NotSpecified, "Run chip-ota-provider-app command: %s successfully.", cmd.c_str());
+            otaReport = "OTA Report: chip-ota-provider-app start successfully";
+            try
+            {
+                s->send(hdl, otaReport, msg->get_opcode());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send ota report msg failed because %s", e.what());
+            }
+            break;
+        }
+    }
+
+    const std::string initReceived     = "CHIP:BDX: OutputEvent type: InitReceived";
+    const std::string AckEofReceived   = "CHIP:BDX: OutputEvent type: AckEOFReceived";
+    const std::string internalError    = "CHIP:BDX: OutputEvent type: InternalError";
+    const std::string transferTimeout  = "CHIP:BDX: OutputEvent type: TransferTimeout";
+    const std::string unknown          = "CHIP:BDX: OutputEvent type: Unknown";
+
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+    {
+        result = buffer;
+        if (result.find(initReceived) != std::string::npos)
+        {
+            otaReport = "OTA Report: chip-ota-provider-app start OTA file transfer";
+            try
+            {
+                s->send(hdl, otaReport, msg->get_opcode());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send ota report message failed because %s", e.what());
+            }
+        }
+        if (result.find(AckEofReceived) != std::string::npos)
+        {
+            otaReport = "OTA Report: chip-ota-provider-app ota transfer successfully";
+            try
+            {
+                s->send(hdl, otaReport, msg->get_opcode());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send ota report message failed because %s", e.what());
+            }
+            break;
+        }
+        else if (result.find(internalError) != std::string::npos || result.find(transferTimeout) != std::string::npos || result.find(unknown) != std::string::npos)
+        {
+            otaReport = "OTA Report: chip-ota-provider-app transfer failed";
+            try
+            {
+                s->send(hdl, otaReport, msg->get_opcode());
+            }
+            catch (websocketpp::exception const & e)
+            {
+                ChipLogError(NotSpecified, "WebSocket server send ota report message failed because %s", e.what());
+            }
+            break;
+        }
+    }
+    if (killProcesses(cmd)) {
+        pclose(pipe);
+    }
+    return;
+}
+
+// Define a callback to handle incoming messages
+void on_message(WsServer* s, websocketpp::connection_hdl hdl, message_ptr msg)
+{
+    ChipLogError(NotSpecified, "WebSocket server receive message: %s", msg->get_payload().c_str());
+    std::string command = msg->get_payload();
+    Json::Value jsonObject;
+    Json::Reader reader;
+    if (reader.parse(command, jsonObject))
+    {
+        std::string commandType = jsonObject["command"].asString();
+        if (commandType =="onoff subscribe on-off") {
+            std::string minInterval = jsonObject["minInterval"].asString();
+            std::string maxInterval = jsonObject["maxInterval"].asString();
+            std::string nodeAlias   = jsonObject["nodeAlias"].asString();
+            std::string nodeId      = jsonObject["nodeId"].asString();
+            std::string endPointId  = jsonObject["endPointId"].asString();
+            ChipLogError(NotSpecified, "Received WebSockets request for subscribe with Node ID: %s, Endpoint ID: %s", nodeId.c_str(), endPointId.c_str());
+            std::string subscribeCommand = "onoff subscribe on-off " + minInterval + " " + maxInterval + " " + nodeId + " " + endPointId;
+            wsClient.sendMessage(subscribeCommand);
+            ChipLogError(NotSpecified, "Send subscribe websocket command to chip-tool ws server.");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime++;
+            }
+            if (sleepTime == 20) {
+                ChipLogError(NotSpecified, "Receive websocket command to chip-tool ws server overtime!");
+            } else {
+                Json::Value resultsValue = wsClient.dequeueReport();
+                Json::Value arryValue = resultsValue[0];
+                stringstream report_ss;
+                string report_text;
+                ChipLogError(NotSpecified, "Received subscribe report from chip-tool ws server: %s", arryValue.toStyledString().c_str());
+                report_ss << "Subscribe Report from " << nodeAlias << " " << nodeId << ": " << arryValue["endpointId"] << ". " << "Cluster: "
+                        << arryValue["clusterId"] << "\r\n\r\n" << "On-Off" << ": " << arryValue["value"];
+                report_text = report_ss.str();
+                ChipLogError(NotSpecified, "Generated report successfully: %s", report_text.c_str());
+                try
+                {
+                    s->send(hdl, report_text, msg->get_opcode());
+                    ChipLogError(NotSpecified, "WebSocket server send subscribe report msg: %s", report_text.c_str());
+                }
+                catch (websocketpp::exception const & e)
+                {
+                    ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
+                }
+                std::thread generator(generateMessages, s, hdl, msg, nodeId, nodeAlias);
+                generator.detach();
+            }
+        } else if (commandType =="ota provider") {
+            std::string discriminator      = jsonObject["discriminator"].asString();
+            std::string filePath           = jsonObject["filePath"].asString();
+            std::string otaCommand         = "chip-ota-provider-app --discriminator " + discriminator + " --filepath " + filePath;
+            ChipLogError(NotSpecified, "Received chip-ota-provider-app from chip-tool ws server");
+            if (access(filePath.c_str(), F_OK) == 0) {
+                std::thread otaProviderProcess(generateOtaMessage, s, hdl, msg, otaCommand);
+                otaProviderProcess.detach();
+            } else {
+                try {
+                    ChipLogError(NotSpecified, "Ota file does not exits %s", filePath.c_str());
+                    string report_text = "OTA Report: ota file does not exits";
+                    s->send(hdl, report_text, msg->get_opcode());
+                    ChipLogError(NotSpecified, "WebSocket server send subscribe report msg: %s", report_text.c_str());
+                } catch (websocketpp::exception const & e) {
+                    ChipLogError(NotSpecified, "WebSocket server send subscribe report msg failed because %s", e.what());
+                }
+            }
+        }
     }
 }
 
@@ -533,7 +696,11 @@ int main()
                 std::string command;
                 if (type == "onnetwork") {
                     command = "pairing onnetwork-commissioning-mode " + nodeId + " " + pinCode;
-                } else if (type == "ble-wifi") {
+                } else if (type == "onnetwork-long") {
+                    auto discriminator = std::string(x_body_decoded["discriminator"].s());
+                    command = "pairing onnetwork-long " + nodeId + " " + pinCode + " " + discriminator;
+                }
+                else if (type == "ble-wifi") {
                     auto ssId = std::string(x_body_decoded["ssId"].s());
                     auto password = std::string(x_body_decoded["password"].s());
                     auto discriminator = std::string(x_body_decoded["discriminator"].s());
@@ -866,25 +1033,24 @@ int main()
         try
         {
             ptree root;
-            read_json(req.body, root);
+            auto x_body_decoded = crow::json::load(req.body);
             std::array<std::string, 2> aclConfString;
             for(int i = 0; i < 2; i++)
             {
                 std::string aclConfKey = "aclConf" + std::to_string(i + 1);
-                ptree aclConf = root.get_child(aclConfKey);
-                auto fabricIndex = aclConf.get<string>("fabricIndex");
-                auto privilege = aclConf.get<string>("privilege");
-                auto authMode = aclConf.get<string>("authMode");
-                auto subjects = aclConf.get<string>("subjects");
-                auto targets = aclConf.get<string>("targets");
+                auto fabricIndex = std::string(x_body_decoded[aclConfKey]["fabricIndex"].s());
+                auto privilege = std::string(x_body_decoded[aclConfKey]["privilege"].s());
+                auto authMode = std::string(x_body_decoded[aclConfKey]["authMode"].s());
+                auto subjects = std::string(x_body_decoded[aclConfKey]["subjects"].s());
+                auto targets = std::string(x_body_decoded[aclConfKey]["targets"].s());
                 aclConfString[i] = "{\"fabricIndex\": " +  fabricIndex + ", \"privilege\": " + privilege + ", \"authMode\": " + authMode +
-                                   ", \"subjects\": [" + subjects + "], \"targets\": " + targets + "}";
+                                   ", \"subjects\": " + subjects + ", \"targets\": " + targets + "}";
             }
-            auto lightNodeId = root.get<string>("lightNodeId");
-            auto aclEndpointId = root.get<string>("aclEndpointId");
+            auto nodeId = std::string(x_body_decoded["nodeId"].s());
+            auto endpointId = std::string(x_body_decoded["endpointId"].s());
             ChipLogError(NotSpecified, "Received POST request to Write ACL");
             std::string command;
-            command = "accesscontrol write acl '[" + aclConfString[0] +"," + aclConfString[1] + "]'" + lightNodeId + " " + aclEndpointId;
+            command = "accesscontrol write acl '[" + aclConfString[0] +"," + aclConfString[1] + "]'" + nodeId + " " + endpointId;
             wsClient.sendMessage(command);
             ChipLogError(NotSpecified, "send write_acl command to chip-tool ws server");
             int sleepTime = 0;
@@ -1413,6 +1579,93 @@ int main()
                 } else {
                     root.put("result", RESPONSE_FAILURE);
                     ChipLogError(NotSpecified, "Execute eevse read command failed!");
+                }
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            crow::response response(strContent);
+            response.add_header("Access-Control-Allow-Origin", "*");
+            return response;
+        } catch (const exception & e)
+        {
+            crow::response response(400, e.what());
+            ChipLogError(NotSpecified, "Error on onoff_report: %s", e.what());
+            response.add_header("Access-Control-Allow-Origin", "*");
+            return response;
+        }
+    });
+
+    CROW_ROUTE(crowApplication, "/api/uploader").methods("POST"_method)([](const crow::request& req)
+    {
+        try
+        {
+            ptree root;
+            crow::multipart::message msg(req);
+            for (const auto& part : msg.parts) {
+                const auto& disposition = part.get_header_object("Content-Disposition");
+                auto it = disposition.params.find("filename");
+
+                if (it != disposition.params.end()) {
+                    const std::string& filename = it->second;
+                    std::string otaFileSavePath = "/root/" + std::string(filename) ;
+                    std::ofstream ofs(otaFileSavePath, std::ios::binary);
+                    if (!ofs) {
+                        ChipLogError(NotSpecified, "Uploaded OTA file save failed!");
+                        root.put("result", RESPONSE_FAILURE);
+                    } else {
+                        ofs.write(part.body.data(), part.body.size());
+                        ofs.close();
+                        ChipLogError(NotSpecified, "Uploaded OTA file save as: %s", otaFileSavePath.c_str());
+                        root.put("result", RESPONSE_SUCCESS);
+                    }
+                }
+            }
+            stringstream ss;
+            write_json(ss, root);
+            string strContent = ss.str();
+            crow::response response(strContent);
+            response.add_header("Access-Control-Allow-Origin", "*");
+            return response;
+        } catch (const exception & e)
+        {
+            crow::response response(400, e.what());
+            ChipLogError(NotSpecified, "Error on onoff_report: %s", e.what());
+            response.add_header("Access-Control-Allow-Origin", "*");
+            return response;
+        }
+    });
+
+    CROW_ROUTE(crowApplication, "/api/otasoftwareupdaterequestor").methods("POST"_method)([](const crow::request& req)
+    {
+        try
+        {
+            ptree root;
+            auto x_body_decoded = crow::json::load(req.body);
+            auto otaProviderNodeId = std::string(x_body_decoded["otaProviderNodeId"].s());
+            auto otaRequestorNodeId = std::string(x_body_decoded["otaRequestorNodeId"].s());
+            // ChipLogError(NotSpecified, "Received run OTA provider POST request for device with Node ID: %s", std::string(nodeId).c_str());
+            std::string command;
+            command = "otasoftwareupdaterequestor announce-otaprovider " + otaProviderNodeId + " 0 0 0 " + otaRequestorNodeId + " 0";
+            wsClient.sendMessage(command);
+            ChipLogError(NotSpecified, "Send otasoftwareupdaterequestor command to chip-tool ws server");
+            int sleepTime = 0;
+            while (reportQueue.empty() && sleepTime < 20)
+            {
+                this_thread::sleep_for(chrono::seconds(1));
+                sleepTime++;
+            }
+            if (sleepTime == 20) {
+                root.put("result", RESPONSE_FAILURE);
+                ChipLogError(NotSpecified, "Execute eevse read command overtime!");
+            } else {
+                Json::Value resultsReport = wsClient.dequeueReport();
+                Json::Value resultsValue = resultsReport[0];
+                if (resultsValue.isMember("error"))
+                {
+                    root.put("result", RESPONSE_FAILURE);
+                } else {
+                    root.put("result", RESPONSE_SUCCESS);
                 }
             }
             stringstream ss;
