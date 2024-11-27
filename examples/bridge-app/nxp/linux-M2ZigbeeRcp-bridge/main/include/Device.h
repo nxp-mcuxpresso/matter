@@ -76,6 +76,7 @@ public:
     inline void SetZone(std::string zone) { mZone = zone; };
     void DiscoverNode(m2z_device_params_t* zigbee_node);
     bool HasCluster(uint16_t zcl_cluster_id);
+    ClusterId GetMatterClusterId(uint16_t zcl_cluster_id);
     uint8_t NodeReadAttributeIdFromClusterId(m2z_device_params_t * zigbee_node, uint16_t zcl_cluster_id, uint16_t zcl_attr_id, uint8_t * buffer, uint16_t maxReadLength);
     uint8_t readAttribute(Device* dev, uint16_t zcl_cluster_id, uint16_t zcl_attr_id);
     uint8_t writeAttribute(Device* dev, uint16_t zcl_cluster_id, uint16_t zcl_attr_id, uint8_t * buffer);
@@ -109,6 +110,7 @@ private:
     std::string GetLocation(m2z_device_params_t* zigbee_node);
     std::string GetEndpointDeviceId(m2z_device_params_t* zigbee_node);
     bool NodeReadAllAttributes(m2z_device_params_t* zigbee_node);
+    void BasicClusterForceAttributesRead(zb_uint8_t device_index, zb_uint8_t endpoint_index, m2z_device_cluster_t *cluster);
     std::string GetSupportedClusterString();
     DeviceCallback_fn mChanged_CB;
     bool mOn;

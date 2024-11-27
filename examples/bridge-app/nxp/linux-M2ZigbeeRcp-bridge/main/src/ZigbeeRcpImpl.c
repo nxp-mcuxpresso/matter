@@ -340,7 +340,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
     if( cmd_info -> cmd_direction == ZB_ZCL_FRAME_DIRECTION_TO_SRV )
     {
         WCS_TRACE_DBGREL("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_SRV from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %d:(%s)"
-            , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->cmd_id));
+            , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->is_common_command, cmd_info->cluster_id,cmd_info->cmd_id));
         switch( cmd_info->cmd_id)
         {
             case ZB_ZCL_CMD_READ_ATTRIB:
@@ -382,7 +382,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
     else if (cmd_info->cmd_direction == ZB_ZCL_FRAME_DIRECTION_TO_CLI)
     {
         WCS_TRACE_DBGREL("%s: Got ZB_ZCL_FRAME_DIRECTION_TO_CLI from 0x%x -> Endpoint: %d Cluster 0x%04x:(%s) Command %hd:(%s)"
-            , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->cmd_id));
+            , __FUNCTION__, dst_addr, dst_ep, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), cmd_info->cmd_id, get_cmd_id_str(cmd_info->is_common_command, cmd_info->cluster_id, cmd_info->cmd_id));
         switch( cmd_info->cmd_id)
         {
             case ZB_ZCL_CMD_READ_ATTRIB_RESP:
@@ -400,7 +400,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                       zb_uint8_t attr_size = zb_zcl_get_attribute_size(read_attr_resp->attr_type, &(read_attr_resp->attr_value[0]));
                       zb_uint8_t attr_array[32];
                       WCS_TRACE_DBGREL("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: %d attr_type: 0x%04x attr_size: %d attr_value[0]: 0x%x"
-                        , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), read_attr_resp->attr_id, read_attr_resp->status, read_attr_resp->attr_type, attr_size, read_attr_resp->attr_value[0]);
+                        , __FUNCTION__, get_cmd_id_str(cmd_info->is_common_command, cmd_info->cluster_id, cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), read_attr_resp->attr_id, read_attr_resp->status, read_attr_resp->attr_type, attr_size, read_attr_resp->attr_value[0]);
                       dev_idx = m2z_dev_get_index_by_short_addr(dst_addr);
                       ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(dst_addr, dst_ep);
                       cluster_idx = m2z_dev_get_cluster_idx_by_short_addr_and_ep_id_and_cluster_id(dst_addr, dst_ep, cmd_info->cluster_id);
@@ -469,7 +469,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                 if (write_attr_resp)
                 {
                     WCS_TRACE_DBGREL("%s: Got %s -> Cluster 0x%04x:(%s) attr_id: 0x%04x status: 0x%x "
-                    , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), write_attr_resp->attr_id, write_attr_resp->status);
+                    , __FUNCTION__, get_cmd_id_str(cmd_info->is_common_command, cmd_info->cluster_id, cmd_info->cmd_id), cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), write_attr_resp->attr_id, write_attr_resp->status);
                     dev_idx = m2z_dev_get_index_by_short_addr(dst_addr);
                     ep_idx = m2z_dev_get_ep_idx_by_short_addr_and_ep_id(dst_addr, dst_ep);
                     cluster_idx = m2z_dev_get_cluster_idx_by_short_addr_and_ep_id_and_cluster_id(dst_addr, dst_ep, cmd_info->cluster_id);
@@ -509,7 +509,7 @@ zb_uint8_t zcl_specific_cluster_cmd_handler(zb_uint8_t param)
                 g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[cluster_idx].pending_command = false;
 
                 WCS_TRACE_DBGREL("%s: Got %s -> Dev: %d Endpoint: %d Cluster 0x%04x:(%s) command_id 0x%x status: 0x%x"
-                    , __FUNCTION__, get_cmd_id_str(cmd_info->cmd_id), dev_idx, ep_idx, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), default_resp->command_id, default_resp->status);
+                    , __FUNCTION__, get_cmd_id_str(cmd_info->is_common_command, cmd_info->cluster_id, cmd_info->cmd_id), dev_idx, ep_idx, cmd_info->cluster_id, get_cluster_id_str(cmd_info->cluster_id), default_resp->command_id, default_resp->status);
                 
             break;
 

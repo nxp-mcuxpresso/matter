@@ -425,7 +425,10 @@ void BridgeDevMgr::AddNewZigbeeNode(m2z_device_params_t* zigbee_node)
             }
             for ( zb_uint16_t attr_idx = DUMMY_ENDPOINT_2_FIRST_CLUSTER_INDEX; attr_idx < GENERATED_CLUSTER_COUNT; attr_idx++)
             {
-                if (generatedClusters[attr_idx].clusterId == zigbee_node->endpoints[i].ep_cluster[j].cluster_id)
+                // get the Matter clusterId from the Zigbee clusterId
+                ClusterId clusterId = DiscoveredDevice->GetMatterClusterId(zigbee_node->endpoints[i].ep_cluster[j].cluster_id);
+                
+                if (generatedClusters[attr_idx].clusterId == clusterId)
                 {
                     ChipLogProgress(DeviceLayer, "\t---> matter-zigbee-bridge: %s : Found GENERATED_CLUSTERS clusterId: %d == zigbee_node->endpoints[%d].ep_cluster[%d].cluster_id: %d",__FUNCTION__, generatedClusters[attr_idx].clusterId,
                                     i ,j, zigbee_node->endpoints[i].ep_cluster[j].cluster_id);
@@ -772,17 +775,49 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
 
 Protocols::InteractionModel::Status BridgeDevMgr::HandleReadAttribute(Device * dev, ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : %s: attrId=%d, maxReadLength=%d",__FUNCTION__, attributeId,
+    chip::AttributeId translated_attributeId = attributeId;
+    
+    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : %s: attrId=%d, maxReadLength=%d",__FUNCTION__, translated_attributeId,
                     maxReadLength);
 
-    // if clusterId is BridgedDeviceBasicInformation::Id, Zigbee clusterId should be 0x0 (the Basic Zigbee cluster)
+    // if clusterId is BridgedDeviceBasicInformation::Id
     if(clusterId == BridgedDeviceBasicInformation::Id)
     {
+        // Zigbee clusterId should be 0x0 (the Basic Zigbee cluster)
         clusterId = 0;
+        // a translation is also required from Matter to Zigbee attribute ID
+        switch(attributeId)
+        {
+			case chip::app::Clusters::BasicInformation::Attributes::DataModelRevision::Id: 		translated_attributeId = ZB_ZCL_ATTR_BASIC_ZCL_VERSION_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::VendorName::Id: 			translated_attributeId = ZB_ZCL_ATTR_BASIC_MANUFACTURER_NAME_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::VendorID::Id: 				translated_attributeId = 0xFF;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ProductName::Id: 			translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ProductID::Id: 				translated_attributeId = ZB_ZCL_ATTR_BASIC_PRODUCT_CODE_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::NodeLabel::Id: 				translated_attributeId = ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::Location::Id: 				translated_attributeId = ZB_ZCL_ATTR_BASIC_LOCATION_DESCRIPTION_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::HardwareVersion::Id: 		translated_attributeId = ZB_ZCL_ATTR_BASIC_HW_VERSION_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::HardwareVersionString::Id: 	translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::SoftwareVersion::Id: 		translated_attributeId = ZB_ZCL_ATTR_BASIC_SW_BUILD_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::SoftwareVersionString::Id:	translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ManufacturingDate::Id: 		translated_attributeId = ZB_ZCL_ATTR_BASIC_DATE_CODE_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::PartNumber::Id: 			translated_attributeId = ZB_ZCL_ATTR_BASIC_MANUFACTURER_VERSION_DETAILS_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ProductURL::Id: 			translated_attributeId = ZB_ZCL_ATTR_BASIC_PRODUCT_URL_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ProductLabel::Id: 			translated_attributeId = ZB_ZCL_ATTR_BASIC_PRODUCT_LABEL_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::SerialNumber::Id: 			translated_attributeId = ZB_ZCL_ATTR_BASIC_SERIAL_NUMBER_ID;break;
+			case chip::app::Clusters::BasicInformation::Attributes::LocalConfigDisabled::Id: 	translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::Reachable::Id: 				translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::UniqueID::Id: 				translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::CapabilityMinima::Id: 		translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::ProductAppearance::Id: 		translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::SpecificationVersion::Id: 	translated_attributeId = 0xff;break;
+			case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id: 		translated_attributeId = 0xff;break;
+			//case chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id: 		translated_attributeId = 0xff;break;
+		}
+        
     }
-    dev->readAttribute(dev, (uint16_t)clusterId, (uint16_t)attributeId);
+    dev->readAttribute(dev, (uint16_t)clusterId, (uint16_t)translated_attributeId);
     usleep(COMMAND_COMPLETED_TIME_MS * 1000);
-    dev->NodeReadAttributeIdFromClusterId(dev->GetZigbeeRcp(), (uint16_t)clusterId, (uint16_t)attributeId, buffer, maxReadLength);
+    dev->NodeReadAttributeIdFromClusterId(dev->GetZigbeeRcp(), (uint16_t)clusterId, (uint16_t)translated_attributeId, buffer, maxReadLength);
     //if ((attributeId == OnOff::Attributes::OnOff::Id) && (maxReadLength == 1))
     //{
         //*buffer = dev->IsOn() ? 1 : 0;

@@ -72,6 +72,21 @@ uint8_t Device::NodeReadAttributeIdFromClusterId(m2z_device_params_t * zigbee_no
     {
         attribute = &(zigbee_node->endpoints[ep_id].ep_cluster[cluster_id].attribute[attr_id]);
         memcpy(buffer, &(attribute->attr_value_array), maxReadLength);
+
+		// workarround for different attributes type between Matter and Zigbee
+		if(zcl_cluster_id == ZB_ZCL_CLUSTER_ID_BASIC)
+		{
+			switch(zcl_attr_id)
+			{
+				case ZB_ZCL_ATTR_BASIC_PRODUCT_URL_ID:
+					for ( zb_uint8_t attr_size=buffer[0]; attr_size >= 1; attr_size--)
+					{
+						buffer[attr_size+1] = buffer[attr_size];
+					}
+					buffer[1] = 0;
+				break;
+			}
+		}
         return (0);
     }
     return (0xFF);
@@ -125,6 +140,96 @@ uint8_t Device::GetEndpointClusterAttributeIndexesForClusterAttrId(m2z_device_pa
     return attribute_match;
 }
 
+void Device::BasicClusterForceAttributesRead(zb_uint8_t device_index, zb_uint8_t endpoint_index, m2z_device_cluster_t *cluster)
+{
+	ChipLogProgress(DeviceLayer, " %s Found BASIC cluster, artificially do as if we discovered the whole Cluster !", __FUNCTION__);
+	cluster->num_attrs = 15;
+
+	for(zb_uint8_t attr_idx=0; attr_idx < cluster->num_attrs; attr_idx++)
+	{
+		zb_uint8_t zcl_attr_id;
+		zb_zcl_attr_type_t zcl_attr_data_type;
+		switch(attr_idx){
+			case 0:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_ZCL_VERSION_ID;
+				zcl_attr_data_type = 0x20;
+			break;
+			case 1:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_APPLICATION_VERSION_ID;
+				zcl_attr_data_type = 0x20;
+			break;
+			case 2:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_STACK_VERSION_ID;
+				zcl_attr_data_type = 0x20;
+			break;
+			case 3:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_HW_VERSION_ID;
+				zcl_attr_data_type = 0x20;
+			break;
+			case 4:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_MANUFACTURER_NAME_ID;
+				zcl_attr_data_type = 0x42;
+			break;
+			case 5:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID;
+				zcl_attr_data_type = 0x42;
+			break;
+			case 6:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_DATE_CODE_ID;
+				zcl_attr_data_type = 0x42;
+			break;
+			case 7:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_POWER_SOURCE_ID;
+				zcl_attr_data_type = 0x30;
+			break;
+			case 8:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_GENERIC_DEVICE_CLASS_ID;
+				zcl_attr_data_type = 0x30;
+			break;
+			case 9:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_GENERIC_DEVICE_TYPE_ID;
+				zcl_attr_data_type = 0x30;
+			break;
+			case 10:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_PRODUCT_CODE_ID;
+				zcl_attr_data_type = 0x41;
+			break;
+			case 11:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_PRODUCT_URL_ID;
+				zcl_attr_data_type = 0x42;
+			break;
+			case 12:
+				zcl_attr_id = ZB_ZCL_ATTR_BASIC_SW_BUILD_ID;
+				zcl_attr_data_type = 0x42;
+			break;
+			case 13:
+				zcl_attr_id = 0xfffc;
+				zcl_attr_data_type = 0x1b;
+			break;
+			case 14:
+				zcl_attr_id = 0xfffd;
+				zcl_attr_data_type = 0x21;
+			break;
+
+		}
+		cluster->attribute[attr_idx].attr_state = DISCOVERED_ATTR;
+		cluster->attribute[attr_idx].attr_id = zcl_attr_id;
+		cluster->attribute[attr_idx].attr_type = zcl_attr_data_type;
+
+		cluster->attribute[attr_idx].read_req.dev_idx = device_index;
+		cluster->attribute[attr_idx].read_req.zed_ep = endpoint_index;
+		cluster->attribute[attr_idx].read_req.zc_ep = MATTER_ZIGBEERCP_BRIDGE_ENDPOINT;
+		cluster->attribute[attr_idx].read_req.cluster_id = cluster->cluster_id;
+		cluster->attribute[attr_idx].read_req.attr_id = zcl_attr_id;
+
+		cluster->attribute[attr_idx].write_req.dev_idx = device_index;
+		cluster->attribute[attr_idx].write_req.zed_ep = endpoint_index;
+		cluster->attribute[attr_idx].write_req.zc_ep = MATTER_ZIGBEERCP_BRIDGE_ENDPOINT;
+		cluster->attribute[attr_idx].write_req.cluster_id = cluster->cluster_id;
+		cluster->attribute[attr_idx].write_req.attr_id = zcl_attr_id;
+		cluster->attribute[attr_idx].write_req.attr_type = zcl_attr_data_type;
+	}
+}
 bool Device::NodeReadAllAttributes(m2z_device_params_t* zigbee_node)
 {
     m2z_device_ep_t *endpoint = NULL;
@@ -138,6 +243,11 @@ bool Device::NodeReadAllAttributes(m2z_device_params_t* zigbee_node)
         for( zb_uint8_t cluster_idx=0; cluster_idx < (endpoint->num_in_clusters + endpoint->num_out_clusters); cluster_idx++)
         {
             cluster = &(endpoint->ep_cluster[cluster_idx]);
+            // if this Zigbee device didn't answer to DiscoverAttribute request, force the Basic Cluster attributes read
+            if(cluster->cluster_id == ZB_ZCL_CLUSTER_ID_BASIC && cluster->num_attrs == 0)
+            {
+				BasicClusterForceAttributesRead(zigbee_node->dev_index, ep_idx, cluster);
+			}
             for ( zb_uint8_t attr_idx=0; attr_idx < cluster->num_attrs; attr_idx++)
             {
                 attribute = &(cluster->attribute[attr_idx]);
@@ -330,6 +440,224 @@ void Device::DiscoverNode(m2z_device_params_t* zigbee_node){
     this->SetName((manuf_name + "-" + model_name + "@" + std::to_string(zigbee_node->short_addr)).c_str());
     this->SetLocation(location);
     this->SetEndpointDeviceId(device_id);
+}
+
+ClusterId Device::GetMatterClusterId(uint16_t zcl_cluster_id)
+{
+
+	switch(zcl_cluster_id)
+	{
+        case ZB_ZCL_CLUSTER_ID_BASIC:
+            return( BasicInformation::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_POWER_CONFIG:
+            return( PowerSourceConfiguration::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DEVICE_TEMP_CONFIG:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_IDENTIFY:
+        return( Identify::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_GROUPS:
+            return( Groups::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_SCENES:
+            return( ScenesManagement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ON_OFF:
+            return( OnOff::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL:
+            return( LevelControl::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ALARMS:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_TIME:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_RSSI_LOCATION:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ANALOG_INPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ANALOG_OUTPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ANALOG_VALUE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_BINARY_INPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_BINARY_OUTPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_BINARY_VALUE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_MULTI_INPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_MULTI_OUTPUT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_MULTI_VALUE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_COMMISSIONING:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_OTA_UPGRADE:
+            return( OtaSoftwareUpdateRequestor::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_POLL_CONTROL:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_GREEN_POWER:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_KEEP_ALIVE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_SHADE_CONFIG:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DOOR_LOCK:
+            return( DoorLock::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_WINDOW_COVERING:
+            return( WindowCovering::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_PUMP_CONFIG_CONTROL:
+            return( PumpConfigurationAndControl::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_THERMOSTAT:
+            return( Thermostat::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_FAN_CONTROL:
+            return( FanControl::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DEHUMID_CONTROL:
+			return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_THERMOSTAT_UI_CONFIG:
+            return( ThermostatUserInterfaceConfiguration::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_COLOR_CONTROL:
+            return( ColorControl::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_BALLAST_CONFIG:
+            return( BallastConfiguration::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ILLUMINANCE_MEASUREMENT:
+            return( IlluminanceMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_TEMP_MEASUREMENT:
+            return( TemperatureMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_PRESSURE_MEASUREMENT:
+            return( PressureMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_REL_HUMIDITY_MEASUREMENT:
+             return( RelativeHumidityMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_OCCUPANCY_SENSING:
+            return( OccupancySensing::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_CARBON_DIOXIDE_MEASUREMENT:
+            return( CarbonDioxideConcentrationMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_PM2_5_MEASUREMENT:
+            return( Pm25ConcentrationMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_IAS_ZONE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_IAS_ACE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_IAS_WD:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_PRICE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DRLC:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_METERING:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_MESSAGING:
+            return( Messages::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_TUNNELING:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_PREPAYMENT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ENERGY_MANAGEMENT:
+            return( DeviceEnergyManagement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_CALENDAR:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DEVICE_MANAGEMENT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_EVENTS:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_MDU_PAIRING:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_SUB_GHZ:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DAILY_SCHEDULE:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_KEY_ESTABLISHMENT:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_APPLIANCE_EVENTS_AND_ALERTS:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_ELECTRICAL_MEASUREMENT:
+            return( ElectricalPowerMeasurement::Id);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DIAGNOSTICS:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_WWAH:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_TOUCHLINK_COMMISSIONING:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_TUNNEL:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_IR_BLASTER:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_METER_IDENTIFICATION:
+            return(0xFFFF);
+        break;
+        case ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION:
+            return(0xFFFF);
+        break;
+	}
 }
 
 bool Device::HasCluster(uint16_t zcl_cluster_id)
