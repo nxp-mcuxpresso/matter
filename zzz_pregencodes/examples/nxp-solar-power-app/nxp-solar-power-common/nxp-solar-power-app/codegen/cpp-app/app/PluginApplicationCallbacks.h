@@ -1,0 +1,66 @@
+#pragma once
+void MatterAccessControlPluginServerInitCallback();
+void MatterAdministratorCommissioningPluginServerInitCallback();
+void MatterBasicInformationPluginServerInitCallback();
+void MatterBindingPluginServerInitCallback();
+void MatterDescriptorPluginServerInitCallback();
+void MatterDeviceEnergyManagementPluginServerInitCallback();
+void MatterDeviceEnergyManagementModePluginServerInitCallback();
+void MatterDiagnosticLogsPluginServerInitCallback();
+void MatterElectricalEnergyMeasurementPluginServerInitCallback();
+void MatterElectricalPowerMeasurementPluginServerInitCallback();
+void MatterEnergyEvsePluginServerInitCallback();
+void MatterEnergyEvseModePluginServerInitCallback();
+void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
+void MatterFixedLabelPluginServerInitCallback();
+void MatterGeneralCommissioningPluginServerInitCallback();
+void MatterGeneralDiagnosticsPluginServerInitCallback();
+void MatterGroupKeyManagementPluginServerInitCallback();
+void MatterIdentifyPluginServerInitCallback();
+void MatterLocalizationConfigurationPluginServerInitCallback();
+void MatterNetworkCommissioningPluginServerInitCallback();
+void MatterOperationalCredentialsPluginServerInitCallback();
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
+void MatterPowerSourcePluginServerInitCallback();
+void MatterPowerTopologyPluginServerInitCallback();
+void MatterSoftwareDiagnosticsPluginServerInitCallback();
+void MatterTimeFormatLocalizationPluginServerInitCallback();
+void MatterUnitLocalizationPluginServerInitCallback();
+void MatterUserLabelPluginServerInitCallback();
+void MatterWaterHeaterManagementPluginServerInitCallback();
+void MatterWaterHeaterModePluginServerInitCallback();
+void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+
+#define MATTER_PLUGINS_INIT \
+    MatterAccessControlPluginServerInitCallback(); \
+    MatterAdministratorCommissioningPluginServerInitCallback(); \
+    MatterBasicInformationPluginServerInitCallback(); \
+    MatterBindingPluginServerInitCallback(); \
+    MatterDescriptorPluginServerInitCallback(); \
+    MatterDeviceEnergyManagementPluginServerInitCallback(); \
+    MatterDeviceEnergyManagementModePluginServerInitCallback(); \
+    MatterDiagnosticLogsPluginServerInitCallback(); \
+    MatterElectricalEnergyMeasurementPluginServerInitCallback(); \
+    MatterElectricalPowerMeasurementPluginServerInitCallback(); \
+    MatterEnergyEvsePluginServerInitCallback(); \
+    MatterEnergyEvseModePluginServerInitCallback(); \
+    MatterEthernetNetworkDiagnosticsPluginServerInitCallback(); \
+    MatterFixedLabelPluginServerInitCallback(); \
+    MatterGeneralCommissioningPluginServerInitCallback(); \
+    MatterGeneralDiagnosticsPluginServerInitCallback(); \
+    MatterGroupKeyManagementPluginServerInitCallback(); \
+    MatterIdentifyPluginServerInitCallback(); \
+    MatterLocalizationConfigurationPluginServerInitCallback(); \
+    MatterNetworkCommissioningPluginServerInitCallback(); \
+    MatterOperationalCredentialsPluginServerInitCallback(); \
+    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
+    MatterPowerSourcePluginServerInitCallback(); \
+    MatterPowerTopologyPluginServerInitCallback(); \
+    MatterSoftwareDiagnosticsPluginServerInitCallback(); \
+    MatterTimeFormatLocalizationPluginServerInitCallback(); \
+    MatterUnitLocalizationPluginServerInitCallback(); \
+    MatterUserLabelPluginServerInitCallback(); \
+    MatterWaterHeaterManagementPluginServerInitCallback(); \
+    MatterWaterHeaterModePluginServerInitCallback(); \
+    MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+
