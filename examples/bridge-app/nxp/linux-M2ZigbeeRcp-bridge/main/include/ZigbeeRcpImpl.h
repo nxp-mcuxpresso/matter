@@ -20,8 +20,8 @@
 #define MATTER_ZIGBEERCP_BRIDGE_INVALID_DEV_INDEX 0xff
 #define MATTER_ZIGBEERCP_BRIDGE_INVALID_EP_INDEX  0xff
 #define MATTER_ZIGBEERCP_BRIDGE_DEV_NUMBER 255
-#define MATTER_ZIGBEERCP_BRIDGE_MAX_EP_PER_DEV 4
-#define MATTER_ZIGBEERCP_BRIDGE_MAX_CLUSTERS_PER_EP 16
+#define MATTER_ZIGBEERCP_BRIDGE_MAX_EP_PER_DEV 8
+#define MATTER_ZIGBEERCP_BRIDGE_MAX_CLUSTERS_PER_EP 32
 #define MATTER_ZIGBEERCP_BRIDGE_MAX_ATTRS_PER_CLUSTER 64
 #define MATTER_ZIGBEERCP_BRIDGE_TOGGLE_ITER_TIMEOUT (5*ZB_TIME_ONE_SECOND)
 #define MATTER_ZIGBEERCP_BRIDGE_RANDOM_TIMEOUT_VAL (15)
@@ -123,6 +123,7 @@ typedef ZB_PACKED_PRE struct m2z_device_cluster_attr_s {
 /* Attributes of a Cluster of a joined device */
 typedef ZB_PACKED_PRE struct m2z_device_cluster_s {
     zb_uint16_t cluster_id;
+    bool in_cluster;
     zb_uint8_t disc_attrs_state;
     zb_uint8_t num_attrs;
     m2z_device_cluster_attr_t attribute[MATTER_ZIGBEERCP_BRIDGE_MAX_ATTRS_PER_CLUSTER];
@@ -307,6 +308,7 @@ void configure_reporting_cb(zb_uint8_t param);
 zb_uint16_t m2z_dev_get_index_by_state(zb_uint8_t dev_state);
 zb_uint16_t m2z_dev_get_index_by_short_addr(zb_uint16_t short_addr);
 zb_uint16_t m2z_dev_get_index_by_ieee_addr(zb_ieee_addr_t ieee_addr);
+
 zb_uint16_t m2z_dev_get_ep_idx_by_short_addr_and_ep_id(zb_uint16_t short_addr, zb_uint16_t ep_id);
 zb_uint16_t m2z_dev_get_ep_id_by_short_addr_and_cluster_id(zb_uint16_t short_addr, zb_uint16_t cluster_id);
 zb_uint16_t m2z_dev_get_cluster_idx_by_short_addr_and_ep_id_and_cluster_id(zb_uint16_t short_addr, zb_uint16_t ep_id, zb_uint16_t cluster_id);

@@ -66,7 +66,7 @@ void BridgeActions::unregist()
 
 int BridgeActions::handle(uint16_t actionID, EndpointId endpointID, uint32_t invokeID, bool hasInvokeID, BridgeDevMgr* gDevMgr)
 {
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : BridgeActions::handle: actionID: 0x%x endpointID: 0x%x ", actionID, endpointID);
+    ChipLogProgress(DeviceLayer, " --> M2Z-Br : BridgeActions::handle: actionID: 0x%x endpointID: 0x%x ", actionID, endpointID);
     
     if (actionID == ActionList[0]->getActionId() && ActionList[0]->getIsVisible())
     {
@@ -123,7 +123,7 @@ void BridgeActions::PermitJoinAction(bool actionOn, EndpointId endpointId, uint1
     }
 
     // Open Bridge permit join
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : BridgeActions::PermitJoinAction: actionOn: 0x%x endpointId: 0x%x actionID: 0x%x ", actionOn, endpointId, actionID);
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br : BridgeActions::PermitJoinAction: actionOn: 0x%x endpointId: 0x%x actionID: 0x%x ", actionOn, endpointId, actionID);
     if(actionOn)
     {
         m2z_schedule_request_bdb_start_commissioning();

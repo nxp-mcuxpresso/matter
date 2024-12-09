@@ -142,7 +142,7 @@ uint8_t Device::GetEndpointClusterAttributeIndexesForClusterAttrId(m2z_device_pa
 
 void Device::BasicClusterForceAttributesRead(zb_uint8_t device_index, zb_uint8_t endpoint_index, m2z_device_cluster_t *cluster)
 {
-	ChipLogProgress(DeviceLayer, " %s Found BASIC cluster, artificially do as if we discovered the whole Cluster !", __FUNCTION__);
+	ChipLogProgress(DeviceLayer, " -> M2Z-Br %s Found BASIC cluster, artificially do as if we discovered the whole Cluster !", __FUNCTION__);
 	cluster->num_attrs = 15;
 
 	for(zb_uint8_t attr_idx=0; attr_idx < cluster->num_attrs; attr_idx++)
@@ -237,6 +237,7 @@ bool Device::NodeReadAllAttributes(m2z_device_params_t* zigbee_node)
     m2z_device_cluster_attr_t *attribute = NULL;
     bool attr_to_read = false;
     
+	ChipLogProgress(DeviceLayer, " -> M2Z-Br %s IN ", __FUNCTION__);
     for( zb_uint8_t ep_idx=0; ep_idx < zigbee_node->endpoint; ep_idx++)
     {
         endpoint=&(zigbee_node->endpoints[ep_idx]);
@@ -254,12 +255,13 @@ bool Device::NodeReadAllAttributes(m2z_device_params_t* zigbee_node)
                 if(attribute->attr_state == DISCOVERED_ATTR)
                 {
                     m2z_schedule_read_attribute(zigbee_node, cluster->cluster_id, attribute->read_req.attr_id);
-                    usleep(COMMAND_COMPLETED_TIME_MS * 200);
+                    usleep(COMMAND_COMPLETED_TIME_MS * 400);
                     attr_to_read = true;
                 }
             }
         }
     }
+	ChipLogProgress(DeviceLayer, " -> M2Z-Br %s OUT ", __FUNCTION__);
     return(attr_to_read);
 }
 
@@ -423,6 +425,8 @@ void Device::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
 
 void Device::DiscoverNode(m2z_device_params_t* zigbee_node){
     
+	ChipLogProgress(DeviceLayer, " -> M2Z-Br %s IN", __FUNCTION__);
+
     bool attrs_to_read = this->NodeReadAllAttributes(zigbee_node);
     if (!attrs_to_read)
     {
@@ -437,9 +441,10 @@ void Device::DiscoverNode(m2z_device_params_t* zigbee_node){
     std::string model_name = this->GetModelIdentifier(zigbee_node);
     std::string location = this->GetLocation(zigbee_node);
     std::string device_id = this->GetEndpointDeviceId(zigbee_node);
-    this->SetName((manuf_name + "-" + model_name + "@" + std::to_string(zigbee_node->short_addr)).c_str());
+    this->SetName(("ZED_" + manuf_name + "-" + model_name + "@" + std::to_string(zigbee_node->short_addr)).c_str());
     this->SetLocation(location);
     this->SetEndpointDeviceId(device_id);
+	ChipLogProgress(DeviceLayer, " -> M2Z-Br %s OUT", __FUNCTION__);
 }
 
 ClusterId Device::GetMatterClusterId(uint16_t zcl_cluster_id)
@@ -968,11 +973,11 @@ void Device::SetReachable(bool aReachable)
 
     if (aReachable)
     {
-        ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : Device[%s]: ONLINE", mName.c_str());
+        ChipLogProgress(DeviceLayer, " -> M2Z-Br %s : Device[%s]: ONLINE", __FUNCTION__, mName.c_str());
     }
     else
     {
-        ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : Device[%s]: OFFLINE", mName.c_str());
+        ChipLogProgress(DeviceLayer, " -> M2Z-Br %s : Device[%s]: OFFLINE", __FUNCTION__, mName.c_str());
     }
 
     if (changed)
@@ -984,7 +989,7 @@ void Device::SetReachable(bool aReachable)
 void Device::SetName(std::string szName)
 {
     bool changed = (mName.compare(szName) != 0);
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : Device[%s]: New Name=\"%s\"", mName.c_str(), szName.c_str());
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br %s : Device[%s]: New Name=\"%s\"", __FUNCTION__, mName.c_str(), szName.c_str());
     mName = szName;
 
     if (changed)
@@ -999,7 +1004,7 @@ void Device::SetLocation(std::string szLocation)
 
     mLocation = szLocation;
 
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : Device[%s]: Location=\"%s\"", mName.c_str(), mLocation.c_str());
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br %s : Device[%s]: Location=\"%s\"", __FUNCTION__, mName.c_str(), mLocation.c_str());
 
     if (changed)
     {
@@ -1010,7 +1015,7 @@ void Device::SetLocation(std::string szLocation)
 void Device::SetEndpointDeviceId(std::string szDeviceId)
 {
     mEpDeviceId = szDeviceId;
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : Device[%s]: DeviceId=\"%s\"", mName.c_str(), mEpDeviceId.c_str());
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br %s : Device[%s]: DeviceId=\"%s\"", __FUNCTION__, mName.c_str(), mEpDeviceId.c_str());
 }
 
 void Device::SetClusters()

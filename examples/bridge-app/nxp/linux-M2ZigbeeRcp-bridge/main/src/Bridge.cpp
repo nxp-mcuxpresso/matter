@@ -37,7 +37,7 @@ Bridge::~Bridge()
     gActions = NULL;
     gDevMgr = NULL;
 
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : free bridge ! \n");
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br : free bridge ! \n");
 }
 
 CHIP_ERROR Bridge::Init()
@@ -86,7 +86,7 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     EndpointId endpointID = commandPath.mEndpointId;
     auto & actionID       = commandData.actionID;
 
-    ChipLogProgress(DeviceLayer, " ---> matter-zigbee-bridge : emberAfActionsClusterInstantActionCallback: ep=%d action=0%x", endpointID,actionID);
+    ChipLogProgress(DeviceLayer, " -> M2Z-Br : emberAfActionsClusterInstantActionCallback: ep=%d action=0%x", endpointID,actionID);
     if (commandData.invokeID.HasValue())
     {
         hasInvokeID = true;

@@ -291,7 +291,7 @@ void m2z_impl_init()
 
 void * m2z_impl_ZigbeeRcpMonitor(void * context)
 {
-    WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : BridgeDevMgr::ZigbeeRcpMonitor is running !!!\n");
+    WCS_TRACE_DBGREL(" -> %s :ZigbeeRcpMonitor is running \n", __FUNCTION__);
     if (zboss_start_no_autostart() != RET_OK)
     {
         WCS_TRACE_DBGREL("zboss_start failed");
@@ -309,7 +309,7 @@ int m2z_impl_start_threads()
     int res = pthread_create(&ZigbeeRcpMonitor_thread, NULL, m2z_impl_ZigbeeRcpMonitor, NULL);
     if (res)
     {
-        WCS_TRACE_DBGREL(" ---> matter-zigbee-bridge : Error creating polling thread: %d\n", res);
+        WCS_TRACE_DBGREL(" -> %s : Error creating polling thread: %d\n", __FUNCTION__, res);
         return -1;
     }
 
@@ -1190,20 +1190,22 @@ void m2z_request_attr_disc(zb_bufid_t param, zb_uint16_t dev_idx)
   {
     for ( zb_uint16_t j = 0; j < (dev->endpoints[i].num_in_clusters + dev->endpoints[i].num_out_clusters); j++)
     {
-      /* Break if a cluster with no know attributes is found */
-      if(dev->endpoints[i].ep_cluster[j].disc_attrs_state == NO_DISC_ATTRS_INFO)
+      /* Break if a IN cluster with no know attributes is found */
+      if(dev->endpoints[i].ep_cluster[j].in_cluster)
       {
-        ep_idx = i;
-        ep_cluster_idx = j;
-        found_cluster_ep = 1;
-        break;
-      }
-      if(j == (dev->endpoints[i].num_in_clusters + dev->endpoints[i].num_out_clusters - 1) )
-      {
-          // this cluster has no more attributes to be discovered
-          dev->endpoints[i].ep_cluster[j].disc_attrs_state = KNOWN_DISC_ATTRS;
-      }
-
+		  if(dev->endpoints[i].ep_cluster[j].disc_attrs_state == NO_DISC_ATTRS_INFO)
+		  {
+			ep_idx = i;
+			ep_cluster_idx = j;
+			found_cluster_ep = 1;
+			break;
+		  }
+		  if(j == (dev->endpoints[i].num_in_clusters + dev->endpoints[i].num_out_clusters - 1) )
+		  {
+			  // this cluster has no more attributes to be discovered
+			  dev->endpoints[i].ep_cluster[j].disc_attrs_state = KNOWN_DISC_ATTRS;
+		  }
+	  }
     }
     if(found_cluster_ep)
       break;
@@ -1507,8 +1509,17 @@ void m2z_callback_dev_simple_desc(zb_bufid_t param)
             for(i = 0; i < (resp->simple_desc.app_input_cluster_count + resp->simple_desc.app_output_cluster_count); i++)
             {
               g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[i].cluster_id = *(resp->simple_desc.app_cluster_list + i);
+              /* tag the cluster as IN or OUT cluster */
+              if(i < resp->simple_desc.app_input_cluster_count)
+              {
+				  g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[i].in_cluster = true;
+			  }
+			  else
+			  {
+				  g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[i].in_cluster = false;
+			  }
               m2z_update_endpoint_supported_clusters((m2z_device_params_t *)(&(g_device_ctx.devices[dev_idx])), *(resp->simple_desc.app_cluster_list + i));
-              WCS_TRACE_DBGREL("%s: 0x%hx -> %s",__FUNCTION__,  *(resp->simple_desc.app_cluster_list + i), get_cluster_id_str(*(resp->simple_desc.app_cluster_list + i)));
+              WCS_TRACE_DBGREL("%s: %s:0x%hx -> %s",__FUNCTION__,  (g_device_ctx.devices[dev_idx].endpoints[ep_idx].ep_cluster[i].in_cluster?"IN":"OUT"), *(resp->simple_desc.app_cluster_list + i), get_cluster_id_str(*(resp->simple_desc.app_cluster_list + i)));
             }
 
             /* For each cluster request info of their attributes */
